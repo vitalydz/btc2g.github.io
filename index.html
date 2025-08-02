@@ -19,7 +19,16 @@
 </head>
 <body>
   <h1>Bitcoin vs Gold Forecast</h1>
-  <p>From 2016 to {{текущая дата}}, with projection to 2030</p>
+  <p>From 2016 to <span id="current-date"></span>, with projection to 2030</p>
   <img src="btc_gold_forecast.png" alt="BTC vs Gold Forecast" />
+
+  <script>
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const formattedDate = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('current-date').textContent = formattedDate;
+  </script>
 </body>
 </html>
