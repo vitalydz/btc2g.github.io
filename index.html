@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BTC2G - Bitcoin vs Gold Forecast</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -13,7 +13,6 @@
       margin: 0;
       padding: 20px;
     }
-
     .container {
       max-width: 900px;
       margin: auto;
@@ -22,29 +21,24 @@
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     }
-
     h1 {
       font-size: 2em;
       color: #333;
       margin-bottom: 10px;
     }
-
     p {
       font-size: 1.1em;
       color: #555;
     }
-
     img {
       max-width: 100%;
       height: auto;
       border-radius: 8px;
       margin-top: 20px;
     }
-
     .lang-switch {
       margin-top: 20px;
     }
-
     .lang-switch button {
       margin: 5px;
       padding: 8px 12px;
@@ -54,11 +48,9 @@
       cursor: pointer;
       font-weight: bold;
     }
-
     .lang-switch button:hover {
       background: #ccc;
     }
-
     .moonpay-btn {
       display: inline-block;
       margin-top: 25px;
@@ -68,35 +60,21 @@
       text-decoration: none;
       font-weight: bold;
       border-radius: 6px;
+      cursor: pointer;
       transition: background 0.3s;
+      user-select: none;
     }
-
     .moonpay-btn:hover {
       background-color: #2a4fcc;
-    }
-
-    footer {
-      margin-top: 40px;
-      padding: 20px 10px;
-      font-size: 0.9em;
-      color: #555;
-    }
-
-    footer a {
-      margin: 0 8px;
-      color: #3c67e3;
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 id="title">Bitcoin vs Gold Forecast</h1>
-    <p id="subtitle">From 2016 to <span id="current-date"></span>, with projection to 2030</p>
+    <p id="subtitle">
+      From 2016 to <span id="current-date"></span>, with projection to 2030
+    </p>
 
     <img src="btc_gold_forecast.png" alt="BTC vs Gold Forecast" />
 
@@ -110,21 +88,11 @@
       <button onclick="setLang('zh')">🇨🇳 中文</button>
     </div>
 
-    <a class="moonpay-btn" href="https://buy.moonpay.com" target="_blank" id="moonpay-text">
-      Buy Bitcoin via MoonPay 🚀
-    </a>
+    <button id="moonpay-btn" class="moonpay-btn">Buy Bitcoin via MoonPay 🚀</button>
   </div>
 
-  <footer>
-    <p>
-      <a href="about.html">About</a> |
-      <a href="privacy.html">Privacy Policy</a> |
-      <a href="terms.html">Terms of Service</a>
-    </p>
-    <p>© 2025 BTC2G</p>
-  </footer>
-
-  <script>
+  <script type="module">
+    // Date formatting
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -132,6 +100,7 @@
     const formattedDate = `${yyyy}-${mm}-${dd}`;
     document.getElementById('current-date').textContent = formattedDate;
 
+    // Multilanguage texts
     const texts = {
       en: {
         title: 'Bitcoin vs Gold Forecast',
@@ -167,16 +136,17 @@
         title: '比特币与黄金走势预测',
         subtitle: `从2016年至${formattedDate}，预测至2030年`,
         moonpay: '通过 MoonPay 购买比特币 🚀',
-      }
+      },
     };
 
     function setLang(lang) {
       localStorage.setItem('lang', lang);
       document.getElementById('title').textContent = texts[lang].title;
       document.getElementById('subtitle').textContent = texts[lang].subtitle;
-      document.getElementById('moonpay-text').textContent = texts[lang].moonpay;
+      document.getElementById('moonpay-btn').textContent = texts[lang].moonpay;
     }
 
+    // Auto-detect or load saved language
     const savedLang = localStorage.getItem('lang');
     const browserLang = navigator.language.slice(0, 2).toLowerCase();
     const supportedLangs = Object.keys(texts);
@@ -188,6 +158,34 @@
     } else {
       setLang('en');
     }
+
+    // MoonPay SDK integration
+    import('https://cdn.skypack.dev/@moonpay/moonpay-js').then(({ loadMoonPay }) => {
+      let moonPaySdk;
+
+      loadMoonPay().then((moonPay) => {
+        moonPaySdk = moonPay({
+          flow: 'buy',
+          environment: 'sandbox', // Change to 'production' for real transactions
+          variant: 'overlay',
+          params: {
+            apiKey: 'pk_test_ijI3RIhL31EASrNb8FZK0X5pB8VYigP',
+            theme: 'dark',
+            baseCurrencyCode: 'usd',
+            baseCurrencyAmount: '100',
+            defaultCurrencyCode: 'btc',
+          },
+        });
+      });
+
+      document.getElementById('moonpay-btn').addEventListener('click', () => {
+        if (moonPaySdk) {
+          moonPaySdk.show();
+        } else {
+          alert('MoonPay is still loading, please wait a moment.');
+        }
+      });
+    });
   </script>
 </body>
 </html>
