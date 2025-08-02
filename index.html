@@ -8,20 +8,20 @@
   <style>
     body {
       font-family: 'Roboto', sans-serif;
+      text-align: center;
+      background: linear-gradient(to bottom right, #1e1e1e, #2c2c2c);
       margin: 0;
       padding: 20px;
-      background: #0f111a;
-      color: #f0f0f0;
-      text-align: center;
+      color: #ffffff;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 960px;
       margin: auto;
       padding: 20px;
-      background: #1c1f2a;
+      background: #222;
       border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     }
 
     h1 {
@@ -31,41 +31,33 @@
 
     p {
       font-size: 1.1em;
-      margin: 0 0 20px;
+      margin-bottom: 20px;
     }
 
     img {
       max-width: 100%;
       height: auto;
       border-radius: 8px;
-      margin-top: 20px;
+      background: #444;
     }
 
     .lang-switch {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
       margin-top: 20px;
-      gap: 10px;
-    }
-
-    .lang-switch.direction-fixed {
-      direction: ltr;
     }
 
     .lang-switch button {
+      margin: 5px;
       padding: 8px 12px;
       border: none;
       border-radius: 6px;
-      background: #333a55;
-      color: #f0f0f0;
+      background: #3a3a3a;
+      color: white;
       cursor: pointer;
       font-weight: bold;
-      min-width: 90px;
     }
 
     .lang-switch button:hover {
-      background: #444e6d;
+      background: #555;
     }
 
     .moonpay-btn {
@@ -86,15 +78,13 @@
 
     footer {
       margin-top: 40px;
-      padding: 20px 10px;
       font-size: 0.9em;
-      color: #aaa;
     }
 
     footer a {
-      margin: 0 8px;
-      color: #8ab4f8;
+      color: #87cefa;
       text-decoration: none;
+      margin: 0 10px;
     }
 
     footer a:hover {
@@ -103,13 +93,16 @@
   </style>
 </head>
 <body>
-  <div class="container" id="main-container">
+  <div class="container">
     <h1 id="title">Bitcoin vs Gold Forecast</h1>
     <p id="subtitle">From 2016 to <span id="current-date"></span>, with projection to 2030</p>
 
-    <img src="btc_gold_forecast.png" alt="BTC vs Gold Forecast" />
+    <!-- Image loads by today's date or falls back to latest version -->
+    <img id="forecast-img" src="" alt="BTC vs Gold Forecast"
+         onerror="this.onerror=null; this.src='btc_gold_forecast_latest.png';" />
 
-    <div class="lang-switch direction-fixed">
+    <!-- Language Switch Buttons -->
+    <div class="lang-switch">
       <button onclick="setLang('en')">English</button>
       <button onclick="setLang('ru')">Русский</button>
       <button onclick="setLang('he')">עברית</button>
@@ -119,6 +112,7 @@
       <button onclick="setLang('zh')">中文</button>
     </div>
 
+    <!-- MoonPay Button -->
     <a class="moonpay-btn" href="https://buy.moonpay.com" target="_blank" id="moonpay-text">
       Buy Bitcoin via MoonPay 🚀
     </a>
@@ -138,70 +132,58 @@
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const dd = String(now.getDate()).padStart(2, '0');
-    const formattedDate = `${yyyy}-${mm}-${dd}`;
-    document.getElementById('current-date').textContent = formattedDate;
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('current-date').textContent = todayStr;
+    document.getElementById('forecast-img').src = `btc_gold_forecast_${todayStr}.png`;
 
     const texts = {
       en: {
         title: 'Bitcoin vs Gold Forecast',
-        subtitle: `From 2016 to ${formattedDate}, with projection to 2030`,
+        subtitle: `From 2016 to ${todayStr}, with projection to 2030`,
         moonpay: 'Buy Bitcoin via MoonPay 🚀',
-        dir: 'ltr',
       },
       ru: {
         title: 'Прогноз: Биткоин против Золота',
-        subtitle: `С 2016 по ${formattedDate}, прогноз до 2030 года`,
+        subtitle: `С 2016 по ${todayStr}, прогноз до 2030 года`,
         moonpay: 'Купить Биткоин через MoonPay 🚀',
-        dir: 'ltr',
       },
       he: {
         title: 'תחזית: ביטקוין מול זהב',
-        subtitle: `מ־2016 עד ${formattedDate}, תחזית עד 2030`,
-        moonpay: '🚀 קנה ביטקוין דרך MoonPay',
-        dir: 'rtl',
+        subtitle: `מ־2016 עד ${todayStr}, תחזית עד 2030`,
+        moonpay: 'קנה ביטקוין דרך MoonPay 🚀',
       },
       de: {
         title: 'Bitcoin vs Gold Prognose',
-        subtitle: `Von 2016 bis ${formattedDate}, mit Prognose bis 2030`,
+        subtitle: `Von 2016 bis ${todayStr}, mit Prognose bis 2030`,
         moonpay: 'Bitcoin über MoonPay kaufen 🚀',
-        dir: 'ltr',
       },
       fr: {
         title: 'Prévision Bitcoin contre Or',
-        subtitle: `De 2016 à ${formattedDate}, avec projection jusqu’en 2030`,
+        subtitle: `De 2016 à ${todayStr}, avec projection jusqu’en 2030`,
         moonpay: 'Acheter du Bitcoin via MoonPay 🚀',
-        dir: 'ltr',
       },
       es: {
         title: 'Pronóstico Bitcoin vs Oro',
-        subtitle: `Desde 2016 hasta ${formattedDate}, con proyección hasta 2030`,
+        subtitle: `Desde 2016 hasta ${todayStr}, con proyección hasta 2030`,
         moonpay: 'Comprar Bitcoin con MoonPay 🚀',
-        dir: 'ltr',
       },
       zh: {
         title: '比特币与黄金走势预测',
-        subtitle: `从2016年至${formattedDate}，预测至2030年`,
+        subtitle: `从2016年至${todayStr}，预测至2030年`,
         moonpay: '通过 MoonPay 购买比特币 🚀',
-        dir: 'ltr',
       }
     };
 
     function setLang(lang) {
       localStorage.setItem('lang', lang);
-      const t = texts[lang];
-      document.getElementById('title').textContent = t.title;
-      document.getElementById('subtitle').textContent = t.subtitle;
-      document.getElementById('moonpay-text').textContent = t.moonpay;
-
-      const container = document.getElementById('main-container');
-      const langSwitch = document.querySelector('.lang-switch');
-
-      if (t.dir === 'rtl') {
-        container.setAttribute('dir', 'rtl');
-        langSwitch.classList.add('direction-fixed');
+      const text = texts[lang];
+      document.getElementById('title').textContent = text.title;
+      document.getElementById('subtitle').textContent = text.subtitle;
+      document.getElementById('moonpay-text').textContent = text.moonpay;
+      if (lang === 'he') {
+        document.body.dir = 'rtl';
       } else {
-        container.setAttribute('dir', 'ltr');
-        langSwitch.classList.remove('direction-fixed');
+        document.body.dir = 'ltr';
       }
     }
 
