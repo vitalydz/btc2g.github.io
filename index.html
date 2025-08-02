@@ -74,6 +74,23 @@
     .moonpay-btn:hover {
       background-color: #2a4fcc;
     }
+
+    footer {
+      margin-top: 40px;
+      padding: 20px 10px;
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    footer a {
+      margin: 0 8px;
+      color: #3c67e3;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -97,6 +114,15 @@
       Buy Bitcoin via MoonPay 🚀
     </a>
   </div>
+
+  <footer>
+    <p>
+      <a href="about.html">About</a> |
+      <a href="privacy.html">Privacy Policy</a> |
+      <a href="terms.html">Terms of Service</a>
+    </p>
+    <p>© 2025 BTC2G</p>
+  </footer>
 
   <script>
     const now = new Date();
@@ -151,7 +177,6 @@
       document.getElementById('moonpay-text').textContent = texts[lang].moonpay;
     }
 
-    // Auto-detect or load saved language
     const savedLang = localStorage.getItem('lang');
     const browserLang = navigator.language.slice(0, 2).toLowerCase();
     const supportedLangs = Object.keys(texts);
