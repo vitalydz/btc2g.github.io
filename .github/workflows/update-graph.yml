@@ -1,0 +1,11 @@
+name: Auto Update BTC/Gold Graph
+
+on:
+  workflow_dispatch:  # 👈 manually running
+
+jobs:
+  test-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say hello
+        run: echo "✅ Workflow is running!"
