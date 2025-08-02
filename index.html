@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BTC2G - Bitcoin vs Gold Forecast</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <style>
@@ -12,7 +12,9 @@
       background: linear-gradient(to bottom right, #f1f4f9, #dff1ff);
       margin: 0;
       padding: 20px;
+      transition: background-color 0.3s ease;
     }
+
     .container {
       max-width: 900px;
       margin: auto;
@@ -20,25 +22,35 @@
       background: white;
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
     }
+
     h1 {
       font-size: 2em;
       color: #333;
       margin-bottom: 10px;
+      transition: color 0.3s ease;
     }
+
     p {
       font-size: 1.1em;
       color: #555;
+      transition: color 0.3s ease;
     }
+
     img {
       max-width: 100%;
       height: auto;
       border-radius: 8px;
       margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: box-shadow 0.3s ease;
     }
+
     .lang-switch {
       margin-top: 20px;
     }
+
     .lang-switch button {
       margin: 5px;
       padding: 8px 12px;
@@ -47,10 +59,19 @@
       background: #e0e0e0;
       cursor: pointer;
       font-weight: bold;
+      transition: background-color 0.3s;
     }
+
     .lang-switch button:hover {
       background: #ccc;
     }
+
+    .lang-switch button.active {
+      background: #3c67e3;
+      color: white;
+      cursor: default;
+    }
+
     .moonpay-btn {
       display: inline-block;
       margin-top: 25px;
@@ -60,39 +81,65 @@
       text-decoration: none;
       font-weight: bold;
       border-radius: 6px;
-      cursor: pointer;
       transition: background 0.3s;
-      user-select: none;
     }
+
     .moonpay-btn:hover {
       background-color: #2a4fcc;
+    }
+
+    footer {
+      margin-top: 40px;
+      padding: 20px 10px;
+      font-size: 0.9em;
+      color: #555;
+      user-select: none;
+    }
+
+    footer a {
+      margin: 0 8px;
+      color: #3c67e3;
+      text-decoration: none;
+      transition: text-decoration 0.3s;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 id="title">Bitcoin vs Gold Forecast</h1>
-    <p id="subtitle">
-      From 2016 to <span id="current-date"></span>, with projection to 2030
-    </p>
+    <p id="subtitle">From 2016 to <span id="current-date"></span>, with projection to 2030</p>
 
     <img src="btc_gold_forecast.png" alt="BTC vs Gold Forecast" />
 
-    <div class="lang-switch">
-      <button onclick="setLang('en')">🇺🇸 English</button>
-      <button onclick="setLang('ru')">🇷🇺 Русский</button>
-      <button onclick="setLang('he')">🇮🇱 עברית</button>
-      <button onclick="setLang('de')">🇩🇪 Deutsch</button>
-      <button onclick="setLang('fr')">🇫🇷 Français</button>
-      <button onclick="setLang('es')">🇪🇸 Español</button>
-      <button onclick="setLang('zh')">🇨🇳 中文</button>
+    <div class="lang-switch" aria-label="Language selector">
+      <button onclick="setLang('en')" id="btn-en" aria-pressed="false">🇺🇸 English</button>
+      <button onclick="setLang('ru')" id="btn-ru" aria-pressed="false">🇷🇺 Русский</button>
+      <button onclick="setLang('he')" id="btn-he" aria-pressed="false">🇮🇱 עברית</button>
+      <button onclick="setLang('de')" id="btn-de" aria-pressed="false">🇩🇪 Deutsch</button>
+      <button onclick="setLang('fr')" id="btn-fr" aria-pressed="false">🇫🇷 Français</button>
+      <button onclick="setLang('es')" id="btn-es" aria-pressed="false">🇪🇸 Español</button>
+      <button onclick="setLang('zh')" id="btn-zh" aria-pressed="false">🇨🇳 中文</button>
     </div>
 
-    <button id="moonpay-btn" class="moonpay-btn">Buy Bitcoin via MoonPay 🚀</button>
+    <a class="moonpay-btn" href="https://buy.moonpay.com" target="_blank" id="moonpay-text" rel="noopener noreferrer" aria-label="Buy Bitcoin via MoonPay">
+      Buy Bitcoin via MoonPay 🚀
+    </a>
   </div>
 
-  <script type="module">
-    // Date formatting
+  <footer>
+    <p>
+      <a href="about.html">About</a> |
+      <a href="privacy.html">Privacy Policy</a> |
+      <a href="terms.html">Terms of Service</a>
+    </p>
+    <p>© 2025 BTC2G</p>
+  </footer>
+
+  <script>
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -100,7 +147,6 @@
     const formattedDate = `${yyyy}-${mm}-${dd}`;
     document.getElementById('current-date').textContent = formattedDate;
 
-    // Multilanguage texts
     const texts = {
       en: {
         title: 'Bitcoin vs Gold Forecast',
@@ -136,56 +182,44 @@
         title: '比特币与黄金走势预测',
         subtitle: `从2016年至${formattedDate}，预测至2030年`,
         moonpay: '通过 MoonPay 购买比特币 🚀',
-      },
+      }
     };
 
     function setLang(lang) {
+      if (!texts[lang]) return;
+
       localStorage.setItem('lang', lang);
+
       document.getElementById('title').textContent = texts[lang].title;
       document.getElementById('subtitle').textContent = texts[lang].subtitle;
-      document.getElementById('moonpay-btn').textContent = texts[lang].moonpay;
+      document.getElementById('moonpay-text').textContent = texts[lang].moonpay;
+
+      // Update active button style and aria-pressed
+      document.querySelectorAll('.lang-switch button').forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
+      });
+      const activeBtn = document.getElementById(`btn-${lang}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.setAttribute('aria-pressed', 'true');
+      }
     }
 
-    // Auto-detect or load saved language
-    const savedLang = localStorage.getItem('lang');
-    const browserLang = navigator.language.slice(0, 2).toLowerCase();
-    const supportedLangs = Object.keys(texts);
+    // Initialize language on page load
+    (function initLang() {
+      const savedLang = localStorage.getItem('lang');
+      const browserLang = navigator.language.slice(0, 2).toLowerCase();
+      const supportedLangs = Object.keys(texts);
 
-    if (savedLang && supportedLangs.includes(savedLang)) {
-      setLang(savedLang);
-    } else if (supportedLangs.includes(browserLang)) {
-      setLang(browserLang);
-    } else {
-      setLang('en');
-    }
-
-    // MoonPay SDK integration
-    import('https://cdn.skypack.dev/@moonpay/moonpay-js').then(({ loadMoonPay }) => {
-      let moonPaySdk;
-
-      loadMoonPay().then((moonPay) => {
-        moonPaySdk = moonPay({
-          flow: 'buy',
-          environment: 'sandbox', // Change to 'production' for real transactions
-          variant: 'overlay',
-          params: {
-            apiKey: 'pk_test_ijI3RIhL31EASrNb8FZK0X5pB8VYigP',
-            theme: 'dark',
-            baseCurrencyCode: 'usd',
-            baseCurrencyAmount: '100',
-            defaultCurrencyCode: 'btc',
-          },
-        });
-      });
-
-      document.getElementById('moonpay-btn').addEventListener('click', () => {
-        if (moonPaySdk) {
-          moonPaySdk.show();
-        } else {
-          alert('MoonPay is still loading, please wait a moment.');
-        }
-      });
-    });
+      if (savedLang && supportedLangs.includes(savedLang)) {
+        setLang(savedLang);
+      } else if (supportedLangs.includes(browserLang)) {
+        setLang(browserLang);
+      } else {
+        setLang('en');
+      }
+    })();
   </script>
 </body>
 </html>
