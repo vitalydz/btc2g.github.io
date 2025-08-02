@@ -1,11 +1,37 @@
 name: Auto Update BTC/Gold Graph
 
 on:
-  workflow_dispatch:  # 👈 manually running
+  schedule:
+    - cron: '0 8 * * *'  # запуск каждый день в 08:00 UTC
+  workflow_dispatch:   # возможность запуска вручную
 
 jobs:
-  test-run:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Say hello
-        run: echo "✅ Workflow is running!"
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install matplotlib numpy yfinance pandas
+
+    - name: Run BTC/Gold forecast script
+      run: python btc2gold_plus5years.py
+
+    - name: Commit and push updated graph
+      run: |
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git add btc_gold_forecast.png
+        git commit -m "Auto update BTC/Gold forecast graph"
+        git push
+      continue-on-error: true  # если нет изменений — не ошибка
+
