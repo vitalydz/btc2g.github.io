@@ -43,17 +43,21 @@
 
     .lang-switch {
       margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
     }
 
     .lang-switch button {
-      margin: 5px;
-      padding: 8px 12px;
+      padding: 8px 14px;
       border: none;
       border-radius: 6px;
       background: #3a3a3a;
       color: white;
       cursor: pointer;
       font-weight: bold;
+      min-width: 100px;
     }
 
     .lang-switch button:hover {
@@ -90,6 +94,12 @@
     footer a:hover {
       text-decoration: underline;
     }
+
+    #img-src-debug {
+      font-size: 0.75em;
+      color: #888;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -97,22 +107,22 @@
     <h1 id="title">Bitcoin vs Gold Forecast</h1>
     <p id="subtitle">From 2016 to <span id="current-date"></span>, with projection to 2030</p>
 
-    <!-- Image loads by today's date or falls back to latest version -->
-    <img id="forecast-img" src="" alt="BTC vs Gold Forecast"
-         onerror="this.onerror=null; this.src='btc_gold_forecast_latest.png';" />
+    <!-- Image -->
+    <img id="forecast-img" src="" alt="BTC vs Gold Forecast" />
+    <div id="img-src-debug"></div>
 
-    <!-- Language Switch Buttons -->
+    <!-- Language Switch -->
     <div class="lang-switch">
-      <button onclick="setLang('en')">English</button>
-      <button onclick="setLang('ru')">Русский</button>
-      <button onclick="setLang('he')">עברית</button>
-      <button onclick="setLang('de')">Deutsch</button>
-      <button onclick="setLang('fr')">Français</button>
-      <button onclick="setLang('es')">Español</button>
-      <button onclick="setLang('zh')">中文</button>
+      <button onclick="setLang('en')">🇺🇸 English</button>
+      <button onclick="setLang('ru')">🇷🇺 Русский</button>
+      <button onclick="setLang('he')">🇮🇱 עברית</button>
+      <button onclick="setLang('de')">🇩🇪 Deutsch</button>
+      <button onclick="setLang('fr')">🇫🇷 Français</button>
+      <button onclick="setLang('es')">🇪🇸 Español</button>
+      <button onclick="setLang('zh')">🇨🇳 中文</button>
     </div>
 
-    <!-- MoonPay Button -->
+    <!-- MoonPay -->
     <a class="moonpay-btn" href="https://buy.moonpay.com" target="_blank" id="moonpay-text">
       Buy Bitcoin via MoonPay 🚀
     </a>
@@ -134,7 +144,19 @@
     const dd = String(now.getDate()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}`;
     document.getElementById('current-date').textContent = todayStr;
-    document.getElementById('forecast-img').src = `btc_gold_forecast_${todayStr}.png`;
+
+    const imageFile = `btc_gold_forecast_${todayStr}.png`;
+    const fallbackImage = 'btc_gold_forecast_latest.png';
+    const forecastImg = document.getElementById('forecast-img');
+
+    forecastImg.src = imageFile;
+    forecastImg.onerror = function () {
+      this.onerror = null;
+      this.src = fallbackImage;
+      document.getElementById('img-src-debug').textContent = `Fallback to: ${fallbackImage}`;
+    };
+
+    document.getElementById('img-src-debug').textContent = `Trying to load: ${imageFile}`;
 
     const texts = {
       en: {
@@ -180,10 +202,13 @@
       document.getElementById('title').textContent = text.title;
       document.getElementById('subtitle').textContent = text.subtitle;
       document.getElementById('moonpay-text').textContent = text.moonpay;
+
       if (lang === 'he') {
         document.body.dir = 'rtl';
+        document.querySelector('.container').style.textAlign = 'right';
       } else {
         document.body.dir = 'ltr';
+        document.querySelector('.container').style.textAlign = 'center';
       }
     }
 
