@@ -92,5 +92,6 @@ def main():
     plt.savefig(filepath, dpi=200)
     print(f"Chart saved to: {filepath}")
 
+
 if __name__ == '__main__':
     main()

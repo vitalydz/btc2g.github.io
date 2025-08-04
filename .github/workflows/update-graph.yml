@@ -24,8 +24,7 @@ jobs:
         pip install matplotlib numpy pandas yfinance
 
     - name: Run BTC/Gold forecast script
-      run: |
-        python btc2gold_plus5years.py
+      run: python btc2gold_plus5years.py
 
     - name: Create .nojekyll file
       run: touch .nojekyll
