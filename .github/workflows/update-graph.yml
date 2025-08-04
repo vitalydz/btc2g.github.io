@@ -10,9 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Setup Python
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
@@ -22,19 +23,17 @@ jobs:
         pip install --upgrade pip
         pip install matplotlib numpy pandas yfinance
 
-    - name: Show current dir and files
-      run: |
-        pwd
-        ls -la
-
     - name: Run BTC/Gold forecast script
-      run: python btc2gold_plus5years.py
+      run: |
+        python btc2gold_plus5years.py
+
+    - name: Create .nojekyll file
+      run: touch .nojekyll
 
     - name: Commit and push updated graph
       run: |
-        git config --local user.name "github-actions[bot]"
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git add btc_gold_forecast.png
-        git commit -m "Auto update BTC/Gold forecast graph"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add btc_gold_forecast_*.png .nojekyll || true
+        git commit -m "Auto update BTC/Gold forecast graph" || echo "No changes to commit"
         git push
-      continue-on-error: true
