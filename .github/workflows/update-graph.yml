@@ -2,8 +2,8 @@ name: Auto Update BTC/Gold Graph
 
 on:
   schedule:
-    - cron: '0 8 * * *'  # каждый день в 08:00 UTC
-  workflow_dispatch:
+    - cron: '0 8 * * *'  # Запуск каждый день в 08:00 UTC
+  workflow_dispatch:      # Ручной запуск по кнопке
 
 jobs:
   build:
@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GH_TOKEN }}  # Твой персональный токен
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -35,4 +37,4 @@ jobs:
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add btc_gold_forecast_*.png .nojekyll || true
         git commit -m "Auto update BTC/Gold forecast graph" || echo "No changes to commit"
-        git push
+        git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
