@@ -2,39 +2,37 @@ name: Auto Update BTC/Gold Graph
 
 on:
   schedule:
-    - cron: '0 8 * * *'  # Запуск каждый день в 08:00 UTC
-  workflow_dispatch:      # Ручной запуск по кнопке
+    - cron: '0 8 * * *'  # каждый день в 08:00 UTC
+  workflow_dispatch:     # запуск вручную с кнопки
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.GH }}  # Твой персональный токен
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-        pip install matplotlib numpy pandas yfinance
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install matplotlib numpy pandas yfinance
 
-    - name: Run BTC/Gold forecast script
-      run: python btc2gold_plus5years.py
+      - name: Run BTC/Gold forecast script
+        run: python btc2gold_plus5years.py
 
-    - name: Create .nojekyll file
-      run: touch .nojekyll
+      - name: Create .nojekyll file
+        run: touch .nojekyll
 
-    - name: Commit and push updated graph
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add btc_gold_forecast_*.png .nojekyll || true
-        git commit -m "Auto update BTC/Gold forecast graph" || echo "No changes to commit"
-        git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
+      - name: Commit and push updated graph
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add btc_gold_forecast_*.png .nojekyll || true
+          git commit -m "Auto update BTC/Gold forecast graph" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
