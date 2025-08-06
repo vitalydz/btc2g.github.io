@@ -65,9 +65,13 @@ def main():
                  fontsize=14, color='white')
     ax.set_xlabel('Date', color='white')
     ax.set_ylabel('Price (USD)', color='white')
-
     ax.tick_params(colors='white')
     ax.set_ylim(0, 220000)
+
+    # Добавляем подпись (водяной знак)
+    ax.text(df.index[-1], 2000, 'Forecast by BTC2G • © 2025', fontsize=10,
+            color='white', ha='right', va='bottom', alpha=0.7)
+
     yticks = np.arange(0, 220001, 10000)
     ax.set_yticks(yticks)
     ax.set_yticklabels([f"${y:,}" for y in yticks], color='white', rotation=45)
@@ -75,9 +79,7 @@ def main():
     ax.grid(True, linestyle='--', linewidth=0.5, color='gray')
     ax.legend(facecolor='#1f1f1f', edgecolor='gray', labelcolor='white')
 
-    # Получаем путь к папке скрипта
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    # Удаляем старые файлы btc_gold_forecast_*.png
     old_files = glob.glob(os.path.join(script_dir, "btc_gold_forecast_*.png"))
     for f in old_files:
         try:
