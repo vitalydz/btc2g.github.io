@@ -2,7 +2,7 @@ name: Auto Update BTC/Gold Graph
 
 on:
   schedule:
-    - cron: '30 21 * * *'  # каждый день в 21:30 UTC
+    - cron: '00 01 * * *'  # каждый день в 01:00 UTC
   workflow_dispatch:     # запуск вручную с кнопки
 
 jobs:
