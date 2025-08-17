@@ -2,18 +2,24 @@ name: Auto Update BTC/Gold Graph
 
 on:
   schedule:
-    - cron: '00 01 * * *'  # каждый день в 01:00 UTC
-  workflow_dispatch:     # запуск вручную с кнопки
+    # 1-го числа каждого нечетного месяца в 8:00 UTC (январь, март, май, июль, сентябрь, ноябрь)
+    - cron: '0 8 1 1,3,5,7,9,11 *'
+    # Или можно просто 1-го числа каждого месяца, а потом через месяц пропускать
+    # - cron: '0 8 1 * *'  # каждое 1-е число месяца
+  workflow_dispatch:     # запуск вручую с кнопки
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_TOKEN }}  # ← твой токен из настроек репозитория
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -26,15 +32,28 @@ jobs:
           pip install matplotlib numpy pandas yfinance
 
       - name: Run BTC/Gold forecast script
-        run: python btc2gold_plus5years.py
+        run: |
+          echo "Running bimonthly update..."
+          python btc2gold_plus5years.py
 
       - name: Create .nojekyll file
         run: touch .nojekyll
 
-      - name: Commit and push updated graph
+      - name: Commit and push updated graph (force update)
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+         
+          # Принудительно добавляем файлы
           git add btc_gold_forecast_*.png .nojekyll || true
-          git commit -m "Auto update BTC/Gold forecast graph" || echo "No changes to commit"
+         
+          # Проверяем есть ли изменения
+          if git diff --staged --quiet; then
+            echo "No changes detected, creating empty commit for consistency"
+            git commit --allow-empty -m "Bimonthly update: BTC/Gold forecast - $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          else
+            echo "Changes detected, committing..."
+            git commit -m "Bimonthly update: BTC/Gold forecast - $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          fi
+         
           git push
