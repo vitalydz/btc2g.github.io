@@ -68,6 +68,15 @@
       letter-spacing: 0;
     }
 
+    .signal-actionable {
+      cursor: pointer;
+    }
+
+    .signal-actionable:focus-visible {
+      outline: 3px solid #ffffff;
+      outline-offset: 3px;
+    }
+
     .signal-buy {
       background: #43d17a;
     }
@@ -706,7 +715,8 @@
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
-    const SUBSCRIPTION_ENDPOINT = 'https://formspree.io/f/YOUR_ID';
+    const SUBSCRIPTION_ENDPOINT = "https://formspree.io/f/mkoyjwkr";
+    const STRIPE_CHECKOUT_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/stripe/create-checkout-session";
     const isPremiumUser = false;
     let currentLang = 'en';
     let currentSignalData = null;
@@ -774,11 +784,29 @@
       return ['BUY', 'HOLD', 'SELL'].includes(normalized) ? normalized : null;
     }
 
+    function localizeSignalNote(note) {
+      if (!note) {
+        return '';
+      }
+
+      return texts[currentLang].signalNotes[note] || note;
+    }
+
+    function scrollToBuyButtons() {
+      document.getElementById('buy-title').scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+
     function setSignalUnavailable() {
       const text = texts[currentLang];
       const signalEl = document.getElementById('signal-value');
       signalEl.className = 'signal-value signal-unavailable';
       signalEl.textContent = text.signalUnavailable;
+      signalEl.removeAttribute('role');
+      signalEl.removeAttribute('tabindex');
+      signalEl.removeAttribute('title');
       document.getElementById('signal-confidence').textContent = text.signalConfidence.replace('{confidence}', '--');
       document.getElementById('signal-updated').textContent = text.signalLastUpdated.replace('{date}', '--');
       document.getElementById('signal-note').textContent = '';
@@ -801,9 +829,19 @@
       const signalEl = document.getElementById('signal-value');
       signalEl.className = `signal-value signal-${signal.toLowerCase()}`;
       signalEl.textContent = text.signalLabels[signal];
+      signalEl.classList.toggle('signal-actionable', signal === 'BUY');
+      if (signal === 'BUY') {
+        signalEl.setAttribute('role', 'button');
+        signalEl.setAttribute('tabindex', '0');
+        signalEl.title = text.signalBuyActionLabel;
+      } else {
+        signalEl.removeAttribute('role');
+        signalEl.removeAttribute('tabindex');
+        signalEl.removeAttribute('title');
+      }
       document.getElementById('signal-confidence').textContent = text.signalConfidence.replace('{confidence}', `${Math.round(confidence * 100)}%`);
       document.getElementById('signal-updated').textContent = text.signalLastUpdated.replace('{date}', formatLocalizedDate(currentSignalData.last_updated, currentLang));
-      document.getElementById('signal-note').textContent = currentSignalData.note || '';
+      document.getElementById('signal-note').textContent = localizeSignalNote(currentSignalData.note);
     }
 
     function renderPremiumState() {
@@ -856,6 +894,17 @@
       const isOpen = explanation.classList.toggle('is-open');
       document.getElementById('signal-toggle').setAttribute('aria-expanded', String(isOpen));
     });
+    document.getElementById('signal-value').addEventListener('click', () => {
+      if (normalizeSignal(currentSignalData?.signal) === 'BUY') {
+        scrollToBuyButtons();
+      }
+    });
+    document.getElementById('signal-value').addEventListener('keydown', (event) => {
+      if ((event.key === 'Enter' || event.key === ' ') && normalizeSignal(currentSignalData?.signal) === 'BUY') {
+        event.preventDefault();
+        scrollToBuyButtons();
+      }
+    });
     setChartSrc(todayStr);
 
     const texts = {
@@ -874,6 +923,10 @@
           HOLD: 'HOLD',
           SELL: 'SELL',
         },
+        signalNotes: {
+          'BTC appears undervalued compared to gold based on the model': 'BTC appears undervalued compared to gold based on the model',
+        },
+        signalBuyActionLabel: 'Jump to Buy Bitcoin buttons',
         chartError: 'The BTC vs Gold Forecast chart is unavailable right now. Please try refreshing it.',
         whyTitle: 'Why compare Bitcoin with gold?',
         whyText: 'Gold has been used as a store of value for centuries. Bitcoin is often compared to gold because of its limited supply and digital scarcity. BTC2G shows a visual BTC vs Gold model to help users compare long-term trends.',
@@ -907,11 +960,15 @@
         premiumZones: 'Model-based entry zones',
         premiumEarly: 'Early signal updates',
         premiumWeekly: 'Weekly forecast updates',
-        premiumPrice: 'Coming soon',
+        premiumPrice: 'Secure checkout via Stripe. Pricing is shown before payment.',
         premiumEmailPlaceholder: 'you@example.com',
-        premiumSubmit: 'Get early access',
-        premiumSuccess: 'You will be notified when Premium is available.',
+        premiumSubmit: 'Continue to Checkout',
+        premiumSuccess: 'Redirecting to Stripe Checkout...',
         premiumSource: 'BTC2G Premium early access',
+        premiumCheckoutCreating: 'Creating secure checkout...',
+        premiumCheckoutUnexpected: 'Checkout response was missing a redirect URL.',
+        premiumCheckoutFailed: 'Checkout is unavailable right now. Please try again later.',
+        stripeNotConfigured: 'Stripe checkout is not configured yet. Replace YOUR-VERCEL-PROJECT in index.html.',
         closeModal: 'Close',
         moonpay: 'Buy Bitcoin with MoonPay 🚀',
         topper: 'Buy Bitcoin with Topper ✨',
@@ -934,6 +991,10 @@
           HOLD: 'ДЕРЖАТЬ',
           SELL: 'ПРОДАВАТЬ',
         },
+        signalNotes: {
+          'BTC appears undervalued compared to gold based on the model': 'BTC выглядит недооцененным по сравнению с золотом на основе модели',
+        },
+        signalBuyActionLabel: 'Перейти к кнопкам покупки Биткоина',
         chartError: 'График прогноза BTC и золота сейчас недоступен. Попробуйте обновить его.',
         whyTitle: 'Зачем сравнивать Биткоин с золотом?',
         whyText: 'Золото веками использовалось как средство сохранения стоимости. Биткоин часто сравнивают с золотом из-за ограниченного предложения и цифровой редкости. BTC2G показывает визуальную модель BTC против золота, чтобы помочь сравнить долгосрочные тренды.',
@@ -967,11 +1028,15 @@
         premiumZones: 'Модельные зоны входа',
         premiumEarly: 'Ранние обновления сигналов',
         premiumWeekly: 'Еженедельные обновления прогноза',
-        premiumPrice: 'Скоро',
+        premiumPrice: 'Безопасная оплата через Stripe. Цена будет показана перед оплатой.',
         premiumEmailPlaceholder: 'you@example.com',
-        premiumSubmit: 'Получить ранний доступ',
-        premiumSuccess: 'Мы сообщим вам, когда Premium будет доступен.',
+        premiumSubmit: 'Перейти к оплате',
+        premiumSuccess: 'Перенаправляем в Stripe Checkout...',
         premiumSource: 'BTC2G Premium ранний доступ',
+        premiumCheckoutCreating: 'Создаем безопасную оплату...',
+        premiumCheckoutUnexpected: 'В ответе оплаты нет ссылки для перехода.',
+        premiumCheckoutFailed: 'Оплата сейчас недоступна. Попробуйте позже.',
+        stripeNotConfigured: 'Stripe Checkout еще не настроен. Замените YOUR-VERCEL-PROJECT в index.html.',
         closeModal: 'Закрыть',
         moonpay: 'Купить Биткоин с MoonPay 🚀',
         topper: 'Купить Биткоин с Topper ✨',
@@ -994,6 +1059,10 @@
           HOLD: 'החזקה',
           SELL: 'מכירה',
         },
+        signalNotes: {
+          'BTC appears undervalued compared to gold based on the model': 'BTC נראה מתומחר בחסר לעומת זהב לפי המודל',
+        },
+        signalBuyActionLabel: 'עבור לכפתורי קניית ביטקוין',
         chartError: 'תרשים תחזית BTC מול זהב אינו זמין כרגע. נסה לרענן אותו.',
         whyTitle: 'למה להשוות ביטקוין לזהב?',
         whyText: 'זהב שימש לשמירת ערך במשך מאות שנים. ביטקוין מושווה לעיתים קרובות לזהב בגלל ההיצע המוגבל והנדירות הדיגיטלית שלו. BTC2G מציג מודל חזותי של BTC מול זהב כדי לעזור להשוות מגמות ארוכות טווח.',
@@ -1027,11 +1096,15 @@
         premiumZones: 'אזורי כניסה מבוססי מודל',
         premiumEarly: 'עדכוני איתות מוקדמים',
         premiumWeekly: 'עדכוני תחזית שבועיים',
-        premiumPrice: 'בקרוב',
+        premiumPrice: 'תשלום מאובטח דרך Stripe. המחיר יוצג לפני התשלום.',
         premiumEmailPlaceholder: 'you@example.com',
-        premiumSubmit: 'קבל גישה מוקדמת',
-        premiumSuccess: 'נעדכן אותך כאשר Premium יהיה זמין.',
+        premiumSubmit: 'המשך לתשלום',
+        premiumSuccess: 'מעביר אל Stripe Checkout...',
         premiumSource: 'גישה מוקדמת ל-BTC2G Premium',
+        premiumCheckoutCreating: 'יוצר תשלום מאובטח...',
+        premiumCheckoutUnexpected: 'בתשובת התשלום חסרה כתובת מעבר.',
+        premiumCheckoutFailed: 'התשלום אינו זמין כרגע. נסה שוב מאוחר יותר.',
+        stripeNotConfigured: 'Stripe Checkout עדיין לא הוגדר. החלף את YOUR-VERCEL-PROJECT בקובץ index.html.',
         closeModal: 'סגור',
         moonpay: 'קנה ביטקוין עם MoonPay 🚀',
         topper: 'קנה ביטקוין עם Topper ✨',
@@ -1054,6 +1127,10 @@
           HOLD: 'HALTEN',
           SELL: 'VERKAUFEN',
         },
+        signalNotes: {
+          'BTC appears undervalued compared to gold based on the model': 'BTC erscheint im Vergleich zu Gold laut Modell unterbewertet',
+        },
+        signalBuyActionLabel: 'Zu den Bitcoin-Kaufbuttons springen',
         chartError: 'Das BTC-vs-Gold-Prognosediagramm ist derzeit nicht verfügbar. Bitte aktualisieren Sie es.',
         whyTitle: 'Warum Bitcoin mit Gold vergleichen?',
         whyText: 'Gold wird seit Jahrhunderten als Wertspeicher genutzt. Bitcoin wird wegen seines begrenzten Angebots und seiner digitalen Knappheit oft mit Gold verglichen. BTC2G zeigt ein visuelles BTC-vs-Gold-Modell, um langfristige Trends zu vergleichen.',
@@ -1087,11 +1164,15 @@
         premiumZones: 'Modellbasierte Einstiegszonen',
         premiumEarly: 'Frühe Signal-Updates',
         premiumWeekly: 'Wöchentliche Prognose-Updates',
-        premiumPrice: 'Demnächst',
+        premiumPrice: 'Sichere Zahlung über Stripe. Der Preis wird vor der Zahlung angezeigt.',
         premiumEmailPlaceholder: 'you@example.com',
-        premiumSubmit: 'Frühen Zugang erhalten',
-        premiumSuccess: 'Sie werden benachrichtigt, wenn Premium verfügbar ist.',
+        premiumSubmit: 'Weiter zur Zahlung',
+        premiumSuccess: 'Weiterleitung zu Stripe Checkout...',
         premiumSource: 'BTC2G Premium Frühzugang',
+        premiumCheckoutCreating: 'Sicherer Checkout wird erstellt...',
+        premiumCheckoutUnexpected: 'In der Checkout-Antwort fehlt eine Weiterleitungs-URL.',
+        premiumCheckoutFailed: 'Checkout ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.',
+        stripeNotConfigured: 'Stripe Checkout ist noch nicht konfiguriert. Ersetzen Sie YOUR-VERCEL-PROJECT in index.html.',
         closeModal: 'Schließen',
         moonpay: 'Bitcoin mit MoonPay kaufen 🚀',
         topper: 'Bitcoin mit Topper kaufen ✨',
@@ -1114,6 +1195,10 @@
           HOLD: 'CONSERVER',
           SELL: 'VENDRE',
         },
+        signalNotes: {
+          'BTC appears undervalued compared to gold based on the model': 'BTC semble sous-évalué par rapport à l’or selon le modèle',
+        },
+        signalBuyActionLabel: 'Aller aux boutons d’achat Bitcoin',
         chartError: 'Le graphique de prévision BTC contre or est indisponible pour le moment. Essayez de l’actualiser.',
         whyTitle: 'Pourquoi comparer Bitcoin à l’or ?',
         whyText: 'L’or est utilisé comme réserve de valeur depuis des siècles. Bitcoin est souvent comparé à l’or en raison de son offre limitée et de sa rareté numérique. BTC2G affiche un modèle visuel BTC contre or pour aider à comparer les tendances à long terme.',
@@ -1147,11 +1232,15 @@
         premiumZones: 'Zones d’entrée basées sur le modèle',
         premiumEarly: 'Mises à jour anticipées des signaux',
         premiumWeekly: 'Mises à jour hebdomadaires des prévisions',
-        premiumPrice: 'Bientôt disponible',
+        premiumPrice: 'Paiement sécurisé via Stripe. Le prix est affiché avant le paiement.',
         premiumEmailPlaceholder: 'you@example.com',
-        premiumSubmit: 'Obtenir un accès anticipé',
-        premiumSuccess: 'Vous serez averti lorsque Premium sera disponible.',
+        premiumSubmit: 'Continuer vers le paiement',
+        premiumSuccess: 'Redirection vers Stripe Checkout...',
         premiumSource: 'Accès anticipé BTC2G Premium',
+        premiumCheckoutCreating: 'Création du paiement sécurisé...',
+        premiumCheckoutUnexpected: 'La réponse Checkout ne contient pas d’URL de redirection.',
+        premiumCheckoutFailed: 'Le paiement est indisponible pour le moment. Veuillez réessayer plus tard.',
+        stripeNotConfigured: 'Stripe Checkout n’est pas encore configuré. Remplacez YOUR-VERCEL-PROJECT dans index.html.',
         closeModal: 'Fermer',
         moonpay: 'Acheter du Bitcoin avec MoonPay 🚀',
         topper: 'Acheter du Bitcoin avec Topper ✨',
@@ -1174,6 +1263,10 @@
           HOLD: 'MANTENER',
           SELL: 'VENDER',
         },
+        signalNotes: {
+          'BTC appears undervalued compared to gold based on the model': 'BTC parece infravalorado frente al oro según el modelo',
+        },
+        signalBuyActionLabel: 'Ir a los botones para comprar Bitcoin',
         chartError: 'El gráfico de pronóstico BTC vs oro no está disponible ahora. Intenta actualizarlo.',
         whyTitle: '¿Por qué comparar Bitcoin con oro?',
         whyText: 'El oro se ha usado como reserva de valor durante siglos. Bitcoin suele compararse con el oro por su oferta limitada y escasez digital. BTC2G muestra un modelo visual BTC vs oro para ayudar a comparar tendencias a largo plazo.',
@@ -1207,11 +1300,15 @@
         premiumZones: 'Zonas de entrada basadas en el modelo',
         premiumEarly: 'Actualizaciones tempranas de señales',
         premiumWeekly: 'Actualizaciones semanales del pronóstico',
-        premiumPrice: 'Próximamente',
+        premiumPrice: 'Pago seguro con Stripe. El precio se muestra antes del pago.',
         premiumEmailPlaceholder: 'you@example.com',
-        premiumSubmit: 'Obtener acceso anticipado',
-        premiumSuccess: 'Te avisaremos cuando Premium esté disponible.',
+        premiumSubmit: 'Continuar al pago',
+        premiumSuccess: 'Redirigiendo a Stripe Checkout...',
         premiumSource: 'Acceso anticipado BTC2G Premium',
+        premiumCheckoutCreating: 'Creando pago seguro...',
+        premiumCheckoutUnexpected: 'La respuesta de Checkout no incluyó una URL de redirección.',
+        premiumCheckoutFailed: 'El pago no está disponible ahora. Inténtalo de nuevo más tarde.',
+        stripeNotConfigured: 'Stripe Checkout aún no está configurado. Reemplaza YOUR-VERCEL-PROJECT en index.html.',
         closeModal: 'Cerrar',
         moonpay: 'Comprar Bitcoin con MoonPay 🚀',
         topper: 'Comprar Bitcoin con Topper ✨',
@@ -1234,6 +1331,10 @@
           HOLD: '持有',
           SELL: '卖出',
         },
+        signalNotes: {
+          'BTC appears undervalued compared to gold based on the model': '根据模型，BTC 相对于黄金似乎被低估',
+        },
+        signalBuyActionLabel: '跳转到购买比特币按钮',
         chartError: 'BTC 与黄金预测图表暂时不可用。请尝试刷新。',
         whyTitle: '为什么比较比特币和黄金？',
         whyText: '几个世纪以来，黄金一直被用作价值储存工具。由于供应有限和数字稀缺性，比特币经常被拿来与黄金比较。BTC2G 通过 BTC 与黄金的可视化模型，帮助用户比较长期趋势。',
@@ -1267,11 +1368,15 @@
         premiumZones: '基于模型的入场区域',
         premiumEarly: '提前信号更新',
         premiumWeekly: '每周预测更新',
-        premiumPrice: '即将推出',
+        premiumPrice: '通过 Stripe 安全结账。付款前会显示价格。',
         premiumEmailPlaceholder: 'you@example.com',
-        premiumSubmit: '获取早期访问',
-        premiumSuccess: 'Premium 可用时我们会通知你。',
+        premiumSubmit: '继续结账',
+        premiumSuccess: '正在跳转到 Stripe Checkout...',
         premiumSource: 'BTC2G Premium 早期访问',
+        premiumCheckoutCreating: '正在创建安全结账...',
+        premiumCheckoutUnexpected: 'Checkout 响应缺少跳转 URL。',
+        premiumCheckoutFailed: '结账暂时不可用。请稍后再试。',
+        stripeNotConfigured: 'Stripe Checkout 尚未配置。请在 index.html 中替换 YOUR-VERCEL-PROJECT。',
         closeModal: '关闭',
         moonpay: '使用 MoonPay 购买比特币 🚀',
         topper: '使用 Topper 购买比特币 ✨',
@@ -1418,19 +1523,77 @@
       source: 'BTC2G homepage',
     });
 
-    attachSubscriptionForm('premium-form', {
-      emailInputId: 'premium-email',
-      buttonId: 'premium-submit-button',
-      messageId: 'premium-message',
-      buttonTextKey: 'premiumSubmit',
-      successTextKey: 'premiumSuccess',
-      source: (text) => text.premiumSource,
+    async function createPremiumCheckout() {
+      const emailInput = document.getElementById('premium-email');
+      const submitButton = document.getElementById('premium-submit-button');
+      const email = emailInput.value.trim();
+      const text = texts[currentLang];
+
+      if (!email) {
+        setFormMessage('premium-message', text.subscribeEmpty, true);
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        setFormMessage('premium-message', text.subscribeInvalid, true);
+        return;
+      }
+
+      if (STRIPE_CHECKOUT_URL.includes('YOUR-VERCEL-PROJECT')) {
+        setFormMessage('premium-message', text.stripeNotConfigured, true);
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = text.premiumCheckoutCreating;
+      setFormMessage('premium-message', '');
+
+      try {
+        const response = await fetch(STRIPE_CHECKOUT_URL, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.error || text.premiumCheckoutFailed);
+        }
+
+        if (!data.url || typeof data.url !== 'string') {
+          throw new Error(text.premiumCheckoutUnexpected);
+        }
+
+        setFormMessage('premium-message', text.premiumSuccess);
+        window.location.href = data.url;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : text.premiumCheckoutFailed;
+        setFormMessage('premium-message', message, true);
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = texts[currentLang].premiumSubmit;
+      }
+    }
+
+    document.getElementById('premium-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      await createPremiumCheckout();
     });
 
     function openPremiumModal() {
+      const existingEmail = document.getElementById('subscriber-email').value.trim();
+      const premiumEmail = document.getElementById('premium-email');
+
+      if (!premiumEmail.value.trim() && existingEmail) {
+        premiumEmail.value = existingEmail;
+      }
+
       document.getElementById('premium-modal').hidden = false;
       setFormMessage('premium-message', '');
-      document.getElementById('premium-email').focus();
+      premiumEmail.focus();
     }
 
     function closePremiumModal() {

@@ -187,7 +187,7 @@ Future accuracy improvements can replace `build_signal(...)` with a more robust 
 
 ## Premium Signals (MVP)
 
-The homepage includes a UI-only Premium BTC Signals layer. It does not add payments, authentication, or backend user management yet.
+The homepage includes a Premium BTC Signals layer backed by Stripe Checkout for the subscription payment MVP. It does not add custom card forms, card storage, or a user database yet.
 
 Current MVP behavior:
 
@@ -195,17 +195,83 @@ Current MVP behavior:
 - Premium-only areas are marked with a lock and careful wording.
 - `const isPremiumUser = false;` in `index.html` is the temporary frontend gating flag.
 - The "Unlock Premium" button opens a lightweight modal.
-- The modal captures early-access emails through the same Formspree subscription helper used by the main email form.
+- The modal asks for email and redirects to Stripe Checkout.
 
-Premium early access is configured through the same endpoint:
+Frontend Stripe endpoint placeholder:
 
 ```js
-const SUBSCRIPTION_ENDPOINT = 'https://formspree.io/f/YOUR_ID';
+const STRIPE_CHECKOUT_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/stripe/create-checkout-session";
 ```
 
-Future paid subscription work can connect Stripe or a similar provider from the Premium modal button flow. Keep payment secrets, webhook signing secrets, and user entitlement checks on a backend. Do not put private keys or payment secrets in frontend files.
+Keep payment secrets, webhook signing secrets, and user entitlement checks on a backend. Do not put private keys or payment secrets in frontend files.
 
-No sensitive user data is stored in this repository. Email collection depends on the external form provider configured in `SUBSCRIPTION_ENDPOINT`.
+No card data is handled by BTC2G. Stripe Checkout collects payment details on Stripe-hosted pages.
+
+## Stripe Premium Subscription Setup
+
+1. Create or open your Stripe account.
+2. Use Stripe test mode first.
+3. Create a product named `BTC2G Premium Signals`.
+4. Create a recurring monthly price, for example `$4.99/month` or `$9.99/month`.
+5. Copy the Stripe Price ID, such as `price_...`.
+6. Add these Vercel environment variables:
+
+```env
+STRIPE_SECRET_KEY=<your Stripe secret key>
+STRIPE_PRICE_ID=<your recurring Stripe price id>
+STRIPE_WEBHOOK_SECRET=<your Stripe webhook signing secret>
+SITE_URL=https://btc2g.com
+```
+
+7. Replace the frontend placeholder in `index.html`:
+
+```js
+const STRIPE_CHECKOUT_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/stripe/create-checkout-session";
+```
+
+8. Deploy to Vercel.
+9. Add this webhook endpoint in Stripe:
+
+```text
+https://YOUR-VERCEL-PROJECT.vercel.app/api/stripe/webhook
+```
+
+10. Subscribe the webhook to these events:
+
+- `checkout.session.completed`
+- `customer.subscription.created`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+- `invoice.payment_succeeded`
+- `invoice.payment_failed`
+
+Do not commit Stripe secret keys. Use only Vercel environment variables for `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`, and `SITE_URL`.
+
+### Stripe test plan
+
+```powershell
+cd C:\Users\vitly\PycharmProjects\BTC2G\btc2g.github.io
+npm install
+```
+
+Then:
+
+1. Deploy to Vercel.
+2. Add Stripe test keys and `SITE_URL`.
+3. Open the GitHub Pages site.
+4. Click `Unlock Premium`.
+5. Enter an email and continue to Stripe Checkout.
+6. Use a Stripe test card.
+7. Confirm redirect to `premium-success.html`.
+8. Confirm webhook events appear in Vercel logs.
+9. Confirm no secret values appear in browser output or logs.
+
+TODO before production:
+
+- Replace the temporary `isPremiumUser = false` flag with backend entitlement checks.
+- Store subscription status by Stripe customer, email, or app user ID.
+- Decide exact pricing, refund policy, and cancellation flow.
+- Add production Stripe webhook endpoint and production Stripe keys only after test mode works.
 
 ## Daily BTC vs Gold chart update
 
