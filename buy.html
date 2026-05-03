@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Buy Crypto via MoonPay</title>
+  <title>Buy BTC</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -43,6 +43,7 @@
     }
     .buy-button {
       display: inline-block;
+      margin: 8px 0;
       padding: 14px 28px;
       font-weight: bold;
       font-size: 1.2em;
@@ -57,6 +58,56 @@
     .buy-button:hover {
       background-color: #2a4fcc;
     }
+    .topper-section {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid #e7e7e7;
+      text-align: left;
+    }
+    .topper-section h2 {
+      margin: 0 0 14px;
+      color: #333;
+      font-size: 1.25em;
+      text-align: center;
+    }
+    .field {
+      margin-bottom: 14px;
+    }
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      color: #333;
+      font-weight: bold;
+    }
+    .field input {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cfcfcf;
+      border-radius: 6px;
+      font: inherit;
+    }
+    .topper-button {
+      width: 100%;
+      background-color: #0f8f68;
+    }
+    .topper-button:hover {
+      background-color: #0b7556;
+    }
+    .topper-button:disabled {
+      background-color: #8ab8a9;
+      cursor: wait;
+    }
+    .topper-message {
+      min-height: 20px;
+      margin: 12px 0 0;
+      color: #555;
+      font-size: 0.95em;
+      text-align: center;
+    }
+    .topper-message.error {
+      color: #b00020;
+    }
     .footer-text {
       margin-top: 25px;
       font-size: 0.9em;
@@ -66,7 +117,7 @@
 </head>
 <body>
   <div class="container">
-    <h1 id="title">Buy Bitcoin via MoonPay</h1>
+    <h1 id="title">Buy Bitcoin</h1>
 
     <div class="lang-switch">
       <button onclick="setLang('en')">🇺🇸 English</button>
@@ -78,47 +129,107 @@
       <button onclick="setLang('zh')">🇨🇳 中文</button>
     </div>
 
-    <button id="buy-btn" class="buy-button">Buy Crypto Now 🚀</button>
+    <button id="buy-btn" class="buy-button">Buy with MoonPay 🚀</button>
 
-    <p class="footer-text" id="footer-text">Powered by MoonPay</p>
+    <div class="topper-section">
+      <h2 id="topper-title">Buy BTC with Topper</h2>
+
+      <div class="field">
+        <label for="topper-address" id="topper-address-label">BTC wallet address</label>
+        <input
+          id="topper-address"
+          name="topper-address"
+          type="text"
+          autocomplete="off"
+          placeholder="bc1..."
+        />
+      </div>
+
+      <div class="field">
+        <label for="topper-amount" id="topper-amount-label">Amount in USD</label>
+        <input
+          id="topper-amount"
+          name="topper-amount"
+          type="number"
+          min="1"
+          step="0.01"
+          value="50.00"
+        />
+      </div>
+
+      <button id="topper-btn" class="buy-button topper-button">Buy BTC with Topper</button>
+      <p id="topper-message" class="topper-message" role="status" aria-live="polite"></p>
+    </div>
+
+    <p class="footer-text" id="footer-text">Powered by MoonPay and Topper</p>
   </div>
 
   <script type="module">
+    const TOPPER_API_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/topper/token";
+
     const texts = {
       en: {
-        title: 'Buy Bitcoin via MoonPay',
-        buyBtn: 'Buy Crypto Now 🚀',
-        footer: 'Powered by MoonPay',
+        title: 'Buy Bitcoin',
+        buyBtn: 'Buy with MoonPay 🚀',
+        topperTitle: 'Buy BTC with Topper',
+        topperAddressLabel: 'BTC wallet address',
+        topperAmountLabel: 'Amount in USD',
+        topperBtn: 'Buy BTC with Topper',
+        footer: 'Powered by MoonPay and Topper',
       },
       ru: {
-        title: 'Купить Биткойн через MoonPay',
-        buyBtn: 'Купить криптовалюту 🚀',
-        footer: 'При поддержке MoonPay',
+        title: 'Купить Биткойн',
+        buyBtn: 'Купить через MoonPay 🚀',
+        topperTitle: 'Купить BTC через Topper',
+        topperAddressLabel: 'BTC-адрес кошелька',
+        topperAmountLabel: 'Сумма в USD',
+        topperBtn: 'Купить BTC через Topper',
+        footer: 'При поддержке MoonPay и Topper',
       },
       he: {
-        title: 'קנה ביטקוין דרך MoonPay',
-        buyBtn: 'קנה קריפטו עכשיו 🚀',
-        footer: 'בהפעלה של MoonPay',
+        title: 'קנה ביטקוין',
+        buyBtn: 'קנה דרך MoonPay 🚀',
+        topperTitle: 'קנה BTC דרך Topper',
+        topperAddressLabel: 'כתובת ארנק BTC',
+        topperAmountLabel: 'סכום בדולר',
+        topperBtn: 'קנה BTC דרך Topper',
+        footer: 'בהפעלה של MoonPay ו-Topper',
       },
       de: {
-        title: 'Bitcoin über MoonPay kaufen',
-        buyBtn: 'Jetzt Krypto kaufen 🚀',
-        footer: 'Bereitgestellt von MoonPay',
+        title: 'Bitcoin kaufen',
+        buyBtn: 'Mit MoonPay kaufen 🚀',
+        topperTitle: 'BTC mit Topper kaufen',
+        topperAddressLabel: 'BTC-Wallet-Adresse',
+        topperAmountLabel: 'Betrag in USD',
+        topperBtn: 'BTC mit Topper kaufen',
+        footer: 'Bereitgestellt von MoonPay und Topper',
       },
       fr: {
-        title: 'Acheter du Bitcoin via MoonPay',
-        buyBtn: 'Acheter des cryptos 🚀',
-        footer: 'Propulsé par MoonPay',
+        title: 'Acheter du Bitcoin',
+        buyBtn: 'Acheter avec MoonPay 🚀',
+        topperTitle: 'Acheter du BTC avec Topper',
+        topperAddressLabel: 'Adresse du portefeuille BTC',
+        topperAmountLabel: 'Montant en USD',
+        topperBtn: 'Acheter du BTC avec Topper',
+        footer: 'Propulsé par MoonPay et Topper',
       },
       es: {
-        title: 'Comprar Bitcoin con MoonPay',
-        buyBtn: 'Comprar Cripto Ahora 🚀',
-        footer: 'Con tecnología de MoonPay',
+        title: 'Comprar Bitcoin',
+        buyBtn: 'Comprar con MoonPay 🚀',
+        topperTitle: 'Comprar BTC con Topper',
+        topperAddressLabel: 'Dirección de billetera BTC',
+        topperAmountLabel: 'Importe en USD',
+        topperBtn: 'Comprar BTC con Topper',
+        footer: 'Con tecnología de MoonPay y Topper',
       },
       zh: {
-        title: '通过 MoonPay 购买比特币',
-        buyBtn: '立即购买加密货币 🚀',
-        footer: '由 MoonPay 提供技术支持',
+        title: '购买比特币',
+        buyBtn: '通过 MoonPay 购买 🚀',
+        topperTitle: '通过 Topper 购买 BTC',
+        topperAddressLabel: 'BTC 钱包地址',
+        topperAmountLabel: 'USD 金额',
+        topperBtn: '通过 Topper 购买 BTC',
+        footer: '由 MoonPay 和 Topper 提供支持',
       },
     };
 
@@ -126,6 +237,10 @@
       localStorage.setItem('lang', lang);
       document.getElementById('title').textContent = texts[lang].title;
       document.getElementById('buy-btn').textContent = texts[lang].buyBtn;
+      document.getElementById('topper-title').textContent = texts[lang].topperTitle;
+      document.getElementById('topper-address-label').textContent = texts[lang].topperAddressLabel;
+      document.getElementById('topper-amount-label').textContent = texts[lang].topperAmountLabel;
+      document.getElementById('topper-btn').textContent = texts[lang].topperBtn;
       document.getElementById('footer-text').textContent = texts[lang].footer;
     }
 
@@ -140,6 +255,70 @@
     } else {
       setLang('en');
     }
+
+    function setTopperMessage(message, isError = false) {
+      const messageEl = document.getElementById('topper-message');
+      messageEl.textContent = message;
+      messageEl.classList.toggle('error', isError);
+    }
+
+    function getTopperRequestPayload() {
+      const address = document.getElementById('topper-address').value.trim();
+      const amount = document.getElementById('topper-amount').value.trim() || '50.00';
+
+      return {
+        address,
+        amount,
+        fiat: 'USD',
+        asset: 'BTC',
+        network: 'bitcoin',
+      };
+    }
+
+    document.getElementById('topper-btn').addEventListener('click', async () => {
+      const topperBtn = document.getElementById('topper-btn');
+      const payload = getTopperRequestPayload();
+
+      if (!payload.address) {
+        setTopperMessage('Enter a BTC wallet address before opening Topper.', true);
+        return;
+      }
+
+      if (TOPPER_API_URL.includes('YOUR-VERCEL-PROJECT')) {
+        setTopperMessage('Topper API URL is not configured yet. Replace YOUR-VERCEL-PROJECT in buy.html.', true);
+        return;
+      }
+
+      topperBtn.disabled = true;
+      setTopperMessage('Creating secure Topper session...');
+
+      try {
+        const response = await fetch(TOPPER_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Could not create a Topper session.');
+        }
+
+        if (!data.bt || !data.appUrl) {
+          throw new Error('Topper response was missing token data.');
+        }
+
+        window.open(`${data.appUrl}?bt=${encodeURIComponent(data.bt)}`, '_blank', 'noopener,noreferrer');
+        setTopperMessage('Topper opened in a new tab.');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Topper is unavailable right now.';
+        setTopperMessage(message, true);
+      } finally {
+        topperBtn.disabled = false;
+      }
+    });
 
     import('https://cdn.skypack.dev/@moonpay/moonpay-js').then(({ loadMoonPay }) => {
       let moonPaySdk;

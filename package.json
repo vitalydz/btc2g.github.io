@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@moonpay/moonpay-js": "^0.7.4"
+    "@moonpay/moonpay-js": "^0.7.4",
+    "jose": "^6.2.3"
   }
 }

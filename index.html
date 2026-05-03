@@ -48,6 +48,13 @@
       margin-right: auto;
     }
 
+    .chart-error {
+      display: none;
+      margin: -6px 0 18px;
+      color: #ffb4b4;
+      font-weight: bold;
+    }
+
     .lang-switch {
       margin-top: 20px;
     }
@@ -68,11 +75,13 @@
       background: #555;
     }
 
-    .moonpay-btn {
+    .moonpay-btn,
+    .topper-btn {
       display: inline-block;
       margin-top: 25px;
+      margin-left: 6px;
+      margin-right: 6px;
       padding: 12px 24px;
-      background-color: #3c67e3;
       color: white;
       text-decoration: none;
       font-weight: bold;
@@ -80,13 +89,26 @@
       transition: background 0.3s;
     }
 
+    .moonpay-btn {
+      background-color: #3c67e3;
+    }
+
     .moonpay-btn:hover {
       background-color: #2a4fcc;
+    }
+
+    .topper-btn {
+      background-color: #0f8f68;
+    }
+
+    .topper-btn:hover {
+      background-color: #0b7556;
     }
 
     .update-btn {
       display: inline-flex;
       align-items: center;
+      border: none;
       margin-top: 20px;
       margin-bottom: 20px;
       padding: 12px 24px;
@@ -95,6 +117,8 @@
       text-decoration: none;
       font-weight: bold;
       border-radius: 6px;
+      cursor: pointer;
+      font: inherit;
       transition: background 0.3s, transform 0.2s;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
@@ -133,19 +157,19 @@
     <p id="subtitle">From 2016 to <span id="current-date"></span>, with projection to 2030</p>
 
     <img
-      id="forecast-img"
-      src=""
+      id="forecastChart"
+      src="assets/btc_gold_forecast.png"
       alt="BTC vs Gold Forecast"
-      onerror="this.onerror=null; this.src='btc_gold_forecast_latest.png';"
     />
+    <p id="chart-error" class="chart-error">The BTC vs Gold Forecast chart is unavailable right now. Please try refreshing it.</p>
 
-    <a class="update-btn" href="https://github.com/vitalydz/btc2g.github.io/actions/workflows/update-graph.yml" target="_blank">
+    <button class="update-btn" id="refresh-chart-btn" type="button">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
         <path d="M12 4V1L8 5l4 4V6c3.3 0 6 2.7 6 6a6.002 6.002 0 0 1-5.125 5.938 1 1 0 1 0 .25 1.984A8.002 8.002 0 0 0 20 12c0-4.4-3.6-8-8-8z"/>
         <path d="M12 20v3l4-4-4-4v3c-3.3 0-6-2.7-6-6a6.002 6.002 0 0 1 5.125-5.938 1 1 0 1 0-.25-1.984A8.002 8.002 0 0 0 4 12c0 4.4 3.6 8 8 8z"/>
       </svg>
-      Обновить график вручную
-    </a>
+      <span id="refresh-chart-text">Update chart manually</span>
+    </button>
 
     <div class="lang-switch">
       <button onclick="setLang('en')">English</button>
@@ -166,6 +190,14 @@
     >
       Buy Bitcoin via MoonPay 🚀
     </a>
+
+    <a
+      class="topper-btn"
+      href="buy.html"
+      id="topper-text"
+    >
+      Buy BTC with Topper
+    </a>
   </div>
 
   <footer>
@@ -178,50 +210,90 @@
   </footer>
 
   <script>
-    const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
-    const todayStr = `${yyyy}-${mm}-${dd}`;
+    const CHART_PATH = 'assets/btc_gold_forecast.png';
 
+    function getUtcDateStamp(date = new Date()) {
+      const yyyy = date.getUTCFullYear();
+      const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(date.getUTCDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    const todayStr = getUtcDateStamp();
     document.getElementById('current-date').textContent = todayStr;
-    document.getElementById('forecast-img').src = `btc_gold_forecast_${todayStr}.png`;
+
+    function setChartSrc(version) {
+      const chart = document.getElementById('forecastChart');
+      const chartError = document.getElementById('chart-error');
+      chartError.style.display = 'none';
+      chart.style.display = 'block';
+      chart.src = `${CHART_PATH}?v=${encodeURIComponent(version)}`;
+    }
+
+    function showChartError() {
+      document.getElementById('forecastChart').style.display = 'none';
+      document.getElementById('chart-error').style.display = 'block';
+    }
+
+    document.getElementById('forecastChart').addEventListener('error', showChartError);
+    document.getElementById('forecastChart').addEventListener('load', () => {
+      document.getElementById('chart-error').style.display = 'none';
+      document.getElementById('forecastChart').style.display = 'block';
+    });
+    document.getElementById('refresh-chart-btn').addEventListener('click', () => {
+      setChartSrc(String(Date.now()));
+    });
+    setChartSrc(todayStr);
 
     const texts = {
       en: {
         title: 'Bitcoin vs Gold Forecast',
         subtitle: `From 2016 to ${todayStr}, with projection to 2030`,
+        refreshChart: 'Update chart manually',
         moonpay: 'Buy Bitcoin via MoonPay 🚀',
+        topper: 'Buy BTC with Topper',
       },
       ru: {
         title: 'Прогноз: Биткоин против золота',
         subtitle: `С 2016 по ${todayStr}, прогноз до 2030 года`,
+        refreshChart: 'Обновить график вручную',
         moonpay: 'Купить Биткоин через MoonPay 🚀',
+        topper: 'Купить BTC через Topper',
       },
       he: {
         title: 'תחזית: ביטקוין מול זהב',
         subtitle: `מ־2016 עד ${todayStr}, תחזית עד 2030`,
+        refreshChart: 'רענן את התרשים ידנית',
         moonpay: '🚀 MoonPay קנה ביטקוין דרך',
+        topper: 'קנה BTC דרך Topper',
       },
       de: {
         title: 'Bitcoin vs Gold Prognose',
         subtitle: `Von 2016 bis ${todayStr}, mit Prognose bis 2030`,
+        refreshChart: 'Diagramm manuell aktualisieren',
         moonpay: 'Bitcoin über MoonPay kaufen 🚀',
+        topper: 'BTC mit Topper kaufen',
       },
       fr: {
         title: 'Prévision Bitcoin contre Or',
         subtitle: `De 2016 à ${todayStr}, avec projection jusqu’en 2030`,
+        refreshChart: 'Actualiser le graphique',
         moonpay: 'Acheter du Bitcoin via MoonPay 🚀',
+        topper: 'Acheter du BTC avec Topper',
       },
       es: {
         title: 'Pronóstico Bitcoin vs Oro',
         subtitle: `Desde 2016 hasta ${todayStr}, con proyección hasta 2030`,
+        refreshChart: 'Actualizar gráfico manualmente',
         moonpay: 'Comprar Bitcoin con MoonPay 🚀',
+        topper: 'Comprar BTC con Topper',
       },
       zh: {
         title: '比特币与黄金走势预测',
         subtitle: `从2016年至${todayStr}，预测至2030年`,
+        refreshChart: '手动刷新图表',
         moonpay: '通过 MoonPay 购买比特币 🚀',
+        topper: '通过 Topper 购买 BTC',
       }
     };
 
@@ -230,7 +302,9 @@
       const text = texts[lang];
       document.getElementById('title').textContent = text.title;
       document.getElementById('subtitle').textContent = text.subtitle;
+      document.getElementById('refresh-chart-text').textContent = text.refreshChart;
       document.getElementById('moonpay-text').textContent = text.moonpay;
+      document.getElementById('topper-text').textContent = text.topper;
       document.body.dir = 'ltr';
     }
 

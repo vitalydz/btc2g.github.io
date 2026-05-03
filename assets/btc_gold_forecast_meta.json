@@ -1,0 +1,10 @@
+{
+  "last_updated_utc": "2026-05-03T18:40:10.538489+00:00",
+  "status": "ok",
+  "source": "yfinance",
+  "tickers": {
+    "Gold": "GC=F",
+    "Bitcoin": "BTC-USD"
+  },
+  "chart": "assets/btc_gold_forecast.png"
+}
