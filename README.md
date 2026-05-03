@@ -81,6 +81,110 @@ npm install
 
 This repository currently has no `test` or `build` scripts in `package.json`, so `npm test` and `npm run build` are not available unless scripts are added later.
 
+## Monetization flow
+
+The homepage keeps the BTC vs Gold forecast chart first, then shows a short educational explanation and two buy buttons:
+
+- MoonPay: `index.html` links to `buy.html#moonpay`, where the existing MoonPay widget button remains visible.
+- Topper: `index.html` links to `buy.html#topper`, where the Topper address and amount form calls the serverless token endpoint.
+
+Topper API URL configuration lives in `buy.html`:
+
+```js
+const TOPPER_API_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/topper/token";
+```
+
+Future affiliate or revenue share tracking can be added to these button links or provider parameters, but private keys and signing secrets must stay out of frontend files. `TOPPER_PRIVATE_JWK` belongs only in Vercel environment variables.
+
+The homepage disclaimer is intentionally conservative:
+
+```text
+This forecast is for informational purposes only and is not financial advice.
+```
+
+## Email Subscription Setup
+
+The homepage email capture form uses Formspree because it does not require a custom backend or frontend secrets.
+
+The placeholder endpoint lives in `index.html`:
+
+```js
+const SUBSCRIPTION_ENDPOINT = 'https://formspree.io/f/YOUR_ID';
+```
+
+Setup steps:
+
+1. Create a free Formspree form at `https://formspree.io/`.
+2. Copy the form endpoint URL.
+3. Replace `https://formspree.io/f/YOUR_ID` in `index.html` with your real endpoint.
+4. Open the homepage locally or on GitHub Pages.
+5. Submit a test email and confirm it appears in Formspree.
+
+Local test command:
+
+```powershell
+cd C:\Users\vitly\PycharmProjects\BTC2G\btc2g.github.io
+python -m http.server 8765
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8765/index.html
+```
+
+Do not commit private API keys. Formspree form URLs are meant for frontend use, but do not add any private provider secret to `index.html`.
+
+## Localized dates
+
+Dates are stored internally as ISO `YYYY-MM-DD` and localized only in the UI. The homepage uses `Intl.DateTimeFormat` to render the forecast/model date according to the selected site language.
+
+## BTC Signal System
+
+The homepage displays a simple model-based BTC signal loaded from:
+
+```text
+assets/btc_signal.json
+```
+
+Supported values:
+
+- `BUY`: the model sees BTC as relatively undervalued versus gold.
+- `HOLD`: the model sees BTC as near neutral versus gold.
+- `SELL`: the model sees BTC as relatively overvalued versus gold.
+
+The signal is based on the BTC/Gold ratio model and is not financial advice. It reflects relative valuation, not guaranteed profit or short-term price predictions.
+
+The MVP signal logic is implemented in:
+
+```text
+scripts/update_btc_gold_chart.py
+```
+
+Look for:
+
+```python
+def build_signal(df: pd.DataFrame) -> dict:
+```
+
+Current MVP rule:
+
+- Compute the latest BTC/Gold ratio.
+- Compare it with the last 365 days of the BTC/Gold ratio.
+- Below the rolling range threshold becomes `BUY`.
+- Near the rolling average becomes `HOLD`.
+- Above the rolling range threshold becomes `SELL`.
+
+The daily GitHub Actions workflow runs the chart script and commits:
+
+```text
+assets/btc_gold_forecast.png
+assets/btc_gold_forecast_meta.json
+assets/btc_signal.json
+```
+
+Future accuracy improvements can replace `build_signal(...)` with a more robust model while keeping the JSON shape stable for the frontend.
+
 ## Daily BTC vs Gold chart update
 
 The public chart is saved at:

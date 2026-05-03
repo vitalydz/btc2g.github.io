@@ -26,6 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 ASSETS_DIR = REPO_ROOT / "assets"
 CHART_PATH = ASSETS_DIR / "btc_gold_forecast.png"
 META_PATH = ASSETS_DIR / "btc_gold_forecast_meta.json"
+SIGNAL_PATH = ASSETS_DIR / "btc_signal.json"
 
 
 def utc_today() -> datetime:
@@ -76,6 +77,48 @@ def forecast_polyfit(dates, prices, future_days: int, degree: int = 2):
     x_future = np.array([day.toordinal() for day in future_dates])
 
     return future_dates, poly(x_future)
+
+
+def build_signal(df: pd.DataFrame) -> dict:
+    """Create a cautious model-based BTC signal from the BTC/Gold ratio.
+
+    This MVP rule compares the latest BTC/Gold ratio with its 365-day rolling
+    average. It is intentionally simple and should be reviewed before being
+    used as a paid signal product.
+    """
+    ratio = (df["Bitcoin"] / df["Gold"]).dropna()
+    if len(ratio) < 365:
+        raise RuntimeError("Not enough BTC/Gold ratio data to build a signal.")
+
+    latest_ratio = float(ratio.iloc[-1])
+    rolling_window = ratio.tail(365)
+    rolling_mean = float(rolling_window.mean())
+    rolling_std = float(rolling_window.std())
+
+    if rolling_std <= 0:
+        signal = "HOLD"
+        confidence = 0.5
+        note = "BTC appears neutral compared to gold based on the model"
+    else:
+        z_score = (latest_ratio - rolling_mean) / rolling_std
+        confidence = round(min(0.95, 0.5 + min(abs(z_score), 2.0) * 0.2), 2)
+
+        if z_score <= -0.5:
+            signal = "BUY"
+            note = "BTC appears undervalued compared to gold based on the model"
+        elif z_score >= 0.5:
+            signal = "SELL"
+            note = "BTC appears overvalued compared to gold based on the model"
+        else:
+            signal = "HOLD"
+            note = "BTC appears neutral compared to gold based on the model"
+
+    return {
+        "signal": signal,
+        "confidence": confidence,
+        "last_updated": utc_today().strftime("%Y-%m-%d"),
+        "note": note,
+    }
 
 
 def build_chart() -> None:
@@ -137,6 +180,9 @@ def build_chart() -> None:
     plt.close(fig)
 
     os.replace(temp_chart_path, CHART_PATH)
+    signal = build_signal(df)
+    SIGNAL_PATH.write_text(json.dumps(signal, indent=2) + "\n", encoding="utf-8")
+
     META_PATH.write_text(
         json.dumps(
             {
@@ -145,6 +191,7 @@ def build_chart() -> None:
                 "source": "yfinance",
                 "tickers": TICKERS,
                 "chart": str(CHART_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+                "signal": str(SIGNAL_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
             },
             indent=2,
         )
@@ -152,6 +199,7 @@ def build_chart() -> None:
         encoding="utf-8",
     )
     print(f"Chart saved to: {CHART_PATH}")
+    print(f"Signal saved to: {SIGNAL_PATH}")
 
 
 def main() -> int:
@@ -162,6 +210,8 @@ def main() -> int:
         print(f"Chart update failed: {exc}", file=sys.stderr)
         if CHART_PATH.exists():
             print(f"Keeping existing chart: {CHART_PATH}", file=sys.stderr)
+            if SIGNAL_PATH.exists():
+                print(f"Keeping existing signal: {SIGNAL_PATH}", file=sys.stderr)
             return 0
         return 1
 

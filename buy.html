@@ -42,11 +42,17 @@
       background: #ccc;
     }
     .buy-button {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 54px;
+      box-sizing: border-box;
       margin: 8px 0;
       padding: 14px 28px;
       font-weight: bold;
       font-size: 1.2em;
+      line-height: 1.2;
       color: white;
       background-color: #3c67e3;
       border-radius: 8px;
@@ -57,6 +63,10 @@
     }
     .buy-button:hover {
       background-color: #2a4fcc;
+    }
+    .moonpay-section,
+    .topper-section {
+      scroll-margin-top: 24px;
     }
     .topper-section {
       margin-top: 28px;
@@ -88,7 +98,6 @@
       font: inherit;
     }
     .topper-button {
-      width: 100%;
       background-color: #0f8f68;
     }
     .topper-button:hover {
@@ -129,10 +138,12 @@
       <button onclick="setLang('zh')">🇨🇳 中文</button>
     </div>
 
-    <button id="buy-btn" class="buy-button">Buy with MoonPay 🚀</button>
+    <div id="moonpay" class="moonpay-section">
+      <button id="buy-btn" class="buy-button">Buy Bitcoin with MoonPay 🚀</button>
+    </div>
 
-    <div class="topper-section">
-      <h2 id="topper-title">Buy BTC with Topper</h2>
+    <div id="topper" class="topper-section">
+      <h2 id="topper-title">Buy Bitcoin with Topper</h2>
 
       <div class="field">
         <label for="topper-address" id="topper-address-label">BTC wallet address</label>
@@ -157,7 +168,7 @@
         />
       </div>
 
-      <button id="topper-btn" class="buy-button topper-button">Buy BTC with Topper</button>
+      <button id="topper-btn" class="buy-button topper-button">Buy Bitcoin with Topper ✨</button>
       <p id="topper-message" class="topper-message" role="status" aria-live="polite"></p>
     </div>
 
@@ -171,11 +182,11 @@
     const texts = {
       en: {
         title: 'Buy Bitcoin',
-        buyBtn: 'Buy with MoonPay 🚀',
-        topperTitle: 'Buy BTC with Topper',
+        buyBtn: 'Buy Bitcoin with MoonPay 🚀',
+        topperTitle: 'Buy Bitcoin with Topper',
         topperAddressLabel: 'BTC wallet address',
         topperAmountLabel: 'Amount in USD',
-        topperBtn: 'Buy BTC with Topper',
+        topperBtn: 'Buy Bitcoin with Topper ✨',
         footer: 'Powered by MoonPay and Topper',
         missingAddress: 'Enter a BTC wallet address before opening Topper.',
         apiNotConfigured: 'Topper API URL is not configured yet. Replace YOUR-VERCEL-PROJECT in buy.html.',
@@ -187,11 +198,11 @@
       },
       ru: {
         title: 'Купить Биткойн',
-        buyBtn: 'Купить через MoonPay 🚀',
-        topperTitle: 'Купить BTC через Topper',
+        buyBtn: 'Купить Биткоин с MoonPay 🚀',
+        topperTitle: 'Купить Биткоин с Topper',
         topperAddressLabel: 'BTC-адрес кошелька',
         topperAmountLabel: 'Сумма в USD',
-        topperBtn: 'Купить BTC через Topper',
+        topperBtn: 'Купить Биткоин с Topper ✨',
         footer: 'При поддержке MoonPay и Topper',
         missingAddress: 'Введите BTC-адрес кошелька перед открытием Topper.',
         apiNotConfigured: 'URL Topper API еще не настроен. Замените YOUR-VERCEL-PROJECT в buy.html.',
@@ -203,11 +214,11 @@
       },
       he: {
         title: 'קנה ביטקוין',
-        buyBtn: 'קנה דרך MoonPay 🚀',
-        topperTitle: 'קנה BTC דרך Topper',
+        buyBtn: 'קנה ביטקוין עם MoonPay 🚀',
+        topperTitle: 'קנה ביטקוין עם Topper',
         topperAddressLabel: 'כתובת ארנק BTC',
         topperAmountLabel: 'סכום בדולר',
-        topperBtn: 'קנה BTC דרך Topper',
+        topperBtn: 'קנה ביטקוין עם Topper ✨',
         footer: 'בהפעלה של MoonPay ו-Topper',
         missingAddress: 'הזן כתובת ארנק BTC לפני פתיחת Topper.',
         apiNotConfigured: 'כתובת Topper API עדיין לא הוגדרה. החלף את YOUR-VERCEL-PROJECT בקובץ buy.html.',
@@ -219,11 +230,11 @@
       },
       de: {
         title: 'Bitcoin kaufen',
-        buyBtn: 'Mit MoonPay kaufen 🚀',
-        topperTitle: 'BTC mit Topper kaufen',
+        buyBtn: 'Bitcoin mit MoonPay kaufen 🚀',
+        topperTitle: 'Bitcoin mit Topper kaufen',
         topperAddressLabel: 'BTC-Wallet-Adresse',
         topperAmountLabel: 'Betrag in USD',
-        topperBtn: 'BTC mit Topper kaufen',
+        topperBtn: 'Bitcoin mit Topper kaufen ✨',
         footer: 'Bereitgestellt von MoonPay und Topper',
         missingAddress: 'Geben Sie eine BTC-Wallet-Adresse ein, bevor Topper geöffnet wird.',
         apiNotConfigured: 'Die Topper-API-URL ist noch nicht konfiguriert. Ersetzen Sie YOUR-VERCEL-PROJECT in buy.html.',
@@ -235,11 +246,11 @@
       },
       fr: {
         title: 'Acheter du Bitcoin',
-        buyBtn: 'Acheter avec MoonPay 🚀',
-        topperTitle: 'Acheter du BTC avec Topper',
+        buyBtn: 'Acheter du Bitcoin avec MoonPay 🚀',
+        topperTitle: 'Acheter du Bitcoin avec Topper',
         topperAddressLabel: 'Adresse du portefeuille BTC',
         topperAmountLabel: 'Montant en USD',
-        topperBtn: 'Acheter du BTC avec Topper',
+        topperBtn: 'Acheter du Bitcoin avec Topper ✨',
         footer: 'Propulsé par MoonPay et Topper',
         missingAddress: 'Saisissez une adresse de portefeuille BTC avant d’ouvrir Topper.',
         apiNotConfigured: 'L’URL de l’API Topper n’est pas encore configurée. Remplacez YOUR-VERCEL-PROJECT dans buy.html.',
@@ -251,11 +262,11 @@
       },
       es: {
         title: 'Comprar Bitcoin',
-        buyBtn: 'Comprar con MoonPay 🚀',
-        topperTitle: 'Comprar BTC con Topper',
+        buyBtn: 'Comprar Bitcoin con MoonPay 🚀',
+        topperTitle: 'Comprar Bitcoin con Topper',
         topperAddressLabel: 'Dirección de billetera BTC',
         topperAmountLabel: 'Importe en USD',
-        topperBtn: 'Comprar BTC con Topper',
+        topperBtn: 'Comprar Bitcoin con Topper ✨',
         footer: 'Con tecnología de MoonPay y Topper',
         missingAddress: 'Ingresa una dirección de billetera BTC antes de abrir Topper.',
         apiNotConfigured: 'La URL de la API de Topper aún no está configurada. Reemplaza YOUR-VERCEL-PROJECT en buy.html.',
@@ -267,11 +278,11 @@
       },
       zh: {
         title: '购买比特币',
-        buyBtn: '通过 MoonPay 购买 🚀',
-        topperTitle: '通过 Topper 购买 BTC',
+        buyBtn: '使用 MoonPay 购买比特币 🚀',
+        topperTitle: '使用 Topper 购买比特币',
         topperAddressLabel: 'BTC 钱包地址',
         topperAmountLabel: 'USD 金额',
-        topperBtn: '通过 Topper 购买 BTC',
+        topperBtn: '使用 Topper 购买比特币 ✨',
         footer: '由 MoonPay 和 Topper 提供支持',
         missingAddress: '请先输入 BTC 钱包地址，然后再打开 Topper。',
         apiNotConfigured: 'Topper API URL 尚未配置。请在 buy.html 中替换 YOUR-VERCEL-PROJECT。',
