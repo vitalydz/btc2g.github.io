@@ -19,9 +19,10 @@
     }
 
     .container {
+      position: relative;
       max-width: 960px;
       margin: auto;
-      padding: 20px;
+      padding: 64px 20px 20px;
       background: #222;
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
@@ -143,23 +144,29 @@
       font-weight: bold;
     }
 
-    .lang-switch {
-      margin-top: 20px;
+    .language-control {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: flex-end;
     }
 
-    .lang-switch button {
-      margin: 5px;
-      padding: 8px 12px;
-      border: none;
+    .language-control select {
+      min-height: 32px;
+      min-width: 132px;
+      box-sizing: border-box;
+      padding: 4px 30px 4px 10px;
+      border: 1px solid #565656;
       border-radius: 6px;
       background: #3a3a3a;
       color: white;
       cursor: pointer;
       font-weight: bold;
-      min-width: 80px;
+      font: inherit;
     }
 
-    .lang-switch button:hover {
+    .language-control select:hover {
       background: #555;
     }
 
@@ -288,13 +295,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      flex: 1 1 280px;
-      max-width: 330px;
+      flex: 0 1 260px;
+      max-width: 260px;
       min-height: 48px;
       box-sizing: border-box;
-      padding: 12px 24px;
+      padding: 0 16px;
       color: white;
       text-decoration: none;
+      font-size: 0.98em;
       font-weight: bold;
       border-radius: 6px;
       transition: background 0.3s;
@@ -408,6 +416,9 @@
       .topper-btn,
       .update-btn {
         width: 100%;
+        max-width: 320px;
+        margin-left: auto;
+        margin-right: auto;
         box-sizing: border-box;
       }
     }
@@ -489,14 +500,16 @@
       <span id="refresh-chart-text">Update chart manually</span>
     </button>
 
-    <div class="lang-switch">
-      <button onclick="setLang('en')">English</button>
-      <button onclick="setLang('ru')">Русский</button>
-      <button onclick="setLang('he')">עברית</button>
-      <button onclick="setLang('de')">Deutsch</button>
-      <button onclick="setLang('fr')">Français</button>
-      <button onclick="setLang('es')">Español</button>
-      <button onclick="setLang('zh')">中文</button>
+    <div class="language-control">
+      <select id="language-select" aria-label="Language">
+        <option value="en">English</option>
+        <option value="ru">Русский</option>
+        <option value="he">עברית</option>
+        <option value="de">Deutsch</option>
+        <option value="fr">Français</option>
+        <option value="es">Español</option>
+        <option value="zh">中文</option>
+      </select>
     </div>
   </div>
 
@@ -688,6 +701,7 @@
         buyTitle: 'Buy Bitcoin',
         disclaimer: 'This forecast is for informational purposes only and is not financial advice.',
         refreshChart: 'Update chart manually',
+        languageLabel: 'Language',
         moonpay: 'Buy Bitcoin with MoonPay 🚀',
         topper: 'Buy Bitcoin with Topper ✨',
         about: 'About',
@@ -726,6 +740,7 @@
         buyTitle: 'Купить Биткоин',
         disclaimer: 'Этот прогноз предназначен только для информации и не является финансовым советом.',
         refreshChart: 'Обновить график вручную',
+        languageLabel: 'Язык',
         moonpay: 'Купить Биткоин с MoonPay 🚀',
         topper: 'Купить Биткоин с Topper ✨',
         about: 'О проекте',
@@ -764,6 +779,7 @@
         buyTitle: 'קנה ביטקוין',
         disclaimer: 'התחזית מיועדת למידע בלבד ואינה ייעוץ פיננסי.',
         refreshChart: 'רענן את התרשים ידנית',
+        languageLabel: 'שפה',
         moonpay: 'קנה ביטקוין עם MoonPay 🚀',
         topper: 'קנה ביטקוין עם Topper ✨',
         about: 'אודות',
@@ -802,6 +818,7 @@
         buyTitle: 'Bitcoin kaufen',
         disclaimer: 'Diese Prognose dient nur zu Informationszwecken und ist keine Finanzberatung.',
         refreshChart: 'Diagramm manuell aktualisieren',
+        languageLabel: 'Sprache',
         moonpay: 'Bitcoin mit MoonPay kaufen 🚀',
         topper: 'Bitcoin mit Topper kaufen ✨',
         about: 'Über uns',
@@ -840,6 +857,7 @@
         buyTitle: 'Acheter du Bitcoin',
         disclaimer: 'Cette prévision est fournie à titre informatif uniquement et ne constitue pas un conseil financier.',
         refreshChart: 'Actualiser le graphique',
+        languageLabel: 'Langue',
         moonpay: 'Acheter du Bitcoin avec MoonPay 🚀',
         topper: 'Acheter du Bitcoin avec Topper ✨',
         about: 'À propos',
@@ -878,6 +896,7 @@
         buyTitle: 'Comprar Bitcoin',
         disclaimer: 'Este pronóstico es solo informativo y no constituye asesoramiento financiero.',
         refreshChart: 'Actualizar gráfico manualmente',
+        languageLabel: 'Idioma',
         moonpay: 'Comprar Bitcoin con MoonPay 🚀',
         topper: 'Comprar Bitcoin con Topper ✨',
         about: 'Acerca de',
@@ -916,6 +935,7 @@
         buyTitle: '购买比特币',
         disclaimer: '本预测仅供参考，不构成财务建议。',
         refreshChart: '手动刷新图表',
+        languageLabel: '语言',
         moonpay: '使用 MoonPay 购买比特币 🚀',
         topper: '使用 Topper 购买比特币 ✨',
         about: '关于',
@@ -931,6 +951,9 @@
       currentLang = lang;
       document.documentElement.lang = lang;
       document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+      document.getElementById('language-select').value = lang;
+      document.getElementById('language-select').setAttribute('aria-label', text.languageLabel);
+      document.getElementById('language-select').title = text.languageLabel;
       document.getElementById('title').textContent = text.title;
       document.getElementById('subtitle').textContent = text.subtitle.replace('{date}', localizedToday);
       document.getElementById('signal-title').textContent = text.signalTitle;
@@ -955,6 +978,10 @@
       document.getElementById('terms-link').textContent = text.terms;
       renderSignal();
     }
+
+    document.getElementById('language-select').addEventListener('change', (event) => {
+      setLang(event.target.value);
+    });
 
     function isValidEmail(email) {
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
