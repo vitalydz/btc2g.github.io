@@ -240,6 +240,18 @@ Keep payment secrets, webhook signing secrets, and user entitlement checks on a 
 
 No card data is handled by BTC2G. Stripe Checkout collects payment details on Stripe-hosted pages.
 
+## Premium Page
+
+`premium.html` is a product presentation page for BTC2G Premium Signals. It shows the planned `$4.99/month` price, included Premium features, and cautious product positioning.
+
+Payments are not connected from `premium.html` yet. The "Get early access" CTA links to the existing homepage subscription form:
+
+```text
+index.html#subscribe-form
+```
+
+This reuses the existing Formspree subscription flow instead of adding a second email form. Future payment options may include PayPal, Paddle, or Lemon Squeezy after pricing, access rules, and subscription management are finalized.
+
 ## Stripe Premium Subscription Setup
 
 1. Create or open your Stripe account.
