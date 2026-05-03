@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Buy BTC</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -200,6 +207,12 @@
     const TOPPER_API_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/topper/token";
     let currentLang = 'en';
 
+    function trackEvent(eventName) {
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', eventName);
+      }
+    }
+
     const texts = {
       en: {
         title: 'Buy Bitcoin',
@@ -376,6 +389,7 @@
     }
 
     document.getElementById('topper-btn').addEventListener('click', async () => {
+      trackEvent('buy_topper_click');
       const topperBtn = document.getElementById('topper-btn');
       const payload = getTopperRequestPayload();
 
@@ -441,6 +455,7 @@
       });
 
       document.getElementById('buy-btn').addEventListener('click', () => {
+        trackEvent('buy_moonpay_click');
         if (moonPaySdk) {
           moonPaySdk.show();
         } else {

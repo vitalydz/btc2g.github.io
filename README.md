@@ -135,6 +135,39 @@ http://127.0.0.1:8765/index.html
 
 Do not commit private API keys. Formspree form URLs are meant for frontend use, but do not add any private provider secret to `index.html`.
 
+## Analytics setup
+
+BTC2G uses a basic Google Analytics 4 placeholder so page views and key monetization events can be measured without custom tracking infrastructure.
+
+Create a GA4 property in Google Analytics, then replace this placeholder in each HTML page:
+
+```text
+G-XXXXXXXXXX
+```
+
+Use your real GA4 Measurement ID, for example:
+
+```text
+G-ABC1234567
+```
+
+Tracked events:
+
+- `buy_moonpay_click`: user clicks a MoonPay buy button.
+- `buy_topper_click`: user clicks a Topper buy button.
+- `email_subscribe`: Formspree subscription succeeds.
+- `premium_click`: user clicks the Premium unlock button.
+
+Event calls use a safe helper:
+
+```js
+if (typeof window.gtag === 'function') {
+  window.gtag('event', eventName);
+}
+```
+
+If analytics is blocked or the Measurement ID is not replaced yet, site functionality still works.
+
 ## Localized dates
 
 Dates are stored internally as ISO `YYYY-MM-DD` and localized only in the UI. The homepage uses `Intl.DateTimeFormat` to render the forecast/model date according to the selected site language.
