@@ -22,7 +22,7 @@
       position: relative;
       max-width: 960px;
       margin: auto;
-      padding: 64px 20px 20px;
+      padding: 72px 20px 20px;
       background: #222;
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
@@ -126,6 +126,22 @@
       display: block;
     }
 
+    .premium-locked {
+      margin: 16px auto 0;
+      max-width: 520px;
+      padding: 14px;
+      border: 1px solid #454545;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #dddddd;
+    }
+
+    .premium-locked strong {
+      display: block;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
     img {
       max-width: 100%;
       height: auto;
@@ -177,6 +193,7 @@
     }
 
     .chart-explanation h2,
+    .premium-section h2,
     .buy-cta h2 {
       margin: 0 0 10px;
       font-size: 1.35em;
@@ -184,10 +201,124 @@
     }
 
     .chart-explanation p,
+    .premium-section p,
     .buy-cta p {
       margin: 0;
       color: #dddddd;
       line-height: 1.6;
+    }
+
+    .premium-section {
+      margin: 24px auto 0;
+      max-width: 820px;
+      padding: 22px;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      background: #1b1b1b;
+      text-align: left;
+    }
+
+    .premium-list,
+    .premium-modal-list {
+      margin: 14px 0 18px;
+      padding-left: 22px;
+      color: #dddddd;
+      line-height: 1.7;
+    }
+
+    [dir="rtl"] .premium-list,
+    [dir="rtl"] .premium-modal-list {
+      padding-left: 0;
+      padding-right: 22px;
+    }
+
+    .premium-button {
+      min-height: 48px;
+      padding: 12px 22px;
+      border: none;
+      border-radius: 6px;
+      background: #f2a900;
+      color: #181818;
+      cursor: pointer;
+      font: inherit;
+      font-weight: bold;
+    }
+
+    .premium-button:hover {
+      background: #d99600;
+    }
+
+    .premium-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.72);
+    }
+
+    .premium-modal[hidden] {
+      display: none;
+    }
+
+    .premium-modal-content {
+      position: relative;
+      width: min(560px, 100%);
+      max-height: min(720px, calc(100vh - 36px));
+      overflow-y: auto;
+      box-sizing: border-box;
+      padding: 26px;
+      border: 1px solid #3f3f3f;
+      border-radius: 8px;
+      background: #1b1b1b;
+      color: #ffffff;
+      text-align: left;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+    }
+
+    [dir="rtl"] .premium-modal-content {
+      text-align: right;
+    }
+
+    .premium-modal-content h2 {
+      margin: 0 34px 10px 0;
+      font-size: 1.45em;
+    }
+
+    [dir="rtl"] .premium-modal-content h2 {
+      margin: 0 0 10px 34px;
+    }
+
+    .premium-modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 50%;
+      background: #333333;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 1.25em;
+      line-height: 1;
+    }
+
+    [dir="rtl"] .premium-modal-close {
+      right: auto;
+      left: 14px;
+    }
+
+    .premium-price {
+      margin: 12px 0 16px;
+      color: #f2d14b;
+      font-weight: bold;
+    }
+
+    .premium-form {
+      margin-top: 14px;
     }
 
     .buy-cta {
@@ -295,13 +426,13 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      flex: 0 1 260px;
-      max-width: 260px;
+      flex: 0 0 auto;
       min-height: 48px;
       box-sizing: border-box;
-      padding: 0 16px;
+      padding: 12px 22px;
       color: white;
       text-decoration: none;
+      font: inherit;
       font-size: 0.98em;
       font-weight: bold;
       border-radius: 6px;
@@ -381,7 +512,7 @@
       }
 
       .container {
-        padding: 14px;
+        padding: 72px 14px 14px;
       }
 
       .signal-card {
@@ -395,17 +526,25 @@
       }
 
       .chart-explanation,
+      .premium-section,
       .subscribe-section,
       .buy-cta {
         text-align: left;
       }
 
-      .subscribe-form {
+      .subscribe-form,
+      .premium-form {
         flex-direction: column;
       }
 
-      .subscribe-form button {
+      .subscribe-form button,
+      .premium-form button,
+      .premium-button {
         width: 100%;
+      }
+
+      .premium-modal-content {
+        padding: 22px 16px;
       }
 
       .cta-buttons {
@@ -416,7 +555,7 @@
       .topper-btn,
       .update-btn {
         width: 100%;
-        max-width: 320px;
+        max-width: none;
         margin-left: auto;
         margin-right: auto;
         box-sizing: border-box;
@@ -438,6 +577,21 @@
       <p id="signal-disclaimer" class="signal-disclaimer">This signal is based on the BTC vs Gold model and is not financial advice.</p>
       <button id="signal-toggle" class="signal-toggle" type="button" aria-expanded="false" aria-controls="signal-explanation">What is this?</button>
       <p id="signal-explanation" class="signal-explanation">This signal is derived from the BTC vs Gold ratio model. It reflects relative valuation, not short-term price predictions.</p>
+      <div id="premium-next-card" class="premium-locked">
+        <strong id="premium-next-title">Next model move (Premium) 🔒</strong>
+        <span id="premium-next-text">Premium feature</span>
+      </div>
+    </section>
+
+    <section class="premium-section" aria-labelledby="premium-title">
+      <h2 id="premium-title">Premium BTC Signals</h2>
+      <p id="premium-subtitle">Model insights for users who want more detail.</p>
+      <ul class="premium-list">
+        <li id="premium-item-insights">Get detailed model insights</li>
+        <li id="premium-item-forecasts">Access extended forecasts</li>
+        <li id="premium-item-history">See signal history and confidence trends</li>
+      </ul>
+      <button id="premium-unlock-btn" class="premium-button" type="button">Unlock Premium</button>
     </section>
 
     <img
@@ -513,6 +667,33 @@
     </div>
   </div>
 
+  <div id="premium-modal" class="premium-modal" role="dialog" aria-modal="true" aria-labelledby="premium-modal-title" hidden>
+    <div class="premium-modal-content">
+      <button id="premium-modal-close" class="premium-modal-close" type="button" aria-label="Close">×</button>
+      <h2 id="premium-modal-title">Premium BTC Signals</h2>
+      <p id="premium-modal-intro">Premium includes:</p>
+      <ul class="premium-modal-list">
+        <li id="premium-modal-breakdown">Detailed signal breakdown</li>
+        <li id="premium-modal-zones">Model-based entry zones</li>
+        <li id="premium-modal-early">Early signal updates</li>
+        <li id="premium-modal-weekly">Weekly forecast updates</li>
+      </ul>
+      <p id="premium-price" class="premium-price">Coming soon</p>
+      <form id="premium-form" class="subscribe-form premium-form" novalidate>
+        <input
+          id="premium-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          placeholder="you@example.com"
+          aria-describedby="premium-message"
+        />
+        <button id="premium-submit-button" type="submit">Get early access</button>
+      </form>
+      <p id="premium-message" class="subscribe-message" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
   <footer>
     <p>
       <a href="about.html" id="about-link">About</a> |
@@ -526,6 +707,7 @@
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
     const SUBSCRIPTION_ENDPOINT = 'https://formspree.io/f/YOUR_ID';
+    const isPremiumUser = false;
     let currentLang = 'en';
     let currentSignalData = null;
     const LOCALE_BY_LANGUAGE = {
@@ -624,6 +806,14 @@
       document.getElementById('signal-note').textContent = currentSignalData.note || '';
     }
 
+    function renderPremiumState() {
+      const text = texts[currentLang];
+      const premiumCard = document.getElementById('premium-next-card');
+      document.getElementById('premium-next-title').textContent = text.premiumNextTitle;
+      document.getElementById('premium-next-text').textContent = isPremiumUser ? text.premiumNextUnlocked : text.premiumNextLocked;
+      premiumCard.classList.toggle('premium-locked', !isPremiumUser);
+    }
+
     async function loadSignal() {
       try {
         const response = await fetch(`${SIGNAL_PATH}?v=${encodeURIComponent(todayStr)}`);
@@ -702,6 +892,27 @@
         disclaimer: 'This forecast is for informational purposes only and is not financial advice.',
         refreshChart: 'Update chart manually',
         languageLabel: 'Language',
+        premiumNextTitle: 'Next model move (Premium) 🔒',
+        premiumNextLocked: 'Premium feature',
+        premiumNextUnlocked: 'Extended model move details are enabled.',
+        premiumTitle: 'Premium BTC Signals',
+        premiumSubtitle: 'Model insights for users who want more detail.',
+        premiumInsight: 'Get detailed model insights',
+        premiumForecasts: 'Access extended forecasts',
+        premiumHistory: 'See signal history and confidence trends',
+        premiumUnlock: 'Unlock Premium',
+        premiumModalTitle: 'Premium BTC Signals',
+        premiumModalIntro: 'Premium includes:',
+        premiumBreakdown: 'Detailed signal breakdown',
+        premiumZones: 'Model-based entry zones',
+        premiumEarly: 'Early signal updates',
+        premiumWeekly: 'Weekly forecast updates',
+        premiumPrice: 'Coming soon',
+        premiumEmailPlaceholder: 'you@example.com',
+        premiumSubmit: 'Get early access',
+        premiumSuccess: 'You will be notified when Premium is available.',
+        premiumSource: 'BTC2G Premium early access',
+        closeModal: 'Close',
         moonpay: 'Buy Bitcoin with MoonPay 🚀',
         topper: 'Buy Bitcoin with Topper ✨',
         about: 'About',
@@ -741,6 +952,27 @@
         disclaimer: 'Этот прогноз предназначен только для информации и не является финансовым советом.',
         refreshChart: 'Обновить график вручную',
         languageLabel: 'Язык',
+        premiumNextTitle: 'Следующее движение модели (Premium) 🔒',
+        premiumNextLocked: 'Премиум-функция',
+        premiumNextUnlocked: 'Расширенные детали движения модели включены.',
+        premiumTitle: 'Премиум BTC-сигналы',
+        premiumSubtitle: 'Инсайты модели для пользователей, которым нужно больше деталей.',
+        premiumInsight: 'Получайте подробные инсайты модели',
+        premiumForecasts: 'Доступ к расширенным прогнозам',
+        premiumHistory: 'История сигналов и тренды уверенности',
+        premiumUnlock: 'Открыть Premium',
+        premiumModalTitle: 'Премиум BTC-сигналы',
+        premiumModalIntro: 'Premium включает:',
+        premiumBreakdown: 'Подробный разбор сигнала',
+        premiumZones: 'Модельные зоны входа',
+        premiumEarly: 'Ранние обновления сигналов',
+        premiumWeekly: 'Еженедельные обновления прогноза',
+        premiumPrice: 'Скоро',
+        premiumEmailPlaceholder: 'you@example.com',
+        premiumSubmit: 'Получить ранний доступ',
+        premiumSuccess: 'Мы сообщим вам, когда Premium будет доступен.',
+        premiumSource: 'BTC2G Premium ранний доступ',
+        closeModal: 'Закрыть',
         moonpay: 'Купить Биткоин с MoonPay 🚀',
         topper: 'Купить Биткоин с Topper ✨',
         about: 'О проекте',
@@ -780,6 +1012,27 @@
         disclaimer: 'התחזית מיועדת למידע בלבד ואינה ייעוץ פיננסי.',
         refreshChart: 'רענן את התרשים ידנית',
         languageLabel: 'שפה',
+        premiumNextTitle: 'המהלך הבא של המודל (Premium) 🔒',
+        premiumNextLocked: 'תכונת Premium',
+        premiumNextUnlocked: 'פרטי המהלך המורחבים של המודל זמינים.',
+        premiumTitle: 'איתותי BTC Premium',
+        premiumSubtitle: 'תובנות מודל למשתמשים שרוצים יותר פירוט.',
+        premiumInsight: 'קבל תובנות מודל מפורטות',
+        premiumForecasts: 'גישה לתחזיות מורחבות',
+        premiumHistory: 'הצג היסטוריית איתותים ומגמות ביטחון',
+        premiumUnlock: 'פתח Premium',
+        premiumModalTitle: 'איתותי BTC Premium',
+        premiumModalIntro: 'Premium כולל:',
+        premiumBreakdown: 'פירוט איתות מפורט',
+        premiumZones: 'אזורי כניסה מבוססי מודל',
+        premiumEarly: 'עדכוני איתות מוקדמים',
+        premiumWeekly: 'עדכוני תחזית שבועיים',
+        premiumPrice: 'בקרוב',
+        premiumEmailPlaceholder: 'you@example.com',
+        premiumSubmit: 'קבל גישה מוקדמת',
+        premiumSuccess: 'נעדכן אותך כאשר Premium יהיה זמין.',
+        premiumSource: 'גישה מוקדמת ל-BTC2G Premium',
+        closeModal: 'סגור',
         moonpay: 'קנה ביטקוין עם MoonPay 🚀',
         topper: 'קנה ביטקוין עם Topper ✨',
         about: 'אודות',
@@ -819,6 +1072,27 @@
         disclaimer: 'Diese Prognose dient nur zu Informationszwecken und ist keine Finanzberatung.',
         refreshChart: 'Diagramm manuell aktualisieren',
         languageLabel: 'Sprache',
+        premiumNextTitle: 'Nächste Modellbewegung (Premium) 🔒',
+        premiumNextLocked: 'Premium-Funktion',
+        premiumNextUnlocked: 'Erweiterte Details zur Modellbewegung sind aktiviert.',
+        premiumTitle: 'Premium-BTC-Signale',
+        premiumSubtitle: 'Modell-Insights für Nutzer, die mehr Details möchten.',
+        premiumInsight: 'Detaillierte Modell-Insights erhalten',
+        premiumForecasts: 'Erweiterte Prognosen nutzen',
+        premiumHistory: 'Signalhistorie und Konfidenztrends sehen',
+        premiumUnlock: 'Premium freischalten',
+        premiumModalTitle: 'Premium-BTC-Signale',
+        premiumModalIntro: 'Premium enthält:',
+        premiumBreakdown: 'Detaillierte Signalaufschlüsselung',
+        premiumZones: 'Modellbasierte Einstiegszonen',
+        premiumEarly: 'Frühe Signal-Updates',
+        premiumWeekly: 'Wöchentliche Prognose-Updates',
+        premiumPrice: 'Demnächst',
+        premiumEmailPlaceholder: 'you@example.com',
+        premiumSubmit: 'Frühen Zugang erhalten',
+        premiumSuccess: 'Sie werden benachrichtigt, wenn Premium verfügbar ist.',
+        premiumSource: 'BTC2G Premium Frühzugang',
+        closeModal: 'Schließen',
         moonpay: 'Bitcoin mit MoonPay kaufen 🚀',
         topper: 'Bitcoin mit Topper kaufen ✨',
         about: 'Über uns',
@@ -858,6 +1132,27 @@
         disclaimer: 'Cette prévision est fournie à titre informatif uniquement et ne constitue pas un conseil financier.',
         refreshChart: 'Actualiser le graphique',
         languageLabel: 'Langue',
+        premiumNextTitle: 'Prochain mouvement du modèle (Premium) 🔒',
+        premiumNextLocked: 'Fonction Premium',
+        premiumNextUnlocked: 'Les détails étendus du mouvement du modèle sont activés.',
+        premiumTitle: 'Signaux BTC Premium',
+        premiumSubtitle: 'Des insights du modèle pour les utilisateurs qui veulent plus de détails.',
+        premiumInsight: 'Obtenir des insights détaillés du modèle',
+        premiumForecasts: 'Accéder à des prévisions étendues',
+        premiumHistory: 'Voir l’historique des signaux et les tendances de confiance',
+        premiumUnlock: 'Débloquer Premium',
+        premiumModalTitle: 'Signaux BTC Premium',
+        premiumModalIntro: 'Premium inclut :',
+        premiumBreakdown: 'Analyse détaillée du signal',
+        premiumZones: 'Zones d’entrée basées sur le modèle',
+        premiumEarly: 'Mises à jour anticipées des signaux',
+        premiumWeekly: 'Mises à jour hebdomadaires des prévisions',
+        premiumPrice: 'Bientôt disponible',
+        premiumEmailPlaceholder: 'you@example.com',
+        premiumSubmit: 'Obtenir un accès anticipé',
+        premiumSuccess: 'Vous serez averti lorsque Premium sera disponible.',
+        premiumSource: 'Accès anticipé BTC2G Premium',
+        closeModal: 'Fermer',
         moonpay: 'Acheter du Bitcoin avec MoonPay 🚀',
         topper: 'Acheter du Bitcoin avec Topper ✨',
         about: 'À propos',
@@ -897,6 +1192,27 @@
         disclaimer: 'Este pronóstico es solo informativo y no constituye asesoramiento financiero.',
         refreshChart: 'Actualizar gráfico manualmente',
         languageLabel: 'Idioma',
+        premiumNextTitle: 'Próximo movimiento del modelo (Premium) 🔒',
+        premiumNextLocked: 'Función Premium',
+        premiumNextUnlocked: 'Los detalles extendidos del movimiento del modelo están activos.',
+        premiumTitle: 'Señales BTC Premium',
+        premiumSubtitle: 'Insights del modelo para usuarios que quieren más detalle.',
+        premiumInsight: 'Obtén insights detallados del modelo',
+        premiumForecasts: 'Accede a pronósticos extendidos',
+        premiumHistory: 'Consulta historial de señales y tendencias de confianza',
+        premiumUnlock: 'Desbloquear Premium',
+        premiumModalTitle: 'Señales BTC Premium',
+        premiumModalIntro: 'Premium incluye:',
+        premiumBreakdown: 'Desglose detallado de la señal',
+        premiumZones: 'Zonas de entrada basadas en el modelo',
+        premiumEarly: 'Actualizaciones tempranas de señales',
+        premiumWeekly: 'Actualizaciones semanales del pronóstico',
+        premiumPrice: 'Próximamente',
+        premiumEmailPlaceholder: 'you@example.com',
+        premiumSubmit: 'Obtener acceso anticipado',
+        premiumSuccess: 'Te avisaremos cuando Premium esté disponible.',
+        premiumSource: 'Acceso anticipado BTC2G Premium',
+        closeModal: 'Cerrar',
         moonpay: 'Comprar Bitcoin con MoonPay 🚀',
         topper: 'Comprar Bitcoin con Topper ✨',
         about: 'Acerca de',
@@ -936,6 +1252,27 @@
         disclaimer: '本预测仅供参考，不构成财务建议。',
         refreshChart: '手动刷新图表',
         languageLabel: '语言',
+        premiumNextTitle: '下一个模型走势（Premium）🔒',
+        premiumNextLocked: 'Premium 功能',
+        premiumNextUnlocked: '扩展模型走势详情已启用。',
+        premiumTitle: 'Premium BTC 信号',
+        premiumSubtitle: '为需要更多细节的用户提供模型洞察。',
+        premiumInsight: '获取详细模型洞察',
+        premiumForecasts: '访问扩展预测',
+        premiumHistory: '查看信号历史和置信度趋势',
+        premiumUnlock: '解锁 Premium',
+        premiumModalTitle: 'Premium BTC 信号',
+        premiumModalIntro: 'Premium 包括：',
+        premiumBreakdown: '详细信号分解',
+        premiumZones: '基于模型的入场区域',
+        premiumEarly: '提前信号更新',
+        premiumWeekly: '每周预测更新',
+        premiumPrice: '即将推出',
+        premiumEmailPlaceholder: 'you@example.com',
+        premiumSubmit: '获取早期访问',
+        premiumSuccess: 'Premium 可用时我们会通知你。',
+        premiumSource: 'BTC2G Premium 早期访问',
+        closeModal: '关闭',
         moonpay: '使用 MoonPay 购买比特币 🚀',
         topper: '使用 Topper 购买比特币 ✨',
         about: '关于',
@@ -968,6 +1305,22 @@
       document.getElementById('subscriber-email').placeholder = text.subscribePlaceholder;
       document.getElementById('subscribe-button').textContent = text.subscribeButton;
       document.getElementById('subscribe-trust').textContent = text.subscribeTrust;
+      document.getElementById('premium-title').textContent = text.premiumTitle;
+      document.getElementById('premium-subtitle').textContent = text.premiumSubtitle;
+      document.getElementById('premium-item-insights').textContent = text.premiumInsight;
+      document.getElementById('premium-item-forecasts').textContent = text.premiumForecasts;
+      document.getElementById('premium-item-history').textContent = text.premiumHistory;
+      document.getElementById('premium-unlock-btn').textContent = text.premiumUnlock;
+      document.getElementById('premium-modal-title').textContent = text.premiumModalTitle;
+      document.getElementById('premium-modal-intro').textContent = text.premiumModalIntro;
+      document.getElementById('premium-modal-breakdown').textContent = text.premiumBreakdown;
+      document.getElementById('premium-modal-zones').textContent = text.premiumZones;
+      document.getElementById('premium-modal-early').textContent = text.premiumEarly;
+      document.getElementById('premium-modal-weekly').textContent = text.premiumWeekly;
+      document.getElementById('premium-price').textContent = text.premiumPrice;
+      document.getElementById('premium-email').placeholder = text.premiumEmailPlaceholder;
+      document.getElementById('premium-submit-button').textContent = text.premiumSubmit;
+      document.getElementById('premium-modal-close').setAttribute('aria-label', text.closeModal);
       document.getElementById('buy-title').textContent = text.buyTitle;
       document.getElementById('disclaimer-text').textContent = text.disclaimer;
       document.getElementById('refresh-chart-text').textContent = text.refreshChart;
@@ -977,6 +1330,7 @@
       document.getElementById('privacy-link').textContent = text.privacy;
       document.getElementById('terms-link').textContent = text.terms;
       renderSignal();
+      renderPremiumState();
     }
 
     document.getElementById('language-select').addEventListener('change', (event) => {
@@ -987,39 +1341,37 @@
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
-    function setSubscribeMessage(message, isError = false) {
-      const messageEl = document.getElementById('subscribe-message');
+    function setFormMessage(messageId, message, isError = false) {
+      const messageEl = document.getElementById(messageId);
       messageEl.textContent = message;
       messageEl.classList.toggle('error', isError);
     }
 
-    document.getElementById('subscribe-form').addEventListener('submit', async (event) => {
-      event.preventDefault();
-
-      const emailInput = document.getElementById('subscriber-email');
-      const submitButton = document.getElementById('subscribe-button');
+    async function submitEmailSubscription(config) {
+      const emailInput = document.getElementById(config.emailInputId);
+      const submitButton = document.getElementById(config.buttonId);
       const email = emailInput.value.trim();
       const text = texts[currentLang];
 
       if (!email) {
-        setSubscribeMessage(text.subscribeEmpty, true);
+        setFormMessage(config.messageId, text.subscribeEmpty, true);
         return;
       }
 
       if (!isValidEmail(email)) {
-        setSubscribeMessage(text.subscribeInvalid, true);
+        setFormMessage(config.messageId, text.subscribeInvalid, true);
         return;
       }
 
       if (SUBSCRIPTION_ENDPOINT.includes('YOUR_ID')) {
         console.log('Subscription failed: Formspree endpoint is not configured.');
-        setSubscribeMessage(text.subscribeNotConfigured, true);
+        setFormMessage(config.messageId, text.subscribeNotConfigured, true);
         return;
       }
 
       submitButton.disabled = true;
       submitButton.textContent = text.subscribeSending;
-      setSubscribeMessage('');
+      setFormMessage(config.messageId, '');
 
       try {
         const response = await fetch(SUBSCRIPTION_ENDPOINT, {
@@ -1030,7 +1382,7 @@
           },
           body: JSON.stringify({
             email,
-            source: 'BTC2G homepage',
+            source: typeof config.source === 'function' ? config.source(text) : config.source,
           }),
         });
 
@@ -1040,13 +1392,61 @@
 
         console.log('Subscription succeeded.');
         emailInput.value = '';
-        setSubscribeMessage(text.subscribeSuccess);
+        setFormMessage(config.messageId, text[config.successTextKey]);
       } catch (error) {
         console.log('Subscription failed.', error);
-        setSubscribeMessage(text.subscribeError, true);
+        setFormMessage(config.messageId, text.subscribeError, true);
       } finally {
         submitButton.disabled = false;
-        submitButton.textContent = texts[currentLang].subscribeButton;
+        submitButton.textContent = texts[currentLang][config.buttonTextKey];
+      }
+    }
+
+    function attachSubscriptionForm(formId, config) {
+      document.getElementById(formId).addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await submitEmailSubscription(config);
+      });
+    }
+
+    attachSubscriptionForm('subscribe-form', {
+      emailInputId: 'subscriber-email',
+      buttonId: 'subscribe-button',
+      messageId: 'subscribe-message',
+      buttonTextKey: 'subscribeButton',
+      successTextKey: 'subscribeSuccess',
+      source: 'BTC2G homepage',
+    });
+
+    attachSubscriptionForm('premium-form', {
+      emailInputId: 'premium-email',
+      buttonId: 'premium-submit-button',
+      messageId: 'premium-message',
+      buttonTextKey: 'premiumSubmit',
+      successTextKey: 'premiumSuccess',
+      source: (text) => text.premiumSource,
+    });
+
+    function openPremiumModal() {
+      document.getElementById('premium-modal').hidden = false;
+      setFormMessage('premium-message', '');
+      document.getElementById('premium-email').focus();
+    }
+
+    function closePremiumModal() {
+      document.getElementById('premium-modal').hidden = true;
+    }
+
+    document.getElementById('premium-unlock-btn').addEventListener('click', openPremiumModal);
+    document.getElementById('premium-modal-close').addEventListener('click', closePremiumModal);
+    document.getElementById('premium-modal').addEventListener('click', (event) => {
+      if (event.target.id === 'premium-modal') {
+        closePremiumModal();
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !document.getElementById('premium-modal').hidden) {
+        closePremiumModal();
       }
     });
 

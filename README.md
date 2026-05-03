@@ -185,6 +185,28 @@ assets/btc_signal.json
 
 Future accuracy improvements can replace `build_signal(...)` with a more robust model while keeping the JSON shape stable for the frontend.
 
+## Premium Signals (MVP)
+
+The homepage includes a UI-only Premium BTC Signals layer. It does not add payments, authentication, or backend user management yet.
+
+Current MVP behavior:
+
+- Free users still see the current model signal, confidence, and basic explanation.
+- Premium-only areas are marked with a lock and careful wording.
+- `const isPremiumUser = false;` in `index.html` is the temporary frontend gating flag.
+- The "Unlock Premium" button opens a lightweight modal.
+- The modal captures early-access emails through the same Formspree subscription helper used by the main email form.
+
+Premium early access is configured through the same endpoint:
+
+```js
+const SUBSCRIPTION_ENDPOINT = 'https://formspree.io/f/YOUR_ID';
+```
+
+Future paid subscription work can connect Stripe or a similar provider from the Premium modal button flow. Keep payment secrets, webhook signing secrets, and user entitlement checks on a backend. Do not put private keys or payment secrets in frontend files.
+
+No sensitive user data is stored in this repository. Email collection depends on the external form provider configured in `SUBSCRIPTION_ENDPOINT`.
+
 ## Daily BTC vs Gold chart update
 
 The public chart is saved at:
