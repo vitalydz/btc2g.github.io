@@ -202,11 +202,11 @@
 
   <footer>
     <p>
-      <a href="about.html">About</a> |
-      <a href="privacy.html">Privacy Policy</a> |
-      <a href="terms.html">Terms of Service</a>
+      <a href="about.html" id="about-link">About</a> |
+      <a href="privacy.html" id="privacy-link">Privacy Policy</a> |
+      <a href="terms.html" id="terms-link">Terms of Service</a>
     </p>
-    <p>© 2025 BTC2G</p>
+    <p>© 2026 BTC2G</p>
   </footer>
 
   <script>
@@ -249,63 +249,96 @@
       en: {
         title: 'Bitcoin vs Gold Forecast',
         subtitle: `From 2016 to ${todayStr}, with projection to 2030`,
+        chartError: 'The BTC vs Gold Forecast chart is unavailable right now. Please try refreshing it.',
         refreshChart: 'Update chart manually',
         moonpay: 'Buy Bitcoin via MoonPay 🚀',
         topper: 'Buy BTC with Topper',
+        about: 'About',
+        privacy: 'Privacy Policy',
+        terms: 'Terms of Service',
       },
       ru: {
         title: 'Прогноз: Биткоин против золота',
         subtitle: `С 2016 по ${todayStr}, прогноз до 2030 года`,
+        chartError: 'График прогноза BTC и золота сейчас недоступен. Попробуйте обновить его.',
         refreshChart: 'Обновить график вручную',
         moonpay: 'Купить Биткоин через MoonPay 🚀',
         topper: 'Купить BTC через Topper',
+        about: 'О проекте',
+        privacy: 'Политика конфиденциальности',
+        terms: 'Условия использования',
       },
       he: {
         title: 'תחזית: ביטקוין מול זהב',
         subtitle: `מ־2016 עד ${todayStr}, תחזית עד 2030`,
+        chartError: 'תרשים תחזית BTC מול זהב אינו זמין כרגע. נסה לרענן אותו.',
         refreshChart: 'רענן את התרשים ידנית',
         moonpay: '🚀 MoonPay קנה ביטקוין דרך',
         topper: 'קנה BTC דרך Topper',
+        about: 'אודות',
+        privacy: 'מדיניות פרטיות',
+        terms: 'תנאי שימוש',
       },
       de: {
         title: 'Bitcoin vs Gold Prognose',
         subtitle: `Von 2016 bis ${todayStr}, mit Prognose bis 2030`,
+        chartError: 'Das BTC-vs-Gold-Prognosediagramm ist derzeit nicht verfügbar. Bitte aktualisieren Sie es.',
         refreshChart: 'Diagramm manuell aktualisieren',
         moonpay: 'Bitcoin über MoonPay kaufen 🚀',
         topper: 'BTC mit Topper kaufen',
+        about: 'Über uns',
+        privacy: 'Datenschutz',
+        terms: 'Nutzungsbedingungen',
       },
       fr: {
         title: 'Prévision Bitcoin contre Or',
         subtitle: `De 2016 à ${todayStr}, avec projection jusqu’en 2030`,
+        chartError: 'Le graphique de prévision BTC contre or est indisponible pour le moment. Essayez de l’actualiser.',
         refreshChart: 'Actualiser le graphique',
         moonpay: 'Acheter du Bitcoin via MoonPay 🚀',
         topper: 'Acheter du BTC avec Topper',
+        about: 'À propos',
+        privacy: 'Confidentialité',
+        terms: 'Conditions d’utilisation',
       },
       es: {
         title: 'Pronóstico Bitcoin vs Oro',
         subtitle: `Desde 2016 hasta ${todayStr}, con proyección hasta 2030`,
+        chartError: 'El gráfico de pronóstico BTC vs oro no está disponible ahora. Intenta actualizarlo.',
         refreshChart: 'Actualizar gráfico manualmente',
         moonpay: 'Comprar Bitcoin con MoonPay 🚀',
         topper: 'Comprar BTC con Topper',
+        about: 'Acerca de',
+        privacy: 'Política de privacidad',
+        terms: 'Términos de servicio',
       },
       zh: {
         title: '比特币与黄金走势预测',
         subtitle: `从2016年至${todayStr}，预测至2030年`,
+        chartError: 'BTC 与黄金预测图表暂时不可用。请尝试刷新。',
         refreshChart: '手动刷新图表',
         moonpay: '通过 MoonPay 购买比特币 🚀',
         topper: '通过 Topper 购买 BTC',
+        about: '关于',
+        privacy: '隐私政策',
+        terms: '服务条款',
       }
     };
 
     function setLang(lang) {
       localStorage.setItem('lang', lang);
       const text = texts[lang];
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
       document.getElementById('title').textContent = text.title;
       document.getElementById('subtitle').textContent = text.subtitle;
+      document.getElementById('chart-error').textContent = text.chartError;
       document.getElementById('refresh-chart-text').textContent = text.refreshChart;
       document.getElementById('moonpay-text').textContent = text.moonpay;
       document.getElementById('topper-text').textContent = text.topper;
-      document.body.dir = 'ltr';
+      document.getElementById('about-link').textContent = text.about;
+      document.getElementById('privacy-link').textContent = text.privacy;
+      document.getElementById('terms-link').textContent = text.terms;
     }
 
     const savedLang = localStorage.getItem('lang');

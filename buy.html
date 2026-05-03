@@ -166,6 +166,7 @@
 
   <script type="module">
     const TOPPER_API_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/topper/token";
+    let currentLang = 'en';
 
     const texts = {
       en: {
@@ -176,6 +177,13 @@
         topperAmountLabel: 'Amount in USD',
         topperBtn: 'Buy BTC with Topper',
         footer: 'Powered by MoonPay and Topper',
+        missingAddress: 'Enter a BTC wallet address before opening Topper.',
+        apiNotConfigured: 'Topper API URL is not configured yet. Replace YOUR-VERCEL-PROJECT in buy.html.',
+        creatingTopper: 'Creating secure Topper session...',
+        topperOpened: 'Topper opened in a new tab.',
+        topperMissingToken: 'Topper response was missing token data.',
+        topperUnavailable: 'Topper is unavailable right now.',
+        moonpayLoading: 'MoonPay is still loading, please wait.',
       },
       ru: {
         title: 'Купить Биткойн',
@@ -185,6 +193,13 @@
         topperAmountLabel: 'Сумма в USD',
         topperBtn: 'Купить BTC через Topper',
         footer: 'При поддержке MoonPay и Topper',
+        missingAddress: 'Введите BTC-адрес кошелька перед открытием Topper.',
+        apiNotConfigured: 'URL Topper API еще не настроен. Замените YOUR-VERCEL-PROJECT в buy.html.',
+        creatingTopper: 'Создаем защищенную сессию Topper...',
+        topperOpened: 'Topper открыт в новой вкладке.',
+        topperMissingToken: 'В ответе Topper нет данных токена.',
+        topperUnavailable: 'Topper сейчас недоступен.',
+        moonpayLoading: 'MoonPay еще загружается, пожалуйста подождите.',
       },
       he: {
         title: 'קנה ביטקוין',
@@ -194,6 +209,13 @@
         topperAmountLabel: 'סכום בדולר',
         topperBtn: 'קנה BTC דרך Topper',
         footer: 'בהפעלה של MoonPay ו-Topper',
+        missingAddress: 'הזן כתובת ארנק BTC לפני פתיחת Topper.',
+        apiNotConfigured: 'כתובת Topper API עדיין לא הוגדרה. החלף את YOUR-VERCEL-PROJECT בקובץ buy.html.',
+        creatingTopper: 'יוצר חיבור מאובטח ל-Topper...',
+        topperOpened: 'Topper נפתח בלשונית חדשה.',
+        topperMissingToken: 'בתשובת Topper חסרים נתוני הטוקן.',
+        topperUnavailable: 'Topper אינו זמין כרגע.',
+        moonpayLoading: 'MoonPay עדיין נטען, אנא המתן.',
       },
       de: {
         title: 'Bitcoin kaufen',
@@ -203,6 +225,13 @@
         topperAmountLabel: 'Betrag in USD',
         topperBtn: 'BTC mit Topper kaufen',
         footer: 'Bereitgestellt von MoonPay und Topper',
+        missingAddress: 'Geben Sie eine BTC-Wallet-Adresse ein, bevor Topper geöffnet wird.',
+        apiNotConfigured: 'Die Topper-API-URL ist noch nicht konfiguriert. Ersetzen Sie YOUR-VERCEL-PROJECT in buy.html.',
+        creatingTopper: 'Sichere Topper-Sitzung wird erstellt...',
+        topperOpened: 'Topper wurde in einem neuen Tab geöffnet.',
+        topperMissingToken: 'In der Topper-Antwort fehlen Tokendaten.',
+        topperUnavailable: 'Topper ist derzeit nicht verfügbar.',
+        moonpayLoading: 'MoonPay wird noch geladen, bitte warten.',
       },
       fr: {
         title: 'Acheter du Bitcoin',
@@ -212,6 +241,13 @@
         topperAmountLabel: 'Montant en USD',
         topperBtn: 'Acheter du BTC avec Topper',
         footer: 'Propulsé par MoonPay et Topper',
+        missingAddress: 'Saisissez une adresse de portefeuille BTC avant d’ouvrir Topper.',
+        apiNotConfigured: 'L’URL de l’API Topper n’est pas encore configurée. Remplacez YOUR-VERCEL-PROJECT dans buy.html.',
+        creatingTopper: 'Création d’une session Topper sécurisée...',
+        topperOpened: 'Topper s’est ouvert dans un nouvel onglet.',
+        topperMissingToken: 'La réponse Topper ne contient pas les données du jeton.',
+        topperUnavailable: 'Topper est indisponible pour le moment.',
+        moonpayLoading: 'MoonPay est encore en cours de chargement, veuillez patienter.',
       },
       es: {
         title: 'Comprar Bitcoin',
@@ -221,6 +257,13 @@
         topperAmountLabel: 'Importe en USD',
         topperBtn: 'Comprar BTC con Topper',
         footer: 'Con tecnología de MoonPay y Topper',
+        missingAddress: 'Ingresa una dirección de billetera BTC antes de abrir Topper.',
+        apiNotConfigured: 'La URL de la API de Topper aún no está configurada. Reemplaza YOUR-VERCEL-PROJECT en buy.html.',
+        creatingTopper: 'Creando sesión segura de Topper...',
+        topperOpened: 'Topper se abrió en una nueva pestaña.',
+        topperMissingToken: 'La respuesta de Topper no incluyó los datos del token.',
+        topperUnavailable: 'Topper no está disponible en este momento.',
+        moonpayLoading: 'MoonPay aún se está cargando, espera un momento.',
       },
       zh: {
         title: '购买比特币',
@@ -230,11 +273,21 @@
         topperAmountLabel: 'USD 金额',
         topperBtn: '通过 Topper 购买 BTC',
         footer: '由 MoonPay 和 Topper 提供支持',
+        missingAddress: '请先输入 BTC 钱包地址，然后再打开 Topper。',
+        apiNotConfigured: 'Topper API URL 尚未配置。请在 buy.html 中替换 YOUR-VERCEL-PROJECT。',
+        creatingTopper: '正在创建安全的 Topper 会话...',
+        topperOpened: 'Topper 已在新标签页中打开。',
+        topperMissingToken: 'Topper 响应缺少令牌数据。',
+        topperUnavailable: 'Topper 目前不可用。',
+        moonpayLoading: 'MoonPay 仍在加载，请稍候。',
       },
     };
 
     function setLang(lang) {
       localStorage.setItem('lang', lang);
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
       document.getElementById('title').textContent = texts[lang].title;
       document.getElementById('buy-btn').textContent = texts[lang].buyBtn;
       document.getElementById('topper-title').textContent = texts[lang].topperTitle;
@@ -243,6 +296,8 @@
       document.getElementById('topper-btn').textContent = texts[lang].topperBtn;
       document.getElementById('footer-text').textContent = texts[lang].footer;
     }
+
+    window.setLang = setLang;
 
     const savedLang = localStorage.getItem('lang');
     const browserLang = navigator.language.slice(0, 2).toLowerCase();
@@ -280,17 +335,18 @@
       const payload = getTopperRequestPayload();
 
       if (!payload.address) {
-        setTopperMessage('Enter a BTC wallet address before opening Topper.', true);
+        setTopperMessage(texts[currentLang].missingAddress, true);
         return;
       }
 
       if (TOPPER_API_URL.includes('YOUR-VERCEL-PROJECT')) {
-        setTopperMessage('Topper API URL is not configured yet. Replace YOUR-VERCEL-PROJECT in buy.html.', true);
+        setTopperMessage(texts[currentLang].apiNotConfigured, true);
         return;
       }
 
       topperBtn.disabled = true;
-      setTopperMessage('Creating secure Topper session...');
+      topperBtn.textContent = texts[currentLang].creatingTopper;
+      setTopperMessage(texts[currentLang].creatingTopper);
 
       try {
         const response = await fetch(TOPPER_API_URL, {
@@ -307,16 +363,17 @@
         }
 
         if (!data.bt || !data.appUrl) {
-          throw new Error('Topper response was missing token data.');
+          throw new Error(texts[currentLang].topperMissingToken);
         }
 
         window.open(`${data.appUrl}?bt=${encodeURIComponent(data.bt)}`, '_blank', 'noopener,noreferrer');
-        setTopperMessage('Topper opened in a new tab.');
+        setTopperMessage(texts[currentLang].topperOpened);
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Topper is unavailable right now.';
+        const message = error instanceof Error ? error.message : texts[currentLang].topperUnavailable;
         setTopperMessage(message, true);
       } finally {
         topperBtn.disabled = false;
+        topperBtn.textContent = texts[currentLang].topperBtn;
       }
     });
 
@@ -342,7 +399,7 @@
         if (moonPaySdk) {
           moonPaySdk.show();
         } else {
-          alert('MoonPay is still loading, please wait.');
+          alert(texts[currentLang].moonpayLoading);
         }
       });
     });
