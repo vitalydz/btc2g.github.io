@@ -81,9 +81,30 @@ npm install
 
 This repository currently has no `test` or `build` scripts in `package.json`, so `npm test` and `npm run build` are not available unless scripts are added later.
 
+## Professional UI and sharing
+
+The homepage was simplified into a dashboard-style layout:
+
+- Compact BTC model signal summary with confidence, localized update date, and a not-financial-advice note.
+- Large BTC vs Gold forecast chart with short explanatory text.
+- Key insights cards for BTC vs Gold ratio, model direction, and last forecast update.
+- MoonPay and Topper remain available in a secondary Buy Bitcoin section.
+- The subscription form remains compact and keeps the existing Formspree endpoint logic.
+- The Premium section links to a calmer `premium.html` product information page.
+
+Sharing is available on `index.html` and `premium.html` through the native Web Share API when the browser supports `navigator.share`, plus a copy link fallback. Mobile users can choose WhatsApp, Telegram, Email, or another installed app from the native share sheet.
+
+Open Graph and Twitter meta tags are present on `index.html` and `premium.html` for improved social previews. They use:
+
+```text
+https://btc2g.com/assets/btc_gold_forecast.png
+```
+
+as the preview image.
+
 ## Monetization flow
 
-The homepage keeps the BTC vs Gold forecast chart first, then shows a short educational explanation and two buy buttons:
+The homepage keeps the BTC vs Gold forecast chart central, then shows provider links in a secondary Buy Bitcoin section:
 
 - MoonPay: `index.html` links to `buy.html#moonpay`, where the existing MoonPay widget button remains visible.
 - Topper: `index.html` links to `buy.html#topper`, where the Topper address and amount form calls the serverless token endpoint.

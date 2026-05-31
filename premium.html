@@ -4,7 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BTC2G Premium Signals - Bitcoin vs Gold Forecast</title>
-  <meta name="description" content="BTC2G Premium Signals provides model-based Bitcoin vs Gold insights, forecast updates, and signal history for long-term market perspective." />
+  <meta name="description" content="BTC2G Premium Signals provides extended BTC model signal history, forecast updates, model notes, and weekly updates." />
+  <meta property="og:title" content="BTC2G Premium Signals" />
+  <meta property="og:description" content="Extended Bitcoin vs Gold signal history, model notes, forecast updates, and weekly updates." />
+  <meta property="og:url" content="https://btc2g.com/premium.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://btc2g.com/assets/btc_gold_forecast.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BTC2G Premium Signals" />
+  <meta name="twitter:description" content="Extended Bitcoin vs Gold signal history, model notes, forecast updates, and weekly updates." />
+  <meta name="twitter:image" content="https://btc2g.com/assets/btc_gold_forecast.png" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
@@ -17,204 +26,322 @@
   <style>
     body {
       margin: 0;
-      padding: 20px;
-      background: linear-gradient(to bottom right, #1e1e1e, #2c2c2c);
+      background: #071426;
       color: #ffffff;
       font-family: 'Roboto', sans-serif;
       line-height: 1.7;
     }
 
     main {
-      max-width: 940px;
+      max-width: 1040px;
       margin: 0 auto;
-      padding: 28px;
-      border-radius: 12px;
-      background: #222222;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      padding: 24px 20px 32px;
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #1d3654;
+    }
+
+    .brand,
+    nav a {
+      color: #ffffff;
+      font-weight: 700;
+      text-decoration: none;
     }
 
     nav {
       display: flex;
       flex-wrap: wrap;
-      gap: 14px;
-      margin-bottom: 28px;
+      gap: 6px;
     }
 
-    nav a,
-    .cta-button {
-      color: #87cefa;
-      font-weight: bold;
-      text-decoration: none;
+    nav a {
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: #d6dce7;
+      font-size: 0.95rem;
     }
 
     nav a:hover,
     .text-link:hover {
-      text-decoration: underline;
+      background: #10233b;
+      color: #ffffff;
     }
 
-    .hero {
-      margin-bottom: 28px;
-      text-align: center;
-    }
-
-    .hero h1 {
-      margin: 0 0 12px;
-      font-size: clamp(2rem, 5vw, 3.4rem);
-      line-height: 1.12;
-    }
-
-    .hero p {
-      max-width: 720px;
-      margin: 0 auto;
-      color: #dddddd;
-      font-size: 1.1em;
-    }
-
-    .price-card {
-      max-width: 680px;
-      margin: 0 auto 28px;
-      padding: 24px;
-      border: 1px solid #3a3a3a;
+    .intro,
+    .product-card,
+    .details,
+    .share-section {
+      margin-top: 24px;
+      padding: 18px;
+      border: 1px solid #1d3654;
       border-radius: 8px;
-      background: #1b1b1b;
-      text-align: center;
+      background: #0c1b2f;
+    }
+
+    .intro {
+      margin-top: 0;
+    }
+
+    h1,
+    h2 {
+      margin: 0 0 10px;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+    }
+
+    p {
+      margin: 0;
+      color: #d6dce7;
     }
 
     .price {
-      margin: 0 0 6px;
-      color: #f2d14b;
-      font-size: clamp(2.3rem, 8vw, 4rem);
+      margin: 10px 0 14px;
+      color: #e3be57;
+      font-size: 2.4rem;
       font-weight: 700;
       line-height: 1;
     }
 
     .price span {
-      color: #dddddd;
-      font-size: 0.36em;
+      color: #d6dce7;
+      font-size: 1rem;
       font-weight: 400;
     }
 
-    .included {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin: 22px 0;
-      padding: 0;
-      list-style: none;
+    .feature-table {
+      width: 100%;
+      margin: 16px 0;
+      border-collapse: collapse;
+      color: #d6dce7;
+    }
+
+    .feature-table th,
+    .feature-table td {
+      padding: 12px;
+      border-bottom: 1px solid #1d3654;
       text-align: left;
     }
 
-    .included li {
-      padding: 12px;
-      border: 1px solid #333333;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      color: #dddddd;
+    .feature-table th {
+      color: #ffffff;
+      font-size: 0.92rem;
+      text-transform: uppercase;
     }
 
-    .cta-button {
+    .cta-button,
+    .share-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      width: fit-content;
+      min-width: 240px;
+      max-width: 100%;
+      height: 48px;
       min-height: 48px;
       box-sizing: border-box;
-      padding: 12px 22px;
+      padding: 0 18px;
+      border: 1px solid #3454c8;
       border-radius: 6px;
-      background: #f2a900;
-      color: #181818;
+      background: #3454c8;
+      color: #ffffff;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1;
       text-decoration: none;
+      white-space: nowrap;
     }
 
-    .cta-button:hover {
-      background: #d99600;
-    }
-
-    .notice {
-      margin: 16px auto 0;
-      max-width: 620px;
-      color: #bbbbbb;
-      font-size: 0.96em;
-    }
-
-    .details {
-      max-width: 760px;
-      margin: 0 auto;
-    }
-
-    .details h2 {
+    .cta-button {
+      border-color: #3454c8;
+      background: #3454c8;
       color: #ffffff;
     }
 
-    .details p {
-      color: #dddddd;
+    .cta-button:hover,
+    .share-button:hover {
+      background: #2944ad;
+      border-color: #2944ad;
     }
 
+    .notice,
     .disclaimer {
-      margin-top: 26px;
-      padding-top: 16px;
-      border-top: 1px solid #3a3a3a;
-      color: #bbbbbb;
-      font-size: 0.95em;
+      margin-top: 14px;
+      color: #98a3b5;
+      font-size: 0.95rem;
+    }
+
+    .details p + h2 {
+      margin-top: 22px;
+    }
+
+    .share-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .share-status {
+      min-height: 20px;
+      margin: 10px 0 0;
+      color: #a8e6bf;
+      font-weight: 700;
+    }
+
+    .native-share-button[hidden] {
+      display: none;
     }
 
     @media (max-width: 640px) {
-      body {
-        padding: 12px;
-      }
-
       main {
-        padding: 20px 14px;
+        padding: 16px 14px 24px;
       }
 
-      nav {
+      .site-header {
+        align-items: flex-start;
         flex-direction: column;
       }
 
-      .included {
-        grid-template-columns: 1fr;
+      nav,
+      .share-buttons {
+        width: 100%;
       }
 
-      .cta-button {
+      .cta-button,
+      .share-button {
         width: 100%;
+      }
+
+      .feature-table th,
+      .feature-table td {
+        padding: 10px 8px;
       }
     }
   </style>
 </head>
 <body>
   <main>
-    <nav aria-label="Premium page navigation">
-      <a href="index.html">Back to BTC2G</a>
-      <a href="buy.html">Buy Bitcoin</a>
-    </nav>
+    <header class="site-header">
+      <a class="brand" href="index.html">BTC2G</a>
+      <nav aria-label="Premium page navigation">
+        <a href="index.html">Home</a>
+        <a href="index.html#forecast">Forecast</a>
+        <a href="premium.html">Premium</a>
+        <a href="buy.html">Buy BTC</a>
+      </nav>
+    </header>
 
-    <section class="hero">
-      <h1>BTC2G Premium Signals</h1>
-      <p>Model-based Bitcoin vs Gold insights for long-term market perspective.</p>
+    <section class="intro">
+      <h1>Premium Signals</h1>
+      <p>Extended signal history, model notes, and weekly Bitcoin vs Gold forecast updates.</p>
     </section>
 
-    <section class="price-card" aria-labelledby="premium-price-title">
+    <section class="product-card" aria-labelledby="premium-price-title">
       <h2 id="premium-price-title">Premium access</h2>
       <p class="price">$4.99 <span>/ month</span></p>
-      <ul class="included">
-        <li>BTC model signals</li>
-        <li>BTC vs Gold forecast updates</li>
-        <li>Weekly market updates</li>
-        <li>Signal history</li>
-        <li>Extended model notes</li>
-      </ul>
-      <a class="cta-button" href="index.html#subscribe-form">Get early access</a>
-      <p class="notice">Payments are not enabled yet. Join the early access list and we will notify you when Premium is available.</p>
+      <table class="feature-table">
+        <thead>
+          <tr>
+            <th scope="col">Feature</th>
+            <th scope="col">Included</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>BTC model signals</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <td>Forecast updates</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <td>Weekly updates</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <td>Signal history</td>
+            <td>Coming soon</td>
+          </tr>
+        </tbody>
+      </table>
+      <a class="cta-button" href="index.html#subscribe-form">Join early access</a>
+      <p class="notice">Payments are not enabled yet.</p>
     </section>
 
     <section class="details">
-      <h2>Built for longer-term context</h2>
-      <p>BTC2G Premium is planned as a deeper research layer on top of the free BTC vs Gold signal. The goal is to help users review model context, signal history, and forecast updates without making short-term promises.</p>
+      <h2>Product focus</h2>
+      <p>BTC2G Premium is planned as a research layer for reviewing model context, signal history, and forecast updates without short-term trading promises.</p>
 
-      <h2>What Premium is not</h2>
+      <h2>Important note</h2>
       <p>Premium is not a guarantee, a trading command, or a replacement for independent research. Market conditions can change quickly, and model-based signals can be wrong.</p>
 
       <p class="disclaimer">BTC2G Premium Signals are model-based and for informational purposes only. They are not financial advice and do not guarantee profit.</p>
     </section>
+
+    <section class="share-section" aria-labelledby="share-title">
+      <h2 id="share-title">Share BTC2G</h2>
+      <p id="share-text">BTC2G: Bitcoin vs Gold forecast and model-based BTC signal</p>
+      <div class="share-buttons">
+        <button id="native-share-btn" class="share-button native-share-button" type="button" hidden>Share</button>
+        <button id="copy-link-btn" class="share-button" type="button">Copy link</button>
+      </div>
+      <p id="share-status" class="share-status" role="status" aria-live="polite"></p>
+    </section>
   </main>
+
+  <script>
+    function getSharePayload() {
+      return {
+        title: 'BTC2G - Bitcoin vs Gold Forecast',
+        text: 'BTC2G: Bitcoin vs Gold forecast and model-based BTC signal',
+        url: window.location.href,
+      };
+    }
+
+    function updateShareLinks() {
+      document.getElementById('native-share-btn').hidden = !navigator.share;
+    }
+
+    async function copyCurrentLink() {
+      const statusEl = document.getElementById('share-status');
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        statusEl.textContent = 'Link copied';
+      } catch (error) {
+        console.log('Copy link failed.', error);
+        statusEl.textContent = window.location.href;
+      }
+    }
+
+    async function shareWithNativeApi() {
+      if (!navigator.share) {
+        await copyCurrentLink();
+        return;
+      }
+
+      try {
+        await navigator.share(getSharePayload());
+      } catch (error) {
+        console.log('Native share was not completed.', error);
+      }
+    }
+
+    updateShareLinks();
+    document.getElementById('native-share-btn').addEventListener('click', shareWithNativeApi);
+    document.getElementById('copy-link-btn').addEventListener('click', copyCurrentLink);
+  </script>
 </body>
 </html>

@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BTC2G - Bitcoin vs Gold Forecast</title>
+  <meta name="description" content="BTC2G compares Bitcoin with gold and shows a model-based BTC signal for long-term market context." />
+  <meta property="og:title" content="BTC2G - Bitcoin vs Gold Forecast" />
+  <meta property="og:description" content="Bitcoin vs Gold forecast chart with a model-based BTC signal and compact research dashboard." />
+  <meta property="og:url" content="https://btc2g.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://btc2g.com/assets/btc_gold_forecast.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BTC2G - Bitcoin vs Gold Forecast" />
+  <meta name="twitter:description" content="Bitcoin vs Gold forecast chart with a model-based BTC signal and compact research dashboard." />
+  <meta name="twitter:image" content="https://btc2g.com/assets/btc_gold_forecast.png" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
@@ -65,14 +75,21 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 128px;
-      min-height: 58px;
-      padding: 8px 20px;
-      border-radius: 8px;
+      width: fit-content;
+      max-width: 100%;
+      height: 48px;
+      min-width: 240px;
+      min-height: 48px;
+      box-sizing: border-box;
+      padding: 0 18px;
+      border: 1px solid transparent;
+      border-radius: 6px;
       color: #101010;
-      font-size: 2.15em;
+      font-size: 0.95rem;
       font-weight: 700;
+      line-height: 1;
       letter-spacing: 0;
+      white-space: nowrap;
     }
 
     .signal-actionable {
@@ -85,7 +102,8 @@
     }
 
     .signal-buy {
-      background: #43d17a;
+      background: #3454c8;
+      color: #ffffff;
     }
 
     .signal-hold {
@@ -387,7 +405,7 @@
 
     .subscribe-form input {
       flex: 1;
-      min-width: 0;
+      min-width: 240px;
       min-height: 48px;
       box-sizing: border-box;
       padding: 12px 14px;
@@ -554,30 +572,441 @@
       text-decoration: underline;
     }
 
+    body {
+      text-align: left;
+      background: #071426;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1120px;
+      padding: 24px 20px 28px;
+      background: transparent;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #1d3654;
+    }
+
+    .brand {
+      color: #ffffff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .main-nav a {
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: #d6dce7;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+
+    .main-nav a:hover {
+      background: #10233b;
+      color: #ffffff;
+    }
+
+    .language-control {
+      position: static;
+    }
+
+    .page-title {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+      text-align: left;
+    }
+
+    p#subtitle {
+      margin: 0 0 18px;
+      color: #adb6c6;
+      font-size: 1rem;
+      text-align: left;
+    }
+
+    .signal-card,
+    .chart-section,
+    .insights-section,
+    .premium-section,
+    .buy-cta,
+    .subscribe-section,
+    .share-section {
+      max-width: none;
+      margin: 24px 0 0;
+      padding: 18px;
+      border: 1px solid #1d3654;
+      border-radius: 8px;
+      background: #0c1b2f;
+      text-align: left;
+    }
+
+    .signal-card {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+      margin-top: 18px;
+    }
+
+    .signal-card h2,
+    .stat-label {
+      margin: 0 0 8px;
+      color: #adb6c6;
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 20px;
+      min-height: 20px;
+      text-transform: uppercase;
+    }
+
+    .signal-main,
+    .signal-detail {
+      display: grid;
+      grid-template-rows: 20px 48px;
+      row-gap: 8px;
+      min-width: 0;
+    }
+
+    .signal-main {
+      justify-self: start;
+    }
+
+    .signal-detail {
+      justify-self: center;
+      text-align: center;
+    }
+
+    .signal-detail + .signal-detail {
+      justify-self: end;
+      text-align: right;
+    }
+
+    .signal-value {
+      min-width: 240px;
+      min-height: 48px;
+      padding: 0 22px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    .signal-meta,
+    .signal-note,
+    .signal-disclaimer {
+      margin: 4px 0 0;
+      color: #d6dce7;
+    }
+
+    .signal-detail .signal-meta {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      margin: 0;
+      line-height: 1;
+    }
+
+    .signal-detail {
+      justify-items: center;
+    }
+
+    .signal-detail + .signal-detail {
+      justify-items: end;
+    }
+
+    .signal-note {
+      grid-column: 1 / -1;
+      color: #c7cfdd;
+    }
+
+    .signal-disclaimer {
+      color: #98a3b5;
+    }
+
+    .signal-toggle {
+      grid-column: 1 / -1;
+      justify-self: start;
+      color: #9fc3f4;
+    }
+
+    .signal-explanation {
+      grid-column: 1 / -1;
+      margin-left: 0;
+    }
+
+    .premium-locked {
+      display: none;
+    }
+
+    .chart-section img {
+      width: 100%;
+      margin-bottom: 12px;
+      background: #10233b;
+    }
+
+    .chart-explanation {
+      max-width: none;
+      margin: 0;
+    }
+
+    .chart-explanation h2 {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    .chart-explanation p,
+    .premium-section p,
+    .buy-cta p,
+    .share-section p {
+      color: #d6dce7;
+    }
+
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .insight-card {
+      min-height: 96px;
+      padding: 14px;
+      border: 1px solid #1d3654;
+      border-radius: 8px;
+      background: #08182b;
+    }
+
+    .insight-card h3 {
+      margin: 0 0 10px;
+      color: #adb6c6;
+      font-size: 0.9rem;
+    }
+
+    .insight-value {
+      margin: 0;
+      color: #ffffff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .premium-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .premium-button,
+    .premium-page-link,
+    .subscribe-form button,
+    .moonpay-btn,
+    .topper-btn,
+    .share-button,
+    .update-btn {
+      width: fit-content;
+      min-width: 240px;
+      max-width: 100%;
+      height: 48px;
+      min-height: 48px;
+      box-sizing: border-box;
+      padding: 0 18px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      line-height: 1;
+      box-shadow: none;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .premium-button,
+    .subscribe-form button {
+      border: 1px solid #3454c8;
+      background: #3454c8;
+      color: #ffffff;
+    }
+
+    .premium-page-link,
+    .share-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      border: 1px solid #3454c8;
+      background: #3454c8;
+      color: #ffffff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .premium-page-link {
+      border-color: #c6922c;
+      background: #c6922c;
+      color: #111318;
+      margin-left: 0;
+    }
+
+    .cta-buttons {
+      justify-content: flex-start;
+    }
+
+    .moonpay-btn {
+      border: 1px solid #3454c8;
+      background-color: #3454c8;
+    }
+
+    .topper-btn {
+      border: 1px solid #3454c8;
+      background-color: #3454c8;
+    }
+
+    .provider-note,
+    .disclaimer,
+    .subscribe-trust {
+      color: #98a3b5;
+    }
+
+    .subscribe-section {
+      max-width: 1040px;
+    }
+
+    .subscribe-form {
+      max-width: 970px;
+    }
+
+    .subscribe-form input {
+      flex: 3 1 0;
+      min-height: 40px;
+      padding: 9px 12px;
+      border-color: #4c596d;
+      background: #061224;
+    }
+
+    .subscribe-form button {
+      flex: 0 0 auto;
+    }
+
+    .update-btn {
+      border: 1px solid #3454c8;
+      background-color: #3454c8;
+      margin-top: 16px;
+      margin-bottom: 0;
+    }
+
+    .premium-button:hover,
+    .subscribe-form button:hover,
+    .moonpay-btn:hover,
+    .topper-btn:hover,
+    .share-button:hover,
+    .update-btn:hover {
+      background-color: #2944ad;
+      border-color: #2944ad;
+    }
+
+    .premium-page-link:hover {
+      background: #b88424;
+      border-color: #b88424;
+      color: #111318;
+      text-decoration: none;
+    }
+
+    .update-btn svg {
+      flex: 0 0 auto;
+    }
+
+    .update-btn:hover {
+      transform: none;
+    }
+
+    .share-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .share-status {
+      min-height: 20px;
+      margin: 10px 0 0;
+      color: #a8e6bf;
+      font-weight: 700;
+    }
+
+    .native-share-button[hidden] {
+      display: none;
+    }
+
     @media (max-width: 600px) {
       body {
-        padding: 12px;
+        padding: 0;
       }
 
       .container {
-        padding: 72px 14px 14px;
+        padding: 16px 14px 20px;
+      }
+
+      .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .main-nav {
+        width: 100%;
+        flex-wrap: wrap;
+        margin-left: 0;
+      }
+
+      .language-control {
+        width: 100%;
+        justify-content: flex-start;
       }
 
       .signal-card {
+        grid-template-columns: 1fr;
         margin-top: 16px;
         padding: 18px 14px;
       }
 
       .signal-value {
-        width: 100%;
+        width: fit-content;
+        max-width: 100%;
         box-sizing: border-box;
       }
 
       .chart-explanation,
+      .insights-section,
       .premium-section,
+      .share-section,
       .subscribe-section,
       .buy-cta {
         text-align: left;
+      }
+
+      .insights-grid {
+        grid-template-columns: 1fr;
       }
 
       .subscribe-form,
@@ -606,7 +1035,8 @@
 
       .moonpay-btn,
       .topper-btn,
-      .update-btn {
+      .update-btn,
+      .share-button {
         width: 100%;
         max-width: none;
         margin-left: auto;
@@ -618,16 +1048,57 @@
 </head>
 <body>
   <div class="container">
-    <h1 id="title">Bitcoin vs Gold Forecast</h1>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="BTC2G home">BTC2G</a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a id="nav-home" href="index.html">Home</a>
+        <a id="nav-forecast" href="#forecast">Forecast</a>
+        <a id="nav-premium" href="premium.html">Premium</a>
+        <a id="nav-buy" href="buy.html">Buy BTC</a>
+      </nav>
+      <div class="language-control">
+        <select id="language-select" aria-label="Language">
+          <option value="en">English</option>
+          <option value="ru">Русский</option>
+          <option value="he">עברית</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+          <option value="es">Español</option>
+          <option value="zh">中文</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+          <option value="ar">العربية</option>
+          <option value="hi">हिन्दी</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="tr">Türkçe</option>
+          <option value="pl">Polski</option>
+          <option value="nl">Nederlands</option>
+          <option value="uk">Українська</option>
+          <option value="id">Bahasa Indonesia</option>
+          <option value="vi">Tiếng Việt</option>
+        </select>
+      </div>
+    </header>
+
+    <h1 id="title" class="page-title">Bitcoin vs Gold Forecast</h1>
     <p id="subtitle">From 2016 to <span id="current-date"></span>, with projection to 2030</p>
 
     <section class="signal-card" aria-labelledby="signal-title">
-      <h2 id="signal-title">BTC Model Signal</h2>
-      <div id="signal-value" class="signal-value signal-unavailable">...</div>
-      <p id="signal-confidence" class="signal-meta">Confidence: --</p>
-      <p id="signal-updated" class="signal-meta">Last updated: --</p>
+      <div class="signal-main">
+        <h2 id="signal-title">BTC Model Signal</h2>
+        <div id="signal-value" class="signal-value signal-unavailable">...</div>
+      </div>
+      <div class="signal-detail">
+        <p id="signal-confidence-label" class="stat-label">Confidence</p>
+        <p id="signal-confidence" class="signal-meta">--</p>
+      </div>
+      <div class="signal-detail">
+        <p id="signal-updated-label" class="stat-label">Last updated</p>
+        <p id="signal-updated" class="signal-meta">--</p>
+      </div>
       <p id="signal-note" class="signal-note"></p>
-      <p id="signal-disclaimer" class="signal-disclaimer">This signal is based on the BTC vs Gold model and is not financial advice.</p>
+      <p id="signal-disclaimer" class="signal-disclaimer">Model-based signal. Not financial advice.</p>
       <button id="signal-toggle" class="signal-toggle" type="button" aria-expanded="false" aria-controls="signal-explanation">What is this?</button>
       <p id="signal-explanation" class="signal-explanation">This signal is derived from the BTC vs Gold ratio model. It reflects relative valuation, not short-term price predictions.</p>
       <div id="premium-next-card" class="premium-locked">
@@ -636,33 +1107,58 @@
       </div>
     </section>
 
-    <section class="premium-section" aria-labelledby="premium-title">
-      <h2 id="premium-title">Premium BTC Signals</h2>
-      <p id="premium-subtitle">Model insights for users who want more detail.</p>
-      <ul class="premium-list">
-        <li id="premium-item-insights">Get detailed model insights</li>
-        <li id="premium-item-forecasts">Access extended forecasts</li>
-        <li id="premium-item-history">See signal history and confidence trends</li>
-      </ul>
-      <button id="premium-unlock-btn" class="premium-button" type="button">Unlock Premium</button>
-      <a id="premium-page-link" class="premium-page-link" href="premium.html">View Premium page</a>
+    <section id="forecast" class="chart-section" aria-labelledby="forecast-title">
+      <h2 id="forecast-title">BTC vs Gold Forecast</h2>
+      <img
+        id="forecastChart"
+        src="assets/btc_gold_forecast.png"
+        alt="BTC vs Gold Forecast"
+      />
+      <p id="chart-error" class="chart-error">The BTC vs Gold Forecast chart is unavailable right now. Please try refreshing it.</p>
+      <section class="chart-explanation" aria-labelledby="why-title">
+        <h2 id="why-title">Chart note</h2>
+        <p id="why-text">BTC2G compares Bitcoin with gold as long-term stores of value.</p>
+      </section>
+      <button class="update-btn" id="refresh-chart-btn" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 4V1L8 5l4 4V6c3.3 0 6 2.7 6 6a6.002 6.002 0 0 1-5.125 5.938 1 1 0 1 0 .25 1.984A8.002 8.002 0 0 0 20 12c0-4.4-3.6-8-8-8z"/>
+          <path d="M12 20v3l4-4-4-4v3c-3.3 0-6-2.7-6-6a6.002 6.002 0 0 1 5.125-5.938 1 1 0 1 0-.25-1.984A8.002 8.002 0 0 0 4 12c0 4.4 3.6 8 8 8z"/>
+        </svg>
+        <span id="refresh-chart-text">Update chart manually</span>
+      </button>
     </section>
 
-    <img
-      id="forecastChart"
-      src="assets/btc_gold_forecast.png"
-      alt="BTC vs Gold Forecast"
-    />
-    <p id="chart-error" class="chart-error">The BTC vs Gold Forecast chart is unavailable right now. Please try refreshing it.</p>
+    <section class="insights-section" aria-labelledby="insights-title">
+      <h2 id="insights-title">Key insights</h2>
+      <div class="insights-grid">
+        <article class="insight-card">
+          <h3 id="insight-ratio-title">BTC vs Gold ratio</h3>
+          <!-- TODO: Connect this to a ratio field when the forecast JSON exposes one. -->
+          <p id="insight-ratio-value" class="insight-value">Not available</p>
+        </article>
+        <article class="insight-card">
+          <h3 id="insight-direction-title">Current model direction</h3>
+          <p id="insight-direction-value" class="insight-value">--</p>
+        </article>
+        <article class="insight-card">
+          <h3 id="insight-update-title">Last forecast update</h3>
+          <p id="insight-update-value" class="insight-value">--</p>
+        </article>
+      </div>
+    </section>
 
-    <section class="chart-explanation" aria-labelledby="why-title">
-      <h2 id="why-title">Why compare Bitcoin with gold?</h2>
-      <p id="why-text">Gold has been used as a store of value for centuries. Bitcoin is often compared to gold because of its limited supply and digital scarcity. BTC2G shows a visual BTC vs Gold model to help users compare long-term trends.</p>
+    <section class="premium-section" aria-labelledby="premium-title">
+      <h2 id="premium-title">Premium Signals</h2>
+      <p id="premium-subtitle">Extended signal history, model notes, and weekly updates.</p>
+      <div class="premium-actions">
+        <a id="premium-page-link" class="premium-page-link" href="premium.html">View Premium</a>
+        <button id="premium-unlock-btn" class="premium-button" type="button">Join early access</button>
+      </div>
     </section>
 
     <section class="subscribe-section" aria-labelledby="subscribe-title">
-      <h2 id="subscribe-title">Get BTC signals & forecast updates</h2>
-      <p id="subscribe-subtitle">Receive updates when BTC vs Gold model changes</p>
+      <h2 id="subscribe-title">Get forecast updates</h2>
+      <p id="subscribe-subtitle">Receive compact BTC2G updates when the model changes.</p>
       <form id="subscribe-form" class="subscribe-form" novalidate>
         <input
           id="subscriber-email"
@@ -680,13 +1176,14 @@
 
     <section class="buy-cta" aria-labelledby="buy-title">
       <h2 id="buy-title">Buy Bitcoin</h2>
+      <p id="buy-text">Use an external provider to buy BTC. BTC2G does not process payments directly.</p>
       <div class="cta-buttons">
         <a
           class="moonpay-btn"
           href="buy.html#moonpay"
           id="moonpay-text"
         >
-          Buy Bitcoin with MoonPay 🚀
+          MoonPay
         </a>
 
         <a
@@ -694,19 +1191,22 @@
           href="buy.html#topper"
           id="topper-text"
         >
-          Buy Bitcoin with Topper ✨
+          Topper
         </a>
       </div>
+      <p id="provider-note" class="provider-note">Availability depends on provider and country.</p>
       <p id="disclaimer-text" class="disclaimer">This forecast is for informational purposes only and is not financial advice.</p>
     </section>
 
-    <button class="update-btn" id="refresh-chart-btn" type="button">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-        <path d="M12 4V1L8 5l4 4V6c3.3 0 6 2.7 6 6a6.002 6.002 0 0 1-5.125 5.938 1 1 0 1 0 .25 1.984A8.002 8.002 0 0 0 20 12c0-4.4-3.6-8-8-8z"/>
-        <path d="M12 20v3l4-4-4-4v3c-3.3 0-6-2.7-6-6a6.002 6.002 0 0 1 5.125-5.938 1 1 0 1 0-.25-1.984A8.002 8.002 0 0 0 4 12c0 4.4 3.6 8 8 8z"/>
-      </svg>
-      <span id="refresh-chart-text">Update chart manually</span>
-    </button>
+    <section class="share-section" aria-labelledby="share-title">
+      <h2 id="share-title">Share BTC2G</h2>
+      <p id="share-text">BTC2G: Bitcoin vs Gold forecast and model-based BTC signal</p>
+      <div class="share-buttons">
+        <button id="native-share-btn" class="share-button native-share-button" type="button" hidden>Share</button>
+        <button id="copy-link-btn" class="share-button" type="button">Copy link</button>
+      </div>
+      <p id="share-status" class="share-status" role="status" aria-live="polite"></p>
+    </section>
 
     <nav class="seo-links" aria-label="Bitcoin vs Gold articles">
       <span id="learn-more-text">Learn more:</span>
@@ -715,17 +1215,6 @@
       <a href="bitcoin-vs-gold-forecast-2026.html" id="seo-forecast-link">2026 Forecast</a>
     </nav>
 
-    <div class="language-control">
-      <select id="language-select" aria-label="Language">
-        <option value="en">English</option>
-        <option value="ru">Русский</option>
-        <option value="he">עברית</option>
-        <option value="de">Deutsch</option>
-        <option value="fr">Français</option>
-        <option value="es">Español</option>
-        <option value="zh">中文</option>
-      </select>
-    </div>
   </div>
 
   <div id="premium-modal" class="premium-modal" role="dialog" aria-modal="true" aria-labelledby="premium-modal-title" hidden>
@@ -767,11 +1256,13 @@
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
+    const META_PATH = 'assets/btc_gold_forecast_meta.json';
     const SUBSCRIPTION_ENDPOINT = "https://formspree.io/f/mkoyjwkr";
     const STRIPE_CHECKOUT_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/stripe/create-checkout-session";
     const isPremiumUser = false;
     let currentLang = 'en';
     let currentSignalData = null;
+    let currentMetaData = null;
     const LOCALE_BY_LANGUAGE = {
       en: 'en-US',
       ru: 'ru-RU',
@@ -780,6 +1271,18 @@
       de: 'de-DE',
       es: 'es-ES',
       zh: 'zh-CN',
+      it: 'it-IT',
+      pt: 'pt-PT',
+      ar: 'ar',
+      hi: 'hi-IN',
+      ja: 'ja-JP',
+      ko: 'ko-KR',
+      tr: 'tr-TR',
+      pl: 'pl-PL',
+      nl: 'nl-NL',
+      uk: 'uk-UA',
+      id: 'id-ID',
+      vi: 'vi-VN',
     };
 
     function getUtcDateStamp(date = new Date()) {
@@ -847,7 +1350,18 @@
         return '';
       }
 
-      return texts[currentLang].signalNotes[note] || note;
+      return getCurrentText().signalNotes[note] || note;
+    }
+
+    function getCurrentText() {
+      return getTextForLanguage(currentLang);
+    }
+
+    function setTextById(id, value) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = value;
+      }
     }
 
     function scrollToBuyButtons() {
@@ -858,16 +1372,17 @@
     }
 
     function setSignalUnavailable() {
-      const text = texts[currentLang];
+      const text = getCurrentText();
       const signalEl = document.getElementById('signal-value');
       signalEl.className = 'signal-value signal-unavailable';
       signalEl.textContent = text.signalUnavailable;
       signalEl.removeAttribute('role');
       signalEl.removeAttribute('tabindex');
       signalEl.removeAttribute('title');
-      document.getElementById('signal-confidence').textContent = text.signalConfidence.replace('{confidence}', '--');
-      document.getElementById('signal-updated').textContent = text.signalLastUpdated.replace('{date}', '--');
+      document.getElementById('signal-confidence').textContent = '--';
+      document.getElementById('signal-updated').textContent = '--';
       document.getElementById('signal-note').textContent = '';
+      document.getElementById('insight-direction-value').textContent = '--';
     }
 
     function renderSignal() {
@@ -876,7 +1391,7 @@
         return;
       }
 
-      const text = texts[currentLang];
+      const text = getCurrentText();
       const signal = normalizeSignal(currentSignalData.signal);
       if (!signal || typeof currentSignalData.confidence !== 'number') {
         setSignalUnavailable();
@@ -897,13 +1412,33 @@
         signalEl.removeAttribute('tabindex');
         signalEl.removeAttribute('title');
       }
-      document.getElementById('signal-confidence').textContent = text.signalConfidence.replace('{confidence}', `${Math.round(confidence * 100)}%`);
-      document.getElementById('signal-updated').textContent = text.signalLastUpdated.replace('{date}', formatLocalizedDate(currentSignalData.last_updated, currentLang));
+      const localizedSignalDate = formatLocalizedDate(currentSignalData.last_updated, currentLang);
+      document.getElementById('signal-confidence').textContent = `${Math.round(confidence * 100)}%`;
+      document.getElementById('signal-updated').textContent = localizedSignalDate;
       document.getElementById('signal-note').textContent = localizeSignalNote(currentSignalData.note);
+      document.getElementById('insight-direction-value').textContent = text.signalLabels[signal];
+      if (!currentMetaData?.last_updated_utc) {
+        document.getElementById('insight-update-value').textContent = localizedSignalDate;
+      }
+    }
+
+    function renderMeta() {
+      const updateValue = document.getElementById('insight-update-value');
+      if (!updateValue) {
+        return;
+      }
+
+      if (currentMetaData?.last_updated_utc) {
+        updateValue.textContent = formatLocalizedDate(currentMetaData.last_updated_utc, currentLang);
+      } else if (currentSignalData?.last_updated) {
+        updateValue.textContent = formatLocalizedDate(currentSignalData.last_updated, currentLang);
+      } else {
+        updateValue.textContent = '--';
+      }
     }
 
     function renderPremiumState() {
-      const text = texts[currentLang];
+      const text = getCurrentText();
       const premiumCard = document.getElementById('premium-next-card');
       document.getElementById('premium-next-title').textContent = text.premiumNextTitle;
       document.getElementById('premium-next-text').textContent = isPremiumUser ? text.premiumNextUnlocked : text.premiumNextLocked;
@@ -926,6 +1461,22 @@
       }
     }
 
+    async function loadMeta() {
+      try {
+        const response = await fetch(`${META_PATH}?v=${encodeURIComponent(todayStr)}`);
+        if (!response.ok) {
+          throw new Error(`Metadata request failed with status ${response.status}`);
+        }
+
+        currentMetaData = await response.json();
+        renderMeta();
+      } catch (error) {
+        console.log('Forecast metadata loading failed.', error);
+        currentMetaData = null;
+        renderMeta();
+      }
+    }
+
     function setChartSrc(version) {
       const chart = document.getElementById('forecastChart');
       const chartError = document.getElementById('chart-error');
@@ -939,6 +1490,42 @@
       document.getElementById('chart-error').style.display = 'block';
     }
 
+    function getSharePayload() {
+      return {
+        title: 'BTC2G - Bitcoin vs Gold Forecast',
+        text: 'BTC2G: Bitcoin vs Gold forecast and model-based BTC signal',
+        url: window.location.href,
+      };
+    }
+
+    function updateShareLinks() {
+      document.getElementById('native-share-btn').hidden = !navigator.share;
+    }
+
+    async function copyCurrentLink() {
+      const statusEl = document.getElementById('share-status');
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        statusEl.textContent = getCurrentText().linkCopied;
+      } catch (error) {
+        console.log('Copy link failed.', error);
+        statusEl.textContent = window.location.href;
+      }
+    }
+
+    async function shareWithNativeApi() {
+      if (!navigator.share) {
+        await copyCurrentLink();
+        return;
+      }
+
+      try {
+        await navigator.share(getSharePayload());
+      } catch (error) {
+        console.log('Native share was not completed.', error);
+      }
+    }
+
     document.getElementById('forecastChart').addEventListener('error', showChartError);
     document.getElementById('forecastChart').addEventListener('load', () => {
       document.getElementById('chart-error').style.display = 'none';
@@ -947,6 +1534,8 @@
     document.getElementById('refresh-chart-btn').addEventListener('click', () => {
       setChartSrc(String(Date.now()));
     });
+    document.getElementById('native-share-btn').addEventListener('click', shareWithNativeApi);
+    document.getElementById('copy-link-btn').addEventListener('click', copyCurrentLink);
     document.getElementById('moonpay-text').addEventListener('click', () => {
       trackEvent('buy_moonpay_click');
     });
@@ -975,11 +1564,17 @@
       en: {
         title: 'Bitcoin vs Gold Forecast',
         subtitle: 'From 2016 to {date}, with projection to 2030',
+        navHome: 'Home',
+        navForecast: 'Forecast',
+        navPremium: 'Premium',
+        navBuy: 'Buy BTC',
         signalTitle: 'BTC Model Signal',
         signalUnavailable: 'Signal unavailable',
         signalConfidence: 'Confidence: {confidence}',
         signalLastUpdated: 'Last updated: {date}',
-        signalDisclaimer: 'This signal is based on the BTC vs Gold model and is not financial advice.',
+        confidenceLabel: 'Confidence',
+        lastUpdatedLabel: 'Last updated',
+        signalDisclaimer: 'Model-based signal. Not financial advice.',
         signalToggle: 'What is this?',
         signalExplanation: 'This signal is derived from the BTC vs Gold ratio model. It reflects relative valuation, not short-term price predictions.',
         signalLabels: {
@@ -991,11 +1586,17 @@
           'BTC appears undervalued compared to gold based on the model': 'BTC appears undervalued compared to gold based on the model',
         },
         signalBuyActionLabel: 'Jump to Buy Bitcoin buttons',
+        forecastTitle: 'BTC vs Gold Forecast',
         chartError: 'The BTC vs Gold Forecast chart is unavailable right now. Please try refreshing it.',
-        whyTitle: 'Why compare Bitcoin with gold?',
-        whyText: 'Gold has been used as a store of value for centuries. Bitcoin is often compared to gold because of its limited supply and digital scarcity. BTC2G shows a visual BTC vs Gold model to help users compare long-term trends.',
-        subscribeTitle: 'Get BTC signals & forecast updates',
-        subscribeSubtitle: 'Receive updates when BTC vs Gold model changes',
+        whyTitle: 'Chart note',
+        whyText: 'BTC2G compares Bitcoin with gold as long-term stores of value.',
+        insightsTitle: 'Key insights',
+        insightRatioTitle: 'BTC vs Gold ratio',
+        insightRatioValue: 'Not available',
+        insightDirectionTitle: 'Current model direction',
+        insightUpdateTitle: 'Last forecast update',
+        subscribeTitle: 'Get forecast updates',
+        subscribeSubtitle: 'Receive compact BTC2G updates when the model changes.',
         subscribePlaceholder: 'you@example.com',
         subscribeButton: 'Subscribe',
         subscribeTrust: 'No spam. Unsubscribe anytime.',
@@ -1006,6 +1607,8 @@
         subscribeError: 'Subscription failed. Please try again later.',
         subscribeNotConfigured: 'Subscription is not configured yet. Replace YOUR_ID in index.html.',
         buyTitle: 'Buy Bitcoin',
+        buyText: 'Use an external provider to buy BTC. BTC2G does not process payments directly.',
+        providerNote: 'Availability depends on provider and country.',
         disclaimer: 'This forecast is for informational purposes only and is not financial advice.',
         refreshChart: 'Update chart manually',
         learnMore: 'Learn more:',
@@ -1013,16 +1616,16 @@
         seoRatio: 'Bitcoin Gold Ratio',
         seoForecast: '2026 Forecast',
         languageLabel: 'Language',
-        premiumNextTitle: 'Next model move (Premium) 🔒',
+        premiumNextTitle: 'Next model move (Premium)',
         premiumNextLocked: 'Premium feature',
         premiumNextUnlocked: 'Extended model move details are enabled.',
-        premiumTitle: 'Premium BTC Signals',
-        premiumSubtitle: 'Model insights for users who want more detail.',
+        premiumTitle: 'Premium Signals',
+        premiumSubtitle: 'Extended signal history, model notes, and weekly updates.',
         premiumInsight: 'Get detailed model insights',
         premiumForecasts: 'Access extended forecasts',
         premiumHistory: 'See signal history and confidence trends',
-        premiumUnlock: 'Unlock Premium',
-        premiumPageLink: 'View Premium page',
+        premiumUnlock: 'Join early access',
+        premiumPageLink: 'View Premium',
         premiumModalTitle: 'Premium BTC Signals',
         premiumModalIntro: 'Premium includes:',
         premiumBreakdown: 'Detailed signal breakdown',
@@ -1039,8 +1642,13 @@
         premiumCheckoutFailed: 'Checkout is unavailable right now. Please try again later.',
         stripeNotConfigured: 'Stripe checkout is not configured yet. Replace YOUR-VERCEL-PROJECT in index.html.',
         closeModal: 'Close',
-        moonpay: 'Buy Bitcoin with MoonPay 🚀',
-        topper: 'Buy Bitcoin with Topper ✨',
+        moonpay: 'MoonPay',
+        topper: 'Topper',
+        shareTitle: 'Share BTC2G',
+        shareText: 'BTC2G: Bitcoin vs Gold forecast and model-based BTC signal',
+        nativeShare: 'Share',
+        copyLink: 'Copy link',
+        linkCopied: 'Link copied',
         about: 'About',
         privacy: 'Privacy Policy',
         terms: 'Terms of Service',
@@ -1112,8 +1720,8 @@
         premiumCheckoutFailed: 'Оплата сейчас недоступна. Попробуйте позже.',
         stripeNotConfigured: 'Stripe Checkout еще не настроен. Замените YOUR-VERCEL-PROJECT в index.html.',
         closeModal: 'Закрыть',
-        moonpay: 'Купить Биткоин с MoonPay 🚀',
-        topper: 'Купить Биткоин с Topper ✨',
+        moonpay: 'MoonPay',
+        topper: 'Topper',
         about: 'О проекте',
         privacy: 'Политика конфиденциальности',
         terms: 'Условия использования',
@@ -1185,8 +1793,8 @@
         premiumCheckoutFailed: 'התשלום אינו זמין כרגע. נסה שוב מאוחר יותר.',
         stripeNotConfigured: 'Stripe Checkout עדיין לא הוגדר. החלף את YOUR-VERCEL-PROJECT בקובץ index.html.',
         closeModal: 'סגור',
-        moonpay: 'קנה ביטקוין עם MoonPay 🚀',
-        topper: 'קנה ביטקוין עם Topper ✨',
+        moonpay: 'MoonPay',
+        topper: 'Topper',
         about: 'אודות',
         privacy: 'מדיניות פרטיות',
         terms: 'תנאי שימוש',
@@ -1258,8 +1866,8 @@
         premiumCheckoutFailed: 'Checkout ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.',
         stripeNotConfigured: 'Stripe Checkout ist noch nicht konfiguriert. Ersetzen Sie YOUR-VERCEL-PROJECT in index.html.',
         closeModal: 'Schließen',
-        moonpay: 'Bitcoin mit MoonPay kaufen 🚀',
-        topper: 'Bitcoin mit Topper kaufen ✨',
+        moonpay: 'MoonPay',
+        topper: 'Topper',
         about: 'Über uns',
         privacy: 'Datenschutz',
         terms: 'Nutzungsbedingungen',
@@ -1331,8 +1939,8 @@
         premiumCheckoutFailed: 'Le paiement est indisponible pour le moment. Veuillez réessayer plus tard.',
         stripeNotConfigured: 'Stripe Checkout n’est pas encore configuré. Remplacez YOUR-VERCEL-PROJECT dans index.html.',
         closeModal: 'Fermer',
-        moonpay: 'Acheter du Bitcoin avec MoonPay 🚀',
-        topper: 'Acheter du Bitcoin avec Topper ✨',
+        moonpay: 'MoonPay',
+        topper: 'Topper',
         about: 'À propos',
         privacy: 'Confidentialité',
         terms: 'Conditions d’utilisation',
@@ -1404,8 +2012,8 @@
         premiumCheckoutFailed: 'El pago no está disponible ahora. Inténtalo de nuevo más tarde.',
         stripeNotConfigured: 'Stripe Checkout aún no está configurado. Reemplaza YOUR-VERCEL-PROJECT en index.html.',
         closeModal: 'Cerrar',
-        moonpay: 'Comprar Bitcoin con MoonPay 🚀',
-        topper: 'Comprar Bitcoin con Topper ✨',
+        moonpay: 'MoonPay',
+        topper: 'Topper',
         about: 'Acerca de',
         privacy: 'Política de privacidad',
         terms: 'Términos de servicio',
@@ -1477,33 +2085,929 @@
         premiumCheckoutFailed: '结账暂时不可用。请稍后再试。',
         stripeNotConfigured: 'Stripe Checkout 尚未配置。请在 index.html 中替换 YOUR-VERCEL-PROJECT。',
         closeModal: '关闭',
-        moonpay: '使用 MoonPay 购买比特币 🚀',
-        topper: '使用 Topper 购买比特币 ✨',
+        moonpay: 'MoonPay',
+        topper: 'Topper',
         about: '关于',
         privacy: '隐私政策',
         terms: '服务条款',
+      },
+      it: {
+        languageLabel: 'Lingua',
+      },
+      pt: {
+        languageLabel: 'Idioma',
+      },
+      ar: {
+        languageLabel: 'اللغة',
+      },
+      hi: {
+        languageLabel: 'भाषा',
+      },
+      ja: {
+        languageLabel: '言語',
+      },
+      ko: {
+        languageLabel: '언어',
+      },
+      tr: {
+        languageLabel: 'Dil',
+      },
+      pl: {
+        languageLabel: 'Język',
+      },
+      nl: {
+        languageLabel: 'Taal',
+      },
+      uk: {
+        languageLabel: 'Мова',
+      },
+      id: {
+        languageLabel: 'Bahasa',
+      },
+      vi: {
+        languageLabel: 'Ngôn ngữ',
       }
     };
 
+    const translationSupplements = {
+      ru: {
+        navHome: 'Главная',
+        navForecast: 'Прогноз',
+        navPremium: 'Premium',
+        navBuy: 'Купить BTC',
+        confidenceLabel: 'Уверенность',
+        lastUpdatedLabel: 'Обновлено',
+        forecastTitle: 'Прогноз BTC vs Gold',
+        insightsTitle: 'Ключевые выводы',
+        insightRatioTitle: 'Соотношение BTC/золото',
+        insightRatioValue: 'Недоступно',
+        insightDirectionTitle: 'Текущее направление модели',
+        insightUpdateTitle: 'Последнее обновление прогноза',
+        buyText: 'Используйте внешнего провайдера для покупки BTC. BTC2G не обрабатывает платежи напрямую.',
+        providerNote: 'Доступность зависит от провайдера и страны.',
+        shareTitle: 'Поделиться BTC2G',
+        shareText: 'BTC2G: прогноз Bitcoin vs Gold и модельный BTC-сигнал',
+        nativeShare: 'Поделиться',
+        copyLink: 'Копировать ссылку',
+        linkCopied: 'Ссылка скопирована',
+      },
+      he: {
+        navHome: 'בית',
+        navForecast: 'תחזית',
+        navPremium: 'Premium',
+        navBuy: 'קנה BTC',
+        confidenceLabel: 'ביטחון',
+        lastUpdatedLabel: 'עודכן לאחרונה',
+        forecastTitle: 'תחזית BTC מול זהב',
+        insightsTitle: 'תובנות מרכזיות',
+        insightRatioTitle: 'יחס BTC מול זהב',
+        insightRatioValue: 'לא זמין',
+        insightDirectionTitle: 'כיוון המודל הנוכחי',
+        insightUpdateTitle: 'עדכון תחזית אחרון',
+        buyText: 'השתמש בספק חיצוני כדי לקנות BTC. BTC2G לא מעבד תשלומים ישירות.',
+        providerNote: 'הזמינות תלויה בספק ובמדינה.',
+        shareTitle: 'שתף את BTC2G',
+        shareText: 'BTC2G: תחזית ביטקוין מול זהב ואיתות BTC מבוסס מודל',
+        nativeShare: 'שתף',
+        copyLink: 'העתק קישור',
+        linkCopied: 'הקישור הועתק',
+      },
+      de: {
+        navHome: 'Start',
+        navForecast: 'Prognose',
+        navPremium: 'Premium',
+        navBuy: 'BTC kaufen',
+        confidenceLabel: 'Konfidenz',
+        lastUpdatedLabel: 'Zuletzt aktualisiert',
+        forecastTitle: 'BTC-vs-Gold-Prognose',
+        insightsTitle: 'Wichtige Erkenntnisse',
+        insightRatioTitle: 'BTC-vs-Gold-Verhältnis',
+        insightRatioValue: 'Nicht verfügbar',
+        insightDirectionTitle: 'Aktuelle Modellrichtung',
+        insightUpdateTitle: 'Letztes Prognose-Update',
+        buyText: 'Nutzen Sie einen externen Anbieter, um BTC zu kaufen. BTC2G verarbeitet Zahlungen nicht direkt.',
+        providerNote: 'Die Verfügbarkeit hängt von Anbieter und Land ab.',
+        shareTitle: 'BTC2G teilen',
+        shareText: 'BTC2G: Bitcoin-vs-Gold-Prognose und modellbasiertes BTC-Signal',
+        nativeShare: 'Teilen',
+        copyLink: 'Link kopieren',
+        linkCopied: 'Link kopiert',
+      },
+      fr: {
+        navHome: 'Accueil',
+        navForecast: 'Prévision',
+        navPremium: 'Premium',
+        navBuy: 'Acheter BTC',
+        confidenceLabel: 'Confiance',
+        lastUpdatedLabel: 'Dernière mise à jour',
+        forecastTitle: 'Prévision BTC contre or',
+        insightsTitle: 'Points clés',
+        insightRatioTitle: 'Ratio BTC/or',
+        insightRatioValue: 'Non disponible',
+        insightDirectionTitle: 'Direction actuelle du modèle',
+        insightUpdateTitle: 'Dernière mise à jour de la prévision',
+        buyText: 'Utilisez un fournisseur externe pour acheter du BTC. BTC2G ne traite pas les paiements directement.',
+        providerNote: 'La disponibilité dépend du fournisseur et du pays.',
+        shareTitle: 'Partager BTC2G',
+        shareText: 'BTC2G : prévision Bitcoin contre or et signal BTC basé sur un modèle',
+        nativeShare: 'Partager',
+        copyLink: 'Copier le lien',
+        linkCopied: 'Lien copié',
+      },
+      es: {
+        navHome: 'Inicio',
+        navForecast: 'Pronóstico',
+        navPremium: 'Premium',
+        navBuy: 'Comprar BTC',
+        confidenceLabel: 'Confianza',
+        lastUpdatedLabel: 'Última actualización',
+        forecastTitle: 'Pronóstico BTC vs oro',
+        insightsTitle: 'Ideas clave',
+        insightRatioTitle: 'Ratio BTC vs oro',
+        insightRatioValue: 'No disponible',
+        insightDirectionTitle: 'Dirección actual del modelo',
+        insightUpdateTitle: 'Última actualización del pronóstico',
+        buyText: 'Usa un proveedor externo para comprar BTC. BTC2G no procesa pagos directamente.',
+        providerNote: 'La disponibilidad depende del proveedor y del país.',
+        shareTitle: 'Compartir BTC2G',
+        shareText: 'BTC2G: pronóstico Bitcoin vs oro y señal BTC basada en modelo',
+        nativeShare: 'Compartir',
+        copyLink: 'Copiar enlace',
+        linkCopied: 'Enlace copiado',
+      },
+      zh: {
+        navHome: '首页',
+        navForecast: '预测',
+        navPremium: 'Premium',
+        navBuy: '购买 BTC',
+        confidenceLabel: '置信度',
+        lastUpdatedLabel: '最后更新',
+        forecastTitle: 'BTC 与黄金预测',
+        insightsTitle: '关键洞察',
+        insightRatioTitle: 'BTC 与黄金比率',
+        insightRatioValue: '不可用',
+        insightDirectionTitle: '当前模型方向',
+        insightUpdateTitle: '最后预测更新',
+        buyText: '使用外部服务商购买 BTC。BTC2G 不直接处理付款。',
+        providerNote: '可用性取决于服务商和国家/地区。',
+        shareTitle: '分享 BTC2G',
+        shareText: 'BTC2G：比特币与黄金预测及基于模型的 BTC 信号',
+        nativeShare: '分享',
+        copyLink: '复制链接',
+        linkCopied: '链接已复制',
+      },
+      it: {
+        title: 'Previsione Bitcoin vs Oro',
+        subtitle: 'Dal 2016 al {date}, con proiezione al 2030',
+        navHome: 'Home',
+        navForecast: 'Previsione',
+        navPremium: 'Premium',
+        navBuy: 'Compra BTC',
+        signalTitle: 'Segnale modello BTC',
+        signalUnavailable: 'Segnale non disponibile',
+        confidenceLabel: 'Fiducia',
+        lastUpdatedLabel: 'Ultimo aggiornamento',
+        signalDisclaimer: 'Segnale basato su modello. Non è consulenza finanziaria.',
+        signalToggle: 'Che cos’è?',
+        signalExplanation: 'Questo segnale deriva dal modello del rapporto BTC contro oro. Riflette una valutazione relativa, non previsioni di prezzo a breve termine.',
+        signalLabels: { BUY: 'COMPRA', HOLD: 'MANTIENI', SELL: 'VENDI' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'Secondo il modello, BTC appare sottovalutato rispetto all’oro' },
+        signalBuyActionLabel: 'Vai ai pulsanti per comprare Bitcoin',
+        forecastTitle: 'Previsione BTC vs Oro',
+        chartError: 'Il grafico della previsione BTC vs oro non è disponibile ora. Prova ad aggiornarlo.',
+        whyTitle: 'Nota sul grafico',
+        whyText: 'BTC2G confronta Bitcoin con l’oro come riserve di valore di lungo periodo.',
+        insightsTitle: 'Punti chiave',
+        insightRatioTitle: 'Rapporto BTC vs oro',
+        insightRatioValue: 'Non disponibile',
+        insightDirectionTitle: 'Direzione attuale del modello',
+        insightUpdateTitle: 'Ultimo aggiornamento della previsione',
+        subscribeTitle: 'Ricevi aggiornamenti previsionali',
+        subscribeSubtitle: 'Ricevi aggiornamenti compatti di BTC2G quando il modello cambia.',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: 'Iscriviti',
+        subscribeTrust: 'Niente spam. Puoi annullare l’iscrizione in qualsiasi momento.',
+        subscribeEmpty: 'Inserisci il tuo indirizzo email.',
+        subscribeInvalid: 'Inserisci un indirizzo email valido.',
+        subscribeSending: 'Iscrizione...',
+        subscribeSuccess: 'Iscrizione completata. Riceverai i prossimi aggiornamenti.',
+        subscribeError: 'Iscrizione non riuscita. Riprova più tardi.',
+        subscribeNotConfigured: 'L’iscrizione non è ancora configurata. Sostituisci YOUR_ID in index.html.',
+        buyTitle: 'Compra Bitcoin',
+        buyText: 'Usa un fornitore esterno per comprare BTC. BTC2G non elabora pagamenti direttamente.',
+        providerNote: 'La disponibilità dipende dal fornitore e dal paese.',
+        disclaimer: 'Questa previsione è solo a scopo informativo e non è consulenza finanziaria.',
+        refreshChart: 'Aggiorna grafico manualmente',
+        learnMore: 'Scopri di più:',
+        seoBitcoinGold: 'Bitcoin vs Oro',
+        seoRatio: 'Rapporto Bitcoin/oro',
+        seoForecast: 'Previsione 2026',
+        premiumTitle: 'Segnali Premium',
+        premiumSubtitle: 'Storico esteso dei segnali, note del modello e aggiornamenti settimanali.',
+        premiumUnlock: 'Apri Premium',
+        premiumPageLink: 'Vedi Premium',
+        shareTitle: 'Condividi BTC2G',
+        shareText: 'BTC2G: previsione Bitcoin vs oro e segnale BTC basato su modello',
+        nativeShare: 'Condividi',
+        copyLink: 'Copia link',
+        linkCopied: 'Link copiato',
+        about: 'Informazioni',
+        privacy: 'Privacy',
+        terms: 'Termini di servizio',
+      },
+      pt: {
+        title: 'Previsão Bitcoin vs Ouro',
+        subtitle: 'De 2016 até {date}, com projeção até 2030',
+        navHome: 'Início',
+        navForecast: 'Previsão',
+        navPremium: 'Premium',
+        navBuy: 'Comprar BTC',
+        signalTitle: 'Sinal do modelo BTC',
+        signalUnavailable: 'Sinal indisponível',
+        confidenceLabel: 'Confiança',
+        lastUpdatedLabel: 'Última atualização',
+        signalDisclaimer: 'Sinal baseado em modelo. Não é aconselhamento financeiro.',
+        signalToggle: 'O que é isto?',
+        signalExplanation: 'Este sinal deriva do modelo de relação BTC contra ouro. Reflete avaliação relativa, não previsões de preço de curto prazo.',
+        signalLabels: { BUY: 'COMPRAR', HOLD: 'MANTER', SELL: 'VENDER' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'Segundo o modelo, o BTC parece subvalorizado em relação ao ouro' },
+        signalBuyActionLabel: 'Ir para os botões de compra de Bitcoin',
+        forecastTitle: 'Previsão BTC vs Ouro',
+        chartError: 'O gráfico de previsão BTC vs ouro não está disponível agora. Tente atualizar.',
+        whyTitle: 'Nota do gráfico',
+        whyText: 'BTC2G compara Bitcoin com ouro como reservas de valor de longo prazo.',
+        insightsTitle: 'Principais insights',
+        insightRatioTitle: 'Relação BTC vs ouro',
+        insightRatioValue: 'Não disponível',
+        insightDirectionTitle: 'Direção atual do modelo',
+        insightUpdateTitle: 'Última atualização da previsão',
+        subscribeTitle: 'Receba atualizações da previsão',
+        subscribeSubtitle: 'Receba atualizações compactas do BTC2G quando o modelo mudar.',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: 'Subscrever',
+        subscribeTrust: 'Sem spam. Cancele quando quiser.',
+        subscribeEmpty: 'Insira seu email.',
+        subscribeInvalid: 'Insira um email válido.',
+        subscribeSending: 'A subscrever...',
+        subscribeSuccess: 'Subscrição concluída. Você receberá futuras atualizações.',
+        subscribeError: 'A subscrição falhou. Tente novamente mais tarde.',
+        subscribeNotConfigured: 'A subscrição ainda não está configurada. Substitua YOUR_ID em index.html.',
+        buyTitle: 'Comprar Bitcoin',
+        buyText: 'Use um fornecedor externo para comprar BTC. A BTC2G não processa pagamentos diretamente.',
+        providerNote: 'A disponibilidade depende do fornecedor e do país.',
+        disclaimer: 'Esta previsão é apenas informativa e não é aconselhamento financeiro.',
+        refreshChart: 'Atualizar gráfico manualmente',
+        learnMore: 'Saiba mais:',
+        seoBitcoinGold: 'Bitcoin vs Ouro',
+        seoRatio: 'Rácio Bitcoin/ouro',
+        seoForecast: 'Previsão 2026',
+        premiumTitle: 'Sinais Premium',
+        premiumSubtitle: 'Histórico estendido de sinais, notas do modelo e atualizações semanais.',
+        premiumUnlock: 'Abrir Premium',
+        premiumPageLink: 'Ver Premium',
+        shareTitle: 'Partilhar BTC2G',
+        shareText: 'BTC2G: previsão Bitcoin vs ouro e sinal BTC baseado em modelo',
+        nativeShare: 'Partilhar',
+        copyLink: 'Copiar link',
+        linkCopied: 'Link copiado',
+        about: 'Sobre',
+        privacy: 'Privacidade',
+        terms: 'Termos de serviço',
+      },
+      ar: {
+        title: 'توقعات Bitcoin مقابل الذهب',
+        subtitle: 'من 2016 إلى {date}، مع توقع حتى 2030',
+        navHome: 'الرئيسية',
+        navForecast: 'التوقعات',
+        navPremium: 'Premium',
+        navBuy: 'شراء BTC',
+        signalTitle: 'إشارة نموذج BTC',
+        signalUnavailable: 'الإشارة غير متاحة',
+        confidenceLabel: 'الثقة',
+        lastUpdatedLabel: 'آخر تحديث',
+        signalDisclaimer: 'إشارة مبنية على نموذج. ليست نصيحة مالية.',
+        signalToggle: 'ما هذا؟',
+        signalExplanation: 'هذه الإشارة مشتقة من نموذج نسبة BTC إلى الذهب. تعكس تقييما نسبيا، وليس توقعات سعرية قصيرة الأجل.',
+        signalLabels: { BUY: 'شراء', HOLD: 'احتفاظ', SELL: 'بيع' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'يبدو BTC مقوما بأقل من الذهب بحسب النموذج' },
+        signalBuyActionLabel: 'انتقل إلى أزرار شراء Bitcoin',
+        forecastTitle: 'توقعات BTC مقابل الذهب',
+        chartError: 'مخطط توقعات BTC مقابل الذهب غير متاح الآن. حاول تحديثه.',
+        whyTitle: 'ملاحظة على المخطط',
+        whyText: 'يقارن BTC2G بين Bitcoin والذهب كمخزنين للقيمة على المدى الطويل.',
+        insightsTitle: 'رؤى رئيسية',
+        insightRatioTitle: 'نسبة BTC إلى الذهب',
+        insightRatioValue: 'غير متاح',
+        insightDirectionTitle: 'اتجاه النموذج الحالي',
+        insightUpdateTitle: 'آخر تحديث للتوقعات',
+        subscribeTitle: 'احصل على تحديثات التوقعات',
+        subscribeSubtitle: 'استلم تحديثات BTC2G مختصرة عند تغير النموذج.',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: 'اشتراك',
+        subscribeTrust: 'لا رسائل مزعجة. يمكنك إلغاء الاشتراك في أي وقت.',
+        subscribeEmpty: 'أدخل بريدك الإلكتروني.',
+        subscribeInvalid: 'أدخل بريدا إلكترونيا صالحا.',
+        subscribeSending: 'جار الاشتراك...',
+        subscribeSuccess: 'تم الاشتراك. ستتلقى التحديثات القادمة.',
+        subscribeError: 'فشل الاشتراك. حاول مرة أخرى لاحقا.',
+        buyTitle: 'شراء Bitcoin',
+        buyText: 'استخدم مزودا خارجيا لشراء BTC. لا يعالج BTC2G المدفوعات مباشرة.',
+        providerNote: 'يعتمد التوفر على المزود والبلد.',
+        disclaimer: 'هذه التوقعات لأغراض معلوماتية فقط وليست نصيحة مالية.',
+        refreshChart: 'تحديث المخطط يدويا',
+        learnMore: 'اعرف المزيد:',
+        seoBitcoinGold: 'Bitcoin مقابل الذهب',
+        seoRatio: 'نسبة Bitcoin إلى الذهب',
+        seoForecast: 'توقعات 2026',
+        premiumTitle: 'إشارات Premium',
+        premiumSubtitle: 'سجل إشارات موسع، ملاحظات النموذج، وتحديثات أسبوعية.',
+        premiumUnlock: 'افتح Premium',
+        premiumPageLink: 'عرض Premium',
+        shareTitle: 'شارك BTC2G',
+        shareText: 'BTC2G: توقعات Bitcoin مقابل الذهب وإشارة BTC مبنية على نموذج',
+        nativeShare: 'مشاركة',
+        copyLink: 'نسخ الرابط',
+        linkCopied: 'تم نسخ الرابط',
+        about: 'حول',
+        privacy: 'الخصوصية',
+        terms: 'الشروط',
+      },
+      hi: {
+        title: 'Bitcoin बनाम सोना पूर्वानुमान',
+        subtitle: '2016 से {date} तक, 2030 तक प्रक्षेपण के साथ',
+        navHome: 'होम',
+        navForecast: 'पूर्वानुमान',
+        navPremium: 'Premium',
+        navBuy: 'BTC खरीदें',
+        signalTitle: 'BTC मॉडल संकेत',
+        signalUnavailable: 'संकेत उपलब्ध नहीं',
+        confidenceLabel: 'विश्वास',
+        lastUpdatedLabel: 'अंतिम अपडेट',
+        signalDisclaimer: 'मॉडल-आधारित संकेत। वित्तीय सलाह नहीं।',
+        signalToggle: 'यह क्या है?',
+        signalExplanation: 'यह संकेत BTC बनाम सोना अनुपात मॉडल से निकला है। यह सापेक्ष मूल्यांकन दिखाता है, अल्पकालिक कीमत पूर्वानुमान नहीं।',
+        signalLabels: { BUY: 'खरीदें', HOLD: 'रखें', SELL: 'बेचें' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'मॉडल के अनुसार BTC सोने की तुलना में कम मूल्यांकित लगता है' },
+        signalBuyActionLabel: 'Bitcoin खरीद बटनों पर जाएं',
+        forecastTitle: 'BTC बनाम सोना पूर्वानुमान',
+        chartError: 'BTC बनाम सोना पूर्वानुमान चार्ट अभी उपलब्ध नहीं है। कृपया रीफ्रेश करें।',
+        whyTitle: 'चार्ट नोट',
+        whyText: 'BTC2G Bitcoin और सोने की तुलना दीर्घकालिक मूल्य भंडार के रूप में करता है।',
+        insightsTitle: 'मुख्य बातें',
+        insightRatioTitle: 'BTC बनाम सोना अनुपात',
+        insightRatioValue: 'उपलब्ध नहीं',
+        insightDirectionTitle: 'वर्तमान मॉडल दिशा',
+        insightUpdateTitle: 'अंतिम पूर्वानुमान अपडेट',
+        subscribeTitle: 'पूर्वानुमान अपडेट पाएं',
+        subscribeSubtitle: 'मॉडल बदलने पर BTC2G के संक्षिप्त अपडेट पाएं।',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: 'सदस्यता लें',
+        subscribeTrust: 'स्पैम नहीं। कभी भी सदस्यता समाप्त करें।',
+        subscribeEmpty: 'अपना ईमेल दर्ज करें।',
+        subscribeInvalid: 'मान्य ईमेल दर्ज करें।',
+        subscribeSending: 'सदस्यता ली जा रही है...',
+        subscribeSuccess: 'आप सदस्य बन गए हैं। आपको अगले अपडेट मिलेंगे।',
+        subscribeError: 'सदस्यता विफल रही। बाद में फिर कोशिश करें।',
+        buyTitle: 'Bitcoin खरीदें',
+        buyText: 'BTC खरीदने के लिए बाहरी प्रदाता का उपयोग करें। BTC2G सीधे भुगतान संसाधित नहीं करता।',
+        providerNote: 'उपलब्धता प्रदाता और देश पर निर्भर करती है।',
+        disclaimer: 'यह पूर्वानुमान केवल जानकारी के लिए है और वित्तीय सलाह नहीं है।',
+        refreshChart: 'चार्ट मैन्युअल रूप से अपडेट करें',
+        learnMore: 'और जानें:',
+        seoBitcoinGold: 'Bitcoin बनाम सोना',
+        seoRatio: 'Bitcoin सोना अनुपात',
+        seoForecast: '2026 पूर्वानुमान',
+        premiumTitle: 'Premium संकेत',
+        premiumSubtitle: 'विस्तृत संकेत इतिहास, मॉडल नोट्स और साप्ताहिक अपडेट।',
+        premiumUnlock: 'Premium खोलें',
+        premiumPageLink: 'Premium देखें',
+        shareTitle: 'BTC2G साझा करें',
+        shareText: 'BTC2G: Bitcoin बनाम सोना पूर्वानुमान और मॉडल-आधारित BTC संकेत',
+        nativeShare: 'साझा करें',
+        copyLink: 'लिंक कॉपी करें',
+        linkCopied: 'लिंक कॉपी हुआ',
+        about: 'परिचय',
+        privacy: 'गोपनीयता',
+        terms: 'सेवा शर्तें',
+      },
+      ja: {
+        title: 'Bitcoin 対 Gold 予測',
+        subtitle: '2016年から{date}まで、2030年までの予測',
+        navHome: 'ホーム',
+        navForecast: '予測',
+        navPremium: 'Premium',
+        navBuy: 'BTCを購入',
+        signalTitle: 'BTCモデルシグナル',
+        signalUnavailable: 'シグナルは利用できません',
+        confidenceLabel: '信頼度',
+        lastUpdatedLabel: '最終更新',
+        signalDisclaimer: 'モデルベースのシグナルです。金融アドバイスではありません。',
+        signalToggle: 'これは何ですか？',
+        signalExplanation: 'このシグナルはBTC対Gold比率モデルから算出されます。短期価格予測ではなく相対評価を示します。',
+        signalLabels: { BUY: '買い', HOLD: '保有', SELL: '売り' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'モデル上、BTCはGoldに対して割安に見えます' },
+        signalBuyActionLabel: 'Bitcoin購入ボタンへ移動',
+        forecastTitle: 'BTC 対 Gold 予測',
+        chartError: 'BTC対Gold予測チャートは現在利用できません。更新してください。',
+        whyTitle: 'チャート注記',
+        whyText: 'BTC2Gは、長期的な価値保存手段としてBitcoinとGoldを比較します。',
+        insightsTitle: '主な洞察',
+        insightRatioTitle: 'BTC対Gold比率',
+        insightRatioValue: '利用不可',
+        insightDirectionTitle: '現在のモデル方向',
+        insightUpdateTitle: '最終予測更新',
+        subscribeTitle: '予測更新を受け取る',
+        subscribeSubtitle: 'モデルが変化したときにBTC2Gの簡潔な更新を受け取ります。',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: '登録',
+        subscribeTrust: 'スパムなし。いつでも解除できます。',
+        subscribeEmpty: 'メールアドレスを入力してください。',
+        subscribeInvalid: '有効なメールアドレスを入力してください。',
+        subscribeSending: '登録中...',
+        subscribeSuccess: '登録しました。今後の更新を受け取れます。',
+        subscribeError: '登録に失敗しました。後でもう一度お試しください。',
+        buyTitle: 'Bitcoinを購入',
+        buyText: 'BTCの購入には外部プロバイダーを使用します。BTC2Gは支払いを直接処理しません。',
+        providerNote: '利用可否はプロバイダーと国によって異なります。',
+        disclaimer: 'この予測は情報提供のみを目的としており、金融アドバイスではありません。',
+        refreshChart: 'チャートを手動更新',
+        learnMore: '詳しく見る:',
+        seoBitcoinGold: 'Bitcoin対Gold',
+        seoRatio: 'Bitcoin Gold比率',
+        seoForecast: '2026年予測',
+        premiumTitle: 'Premiumシグナル',
+        premiumSubtitle: '拡張シグナル履歴、モデルノート、週次更新。',
+        premiumUnlock: 'Premiumを開く',
+        premiumPageLink: 'Premiumを見る',
+        shareTitle: 'BTC2Gを共有',
+        shareText: 'BTC2G: Bitcoin対Gold予測とモデルベースのBTCシグナル',
+        nativeShare: '共有',
+        copyLink: 'リンクをコピー',
+        linkCopied: 'リンクをコピーしました',
+        about: '概要',
+        privacy: 'プライバシー',
+        terms: '利用規約',
+      },
+      ko: {
+        title: 'Bitcoin 대 Gold 전망',
+        subtitle: '2016년부터 {date}까지, 2030년까지 전망',
+        navHome: '홈',
+        navForecast: '전망',
+        navPremium: 'Premium',
+        navBuy: 'BTC 구매',
+        signalTitle: 'BTC 모델 신호',
+        signalUnavailable: '신호를 사용할 수 없음',
+        confidenceLabel: '신뢰도',
+        lastUpdatedLabel: '마지막 업데이트',
+        signalDisclaimer: '모델 기반 신호입니다. 금융 조언이 아닙니다.',
+        signalToggle: '이것은 무엇인가요?',
+        signalExplanation: '이 신호는 BTC 대 Gold 비율 모델에서 파생됩니다. 단기 가격 예측이 아니라 상대 평가를 반영합니다.',
+        signalLabels: { BUY: '매수', HOLD: '보유', SELL: '매도' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': '모델 기준 BTC는 Gold 대비 저평가된 것으로 보입니다' },
+        signalBuyActionLabel: 'Bitcoin 구매 버튼으로 이동',
+        forecastTitle: 'BTC 대 Gold 전망',
+        chartError: 'BTC 대 Gold 전망 차트를 지금 사용할 수 없습니다. 새로고침해 주세요.',
+        whyTitle: '차트 참고',
+        whyText: 'BTC2G는 장기 가치 저장 수단으로서 Bitcoin과 Gold를 비교합니다.',
+        insightsTitle: '주요 인사이트',
+        insightRatioTitle: 'BTC 대 Gold 비율',
+        insightRatioValue: '사용 불가',
+        insightDirectionTitle: '현재 모델 방향',
+        insightUpdateTitle: '마지막 전망 업데이트',
+        subscribeTitle: '전망 업데이트 받기',
+        subscribeSubtitle: '모델이 바뀔 때 BTC2G의 간단한 업데이트를 받으세요.',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: '구독',
+        subscribeTrust: '스팸 없음. 언제든지 구독 해지 가능.',
+        subscribeEmpty: '이메일 주소를 입력하세요.',
+        subscribeInvalid: '유효한 이메일 주소를 입력하세요.',
+        subscribeSending: '구독 중...',
+        subscribeSuccess: '구독되었습니다. 향후 업데이트를 받게 됩니다.',
+        subscribeError: '구독에 실패했습니다. 나중에 다시 시도하세요.',
+        buyTitle: 'Bitcoin 구매',
+        buyText: 'BTC 구매에는 외부 제공업체를 사용합니다. BTC2G는 결제를 직접 처리하지 않습니다.',
+        providerNote: '이용 가능 여부는 제공업체와 국가에 따라 다릅니다.',
+        disclaimer: '이 전망은 정보 제공용이며 금융 조언이 아닙니다.',
+        refreshChart: '차트 수동 업데이트',
+        learnMore: '더 알아보기:',
+        seoBitcoinGold: 'Bitcoin 대 Gold',
+        seoRatio: 'Bitcoin Gold 비율',
+        seoForecast: '2026 전망',
+        premiumTitle: 'Premium 신호',
+        premiumSubtitle: '확장 신호 기록, 모델 노트 및 주간 업데이트.',
+        premiumUnlock: 'Premium 열기',
+        premiumPageLink: 'Premium 보기',
+        shareTitle: 'BTC2G 공유',
+        shareText: 'BTC2G: Bitcoin 대 Gold 전망 및 모델 기반 BTC 신호',
+        nativeShare: '공유',
+        copyLink: '링크 복사',
+        linkCopied: '링크가 복사됨',
+        about: '소개',
+        privacy: '개인정보',
+        terms: '서비스 약관',
+      },
+      tr: {
+        title: 'Bitcoin ve Altın Tahmini',
+        subtitle: '2016’dan {date} tarihine, 2030’a projeksiyonla',
+        navHome: 'Ana sayfa',
+        navForecast: 'Tahmin',
+        navPremium: 'Premium',
+        navBuy: 'BTC al',
+        signalTitle: 'BTC model sinyali',
+        signalUnavailable: 'Sinyal yok',
+        confidenceLabel: 'Güven',
+        lastUpdatedLabel: 'Son güncelleme',
+        signalDisclaimer: 'Model tabanlı sinyal. Finansal tavsiye değildir.',
+        signalToggle: 'Bu nedir?',
+        signalExplanation: 'Bu sinyal BTC ve altın oranı modelinden türetilir. Kısa vadeli fiyat tahmini değil, göreli değerlemeyi yansıtır.',
+        signalLabels: { BUY: 'AL', HOLD: 'TUT', SELL: 'SAT' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'Modele göre BTC altına kıyasla düşük değerlenmiş görünüyor' },
+        signalBuyActionLabel: 'Bitcoin satın alma düğmelerine git',
+        forecastTitle: 'BTC ve Altın Tahmini',
+        chartError: 'BTC ve altın tahmin grafiği şu anda kullanılamıyor. Lütfen yenileyin.',
+        whyTitle: 'Grafik notu',
+        whyText: 'BTC2G, Bitcoin ile altını uzun vadeli değer saklama araçları olarak karşılaştırır.',
+        insightsTitle: 'Temel içgörüler',
+        insightRatioTitle: 'BTC ve altın oranı',
+        insightRatioValue: 'Mevcut değil',
+        insightDirectionTitle: 'Mevcut model yönü',
+        insightUpdateTitle: 'Son tahmin güncellemesi',
+        subscribeTitle: 'Tahmin güncellemeleri al',
+        subscribeSubtitle: 'Model değiştiğinde kısa BTC2G güncellemeleri alın.',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: 'Abone ol',
+        subscribeTrust: 'Spam yok. İstediğiniz zaman çıkabilirsiniz.',
+        subscribeEmpty: 'E-posta adresinizi girin.',
+        subscribeInvalid: 'Geçerli bir e-posta adresi girin.',
+        subscribeSending: 'Abone olunuyor...',
+        subscribeSuccess: 'Abone oldunuz. Gelecek güncellemeleri alacaksınız.',
+        subscribeError: 'Abonelik başarısız oldu. Daha sonra tekrar deneyin.',
+        buyTitle: 'Bitcoin al',
+        buyText: 'BTC satın almak için harici bir sağlayıcı kullanın. BTC2G ödemeleri doğrudan işlemez.',
+        providerNote: 'Kullanılabilirlik sağlayıcıya ve ülkeye bağlıdır.',
+        disclaimer: 'Bu tahmin yalnızca bilgilendirme amaçlıdır ve finansal tavsiye değildir.',
+        refreshChart: 'Grafiği elle güncelle',
+        learnMore: 'Daha fazla bilgi:',
+        seoBitcoinGold: 'Bitcoin ve Altın',
+        seoRatio: 'Bitcoin Altın Oranı',
+        seoForecast: '2026 Tahmini',
+        premiumTitle: 'Premium Sinyaller',
+        premiumSubtitle: 'Genişletilmiş sinyal geçmişi, model notları ve haftalık güncellemeler.',
+        premiumUnlock: 'Premium’u aç',
+        premiumPageLink: 'Premium’u görüntüle',
+        shareTitle: 'BTC2G paylaş',
+        shareText: 'BTC2G: Bitcoin ve altın tahmini ve model tabanlı BTC sinyali',
+        nativeShare: 'Paylaş',
+        copyLink: 'Bağlantıyı kopyala',
+        linkCopied: 'Bağlantı kopyalandı',
+        about: 'Hakkında',
+        privacy: 'Gizlilik',
+        terms: 'Hizmet şartları',
+      },
+      pl: {
+        title: 'Prognoza Bitcoin vs złoto',
+        subtitle: 'Od 2016 do {date}, z projekcją do 2030',
+        navHome: 'Start',
+        navForecast: 'Prognoza',
+        navPremium: 'Premium',
+        navBuy: 'Kup BTC',
+        signalTitle: 'Sygnał modelu BTC',
+        signalUnavailable: 'Sygnał niedostępny',
+        confidenceLabel: 'Pewność',
+        lastUpdatedLabel: 'Ostatnia aktualizacja',
+        signalDisclaimer: 'Sygnał oparty na modelu. To nie jest porada finansowa.',
+        signalToggle: 'Co to jest?',
+        signalExplanation: 'Ten sygnał pochodzi z modelu relacji BTC do złota. Odzwierciedla względną wycenę, a nie krótkoterminową prognozę ceny.',
+        signalLabels: { BUY: 'KUP', HOLD: 'TRZYMAJ', SELL: 'SPRZEDAJ' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'Według modelu BTC wydaje się niedowartościowany względem złota' },
+        signalBuyActionLabel: 'Przejdź do przycisków kupna Bitcoin',
+        forecastTitle: 'Prognoza BTC vs złoto',
+        chartError: 'Wykres prognozy BTC vs złoto jest teraz niedostępny. Spróbuj odświeżyć.',
+        whyTitle: 'Notatka do wykresu',
+        whyText: 'BTC2G porównuje Bitcoin ze złotem jako długoterminowe magazyny wartości.',
+        insightsTitle: 'Kluczowe wnioski',
+        insightRatioTitle: 'Relacja BTC do złota',
+        insightRatioValue: 'Niedostępne',
+        insightDirectionTitle: 'Aktualny kierunek modelu',
+        insightUpdateTitle: 'Ostatnia aktualizacja prognozy',
+        subscribeTitle: 'Otrzymuj aktualizacje prognoz',
+        subscribeSubtitle: 'Otrzymuj krótkie aktualizacje BTC2G, gdy model się zmieni.',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: 'Subskrybuj',
+        subscribeTrust: 'Bez spamu. Możesz zrezygnować w każdej chwili.',
+        subscribeEmpty: 'Wpisz adres e-mail.',
+        subscribeInvalid: 'Wpisz prawidłowy adres e-mail.',
+        subscribeSending: 'Subskrybowanie...',
+        subscribeSuccess: 'Subskrypcja aktywna. Otrzymasz kolejne aktualizacje.',
+        subscribeError: 'Subskrypcja nie powiodła się. Spróbuj później.',
+        buyTitle: 'Kup Bitcoin',
+        buyText: 'Użyj zewnętrznego dostawcy, aby kupić BTC. BTC2G nie przetwarza płatności bezpośrednio.',
+        providerNote: 'Dostępność zależy od dostawcy i kraju.',
+        disclaimer: 'Ta prognoza ma charakter informacyjny i nie jest poradą finansową.',
+        refreshChart: 'Ręcznie odśwież wykres',
+        learnMore: 'Dowiedz się więcej:',
+        seoBitcoinGold: 'Bitcoin vs złoto',
+        seoRatio: 'Relacja Bitcoin/złoto',
+        seoForecast: 'Prognoza 2026',
+        premiumTitle: 'Sygnały Premium',
+        premiumSubtitle: 'Rozszerzona historia sygnałów, notatki modelu i cotygodniowe aktualizacje.',
+        premiumUnlock: 'Otwórz Premium',
+        premiumPageLink: 'Zobacz Premium',
+        shareTitle: 'Udostępnij BTC2G',
+        shareText: 'BTC2G: prognoza Bitcoin vs złoto i modelowy sygnał BTC',
+        nativeShare: 'Udostępnij',
+        copyLink: 'Kopiuj link',
+        linkCopied: 'Link skopiowany',
+        about: 'O stronie',
+        privacy: 'Prywatność',
+        terms: 'Warunki korzystania',
+      },
+      nl: {
+        title: 'Bitcoin versus goud voorspelling',
+        subtitle: 'Van 2016 tot {date}, met projectie tot 2030',
+        navHome: 'Home',
+        navForecast: 'Voorspelling',
+        navPremium: 'Premium',
+        navBuy: 'BTC kopen',
+        signalTitle: 'BTC-modelsignaal',
+        signalUnavailable: 'Signaal niet beschikbaar',
+        confidenceLabel: 'Betrouwbaarheid',
+        lastUpdatedLabel: 'Laatst bijgewerkt',
+        signalDisclaimer: 'Modelgebaseerd signaal. Geen financieel advies.',
+        signalToggle: 'Wat is dit?',
+        signalExplanation: 'Dit signaal komt uit het BTC-tegen-goud-ratiomodel. Het weerspiegelt relatieve waardering, geen korte termijn prijsvoorspelling.',
+        signalLabels: { BUY: 'KOPEN', HOLD: 'HOUDEN', SELL: 'VERKOPEN' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'Volgens het model lijkt BTC ondergewaardeerd ten opzichte van goud' },
+        signalBuyActionLabel: 'Ga naar de Bitcoin-koopknoppen',
+        forecastTitle: 'BTC versus goud voorspelling',
+        chartError: 'De BTC versus goud voorspellinggrafiek is nu niet beschikbaar. Probeer te vernieuwen.',
+        whyTitle: 'Grafieknotitie',
+        whyText: 'BTC2G vergelijkt Bitcoin met goud als langetermijnopslag van waarde.',
+        insightsTitle: 'Belangrijkste inzichten',
+        insightRatioTitle: 'BTC versus goud ratio',
+        insightRatioValue: 'Niet beschikbaar',
+        insightDirectionTitle: 'Huidige modelrichting',
+        insightUpdateTitle: 'Laatste voorspellingupdate',
+        subscribeTitle: 'Ontvang voorspellingupdates',
+        subscribeSubtitle: 'Ontvang compacte BTC2G-updates wanneer het model verandert.',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: 'Abonneren',
+        subscribeTrust: 'Geen spam. Uitschrijven kan altijd.',
+        subscribeEmpty: 'Voer je e-mailadres in.',
+        subscribeInvalid: 'Voer een geldig e-mailadres in.',
+        subscribeSending: 'Abonneren...',
+        subscribeSuccess: 'Je bent geabonneerd. Je ontvangt toekomstige updates.',
+        subscribeError: 'Abonneren mislukt. Probeer het later opnieuw.',
+        buyTitle: 'Bitcoin kopen',
+        buyText: 'Gebruik een externe aanbieder om BTC te kopen. BTC2G verwerkt betalingen niet rechtstreeks.',
+        providerNote: 'Beschikbaarheid hangt af van aanbieder en land.',
+        disclaimer: 'Deze voorspelling is alleen informatief en is geen financieel advies.',
+        refreshChart: 'Grafiek handmatig vernieuwen',
+        learnMore: 'Meer informatie:',
+        seoBitcoinGold: 'Bitcoin versus goud',
+        seoRatio: 'Bitcoin-goudratio',
+        seoForecast: 'Voorspelling 2026',
+        premiumTitle: 'Premium signalen',
+        premiumSubtitle: 'Uitgebreide signaalgeschiedenis, modelnotities en wekelijkse updates.',
+        premiumUnlock: 'Open Premium',
+        premiumPageLink: 'Bekijk Premium',
+        shareTitle: 'Deel BTC2G',
+        shareText: 'BTC2G: Bitcoin versus goud voorspelling en modelgebaseerd BTC-signaal',
+        nativeShare: 'Delen',
+        copyLink: 'Link kopiëren',
+        linkCopied: 'Link gekopieerd',
+        about: 'Over',
+        privacy: 'Privacy',
+        terms: 'Servicevoorwaarden',
+      },
+      uk: {
+        title: 'Прогноз Bitcoin і золота',
+        subtitle: 'З 2016 до {date}, з прогнозом до 2030',
+        navHome: 'Головна',
+        navForecast: 'Прогноз',
+        navPremium: 'Premium',
+        navBuy: 'Купити BTC',
+        signalTitle: 'Сигнал моделі BTC',
+        signalUnavailable: 'Сигнал недоступний',
+        confidenceLabel: 'Впевненість',
+        lastUpdatedLabel: 'Оновлено',
+        signalDisclaimer: 'Сигнал на основі моделі. Не є фінансовою порадою.',
+        signalToggle: 'Що це?',
+        signalExplanation: 'Цей сигнал походить з моделі співвідношення BTC до золота. Він відображає відносну оцінку, а не короткостроковий прогноз ціни.',
+        signalLabels: { BUY: 'КУПУВАТИ', HOLD: 'ТРИМАТИ', SELL: 'ПРОДАВАТИ' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'За моделлю BTC виглядає недооціненим порівняно із золотом' },
+        signalBuyActionLabel: 'Перейти до кнопок купівлі Bitcoin',
+        forecastTitle: 'Прогноз BTC і золота',
+        chartError: 'Графік прогнозу BTC і золота зараз недоступний. Спробуйте оновити.',
+        whyTitle: 'Примітка до графіка',
+        whyText: 'BTC2G порівнює Bitcoin із золотом як довгострокові засоби збереження вартості.',
+        insightsTitle: 'Ключові висновки',
+        insightRatioTitle: 'Співвідношення BTC до золота',
+        insightRatioValue: 'Недоступно',
+        insightDirectionTitle: 'Поточний напрям моделі',
+        insightUpdateTitle: 'Останнє оновлення прогнозу',
+        subscribeTitle: 'Отримувати оновлення прогнозу',
+        subscribeSubtitle: 'Отримуйте короткі оновлення BTC2G, коли модель змінюється.',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: 'Підписатися',
+        subscribeTrust: 'Без спаму. Можна відписатися будь-коли.',
+        subscribeEmpty: 'Введіть вашу електронну адресу.',
+        subscribeInvalid: 'Введіть дійсну електронну адресу.',
+        subscribeSending: 'Підписка...',
+        subscribeSuccess: 'Ви підписані. Ви отримуватимете майбутні оновлення.',
+        subscribeError: 'Підписка не вдалася. Спробуйте пізніше.',
+        buyTitle: 'Купити Bitcoin',
+        buyText: 'Використовуйте зовнішнього провайдера для купівлі BTC. BTC2G не обробляє платежі напряму.',
+        providerNote: 'Доступність залежить від провайдера та країни.',
+        disclaimer: 'Цей прогноз лише для інформації і не є фінансовою порадою.',
+        refreshChart: 'Оновити графік вручну',
+        learnMore: 'Дізнатися більше:',
+        seoBitcoinGold: 'Bitcoin і золото',
+        seoRatio: 'Співвідношення Bitcoin/золото',
+        seoForecast: 'Прогноз 2026',
+        premiumTitle: 'Premium-сигнали',
+        premiumSubtitle: 'Розширена історія сигналів, нотатки моделі та щотижневі оновлення.',
+        premiumUnlock: 'Відкрити Premium',
+        premiumPageLink: 'Переглянути Premium',
+        shareTitle: 'Поділитися BTC2G',
+        shareText: 'BTC2G: прогноз Bitcoin і золота та модельний BTC-сигнал',
+        nativeShare: 'Поділитися',
+        copyLink: 'Копіювати посилання',
+        linkCopied: 'Посилання скопійовано',
+        about: 'Про сайт',
+        privacy: 'Конфіденційність',
+        terms: 'Умови використання',
+      },
+      id: {
+        title: 'Prakiraan Bitcoin vs Emas',
+        subtitle: 'Dari 2016 hingga {date}, dengan proyeksi hingga 2030',
+        navHome: 'Beranda',
+        navForecast: 'Prakiraan',
+        navPremium: 'Premium',
+        navBuy: 'Beli BTC',
+        signalTitle: 'Sinyal model BTC',
+        signalUnavailable: 'Sinyal tidak tersedia',
+        confidenceLabel: 'Keyakinan',
+        lastUpdatedLabel: 'Terakhir diperbarui',
+        signalDisclaimer: 'Sinyal berbasis model. Bukan nasihat keuangan.',
+        signalToggle: 'Apa ini?',
+        signalExplanation: 'Sinyal ini berasal dari model rasio BTC terhadap emas. Ini mencerminkan valuasi relatif, bukan prediksi harga jangka pendek.',
+        signalLabels: { BUY: 'BELI', HOLD: 'TAHAN', SELL: 'JUAL' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'Berdasarkan model, BTC tampak undervalued dibanding emas' },
+        signalBuyActionLabel: 'Lompat ke tombol beli Bitcoin',
+        forecastTitle: 'Prakiraan BTC vs Emas',
+        chartError: 'Grafik prakiraan BTC vs emas tidak tersedia saat ini. Coba segarkan.',
+        whyTitle: 'Catatan grafik',
+        whyText: 'BTC2G membandingkan Bitcoin dengan emas sebagai penyimpan nilai jangka panjang.',
+        insightsTitle: 'Wawasan utama',
+        insightRatioTitle: 'Rasio BTC vs emas',
+        insightRatioValue: 'Tidak tersedia',
+        insightDirectionTitle: 'Arah model saat ini',
+        insightUpdateTitle: 'Pembaruan prakiraan terakhir',
+        subscribeTitle: 'Dapatkan pembaruan prakiraan',
+        subscribeSubtitle: 'Terima pembaruan BTC2G singkat saat model berubah.',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: 'Berlangganan',
+        subscribeTrust: 'Tanpa spam. Berhenti kapan saja.',
+        subscribeEmpty: 'Masukkan alamat email Anda.',
+        subscribeInvalid: 'Masukkan alamat email yang valid.',
+        subscribeSending: 'Berlangganan...',
+        subscribeSuccess: 'Anda sudah berlangganan. Anda akan menerima pembaruan berikutnya.',
+        subscribeError: 'Langganan gagal. Coba lagi nanti.',
+        buyTitle: 'Beli Bitcoin',
+        buyText: 'Gunakan penyedia eksternal untuk membeli BTC. BTC2G tidak memproses pembayaran secara langsung.',
+        providerNote: 'Ketersediaan bergantung pada penyedia dan negara.',
+        disclaimer: 'Prakiraan ini hanya untuk informasi dan bukan nasihat keuangan.',
+        refreshChart: 'Perbarui grafik manual',
+        learnMore: 'Pelajari lebih lanjut:',
+        seoBitcoinGold: 'Bitcoin vs Emas',
+        seoRatio: 'Rasio Bitcoin Emas',
+        seoForecast: 'Prakiraan 2026',
+        premiumTitle: 'Sinyal Premium',
+        premiumSubtitle: 'Riwayat sinyal diperluas, catatan model, dan pembaruan mingguan.',
+        premiumUnlock: 'Buka Premium',
+        premiumPageLink: 'Lihat Premium',
+        shareTitle: 'Bagikan BTC2G',
+        shareText: 'BTC2G: prakiraan Bitcoin vs emas dan sinyal BTC berbasis model',
+        nativeShare: 'Bagikan',
+        copyLink: 'Salin tautan',
+        linkCopied: 'Tautan disalin',
+        about: 'Tentang',
+        privacy: 'Privasi',
+        terms: 'Ketentuan layanan',
+      },
+      vi: {
+        title: 'Dự báo Bitcoin so với vàng',
+        subtitle: 'Từ 2016 đến {date}, với dự phóng đến 2030',
+        navHome: 'Trang chủ',
+        navForecast: 'Dự báo',
+        navPremium: 'Premium',
+        navBuy: 'Mua BTC',
+        signalTitle: 'Tín hiệu mô hình BTC',
+        signalUnavailable: 'Không có tín hiệu',
+        confidenceLabel: 'Độ tin cậy',
+        lastUpdatedLabel: 'Cập nhật lần cuối',
+        signalDisclaimer: 'Tín hiệu dựa trên mô hình. Không phải lời khuyên tài chính.',
+        signalToggle: 'Đây là gì?',
+        signalExplanation: 'Tín hiệu này được lấy từ mô hình tỷ lệ BTC so với vàng. Nó phản ánh định giá tương đối, không phải dự báo giá ngắn hạn.',
+        signalLabels: { BUY: 'MUA', HOLD: 'GIỮ', SELL: 'BÁN' },
+        signalNotes: { 'BTC appears undervalued compared to gold based on the model': 'Theo mô hình, BTC có vẻ bị định giá thấp so với vàng' },
+        signalBuyActionLabel: 'Chuyển đến nút mua Bitcoin',
+        forecastTitle: 'Dự báo BTC so với vàng',
+        chartError: 'Biểu đồ dự báo BTC so với vàng hiện không khả dụng. Hãy thử làm mới.',
+        whyTitle: 'Ghi chú biểu đồ',
+        whyText: 'BTC2G so sánh Bitcoin với vàng như các tài sản lưu trữ giá trị dài hạn.',
+        insightsTitle: 'Nhận định chính',
+        insightRatioTitle: 'Tỷ lệ BTC so với vàng',
+        insightRatioValue: 'Không khả dụng',
+        insightDirectionTitle: 'Hướng mô hình hiện tại',
+        insightUpdateTitle: 'Cập nhật dự báo cuối',
+        subscribeTitle: 'Nhận cập nhật dự báo',
+        subscribeSubtitle: 'Nhận cập nhật BTC2G ngắn gọn khi mô hình thay đổi.',
+        subscribePlaceholder: 'you@example.com',
+        subscribeButton: 'Đăng ký',
+        subscribeTrust: 'Không spam. Có thể hủy bất cứ lúc nào.',
+        subscribeEmpty: 'Nhập địa chỉ email của bạn.',
+        subscribeInvalid: 'Nhập địa chỉ email hợp lệ.',
+        subscribeSending: 'Đang đăng ký...',
+        subscribeSuccess: 'Bạn đã đăng ký. Bạn sẽ nhận các cập nhật tiếp theo.',
+        subscribeError: 'Đăng ký thất bại. Vui lòng thử lại sau.',
+        buyTitle: 'Mua Bitcoin',
+        buyText: 'Dùng nhà cung cấp bên ngoài để mua BTC. BTC2G không xử lý thanh toán trực tiếp.',
+        providerNote: 'Tính khả dụng phụ thuộc vào nhà cung cấp và quốc gia.',
+        disclaimer: 'Dự báo này chỉ nhằm mục đích thông tin và không phải lời khuyên tài chính.',
+        refreshChart: 'Cập nhật biểu đồ thủ công',
+        learnMore: 'Tìm hiểu thêm:',
+        seoBitcoinGold: 'Bitcoin so với vàng',
+        seoRatio: 'Tỷ lệ Bitcoin/vàng',
+        seoForecast: 'Dự báo 2026',
+        premiumTitle: 'Tín hiệu Premium',
+        premiumSubtitle: 'Lịch sử tín hiệu mở rộng, ghi chú mô hình và cập nhật hàng tuần.',
+        premiumUnlock: 'Mở Premium',
+        premiumPageLink: 'Xem Premium',
+        shareTitle: 'Chia sẻ BTC2G',
+        shareText: 'BTC2G: dự báo Bitcoin so với vàng và tín hiệu BTC dựa trên mô hình',
+        nativeShare: 'Chia sẻ',
+        copyLink: 'Sao chép liên kết',
+        linkCopied: 'Đã sao chép liên kết',
+        about: 'Giới thiệu',
+        privacy: 'Quyền riêng tư',
+        terms: 'Điều khoản dịch vụ',
+      },
+    };
+
+    function getTextForLanguage(lang) {
+      const base = texts.en;
+      const selected = texts[lang] || {};
+      const supplement = translationSupplements[lang] || {};
+      return {
+        ...base,
+        ...selected,
+        ...supplement,
+        signalLabels: {
+          ...base.signalLabels,
+          ...(selected.signalLabels || {}),
+          ...(supplement.signalLabels || {}),
+        },
+        signalNotes: {
+          ...base.signalNotes,
+          ...(selected.signalNotes || {}),
+          ...(supplement.signalNotes || {}),
+        },
+      };
+    }
+
     function setLang(lang) {
       localStorage.setItem('lang', lang);
-      const text = texts[lang];
+      const text = getTextForLanguage(lang);
       const localizedToday = formatLocalizedDate(todayStr, lang);
       currentLang = lang;
       document.documentElement.lang = lang;
-      document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+      document.documentElement.dir = ['he', 'ar'].includes(lang) ? 'rtl' : 'ltr';
       document.getElementById('language-select').value = lang;
       document.getElementById('language-select').setAttribute('aria-label', text.languageLabel);
       document.getElementById('language-select').title = text.languageLabel;
       document.getElementById('title').textContent = text.title;
       document.getElementById('subtitle').textContent = text.subtitle.replace('{date}', localizedToday);
+      setTextById('nav-home', text.navHome);
+      setTextById('nav-forecast', text.navForecast);
+      setTextById('nav-premium', text.navPremium);
+      setTextById('nav-buy', text.navBuy);
       document.getElementById('signal-title').textContent = text.signalTitle;
+      document.getElementById('signal-confidence-label').textContent = text.confidenceLabel;
+      document.getElementById('signal-updated-label').textContent = text.lastUpdatedLabel;
       document.getElementById('signal-disclaimer').textContent = text.signalDisclaimer;
       document.getElementById('signal-toggle').textContent = text.signalToggle;
       document.getElementById('signal-explanation').textContent = text.signalExplanation;
+      setTextById('forecast-title', text.forecastTitle);
       document.getElementById('chart-error').textContent = text.chartError;
       document.getElementById('why-title').textContent = text.whyTitle;
       document.getElementById('why-text').textContent = text.whyText;
+      setTextById('insights-title', text.insightsTitle);
+      setTextById('insight-ratio-title', text.insightRatioTitle);
+      setTextById('insight-ratio-value', text.insightRatioValue);
+      setTextById('insight-direction-title', text.insightDirectionTitle);
+      setTextById('insight-update-title', text.insightUpdateTitle);
       document.getElementById('subscribe-title').textContent = text.subscribeTitle;
       document.getElementById('subscribe-subtitle').textContent = text.subscribeSubtitle;
       document.getElementById('subscriber-email').placeholder = text.subscribePlaceholder;
@@ -1511,9 +3015,9 @@
       document.getElementById('subscribe-trust').textContent = text.subscribeTrust;
       document.getElementById('premium-title').textContent = text.premiumTitle;
       document.getElementById('premium-subtitle').textContent = text.premiumSubtitle;
-      document.getElementById('premium-item-insights').textContent = text.premiumInsight;
-      document.getElementById('premium-item-forecasts').textContent = text.premiumForecasts;
-      document.getElementById('premium-item-history').textContent = text.premiumHistory;
+      setTextById('premium-item-insights', text.premiumInsight);
+      setTextById('premium-item-forecasts', text.premiumForecasts);
+      setTextById('premium-item-history', text.premiumHistory);
       document.getElementById('premium-unlock-btn').textContent = text.premiumUnlock;
       document.getElementById('premium-page-link').textContent = text.premiumPageLink;
       document.getElementById('premium-modal-title').textContent = text.premiumModalTitle;
@@ -1527,6 +3031,8 @@
       document.getElementById('premium-submit-button').textContent = text.premiumSubmit;
       document.getElementById('premium-modal-close').setAttribute('aria-label', text.closeModal);
       document.getElementById('buy-title').textContent = text.buyTitle;
+      setTextById('buy-text', text.buyText);
+      setTextById('provider-note', text.providerNote);
       document.getElementById('disclaimer-text').textContent = text.disclaimer;
       document.getElementById('refresh-chart-text').textContent = text.refreshChart;
       document.getElementById('learn-more-text').textContent = text.learnMore;
@@ -1535,11 +3041,17 @@
       document.getElementById('seo-forecast-link').textContent = text.seoForecast;
       document.getElementById('moonpay-text').textContent = text.moonpay;
       document.getElementById('topper-text').textContent = text.topper;
+      setTextById('share-title', text.shareTitle);
+      setTextById('share-text', text.shareText);
+      setTextById('native-share-btn', text.nativeShare);
+      setTextById('copy-link-btn', text.copyLink);
       document.getElementById('about-link').textContent = text.about;
       document.getElementById('privacy-link').textContent = text.privacy;
       document.getElementById('terms-link').textContent = text.terms;
       renderSignal();
+      renderMeta();
       renderPremiumState();
+      updateShareLinks();
     }
 
     document.getElementById('language-select').addEventListener('change', (event) => {
@@ -1560,7 +3072,7 @@
       const emailInput = document.getElementById(config.emailInputId);
       const submitButton = document.getElementById(config.buttonId);
       const email = emailInput.value.trim();
-      const text = texts[currentLang];
+      const text = getCurrentText();
 
       if (!email) {
         setFormMessage(config.messageId, text.subscribeEmpty, true);
@@ -1610,7 +3122,7 @@
         setFormMessage(config.messageId, text.subscribeError, true);
       } finally {
         submitButton.disabled = false;
-        submitButton.textContent = texts[currentLang][config.buttonTextKey];
+        submitButton.textContent = getCurrentText()[config.buttonTextKey];
       }
     }
 
@@ -1635,7 +3147,7 @@
       const emailInput = document.getElementById('premium-email');
       const submitButton = document.getElementById('premium-submit-button');
       const email = emailInput.value.trim();
-      const text = texts[currentLang];
+      const text = getCurrentText();
 
       if (!email) {
         setFormMessage('premium-message', text.subscribeEmpty, true);
@@ -1682,7 +3194,7 @@
         setFormMessage('premium-message', message, true);
       } finally {
         submitButton.disabled = false;
-        submitButton.textContent = texts[currentLang].premiumSubmit;
+        submitButton.textContent = getCurrentText().premiumSubmit;
       }
     }
 
@@ -1736,6 +3248,7 @@
       setLang('en');
     }
     loadSignal();
+    loadMeta();
   </script>
 </body>
 </html>
