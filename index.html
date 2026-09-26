@@ -661,7 +661,7 @@
 
     .signal-card {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
       align-items: start;
       margin-top: 18px;
@@ -701,8 +701,8 @@
     }
 
     .signal-value {
-      min-width: 240px;
       min-height: 48px;
+      min-width: 0;
       padding: 0 22px;
       border-radius: 6px;
       font-size: 0.95rem;
@@ -737,6 +737,7 @@
     }
 
     .signal-disclaimer {
+      grid-column: 1 / -1;
       color: #98a3b5;
     }
 
@@ -1044,13 +1045,44 @@
         box-sizing: border-box;
       }
     }
+    @media (max-width: 700px) {
+      .container { padding: 12px 14px 20px; }
+      .site-header { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0; margin-bottom: 14px; padding-bottom: 10px; }
+      .menu-toggle { display: block; grid-column: 2; padding: 7px 11px; min-width: 44px; min-height: 44px; color: #e4edfc; background: #132b47; border: 1px solid #355778; border-radius: 8px; font-size: 1.3rem; }
+      .main-nav, .language-control { display: none; grid-column: 1 / -1; width: 100%; }
+      .site-header.menu-open .main-nav { display: grid; gap: 2px; margin: 10px 0 0; }
+      .site-header.menu-open .language-control { display: flex; margin-top: 8px; }
+      .main-nav a { padding: 10px 8px; }
+      .page-title { font-size: clamp(1.65rem, 7vw, 2.1rem); }
+      p#subtitle { margin-bottom: 8px; font-size: .85rem; }
+      .signal-card { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; padding: 14px; }
+      .signal-main, .signal-detail { display: block; justify-self: stretch; text-align: start; }
+      .signal-detail, .signal-detail + .signal-detail { justify-self: stretch; justify-items: start; text-align: start; }
+      .signal-card h2, .stat-label { min-height: 0; margin: 0 0 4px; font-size: .75rem; line-height: 1.3; }
+      .signal-value { min-width: 0; min-height: 0; height: auto; width: fit-content; padding: 7px 12px; font-size: .85rem; }
+      .signal-detail .signal-meta { height: auto; min-height: 32px; font-size: .9rem; }
+      #ratio-value { overflow-wrap: anywhere; }
+      .signal-note { margin: 0; font-size: .86rem; }
+      .signal-disclaimer { grid-column: 1 / -1; margin: 0; font-size: .76rem; }
+      .signal-toggle { grid-column: 1 / -1; font-size: .8rem; }
+      .signal-explanation.is-open { display: block; }
+      .chart-section { margin-top: 14px; padding: 12px; }
+      .chart-section img { height: auto; max-width: 100%; }
+      .chart-explanation { margin-top: 12px; }
+    }
+    @media (min-width: 701px) { .menu-toggle { display: none; } }
+    @media (min-width: 701px) and (max-width: 950px) {
+      .signal-card { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .signal-value { min-width: 0; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header class="site-header">
       <a class="brand" href="index.html" aria-label="BTC2G home">BTC2G</a>
-      <nav class="main-nav" aria-label="Primary navigation">
+      <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-controls="primary-navigation" aria-expanded="false">☰</button>
+      <nav id="primary-navigation" class="main-nav" aria-label="Primary navigation">
         <a id="nav-home" href="index.html">Home</a>
         <a id="nav-forecast" href="#forecast">Forecast</a>
         <a id="nav-premium" href="premium.html">Premium</a>
@@ -1085,17 +1117,21 @@
     <p id="subtitle">From 2016 to <span id="current-date"></span>, with projection to 2030</p>
 
     <section class="signal-card" aria-labelledby="signal-title">
+      <div class="signal-detail">
+        <p id="ratio-label" class="stat-label">BTC/Gold ratio</p>
+        <p id="ratio-value" class="signal-meta">Ratio temporarily unavailable</p>
+      </div>
       <div class="signal-main">
         <h2 id="signal-title">BTC Model Signal</h2>
         <div id="signal-value" class="signal-value signal-unavailable">...</div>
       </div>
       <div class="signal-detail">
         <p id="signal-confidence-label" class="stat-label">Confidence</p>
-        <p id="signal-confidence" class="signal-meta">--</p>
+        <p id="signal-confidence" class="signal-meta">Unavailable</p>
       </div>
       <div class="signal-detail">
         <p id="signal-updated-label" class="stat-label">Last updated</p>
-        <p id="signal-updated" class="signal-meta">--</p>
+        <p id="signal-updated" class="signal-meta">Unavailable</p>
       </div>
       <p id="signal-note" class="signal-note"></p>
       <p id="signal-disclaimer" class="signal-disclaimer">Model-based signal. Not financial advice.</p>
@@ -1133,8 +1169,7 @@
       <div class="insights-grid">
         <article class="insight-card">
           <h3 id="insight-ratio-title">BTC vs Gold ratio</h3>
-          <!-- TODO: Connect this to a ratio field when the forecast JSON exposes one. -->
-          <p id="insight-ratio-value" class="insight-value">Not available</p>
+          <p id="insight-ratio-value" class="insight-value">Ratio temporarily unavailable</p>
         </article>
         <article class="insight-card">
           <h3 id="insight-direction-title">Current model direction</h3>
@@ -1350,6 +1385,10 @@
         return '';
       }
 
+      const knownNeutralNote = 'BTC appears neutral compared to gold based on the model';
+      if (note === knownNeutralNote) {
+        return currentLang === 'ru' ? 'Модель показывает нейтральное состояние BTC по отношению к золоту.' : note;
+      }
       return getCurrentText().signalNotes[note] || note;
     }
 
@@ -1379,10 +1418,25 @@
       signalEl.removeAttribute('role');
       signalEl.removeAttribute('tabindex');
       signalEl.removeAttribute('title');
-      document.getElementById('signal-confidence').textContent = '--';
-      document.getElementById('signal-updated').textContent = '--';
+      document.getElementById('signal-confidence').textContent = currentLang === 'ru' ? 'Нет данных' : 'Unavailable';
+      document.getElementById('signal-updated').textContent = currentLang === 'ru' ? 'Нет данных' : 'Unavailable';
       document.getElementById('signal-note').textContent = '';
       document.getElementById('insight-direction-value').textContent = '--';
+      renderRatio();
+    }
+
+    function renderRatio() {
+      const ratio = currentSignalData?.ratio;
+      const available = typeof ratio === 'number' && Number.isFinite(ratio) && ratio > 0;
+      const fallback = currentLang === 'ru' ? 'Данные временно недоступны' : 'Ratio temporarily unavailable';
+      const value = available
+        ? `${new Intl.NumberFormat(LOCALE_BY_LANGUAGE[currentLang] || 'en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 3,
+        }).format(ratio)} oz`
+        : fallback;
+      setTextById('ratio-value', value);
+      setTextById('insight-ratio-value', value);
     }
 
     function renderSignal() {
@@ -1417,6 +1471,7 @@
       document.getElementById('signal-updated').textContent = localizedSignalDate;
       document.getElementById('signal-note').textContent = localizeSignalNote(currentSignalData.note);
       document.getElementById('insight-direction-value').textContent = text.signalLabels[signal];
+      renderRatio();
       if (!currentMetaData?.last_updated_utc) {
         document.getElementById('insight-update-value').textContent = localizedSignalDate;
       }
@@ -1507,6 +1562,7 @@
       try {
         await navigator.clipboard.writeText(window.location.href);
         statusEl.textContent = getCurrentText().linkCopied;
+        trackEvent('copy_link_click');
       } catch (error) {
         console.log('Copy link failed.', error);
         statusEl.textContent = window.location.href;
@@ -1521,6 +1577,7 @@
 
       try {
         await navigator.share(getSharePayload());
+        trackEvent('share_success');
       } catch (error) {
         console.log('Native share was not completed.', error);
       }
@@ -1536,6 +1593,9 @@
     });
     document.getElementById('native-share-btn').addEventListener('click', shareWithNativeApi);
     document.getElementById('copy-link-btn').addEventListener('click', copyCurrentLink);
+    document.getElementById('premium-page-link').addEventListener('click', () => {
+      trackEvent('premium_page_click');
+    });
     document.getElementById('moonpay-text').addEventListener('click', () => {
       trackEvent('buy_moonpay_click');
     });
@@ -2993,6 +3053,8 @@
       setTextById('nav-forecast', text.navForecast);
       setTextById('nav-premium', text.navPremium);
       setTextById('nav-buy', text.navBuy);
+      setTextById('ratio-label', text.insightRatioTitle);
+      updateMenuLabel();
       document.getElementById('signal-title').textContent = text.signalTitle;
       document.getElementById('signal-confidence-label').textContent = text.confidenceLabel;
       document.getElementById('signal-updated-label').textContent = text.lastUpdatedLabel;
@@ -3005,7 +3067,6 @@
       document.getElementById('why-text').textContent = text.whyText;
       setTextById('insights-title', text.insightsTitle);
       setTextById('insight-ratio-title', text.insightRatioTitle);
-      setTextById('insight-ratio-value', text.insightRatioValue);
       setTextById('insight-direction-title', text.insightDirectionTitle);
       setTextById('insight-update-title', text.insightUpdateTitle);
       document.getElementById('subscribe-title').textContent = text.subscribeTitle;
@@ -3056,6 +3117,23 @@
 
     document.getElementById('language-select').addEventListener('change', (event) => {
       setLang(event.target.value);
+    });
+    const mobileMenu = document.getElementById('menu-toggle');
+    function updateMenuLabel() {
+      const isOpen = mobileMenu.getAttribute('aria-expanded') === 'true';
+      mobileMenu.setAttribute('aria-label', currentLang === 'ru' ? (isOpen ? 'Закрыть меню' : 'Открыть меню') : (isOpen ? 'Close menu' : 'Open menu'));
+    }
+    mobileMenu.addEventListener('click', () => {
+      const isOpen = document.querySelector('.site-header').classList.toggle('menu-open');
+      mobileMenu.setAttribute('aria-expanded', String(isOpen));
+      updateMenuLabel();
+    });
+    document.getElementById('primary-navigation').addEventListener('click', (event) => {
+      if (event.target.closest('a')) {
+        document.querySelector('.site-header').classList.remove('menu-open');
+        mobileMenu.setAttribute('aria-expanded', 'false');
+        updateMenuLabel();
+      }
     });
 
     function isValidEmail(email) {
@@ -3129,6 +3207,7 @@
     function attachSubscriptionForm(formId, config) {
       document.getElementById(formId).addEventListener('submit', async (event) => {
         event.preventDefault();
+        trackEvent('subscribe_submit');
         await submitEmailSubscription(config);
       });
     }

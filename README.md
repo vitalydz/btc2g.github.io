@@ -81,6 +81,15 @@ npm install
 
 This repository currently has no `test` or `build` scripts in `package.json`, so `npm test` and `npm run build` are not available unless scripts are added later.
 
+Run the offline regression checks from the repository root after installing the Python requirements:
+
+```powershell
+python -B -m unittest discover -s tests -v
+node tests/ratio.test.cjs
+```
+
+The existing signal JSON is kept during frontend updates. The `ratio` field appears after the next successful chart workflow run; until then the UI displays a localized unavailable message.
+
 ## Professional UI and sharing
 
 The homepage was simplified into a dashboard-style layout:
@@ -224,6 +233,9 @@ def build_signal(df: pd.DataFrame) -> dict:
 Current MVP rule:
 
 - Compute the latest BTC/Gold ratio.
+- Publish the ratio in `assets/btc_signal.json` as `ratio` (BTC-USD divided by GC=F USD per troy ounce).
+- Set `last_updated` to the latest date shared by both price series, rather than the generation date.
+- Reject non-positive or non-finite prices and ratios before writing chart or signal files.
 - Compare it with the last 365 days of the BTC/Gold ratio.
 - Below the rolling range threshold becomes `BUY`.
 - Near the rolling average becomes `HOLD`.

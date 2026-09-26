@@ -86,14 +86,24 @@ def build_signal(df: pd.DataFrame) -> dict:
     average. It is intentionally simple and should be reviewed before being
     used as a paid signal product.
     """
-    ratio = (df["Bitcoin"] / df["Gold"]).dropna()
+    prices = df[["Bitcoin", "Gold"]].dropna().sort_index()
+    if not np.isfinite(prices.to_numpy()).all() or (prices <= 0).any().any():
+        raise RuntimeError("BTC/Gold prices must be finite and positive.")
+    ratio = prices["Bitcoin"] / prices["Gold"]
+    if not np.isfinite(ratio.to_numpy()).all() or (ratio <= 0).any():
+        raise RuntimeError("BTC/Gold ratios must be finite and positive.")
     if len(ratio) < 365:
         raise RuntimeError("Not enough BTC/Gold ratio data to build a signal.")
 
     latest_ratio = float(ratio.iloc[-1])
+    published_ratio = round(latest_ratio, 3)
+    if published_ratio <= 0:
+        raise RuntimeError("BTC/Gold ratio is too small to publish at three decimals.")
     rolling_window = ratio.tail(365)
     rolling_mean = float(rolling_window.mean())
     rolling_std = float(rolling_window.std())
+    if not np.isfinite(rolling_mean) or not np.isfinite(rolling_std):
+        raise RuntimeError("BTC/Gold rolling statistics are invalid.")
 
     if rolling_std <= 0:
         signal = "HOLD"
@@ -116,7 +126,8 @@ def build_signal(df: pd.DataFrame) -> dict:
     return {
         "signal": signal,
         "confidence": confidence,
-        "last_updated": utc_today().strftime("%Y-%m-%d"),
+        "ratio": published_ratio,
+        "last_updated": ratio.index[-1].strftime("%Y-%m-%d"),
         "note": note,
     }
 
@@ -129,6 +140,7 @@ def build_chart() -> None:
     df.columns = ["Gold", "Bitcoin"]
     if df.empty:
         raise RuntimeError("Combined BTC/Gold dataset is empty.")
+    signal = build_signal(df)
 
     gold_future_dates, gold_forecast = forecast_polyfit(df.index, df["Gold"], FUTURE_DAYS)
     btc_future_dates, btc_forecast = forecast_polyfit(df.index, df["Bitcoin"], FUTURE_DAYS)
@@ -180,7 +192,6 @@ def build_chart() -> None:
     plt.close(fig)
 
     os.replace(temp_chart_path, CHART_PATH)
-    signal = build_signal(df)
     SIGNAL_PATH.write_text(json.dumps(signal, indent=2) + "\n", encoding="utf-8")
 
     META_PATH.write_text(
