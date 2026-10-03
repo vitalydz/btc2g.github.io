@@ -480,9 +480,9 @@
       premiumCard.classList.toggle('premium-locked', !isPremiumUser);
     }
 
-    async function loadSignal() {
+    async function loadSignal(version = Date.now()) {
       try {
-        const response = await fetch(`${SIGNAL_PATH}?v=${encodeURIComponent(todayStr)}`);
+        const response = await fetch(`${SIGNAL_PATH}?v=${encodeURIComponent(version)}`, {cache: 'no-store', signal: AbortSignal.timeout(15000)});
         if (!response.ok) {
           throw new Error(`Signal request failed with status ${response.status}`);
         }
@@ -496,9 +496,9 @@
       }
     }
 
-    async function loadMeta() {
+    async function loadMeta(version = Date.now()) {
       try {
-        const response = await fetch(`${META_PATH}?v=${encodeURIComponent(todayStr)}`);
+        const response = await fetch(`${META_PATH}?v=${encodeURIComponent(version)}`, {cache: 'no-store', signal: AbortSignal.timeout(15000)});
         if (!response.ok) {
           throw new Error(`Metadata request failed with status ${response.status}`);
         }
@@ -509,6 +509,23 @@
         console.log('Forecast metadata loading failed.', error);
         currentMetaData = null;
         renderMeta();
+      }
+    }
+
+    async function refreshForecast() {
+      const button = document.getElementById('refresh-chart-btn');
+      if (button.disabled) return;
+      button.disabled = true;
+      button.setAttribute('aria-busy', 'true');
+      try {
+        const version = String(Date.now());
+        setChartSrc(version);
+        await Promise.all([loadSignal(version), loadMeta(version)]);
+        // Resolve the metadata fallback after both requests have completed.
+        renderMeta();
+      } finally {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
       }
     }
 
@@ -568,9 +585,7 @@
       document.getElementById('chart-error').style.display = 'none';
       document.getElementById('forecastChart').style.display = 'block';
     });
-    document.getElementById('refresh-chart-btn').addEventListener('click', () => {
-      setChartSrc(String(Date.now()));
-    });
+    document.getElementById('refresh-chart-btn').addEventListener('click', refreshForecast);
     document.getElementById('native-share-btn').addEventListener('click', shareWithNativeApi);
     document.getElementById('copy-link-btn').addEventListener('click', copyCurrentLink);
     document.getElementById('premium-page-link').addEventListener('click', () => {
@@ -598,7 +613,6 @@
         scrollToBuyButtons();
       }
     });
-    setChartSrc(todayStr);
 
     const texts = {
       en: {
@@ -2074,12 +2088,7 @@
       document.getElementById('buy-title').textContent = text.buyTitle;
       setTextById('buy-text', text.buyText);
       setTextById('provider-note', text.providerNote);
-      const purchaseNotice = {
-        en: 'Purchases are not available yet. Provider pages are informational.',
-        ru: 'Покупки пока недоступны. Страницы провайдеров носят информационный характер.',
-        he: 'הרכישות עדיין אינן זמינות. עמודי הספקים מיועדים למידע בלבד.',
-      };
-      setTextById('provider-note', purchaseNotice[lang] || purchaseNotice.en);
+
       document.getElementById('disclaimer-text').textContent = text.disclaimer;
       document.getElementById('refresh-chart-text').textContent = text.refreshChart;
       document.getElementById('learn-more-text').textContent = text.learnMore;
@@ -2329,8 +2338,7 @@
     } else {
       setLang('en');
     }
-    loadSignal();
-    loadMeta();
+    refreshForecast();
     // Re-evaluate the UTC day when returning to a tab left open overnight.
     document.addEventListener('visibilitychange', () => { if (!document.hidden) renderSignal(); });
     setInterval(renderSignal, 60000);

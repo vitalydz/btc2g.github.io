@@ -87,13 +87,14 @@ Run the offline regression checks from the repository root after installing the 
 python -B -m unittest discover -s tests -v
 node tests/ratio.test.cjs
 node tests/freshness.test.cjs
+node tests/refresh.test.cjs
 ```
 
 The existing signal JSON is kept during frontend updates. The `ratio` field appears after the next successful chart workflow run; until then the UI displays a localized unavailable message.
 
 The dashboard marks market data as delayed after more than three calendar days in UTC. Missing, impossible, or future market dates display a freshness warning. Invalid signal/confidence/ratio values display unavailable data. Chart generation time remains separate from the market date.
 
-The purchase page currently has no active checkout: MoonPay and Topper are shown as coming soon, without loading a payment SDK or sending checkout requests. A production integration must be configured and reviewed before enabling purchases.
+The purchase page provides working external links to the official MoonPay Bitcoin page and Topper website. They open in a new tab without a payment SDK or API keys. BTC2G does not process payments. The historical embedded-checkout setup below is inactive and would require a separate reviewed integration.
 
 ## Professional UI and sharing
 
@@ -423,7 +424,7 @@ The "Update chart manually" button on the homepage reloads the image by changing
 assets/btc_gold_forecast.png?v=Date.now()
 ```
 
-This refreshes the user's browser cache without changing the server file.
+The same button also reloads the signal JSON (including ratio) and forecast metadata with the same cache-busting version and `cache: no-store`. It disables repeated clicks while the JSON requests are pending; each request has a 15-second timeout. A failed request clears the corresponding old data and allows retry. This reads published files without generating or changing any server files.
 
 ### If the chart is broken
 

@@ -58,6 +58,8 @@
       background: #ccc;
     }
     .buy-button {
+      text-decoration: none;
+      max-width: 100%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -168,7 +170,7 @@
   <div class="container">
     <a id="back-home" class="back-home" href="index.html">Back to BTC2G</a>
     <h1 id="title">Buy Bitcoin</h1>
-    <p id="provider-notice" class="provider-notice" role="status">Purchases are not available yet. No payments are processed on this page.</p>
+    <p id="provider-notice" class="provider-notice" role="status">Links open the official provider websites in a new tab. BTC2G does not process payments.</p>
 
     <div class="language-control">
       <select id="language-select" aria-label="Language">
@@ -183,13 +185,13 @@
     </div>
 
     <div id="moonpay" class="moonpay-section">
-      <button id="buy-btn" class="buy-button" disabled aria-describedby="provider-notice">Buy Bitcoin with MoonPay 🚀</button>
+      <a id="buy-btn" class="buy-button" href="https://www.moonpay.com/buy/btc" target="_blank" rel="noopener noreferrer" aria-describedby="provider-notice">Open MoonPay ↗</a>
     </div>
 
     <div id="topper" class="topper-section">
       <h2 id="topper-title">Buy Bitcoin with Topper</h2>
 
-      <button id="topper-btn" class="buy-button topper-button" disabled aria-describedby="provider-notice">Buy Bitcoin with Topper ✨</button>
+      <a id="topper-btn" class="buy-button topper-button" href="https://www.topperpay.com/" target="_blank" rel="noopener noreferrer" aria-describedby="provider-notice">Open Topper ↗</a>
       <p id="topper-message" class="topper-message" role="status" aria-live="polite"></p>
     </div>
 
@@ -328,13 +330,13 @@
     };
 
     const availability = {
-      en: {soon: 'Coming soon', message: 'Purchases are not available yet. No payments are processed on this page.', home: 'Back to BTC2G', footer: 'Provider availability depends on country.'},
-      ru: {soon: 'Скоро', message: 'Покупки пока недоступны. На этой странице платежи не проводятся.', home: 'Вернуться к BTC2G', footer: 'Доступность провайдера зависит от страны.'},
-      he: {soon: 'בקרוב', message: 'הרכישות עדיין אינן זמינות. לא מתבצעים תשלומים בעמוד זה.', home: 'חזרה אל BTC2G', footer: 'זמינות הספק תלויה במדינה.'},
-      de: {soon: 'Demnächst', message: 'Käufe sind noch nicht verfügbar. Auf dieser Seite werden keine Zahlungen abgewickelt.', home: 'Zurück zu BTC2G', footer: 'Die Verfügbarkeit hängt vom Land ab.'},
-      fr: {soon: 'Bientôt', message: 'Les achats ne sont pas encore disponibles. Aucun paiement n’est traité sur cette page.', home: 'Retour à BTC2G', footer: 'La disponibilité dépend du pays.'},
-      es: {soon: 'Próximamente', message: 'Las compras aún no están disponibles. No se procesan pagos en esta página.', home: 'Volver a BTC2G', footer: 'La disponibilidad depende del país.'},
-      zh: {soon: '即将推出', message: '购买功能尚未开放。本页面不处理任何付款。', home: '返回 BTC2G', footer: '服务是否可用取决于所在国家。'},
+      en: {soon: 'Open website ↗', message: 'Links open the official provider websites in a new tab. BTC2G does not process payments.', home: 'Back to BTC2G', footer: 'Provider availability depends on country.'},
+      ru: {soon: 'Открыть сайт ↗', message: 'Ссылки открывают официальные сайты провайдеров в новой вкладке. BTC2G не обрабатывает платежи.', home: 'Вернуться к BTC2G', footer: 'Доступность провайдера зависит от страны.'},
+      he: {soon: 'פתיחת האתר ↗', message: 'הקישורים פותחים את אתרי הספקים הרשמיים בלשונית חדשה. BTC2G אינו מעבד תשלומים.', home: 'חזרה אל BTC2G', footer: 'זמינות הספק תלויה במדינה.'},
+      de: {soon: 'Website öffnen ↗', message: 'Die Links öffnen die offiziellen Anbieter-Websites in einem neuen Tab. BTC2G verarbeitet keine Zahlungen.', home: 'Zurück zu BTC2G', footer: 'Die Verfügbarkeit hängt vom Land ab.'},
+      fr: {soon: 'Ouvrir le site ↗', message: 'Les liens ouvrent les sites officiels dans un nouvel onglet. BTC2G ne traite aucun paiement.', home: 'Retour à BTC2G', footer: 'La disponibilité dépend du pays.'},
+      es: {soon: 'Abrir sitio web ↗', message: 'Los enlaces abren los sitios oficiales en una pestaña nueva. BTC2G no procesa pagos.', home: 'Volver a BTC2G', footer: 'La disponibilidad depende del país.'},
+      zh: {soon: '打开官网 ↗', message: '链接会在新标签页打开服务商官方网站。BTC2G 不处理付款。', home: '返回 BTC2G', footer: '服务是否可用取决于所在国家。'},
     };
 
     function setLang(lang) {
@@ -374,7 +376,7 @@
       setLang('en');
     }
 
-    // Checkout stays unavailable until a production integration is configured and reviewed.
+    // Provider navigation uses ordinary links and requires no checkout SDK or API keys.
   </script>
 </body>
 </html>
