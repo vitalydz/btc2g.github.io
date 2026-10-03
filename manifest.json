@@ -3,8 +3,8 @@
   "short_name": "BTC2G",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1e1e1e",
-  "theme_color": "#2c2c2c",
+  "background_color": "#071426",
+  "theme_color": "#071426",
   "icons": [
     {
       "src": "icons/icon-192.png",

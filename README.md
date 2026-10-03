@@ -86,9 +86,14 @@ Run the offline regression checks from the repository root after installing the 
 ```powershell
 python -B -m unittest discover -s tests -v
 node tests/ratio.test.cjs
+node tests/freshness.test.cjs
 ```
 
 The existing signal JSON is kept during frontend updates. The `ratio` field appears after the next successful chart workflow run; until then the UI displays a localized unavailable message.
+
+The dashboard marks market data as delayed after more than three calendar days in UTC. Missing, impossible, or future market dates display a freshness warning. Invalid signal/confidence/ratio values display unavailable data. Chart generation time remains separate from the market date.
+
+The purchase page currently has no active checkout: MoonPay and Topper are shown as coming soon, without loading a payment SDK or sending checkout requests. A production integration must be configured and reviewed before enabling purchases.
 
 ## Professional UI and sharing
 

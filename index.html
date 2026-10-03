@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#071426" />
   <title>BTC2G - Bitcoin vs Gold Forecast</title>
   <meta name="description" content="BTC2G compares Bitcoin with gold and shows a model-based BTC signal for long-term market context." />
   <meta property="og:title" content="BTC2G - Bitcoin vs Gold Forecast" />
@@ -1045,14 +1046,23 @@
         box-sizing: border-box;
       }
     }
+    .header-panel { display: contents; }
+    .data-freshness { grid-column: 1 / -1; margin: 0; padding: 10px 12px; color: #ffe0a3; border: 1px solid #85632d; border-radius: 6px; background: #342a18; }
+    .data-freshness[hidden] { display: none; }
+    .menu-toggle:focus-visible, .header-panel a:focus-visible, .header-panel select:focus-visible {
+      outline: 2px solid #9fc3f4;
+      outline-offset: 3px;
+    }
     @media (max-width: 700px) {
       .container { padding: 12px 14px 20px; }
-      .site-header { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0; margin-bottom: 14px; padding-bottom: 10px; }
+      .site-header { position: relative; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0; margin-bottom: 14px; padding-bottom: 10px; }
       .menu-toggle { display: block; grid-column: 2; padding: 7px 11px; min-width: 44px; min-height: 44px; color: #e4edfc; background: #132b47; border: 1px solid #355778; border-radius: 8px; font-size: 1.3rem; }
-      .main-nav, .language-control { display: none; grid-column: 1 / -1; width: 100%; }
-      .site-header.menu-open .main-nav { display: grid; gap: 2px; margin: 10px 0 0; }
-      .site-header.menu-open .language-control { display: flex; margin-top: 8px; }
-      .main-nav a { padding: 10px 8px; }
+      .header-panel { display: none; position: absolute; inset-inline-end: 0; top: 100%; z-index: 20; width: min(320px, calc(100vw - 28px)); max-height: calc(100dvh - 90px); overflow-y: auto; box-sizing: border-box; padding: 12px; border: 1px solid #355778; border-radius: 10px; background: #0c1b2f; box-shadow: 0 12px 28px #0008; }
+      .site-header.menu-open .header-panel { display: grid; gap: 10px; }
+      .header-panel .main-nav { display: grid; gap: 2px; margin: 0; }
+      .header-panel .language-control { display: flex; margin: 0; width: 100%; }
+      .header-panel select { width: 100%; min-width: 0; min-height: 44px; }
+      .main-nav a { display: flex; align-items: center; box-sizing: border-box; min-height: 44px; padding: 8px; }
       .page-title { font-size: clamp(1.65rem, 7vw, 2.1rem); }
       p#subtitle { margin-bottom: 8px; font-size: .85rem; }
       .signal-card { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; padding: 14px; }
@@ -1081,7 +1091,8 @@
   <div class="container">
     <header class="site-header">
       <a class="brand" href="index.html" aria-label="BTC2G home">BTC2G</a>
-      <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-controls="primary-navigation" aria-expanded="false">☰</button>
+      <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Open menu" aria-controls="header-panel" aria-expanded="false">☰</button>
+      <div id="header-panel" class="header-panel">
       <nav id="primary-navigation" class="main-nav" aria-label="Primary navigation">
         <a id="nav-home" href="index.html">Home</a>
         <a id="nav-forecast" href="#forecast">Forecast</a>
@@ -1111,6 +1122,7 @@
           <option value="vi">Tiếng Việt</option>
         </select>
       </div>
+      </div>
     </header>
 
     <h1 id="title" class="page-title">Bitcoin vs Gold Forecast</h1>
@@ -1134,6 +1146,7 @@
         <p id="signal-updated" class="signal-meta">Unavailable</p>
       </div>
       <p id="signal-note" class="signal-note"></p>
+      <p id="data-freshness" class="data-freshness" role="status" hidden></p>
       <p id="signal-disclaimer" class="signal-disclaimer">Model-based signal. Not financial advice.</p>
       <button id="signal-toggle" class="signal-toggle" type="button" aria-expanded="false" aria-controls="signal-explanation">What is this?</button>
       <p id="signal-explanation" class="signal-explanation">This signal is derived from the BTC vs Gold ratio model. It reflects relative valuation, not short-term price predictions.</p>
@@ -1422,7 +1435,10 @@
       document.getElementById('signal-updated').textContent = currentLang === 'ru' ? 'Нет данных' : 'Unavailable';
       document.getElementById('signal-note').textContent = '';
       document.getElementById('insight-direction-value').textContent = '--';
-      renderRatio();
+      const unavailable = currentLang === 'ru' ? 'Данные временно недоступны' : 'Ratio temporarily unavailable';
+      setTextById('ratio-value', unavailable);
+      setTextById('insight-ratio-value', unavailable);
+      renderFreshness('unavailable');
     }
 
     function renderRatio() {
@@ -1439,6 +1455,27 @@
       setTextById('insight-ratio-value', value);
     }
 
+    function getSignalFreshness(dateValue, now = new Date()) {
+      if (typeof dateValue !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) return 'unknown';
+      const date = new Date(`${dateValue}T00:00:00Z`);
+      if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== dateValue) return 'unknown';
+      const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+      const days = (today - date.getTime()) / 86400000;
+      if (!Number.isFinite(days) || days < 0) return 'unknown';
+      return days > 3 ? 'delayed' : 'fresh';
+    }
+
+    function renderFreshness(status) {
+      const messages = {
+        en: {delayed: 'Data delayed — market quotes are more than 3 days old.', unknown: 'Data freshness unavailable — market date is missing or invalid.', unavailable: 'Data unavailable — the signal cannot be verified.'},
+        ru: {delayed: 'Данные задерживаются — котировки старше 3 дней.', unknown: 'Свежесть данных неизвестна — дата котировок отсутствует или некорректна.', unavailable: 'Данные недоступны — сигнал невозможно проверить.'},
+        he: {delayed: 'הנתונים מתעכבים — מחירי השוק ישנים מ־3 ימים.', unknown: 'עדכניות הנתונים אינה ידועה — תאריך השוק חסר או שגוי.', unavailable: 'הנתונים אינם זמינים — לא ניתן לאמת את האיתות.'},
+      };
+      const element = document.getElementById('data-freshness');
+      element.hidden = status === 'fresh';
+      element.textContent = (messages[currentLang] || messages.en)[status] || '';
+    }
+
     function renderSignal() {
       if (!currentSignalData) {
         setSignalUnavailable();
@@ -1447,7 +1484,7 @@
 
       const text = getCurrentText();
       const signal = normalizeSignal(currentSignalData.signal);
-      if (!signal || typeof currentSignalData.confidence !== 'number') {
+      if (!signal || !Number.isFinite(currentSignalData.confidence) || currentSignalData.confidence < 0 || currentSignalData.confidence > 1 || !Number.isFinite(currentSignalData.ratio) || currentSignalData.ratio <= 0) {
         setSignalUnavailable();
         return;
       }
@@ -1466,7 +1503,9 @@
         signalEl.removeAttribute('tabindex');
         signalEl.removeAttribute('title');
       }
-      const localizedSignalDate = formatLocalizedDate(currentSignalData.last_updated, currentLang);
+      const freshness = getSignalFreshness(currentSignalData.last_updated);
+      renderFreshness(freshness);
+      const localizedSignalDate = freshness === 'unknown' ? '--' : formatLocalizedDate(currentSignalData.last_updated, currentLang);
       document.getElementById('signal-confidence').textContent = `${Math.round(confidence * 100)}%`;
       document.getElementById('signal-updated').textContent = localizedSignalDate;
       document.getElementById('signal-note').textContent = localizeSignalNote(currentSignalData.note);
@@ -3094,6 +3133,12 @@
       document.getElementById('buy-title').textContent = text.buyTitle;
       setTextById('buy-text', text.buyText);
       setTextById('provider-note', text.providerNote);
+      const purchaseNotice = {
+        en: 'Purchases are not available yet. Provider pages are informational.',
+        ru: 'Покупки пока недоступны. Страницы провайдеров носят информационный характер.',
+        he: 'הרכישות עדיין אינן זמינות. עמודי הספקים מיועדים למידע בלבד.',
+      };
+      setTextById('provider-note', purchaseNotice[lang] || purchaseNotice.en);
       document.getElementById('disclaimer-text').textContent = text.disclaimer;
       document.getElementById('refresh-chart-text').textContent = text.refreshChart;
       document.getElementById('learn-more-text').textContent = text.learnMore;
@@ -3117,11 +3162,20 @@
 
     document.getElementById('language-select').addEventListener('change', (event) => {
       setLang(event.target.value);
+      closeMobileMenu(true);
     });
     const mobileMenu = document.getElementById('menu-toggle');
     function updateMenuLabel() {
       const isOpen = mobileMenu.getAttribute('aria-expanded') === 'true';
-      mobileMenu.setAttribute('aria-label', currentLang === 'ru' ? (isOpen ? 'Закрыть меню' : 'Открыть меню') : (isOpen ? 'Close menu' : 'Open menu'));
+      const labels = {en: ['Open menu', 'Close menu'], ru: ['Открыть меню', 'Закрыть меню'], he: ['פתיחת תפריט', 'סגירת תפריט']};
+      mobileMenu.setAttribute('aria-label', (labels[currentLang] || labels.en)[Number(isOpen)]);
+    }
+    function closeMobileMenu(restoreFocus = false) {
+      const wasOpen = mobileMenu.getAttribute('aria-expanded') === 'true';
+      document.querySelector('.site-header').classList.remove('menu-open');
+      mobileMenu.setAttribute('aria-expanded', 'false');
+      updateMenuLabel();
+      if (wasOpen && restoreFocus) mobileMenu.focus();
     }
     mobileMenu.addEventListener('click', () => {
       const isOpen = document.querySelector('.site-header').classList.toggle('menu-open');
@@ -3130,11 +3184,19 @@
     });
     document.getElementById('primary-navigation').addEventListener('click', (event) => {
       if (event.target.closest('a')) {
-        document.querySelector('.site-header').classList.remove('menu-open');
-        mobileMenu.setAttribute('aria-expanded', 'false');
-        updateMenuLabel();
+        closeMobileMenu();
       }
     });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeMobileMenu(true);
+    });
+    document.addEventListener('click', (event) => {
+      if (!document.querySelector('.site-header').contains(event.target)) closeMobileMenu();
+    });
+    document.querySelector('.site-header').addEventListener('focusout', (event) => {
+      if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) closeMobileMenu();
+    });
+    window.matchMedia('(max-width: 700px)').addEventListener('change', () => closeMobileMenu());
 
     function isValidEmail(email) {
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -3328,6 +3390,9 @@
     }
     loadSignal();
     loadMeta();
+    // Re-evaluate the UTC day when returning to a tab left open overnight.
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) renderSignal(); });
+    setInterval(renderSignal, 60000);
   </script>
 </body>
 </html>

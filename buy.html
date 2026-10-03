@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#071426" />
   <title>Buy BTC</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
@@ -148,11 +149,26 @@
       font-size: 0.9em;
       color: #666;
     }
+    body { background: #071426; color: #e4edfc; padding: 24px 14px; }
+    .container { background: #0c1b2f; border: 1px solid #1d3654; box-shadow: none; box-sizing: border-box; padding: 24px; max-width: 680px; }
+    h1, .topper-section h2 { color: #e4edfc; }
+    .language-control { position: static; margin: 16px 0; }
+    .language-control select { background: #132b47; color: #e4edfc; border-color: #355778; min-height: 44px; max-width: 100%; }
+    .language-control select:hover { background: #1a3657; }
+    .buy-button:disabled { background: #243a53; color: #b5c4d8; cursor: not-allowed; opacity: 1; max-width: 100%; white-space: normal; }
+    .topper-section { border-color: #1d3654; }
+    .provider-notice { color: #ffe0a3; background: #342a18; border: 1px solid #85632d; padding: 14px; border-radius: 8px; line-height: 1.5; }
+    .footer-text { color: #aebed3; }
+    .back-home { color: #9fc3f4; display: inline-flex; align-items: center; min-height: 44px; }
+    a:focus-visible, select:focus-visible { outline: 2px solid #9fc3f4; outline-offset: 3px; }
+    @media (max-width: 480px) { .container { padding: 18px; } }
   </style>
 </head>
 <body>
   <div class="container">
+    <a id="back-home" class="back-home" href="index.html">Back to BTC2G</a>
     <h1 id="title">Buy Bitcoin</h1>
+    <p id="provider-notice" class="provider-notice" role="status">Purchases are not available yet. No payments are processed on this page.</p>
 
     <div class="language-control">
       <select id="language-select" aria-label="Language">
@@ -167,36 +183,13 @@
     </div>
 
     <div id="moonpay" class="moonpay-section">
-      <button id="buy-btn" class="buy-button">Buy Bitcoin with MoonPay 🚀</button>
+      <button id="buy-btn" class="buy-button" disabled aria-describedby="provider-notice">Buy Bitcoin with MoonPay 🚀</button>
     </div>
 
     <div id="topper" class="topper-section">
       <h2 id="topper-title">Buy Bitcoin with Topper</h2>
 
-      <div class="field">
-        <label for="topper-address" id="topper-address-label">BTC wallet address</label>
-        <input
-          id="topper-address"
-          name="topper-address"
-          type="text"
-          autocomplete="off"
-          placeholder="bc1..."
-        />
-      </div>
-
-      <div class="field">
-        <label for="topper-amount" id="topper-amount-label">Amount in USD</label>
-        <input
-          id="topper-amount"
-          name="topper-amount"
-          type="number"
-          min="1"
-          step="0.01"
-          value="50.00"
-        />
-      </div>
-
-      <button id="topper-btn" class="buy-button topper-button">Buy Bitcoin with Topper ✨</button>
+      <button id="topper-btn" class="buy-button topper-button" disabled aria-describedby="provider-notice">Buy Bitcoin with Topper ✨</button>
       <p id="topper-message" class="topper-message" role="status" aria-live="polite"></p>
     </div>
 
@@ -204,7 +197,6 @@
   </div>
 
   <script type="module">
-    const TOPPER_API_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/topper/token";
     let currentLang = 'en';
 
     function trackEvent(eventName) {
@@ -335,6 +327,16 @@
       },
     };
 
+    const availability = {
+      en: {soon: 'Coming soon', message: 'Purchases are not available yet. No payments are processed on this page.', home: 'Back to BTC2G', footer: 'Provider availability depends on country.'},
+      ru: {soon: 'Скоро', message: 'Покупки пока недоступны. На этой странице платежи не проводятся.', home: 'Вернуться к BTC2G', footer: 'Доступность провайдера зависит от страны.'},
+      he: {soon: 'בקרוב', message: 'הרכישות עדיין אינן זמינות. לא מתבצעים תשלומים בעמוד זה.', home: 'חזרה אל BTC2G', footer: 'זמינות הספק תלויה במדינה.'},
+      de: {soon: 'Demnächst', message: 'Käufe sind noch nicht verfügbar. Auf dieser Seite werden keine Zahlungen abgewickelt.', home: 'Zurück zu BTC2G', footer: 'Die Verfügbarkeit hängt vom Land ab.'},
+      fr: {soon: 'Bientôt', message: 'Les achats ne sont pas encore disponibles. Aucun paiement n’est traité sur cette page.', home: 'Retour à BTC2G', footer: 'La disponibilité dépend du pays.'},
+      es: {soon: 'Próximamente', message: 'Las compras aún no están disponibles. No se procesan pagos en esta página.', home: 'Volver a BTC2G', footer: 'La disponibilidad depende del país.'},
+      zh: {soon: '即将推出', message: '购买功能尚未开放。本页面不处理任何付款。', home: '返回 BTC2G', footer: '服务是否可用取决于所在国家。'},
+    };
+
     function setLang(lang) {
       localStorage.setItem('lang', lang);
       currentLang = lang;
@@ -346,10 +348,13 @@
       document.getElementById('title').textContent = texts[lang].title;
       document.getElementById('buy-btn').textContent = texts[lang].buyBtn;
       document.getElementById('topper-title').textContent = texts[lang].topperTitle;
-      document.getElementById('topper-address-label').textContent = texts[lang].topperAddressLabel;
-      document.getElementById('topper-amount-label').textContent = texts[lang].topperAmountLabel;
       document.getElementById('topper-btn').textContent = texts[lang].topperBtn;
-      document.getElementById('footer-text').textContent = texts[lang].footer;
+      const notice = availability[lang] || availability.en;
+      document.getElementById('provider-notice').textContent = notice.message;
+      document.getElementById('buy-btn').textContent = `MoonPay — ${notice.soon}`;
+      document.getElementById('topper-btn').textContent = `Topper — ${notice.soon}`;
+      document.getElementById('back-home').textContent = notice.home;
+      document.getElementById('footer-text').textContent = notice.footer;
     }
 
     window.setLang = setLang;
@@ -369,100 +374,7 @@
       setLang('en');
     }
 
-    function setTopperMessage(message, isError = false) {
-      const messageEl = document.getElementById('topper-message');
-      messageEl.textContent = message;
-      messageEl.classList.toggle('error', isError);
-    }
-
-    function getTopperRequestPayload() {
-      const address = document.getElementById('topper-address').value.trim();
-      const amount = document.getElementById('topper-amount').value.trim() || '50.00';
-
-      return {
-        address,
-        amount,
-        fiat: 'USD',
-        asset: 'BTC',
-        network: 'bitcoin',
-      };
-    }
-
-    document.getElementById('topper-btn').addEventListener('click', async () => {
-      trackEvent('buy_topper_click');
-      const topperBtn = document.getElementById('topper-btn');
-      const payload = getTopperRequestPayload();
-
-      if (!payload.address) {
-        setTopperMessage(texts[currentLang].missingAddress, true);
-        return;
-      }
-
-      if (TOPPER_API_URL.includes('YOUR-VERCEL-PROJECT')) {
-        setTopperMessage(texts[currentLang].apiNotConfigured, true);
-        return;
-      }
-
-      topperBtn.disabled = true;
-      topperBtn.textContent = texts[currentLang].creatingTopper;
-      setTopperMessage(texts[currentLang].creatingTopper);
-
-      try {
-        const response = await fetch(TOPPER_API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Could not create a Topper session.');
-        }
-
-        if (!data.bt || !data.appUrl) {
-          throw new Error(texts[currentLang].topperMissingToken);
-        }
-
-        window.open(`${data.appUrl}?bt=${encodeURIComponent(data.bt)}`, '_blank', 'noopener,noreferrer');
-        setTopperMessage(texts[currentLang].topperOpened);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : texts[currentLang].topperUnavailable;
-        setTopperMessage(message, true);
-      } finally {
-        topperBtn.disabled = false;
-        topperBtn.textContent = texts[currentLang].topperBtn;
-      }
-    });
-
-    import('https://cdn.skypack.dev/@moonpay/moonpay-js').then(({ loadMoonPay }) => {
-      let moonPaySdk;
-
-      loadMoonPay().then((moonPay) => {
-        moonPaySdk = moonPay({
-          flow: 'buy',
-          environment: 'sandbox', // Switch to 'production' when live
-          variant: 'overlay',
-          params: {
-            apiKey: 'pk_test_ijI3RIhL31EASrNb8FZK0X5pB8VYigP',
-            theme: 'dark',
-            baseCurrencyCode: 'usd',
-            baseCurrencyAmount: '100',
-            defaultCurrencyCode: 'btc',
-          },
-        });
-      });
-
-      document.getElementById('buy-btn').addEventListener('click', () => {
-        trackEvent('buy_moonpay_click');
-        if (moonPaySdk) {
-          moonPaySdk.show();
-        } else {
-          alert(texts[currentLang].moonpayLoading);
-        }
-      });
-    });
+    // Checkout stays unavailable until a production integration is configured and reviewed.
   </script>
 </body>
 </html>
