@@ -3,13 +3,21 @@
   const $=id=>document.getElementById(id), texts=window.BTC2GContestText;
   const names={en:'English',ru:'Русский',he:'עברית',de:'Deutsch',fr:'Français',es:'Español',zh:'中文',it:'Italiano',pt:'Português',ar:'العربية',hi:'हिन्दी',ja:'日本語',ko:'한국어',tr:'Türkçe',pl:'Polski',nl:'Nederlands',uk:'Українська',id:'Bahasa Indonesia',vi:'Tiếng Việt'};
   let lang='en',state=null,connected=false,busy=false,offset=0;
+  // Planned public deadlines are display-only; they never enable public writes.
+  // Closing instants are exclusive. The UI shows the preceding final second.
+  const publicSchedule = Object.freeze({
+    opens: Date.parse('2026-11-01T00:00:00+02:00') / 1000,
+    submits: Date.parse('2027-01-01T00:00:00+02:00') / 1000,
+    closes: Date.parse('2027-01-02T00:00:00+02:00') / 1000,
+    runoff_closes: Date.parse('2027-03-02T00:00:00+02:00') / 1000
+  });
   const pending=new Map();
   try {lang=localStorage.getItem('lang')||navigator.language.split('-')[0];} catch (_) { /* Language storage is optional. */ }
   if (!texts[lang]) lang='en';
   const t=key=>texts[lang][key];
   function node(tag,value,className) {const n=document.createElement(tag);if(value!==undefined)n.textContent=value;if(className)n.className=className;return n;}
   function message(value) {$('request-status').textContent=value;}
-  function deadline(value) {return value ? new Intl.DateTimeFormat(lang,{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Jerusalem'}).format(value*1000)+' · Asia/Jerusalem' : t('prep');}
+  function deadline(value, exclusive) {return value ? new Intl.DateTimeFormat(lang,{dateStyle:'medium',timeStyle:'medium',timeZone:'Asia/Jerusalem'}).format((value-(exclusive?1:0))*1000)+' · Asia/Jerusalem' : t('prep');}
   function canWrite(kind) {
     if (!connected||busy||!state?.me) return false;
     const r=state.round,now=(Date.now()+offset)/1000;
@@ -35,7 +43,7 @@
       const li=node('li',t('p_'+key));if(key===phase)li.setAttribute('aria-current','step');$('phases').append(li);
     }
     $('deadlines').replaceChildren();
-    for(const [key,field] of [['opens','opens'],['submissions','submits'],['voting','closes'],['runoff','runoff_closes']]) $('deadlines').append(node('dt',t(key)),node('dd',deadline(state?.round[field])));
+    for(const [key,field] of [['opens','opens'],['submissions','submits'],['voting','closes'],['runoff','runoff_closes']]) $('deadlines').append(node('dt',t(key)),node('dd',deadline(state?.round[field] ?? publicSchedule[field], field!=='opens')));
     $('empty').hidden=!!state?.ideas.length;$('cards').replaceChildren();
     for(const idea of state?.ideas||[]) {
       const card=node('article',undefined,'idea');card.append(node('h3',idea.title),node('p',idea.problem),node('span',`${t('votes')}: ${new Intl.NumberFormat(lang).format(idea.total)}`,'total'));
