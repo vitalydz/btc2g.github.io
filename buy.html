@@ -98,6 +98,12 @@
       font-size: 1.25em;
       text-align: center;
     }
+    .topper-section.selected-provider {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+      text-align: center;
+    }
     .field {
       margin-bottom: 14px;
     }
@@ -197,6 +203,18 @@
 
     <p class="footer-text" id="footer-text">Powered by MoonPay and Topper</p>
   </div>
+
+  <script>
+    // Keep provider-specific links focused on the selected provider.
+    function selectProvider() {
+      const provider = window.location.hash.toLowerCase();
+      document.getElementById('moonpay').hidden = provider === '#topper';
+      document.getElementById('topper').hidden = provider === '#moonpay';
+      document.getElementById('topper').classList.toggle('selected-provider', provider === '#topper');
+    }
+    selectProvider();
+    window.addEventListener('hashchange', selectProvider);
+  </script>
 
   <script type="module">
     let currentLang = 'en';

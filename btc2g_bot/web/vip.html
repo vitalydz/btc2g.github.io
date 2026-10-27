@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer"><title>BTC2G VIP — $4.95</title>
+<style>body{background:#071426;color:#e4edfc;font:18px/1.6 system-ui;margin:auto;max-width:640px;padding:24px}input,button{font:inherit;box-sizing:border-box;max-width:100%}input[type=text]{width:100%;padding:12px}button{background:#3569dc;color:white;border:0;padding:14px 22px;border-radius:8px;cursor:pointer}button:disabled{opacity:.5}a{color:#98c3ff}label{display:block;margin:20px 0}</style></head>
+<body><a href="https://btc2g.com">← BTC2G</a><h1>VIP: $4.95 за 30 дней</h1>
+<p>Прогнозы BTC/Gold на ближайшие 7 дней через Telegram-команду <strong>/forecast</strong>. Разовая оплата, без автоматических списаний. Прогноз не гарантирует прибыль.</p>
+<p>Другой способ покупки: <strong>200 Stars</strong> в Telegram-боте через /vip. Если у вас уже есть VIP, проверьте /status: оплаченные периоды складываются.</p>
+<p>Получите код командой /connect в боте BTC2G для привязки покупки к своему Telegram-аккаунту. Не используйте код другого человека.</p>
+<form id="checkout"><label for="code">Код привязки Telegram</label><input id="code" type="text" minlength="30" maxlength="100" required autocomplete="off" spellcheck="false">
+<label><input id="terms" type="checkbox" required> Принимаю условия: $4.95 за 30 дней, без автопродления; прогноз не гарантирует прибыль. По вопросам оплаты и возврата — /paysupport в боте.</label>
+<button id="pay" type="submit" disabled>Перейти к оплате $4.95</button></form><p id="status" role="status">Проверяем доступность оплаты…</p>
+<script>
+const status = document.getElementById('status');
+fetch('/offer').then(response=>response.json()).then(offer=>{
+ document.getElementById('pay').disabled=!offer.available;
+ if(new URLSearchParams(location.search).get('result') !== 'success') status.textContent=offer.available?'':'Продажи пока недоступны. Оплату отправлять не нужно.';
+}).catch(()=>{status.textContent='Не удалось проверить доступность оплаты. Попробуйте позже.';});
+if(new URLSearchParams(location.search).get('result') === 'success') status.textContent = 'Проверьте /status в боте. Доступ появится после подтверждения платежа; эта страница сама доступ не выдаёт.';
+document.getElementById('checkout').addEventListener('submit', async event => {
+ event.preventDefault(); const button = document.getElementById('pay'); if(button.disabled)return;
+ button.disabled=true; status.textContent='Подготовка оплаты…';
+ try {
+  const response=await fetch('/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:document.getElementById('code').value.trim(),accepted_terms:document.getElementById('terms').checked})});
+  const data=await response.json(); if(!response.ok)throw new Error();
+  const url=new URL(data.url); if(url.protocol!=='https:'||url.hostname!=='checkout.stripe.com')throw new Error();
+  location.assign(url.href);
+ } catch {status.textContent='Оплата недоступна. Проверьте код или обратитесь в /paysupport. Повторная попытка с тем же кодом не создаст новый заказ.';button.disabled=false;}
+});
+</script></body></html>
