@@ -1069,3 +1069,18 @@ body {
     .ratio-calculator a { color: #9fc3f4; }
     .ratio-calculator :focus-visible { outline: 2px solid #9fc3f4; outline-offset: 3px; }
     @media (max-width: 520px) { .calculator-fields { grid-template-columns: 1fr; } .ratio-calculator { padding: 14px; } }
+
+    .buy-cta[aria-labelledby="tools-title"] h2,
+    .buy-cta[aria-labelledby="tools-title"] p,
+    .buy-cta[aria-labelledby="tools-title"] a,
+    .buy-cta[aria-labelledby="tools-title"] a:visited {
+      color: #ffffff;
+    }
+    .buy-cta[aria-labelledby="tools-title"] a:hover,
+    .buy-cta[aria-labelledby="tools-title"] a:focus-visible {
+      color: #ffe27a;
+    }
+    .buy-cta[aria-labelledby="tools-title"] a:focus-visible {
+      outline: 2px solid #ffe27a;
+      outline-offset: 4px;
+    }
