@@ -1,3 +1,8 @@
 node_modules/
 .env
 .env.local
+
+# Local contest runtime data and authentication codes.
+contest/*.sqlite*
+contest/*.db*
+contest/.runtime/
