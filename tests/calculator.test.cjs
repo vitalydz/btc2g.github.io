@@ -59,7 +59,7 @@ window.BTC2GTools.update(null, null, 'ru');
 assert.match(element('calculator-result').textContent, /недоступен/);
 window.BTC2GTools.update(signal, meta, 'he');
 assert.equal(element('calculator-amount').disabled, false);
-assert.match(element('creator-bio').textContent, /vitlyd/);
+assert.equal(element('signal-confidence-label').textContent, window.BTC2GAudienceText.he.score);
 element('calculator-amount').value = '.000000001';
 window.BTC2GTools.update(signal, meta, 'en');
 assert.match(element('calculator-result').textContent, /< 0.000001 oz t/);

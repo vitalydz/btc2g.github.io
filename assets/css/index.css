@@ -1058,16 +1058,14 @@ body {
     }
     .plain-explanation { text-align: start; line-height: 1.6; color: #cbd6e5; }
     .plain-explanation a { color: #9fc3f4; }
-    .ratio-calculator, .creator-section { margin: 24px 0; padding: 20px; border: 1px solid #355778; border-radius: 12px; background: #172333; text-align: start; }
-    .ratio-calculator p, .creator-section p { line-height: 1.6; }
+    .ratio-calculator { margin: 24px 0; padding: 20px; border: 1px solid #355778; border-radius: 12px; background: #172333; text-align: start; }
+    .ratio-calculator p { line-height: 1.6; }
     .calculator-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
     .calculator-fields label { display: grid; gap: 8px; min-width: 0; }
     .calculator-fields input, .calculator-fields select { min-width: 0; width: 100%; min-height: 44px; box-sizing: border-box; font: inherit; color: #fff; background: #132b47; border: 1px solid #6d89a8; border-radius: 6px; padding: 10px; }
     .calculator-fields :disabled { opacity: .65; }
     #calculator-result { display: block; padding: 12px; background: #0c1b2f; border-radius: 6px; overflow-wrap: anywhere; line-height: 1.6; }
     .calculator-source { font-size: .85rem; overflow-wrap: anywhere; color: #cbd6e5; }
-    .ratio-calculator a, .creator-links a { color: #9fc3f4; }
-    .creator-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
-    .creator-links a { display: inline-flex; align-items: center; min-height: 44px; }
-    .ratio-calculator :focus-visible, .creator-links a:focus-visible { outline: 2px solid #9fc3f4; outline-offset: 3px; }
-    @media (max-width: 520px) { .calculator-fields { grid-template-columns: 1fr; } .ratio-calculator, .creator-section { padding: 14px; } }
+    .ratio-calculator a { color: #9fc3f4; }
+    .ratio-calculator :focus-visible { outline: 2px solid #9fc3f4; outline-offset: 3px; }
+    @media (max-width: 520px) { .calculator-fields { grid-template-columns: 1fr; } .ratio-calculator { padding: 14px; } }

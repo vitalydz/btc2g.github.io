@@ -165,3 +165,12 @@ stale data, invalid market date, an unrecognized gold ticker, missing signal HTT
 numeric result was shown. A same-page manual refresh from valid data to HTTP 503
 removed the previous numeric result; restoring valid data and refreshing again
 re-enabled conversion. These were local failure simulations, not production outages.
+
+## Owner correction after viewing the website
+
+The owner clarified that LinkedIn, Stihi.ru and Proza.ru are intended to send
+visitors to BTC2G, not receive outbound promotion from BTC2G. The creator section,
+its three outbound links and its translations/styles were therefore removed.
+The earlier creator-section description above is historical release context,
+not the current site design. The promotion drafts remain inbound-only and
+unpublished. The calculator, source data and provider links are preserved.

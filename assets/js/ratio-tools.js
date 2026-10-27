@@ -50,8 +50,6 @@
     text('calculator-direction-label', t.direction);
     text('calculator-btc-option', `BTC → ${t.gold}`);
     text('calculator-gold-option', `${t.gold} → BTC`);
-    text('creator-title', t.about);
-    text('creator-bio', t.bio);
     const status = dataStatus(signal, meta);
     const result = convert(byId('calculator-amount').value, byId('calculator-direction').value, signal, meta);
     byId('calculator-amount').disabled = status !== 'fresh';

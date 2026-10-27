@@ -10,8 +10,6 @@ window.BTC2GAudienceText = {
     "gold": "Gold (oz t)",
     "unavailable": "Conversion unavailable: data is missing, invalid, future-dated or more than 3 UTC days old.",
     "invalid": "Enter zero or a positive decimal number, using a dot or comma.",
-    "about": "About the creator",
-    "bio": "BTC2G is an independent project by Vitaly (vitlyd). Explore his QA community and literary pages:",
     "marketDate": "Market date (UTC)",
     "generated": "Chart generated (UTC)",
     "subtitle": "Daily reference data · not live prices"
@@ -27,8 +25,6 @@ window.BTC2GAudienceText = {
     "gold": "Золото (oz t)",
     "unavailable": "Расчёт недоступен: данные отсутствуют, некорректны, датированы будущим или старше 3 суток по UTC.",
     "invalid": "Введите ноль или положительное десятичное число с точкой или запятой.",
-    "about": "Об авторе",
-    "bio": "BTC2G — независимый проект Виталия (vitlyd). Его QA-сообщество и литературные страницы:",
     "marketDate": "Дата котировок (UTC)",
     "generated": "График создан (UTC)",
     "subtitle": "Ежедневные справочные данные · не цены в реальном времени"
@@ -44,8 +40,6 @@ window.BTC2GAudienceText = {
     "gold": "זהב (oz t)",
     "unavailable": "החישוב אינו זמין: הנתונים חסרים, שגויים, מתוארכים לעתיד או ישנים מ־3 ימים לפי UTC.",
     "invalid": "הזינו אפס או מספר עשרוני חיובי עם נקודה או פסיק.",
-    "about": "על היוצר",
-    "bio": "BTC2G הוא פרויקט עצמאי של ויטלי (vitlyd). קהילת ה-QA והעמודים הספרותיים שלו:",
     "marketDate": "תאריך שוק (UTC)",
     "generated": "התרשים נוצר (UTC)",
     "subtitle": "נתוני עזר יומיים · לא מחירים בזמן אמת"
@@ -61,8 +55,6 @@ window.BTC2GAudienceText = {
     "gold": "Gold (oz t)",
     "unavailable": "Berechnung nicht verfügbar: Daten fehlen, sind ungültig, zukünftig oder mehr als 3 UTC-Tage alt.",
     "invalid": "Geben Sie null oder eine positive Dezimalzahl mit Punkt oder Komma ein.",
-    "about": "Über den Autor",
-    "bio": "BTC2G ist ein unabhängiges Projekt von Vitaly (vitlyd). Seine QA-Community und literarischen Seiten:",
     "marketDate": "Marktdatum (UTC)",
     "generated": "Diagramm erstellt (UTC)",
     "subtitle": "Tägliche Referenzdaten · keine Live-Kurse"
@@ -78,8 +70,6 @@ window.BTC2GAudienceText = {
     "gold": "Or (oz t)",
     "unavailable": "Calcul indisponible : données absentes, invalides, futures ou datant de plus de 3 jours UTC.",
     "invalid": "Saisissez zéro ou un nombre décimal positif avec un point ou une virgule.",
-    "about": "À propos du créateur",
-    "bio": "BTC2G est un projet indépendant de Vitaly (vitlyd). Sa communauté QA et ses pages littéraires :",
     "marketDate": "Date de marché (UTC)",
     "generated": "Graphique généré (UTC)",
     "subtitle": "Données indicatives quotidiennes · pas de prix en direct"
@@ -95,8 +85,6 @@ window.BTC2GAudienceText = {
     "gold": "Oro (oz t)",
     "unavailable": "Cálculo no disponible: faltan datos, son inválidos, futuros o tienen más de 3 días UTC.",
     "invalid": "Introduzca cero o un decimal positivo con punto o coma.",
-    "about": "Sobre el creador",
-    "bio": "BTC2G es un proyecto independiente de Vitaly (vitlyd). Su comunidad QA y sus páginas literarias:",
     "marketDate": "Fecha de mercado (UTC)",
     "generated": "Gráfico generado (UTC)",
     "subtitle": "Datos diarios de referencia · no son precios en vivo"
@@ -112,8 +100,6 @@ window.BTC2GAudienceText = {
     "gold": "黄金（oz t）",
     "unavailable": "无法计算：数据缺失、无效、日期在未来或距今超过 3 个 UTC 日。",
     "invalid": "请输入零或正十进制数，可使用点或逗号。",
-    "about": "关于创建者",
-    "bio": "BTC2G 是 Vitaly（vitlyd）的独立项目。欢迎了解他的 QA 社区和文学页面：",
     "marketDate": "市场日期（UTC）",
     "generated": "图表生成日期（UTC）",
     "subtitle": "每日参考数据 · 非实时价格"
@@ -129,8 +115,6 @@ window.BTC2GAudienceText = {
     "gold": "Oro (oz t)",
     "unavailable": "Calcolo non disponibile: dati mancanti, non validi, futuri o più vecchi di 3 giorni UTC.",
     "invalid": "Inserisci zero o un decimale positivo con punto o virgola.",
-    "about": "Il creatore",
-    "bio": "BTC2G è un progetto indipendente di Vitaly (vitlyd). La sua comunità QA e le pagine letterarie:",
     "marketDate": "Data di mercato (UTC)",
     "generated": "Grafico generato (UTC)",
     "subtitle": "Dati giornalieri indicativi · non prezzi in tempo reale"
@@ -146,8 +130,6 @@ window.BTC2GAudienceText = {
     "gold": "Ouro (oz t)",
     "unavailable": "Cálculo indisponível: dados ausentes, inválidos, futuros ou com mais de 3 dias UTC.",
     "invalid": "Introduza zero ou um decimal positivo com ponto ou vírgula.",
-    "about": "Sobre o criador",
-    "bio": "BTC2G é um projeto independente de Vitaly (vitlyd). A sua comunidade QA e páginas literárias:",
     "marketDate": "Data de mercado (UTC)",
     "generated": "Gráfico gerado (UTC)",
     "subtitle": "Dados diários de referência · não são preços ao vivo"
@@ -163,8 +145,6 @@ window.BTC2GAudienceText = {
     "gold": "الذهب (oz t)",
     "unavailable": "الحساب غير متاح: البيانات مفقودة أو غير صالحة أو مستقبلية أو أقدم من 3 أيام UTC.",
     "invalid": "أدخل صفراً أو عدداً عشرياً موجباً بنقطة أو فاصلة.",
-    "about": "عن المنشئ",
-    "bio": "BTC2G مشروع مستقل من Vitaly (vitlyd). مجتمع ضمان الجودة وصفحاته الأدبية:",
     "marketDate": "تاريخ السوق (UTC)",
     "generated": "إنشاء الرسم (UTC)",
     "subtitle": "بيانات مرجعية يومية · ليست أسعاراً مباشرة"
@@ -180,8 +160,6 @@ window.BTC2GAudienceText = {
     "gold": "सोना (oz t)",
     "unavailable": "गणना उपलब्ध नहीं: डेटा गायब, अमान्य, भविष्य का या 3 UTC दिन से अधिक पुराना है।",
     "invalid": "शून्य या धनात्मक दशमलव संख्या बिंदु या अल्पविराम से लिखें।",
-    "about": "निर्माता के बारे में",
-    "bio": "BTC2G, Vitaly (vitlyd) की स्वतंत्र परियोजना है। उनका QA समुदाय और साहित्यिक पृष्ठ:",
     "marketDate": "बाजार तारीख (UTC)",
     "generated": "चार्ट निर्माण (UTC)",
     "subtitle": "दैनिक संदर्भ डेटा · लाइव कीमतें नहीं"
@@ -197,8 +175,6 @@ window.BTC2GAudienceText = {
     "gold": "金（oz t）",
     "unavailable": "計算不可：データが欠落・無効・未来日付、またはUTCで3日超経過しています。",
     "invalid": "ゼロまたは正の小数を、点またはコンマで入力してください。",
-    "about": "作成者について",
-    "bio": "BTC2GはVitaly（vitlyd）の独立プロジェクトです。QAコミュニティと文学ページ：",
     "marketDate": "市場日付（UTC）",
     "generated": "チャート生成日（UTC）",
     "subtitle": "日次の参考データ · リアルタイム価格ではありません"
@@ -214,8 +190,6 @@ window.BTC2GAudienceText = {
     "gold": "금 (oz t)",
     "unavailable": "계산 불가: 데이터가 없거나 잘못되었거나 미래 날짜이거나 UTC 기준 3일을 초과했습니다.",
     "invalid": "0 또는 양의 소수를 점이나 쉼표로 입력하세요.",
-    "about": "제작자 소개",
-    "bio": "BTC2G는 Vitaly(vitlyd)의 독립 프로젝트입니다. QA 커뮤니티와 문학 페이지:",
     "marketDate": "시장 날짜 (UTC)",
     "generated": "차트 생성일 (UTC)",
     "subtitle": "일별 참고 데이터 · 실시간 가격 아님"
@@ -231,8 +205,6 @@ window.BTC2GAudienceText = {
     "gold": "Altın (oz t)",
     "unavailable": "Hesaplama yok: veriler eksik, geçersiz, gelecekte veya 3 UTC gününden eski.",
     "invalid": "Nokta veya virgülle sıfır ya da pozitif ondalık sayı girin.",
-    "about": "Oluşturan hakkında",
-    "bio": "BTC2G, Vitaly (vitlyd) tarafından bağımsız geliştirilen bir projedir. QA topluluğu ve edebiyat sayfaları:",
     "marketDate": "Piyasa tarihi (UTC)",
     "generated": "Grafik oluşturma (UTC)",
     "subtitle": "Günlük referans veriler · canlı fiyat değil"
@@ -248,8 +220,6 @@ window.BTC2GAudienceText = {
     "gold": "Złoto (oz t)",
     "unavailable": "Obliczenie niedostępne: dane brakujące, błędne, przyszłe lub starsze niż 3 dni UTC.",
     "invalid": "Podaj zero lub dodatnią liczbę dziesiętną z kropką albo przecinkiem.",
-    "about": "O twórcy",
-    "bio": "BTC2G to niezależny projekt Vitaly (vitlyd). Jego społeczność QA i strony literackie:",
     "marketDate": "Data rynku (UTC)",
     "generated": "Wygenerowano wykres (UTC)",
     "subtitle": "Dzienne dane orientacyjne · nie ceny na żywo"
@@ -265,8 +235,6 @@ window.BTC2GAudienceText = {
     "gold": "Goud (oz t)",
     "unavailable": "Berekening niet beschikbaar: gegevens ontbreken, zijn ongeldig, toekomstig of ouder dan 3 UTC-dagen.",
     "invalid": "Voer nul of een positief decimaal getal met punt of komma in.",
-    "about": "Over de maker",
-    "bio": "BTC2G is een onafhankelijk project van Vitaly (vitlyd). Zijn QA-gemeenschap en literaire pagina’s:",
     "marketDate": "Marktdatum (UTC)",
     "generated": "Grafiek gemaakt (UTC)",
     "subtitle": "Dagelijkse referentiegegevens · geen live prijzen"
@@ -282,8 +250,6 @@ window.BTC2GAudienceText = {
     "gold": "Золото (oz t)",
     "unavailable": "Розрахунок недоступний: дані відсутні, некоректні, датовані майбутнім або старші за 3 доби UTC.",
     "invalid": "Введіть нуль або додатне десяткове число з крапкою чи комою.",
-    "about": "Про автора",
-    "bio": "BTC2G — незалежний проєкт Віталія (vitlyd). Його QA-спільнота та літературні сторінки:",
     "marketDate": "Дата котирувань (UTC)",
     "generated": "Графік створено (UTC)",
     "subtitle": "Щоденні довідкові дані · не ціни в реальному часі"
@@ -299,8 +265,6 @@ window.BTC2GAudienceText = {
     "gold": "Emas (oz t)",
     "unavailable": "Perhitungan tidak tersedia: data hilang, tidak valid, bertanggal masa depan atau lebih dari 3 hari UTC.",
     "invalid": "Masukkan nol atau desimal positif dengan titik atau koma.",
-    "about": "Tentang pembuat",
-    "bio": "BTC2G adalah proyek independen oleh Vitaly (vitlyd). Komunitas QA dan halaman sastranya:",
     "marketDate": "Tanggal pasar (UTC)",
     "generated": "Grafik dibuat (UTC)",
     "subtitle": "Data referensi harian · bukan harga langsung"
@@ -316,8 +280,6 @@ window.BTC2GAudienceText = {
     "gold": "Vàng (oz t)",
     "unavailable": "Không thể tính: dữ liệu thiếu, không hợp lệ, ở tương lai hoặc quá 3 ngày UTC.",
     "invalid": "Nhập số không hoặc số thập phân dương bằng dấu chấm hoặc dấu phẩy.",
-    "about": "Về tác giả",
-    "bio": "BTC2G là dự án độc lập của Vitaly (vitlyd). Cộng đồng QA và các trang văn học của anh:",
     "marketDate": "Ngày thị trường (UTC)",
     "generated": "Ngày tạo biểu đồ (UTC)",
     "subtitle": "Dữ liệu tham khảo hằng ngày · không phải giá trực tiếp"
