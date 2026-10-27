@@ -26,7 +26,7 @@
     gtag('js', new Date());
     gtag('config', 'G-XXXXXXXXXX');
   </script>
-  <link rel="stylesheet" href="assets/css/index.css" />
+  <link rel="stylesheet" href="assets/css/index.css?v=20261027-1" />
 </head>
 <body>
   <div class="container">
@@ -68,6 +68,8 @@
 
     <h1 id="title" class="page-title">Bitcoin vs Gold Forecast</h1>
     <p id="subtitle">From 2016 to <span id="current-date"></span>, with projection to 2030</p>
+    <p id="site-purpose" class="plain-explanation">Compare Bitcoin with gold over time: see how many troy ounces one BTC represents, then explore the chart and reference calculator.</p>
+    <p class="plain-explanation"><a id="calculator-jump" href="#calculator">BTC ↔ gold reference calculator</a></p>
 
     <section class="signal-card" aria-labelledby="signal-title">
       <div class="signal-detail">
@@ -79,7 +81,7 @@
         <div id="signal-value" class="signal-value signal-unavailable">...</div>
       </div>
       <div class="signal-detail">
-        <p id="signal-confidence-label" class="stat-label">Confidence</p>
+        <p id="signal-confidence-label" class="stat-label">Model score</p>
         <p id="signal-confidence" class="signal-meta">Unavailable</p>
       </div>
       <div class="signal-detail">
@@ -105,6 +107,7 @@
         alt="BTC vs Gold Forecast"
       />
       <p id="chart-error" class="chart-error">The BTC vs Gold Forecast chart is unavailable right now. Please try refreshing it.</p>
+      <p id="chart-method" class="plain-explanation">Solid lines show historical USD closes; dashed lines are polynomial scenarios, not reliable price targets. The model score is not a probability of profit.</p>
       <section class="chart-explanation" aria-labelledby="why-title">
         <h2 id="why-title">Chart note</h2>
         <p id="why-text">BTC2G compares Bitcoin with gold as long-term stores of value.</p>
@@ -116,6 +119,25 @@
         </svg>
         <span id="refresh-chart-text">Update chart manually</span>
       </button>
+    </section>
+
+    <section id="calculator" class="ratio-calculator" aria-labelledby="calculator-title">
+      <h2 id="calculator-title">BTC ↔ gold reference calculator</h2>
+      <p id="calculator-note">Gold is measured in troy ounces (oz t), using the GC=F gold-futures proxy. Estimates exclude fees, spreads and taxes.</p>
+      <div class="calculator-fields">
+        <label><span id="calculator-direction-label">Convert from</span>
+          <select id="calculator-direction" disabled>
+            <option id="calculator-btc-option" value="btc">BTC → Gold (oz t)</option>
+            <option id="calculator-gold-option" value="gold">Gold (oz t) → BTC</option>
+          </select>
+        </label>
+        <label><span id="calculator-amount-label">Amount</span>
+          <input id="calculator-amount" type="text" inputmode="decimal" value="1" maxlength="40" autocomplete="off" aria-describedby="calculator-note calculator-result" disabled />
+        </label>
+      </div>
+      <output id="calculator-result" for="calculator-amount calculator-direction" role="status" aria-live="polite">Conversion unavailable until current data is verified.</output>
+      <p id="calculator-source" class="calculator-source">Source and market date unavailable.</p>
+      <p class="calculator-source"><a href="assets/btc_signal.json">btc_signal.json</a> · <a href="assets/btc_gold_forecast_meta.json">btc_gold_forecast_meta.json</a></p>
     </section>
 
     <section class="insights-section" aria-labelledby="insights-title">
@@ -187,6 +209,16 @@
       <p id="disclaimer-text" class="disclaimer">This forecast is for informational purposes only and is not financial advice.</p>
     </section>
 
+    <section class="creator-section" aria-labelledby="creator-title">
+      <h2 id="creator-title">About the creator</h2>
+      <p id="creator-bio">BTC2G is an independent project by Vitaly (vitlyd). Explore his QA community and literary pages:</p>
+      <div class="creator-links">
+        <a href="https://www.linkedin.com/groups/1408997/" target="_blank" rel="noopener noreferrer">LinkedIn · QA</a>
+        <a href="https://stihi.ru/avtor/vitlyd" target="_blank" rel="noopener noreferrer">Stihi.ru</a>
+        <a href="https://proza.ru/avtor/vitlyd" target="_blank" rel="noopener noreferrer">Proza.ru</a>
+      </div>
+    </section>
+
     <section class="share-section" aria-labelledby="share-title">
       <h2 id="share-title">Share BTC2G</h2>
       <p id="share-text">BTC2G: Bitcoin vs Gold forecast and model-based BTC signal</p>
@@ -242,6 +274,8 @@
     <p>© 2026 BTC2G</p>
   </footer>
 
+  <script src="assets/js/audience-text.js?v=20261027-1"></script>
+  <script src="assets/js/ratio-tools.js?v=20261027-1"></script>
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
@@ -365,6 +399,7 @@
     }
 
     function setSignalUnavailable() {
+      if (typeof window !== 'undefined' && window.BTC2GTools) window.BTC2GTools.update(null, currentMetaData, currentLang);
       const text = getCurrentText();
       const signalEl = document.getElementById('signal-value');
       signalEl.className = 'signal-value signal-unavailable';
@@ -383,6 +418,7 @@
     }
 
     function renderRatio() {
+      if (typeof window !== 'undefined' && window.BTC2GTools) window.BTC2GTools.update(currentSignalData, currentMetaData, currentLang);
       const ratio = currentSignalData?.ratio;
       const available = typeof ratio === 'number' && Number.isFinite(ratio) && ratio > 0;
       const fallback = currentLang === 'ru' ? 'Данные временно недоступны' : 'Ratio temporarily unavailable';
@@ -390,7 +426,7 @@
         ? `${new Intl.NumberFormat(LOCALE_BY_LANGUAGE[currentLang] || 'en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 3,
-        }).format(ratio)} oz`
+        }).format(ratio)} oz t`
         : fallback;
       setTextById('ratio-value', value);
       setTextById('insight-ratio-value', value);
@@ -458,6 +494,7 @@
     }
 
     function renderMeta() {
+      if (typeof window !== 'undefined' && window.BTC2GTools) window.BTC2GTools.update(currentSignalData, currentMetaData, currentLang);
       const updateValue = document.getElementById('insight-update-value');
       if (!updateValue) {
         return;

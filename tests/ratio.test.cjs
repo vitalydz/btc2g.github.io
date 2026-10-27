@@ -30,10 +30,10 @@ for (const ratio of [undefined, null, 0, -1, NaN, Infinity, '40']) {
 }
 context.currentSignalData = {ratio: 40.1234};
 vm.runInContext('renderRatio()', context);
-assert.equal(output['ratio-value'], '40.123 oz');
+assert.equal(output['ratio-value'], '40.123 oz t');
 context.currentLang = 'ru';
 vm.runInContext('renderRatio()', context);
-assert.equal(output['ratio-value'], '40,123 oz');
+assert.equal(output['ratio-value'], '40,123 oz t');
 context.currentSignalData = null;
 vm.runInContext('renderRatio()', context);
 assert.equal(output['ratio-value'], 'Данные временно недоступны');
