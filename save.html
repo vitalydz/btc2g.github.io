@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071426">
+  <title>Compare Bitcoin purchase quotes | BTC2G SAVE</title>
+  <meta name="description" content="Compare the final BTC offered by MoonPay and Topper for the same total payment. A private, manual quote calculator with no assumed fees.">
+  <link rel="canonical" href="https://btc2g.com/save.html">
+  <link rel="stylesheet" href="assets/css/save.css?v=20261028-1">
+  <script defer src="assets/js/quote-compare.js?v=20261028-1"></script>
+  <script defer src="assets/js/save.js?v=20261028-1"></script>
+</head>
+<body>
+  <main class="save-shell">
+    <header class="save-header">
+      <a class="brand" href="index.html">BTC2G <span>SAVE</span></a>
+      <select id="save-language" aria-label="Language">
+        <option value="en">English</option><option value="ru">Русский</option><option value="he">עברית</option>
+      </select>
+    </header>
+    <p class="eyebrow" data-text="eyebrow">More clarity before you buy</p>
+    <h1 data-text="title">Compare what reaches your wallet</h1>
+    <p class="intro" data-text="intro">Enter the final BTC from two quotes for the same total payment. No fees or exchange rates are assumed.</p>
+    <section class="budget-panel" aria-labelledby="budget-title">
+      <h2 id="budget-title" data-text="budget">1. Set the total you pay</h2>
+      <div class="budget-fields">
+        <label><span data-text="amount">Total payment, including fees</span><input id="save-amount" inputmode="decimal" value="50" maxlength="16" autocomplete="off"></label>
+        <label><span data-text="currency">Currency</span><select id="save-currency"><option>USD</option><option>EUR</option><option>GBP</option><option>ILS</option></select></label>
+      </div>
+      <div class="presets" aria-label="Payment examples"><button type="button" data-amount="50">50</button><button type="button" data-amount="100">100</button><button type="button" data-amount="200">200</button></div>
+      <p class="small" data-text="resetNote">Changing the amount or currency clears both quotes. Request new quotes for each scenario.</p>
+    </section>
+    <section aria-labelledby="quotes-title">
+      <h2 id="quotes-title" data-text="quotes">2. Enter comparable quotes</h2>
+      <p data-text="instructions">Use the same country, payment method and Bitcoin network. Enter the final BTC delivered after deductions; do not subtract network fees again. Quotes can change before payment.</p>
+      <div class="quote-grid">
+        <article class="quote-card">
+          <h3>MoonPay</h3>
+          <a href="https://www.moonpay.com/buy/btc" target="_blank" rel="noopener noreferrer" data-text="open">Get a quote ↗</a>
+          <label for="save-moonpay" data-text="received">Final BTC received</label><input id="save-moonpay" inputmode="decimal" maxlength="22" autocomplete="off" placeholder="0.00000000">
+          <p class="quote-rate" id="moonpay-rate">Quote required</p>
+        </article>
+        <article class="quote-card">
+          <h3>Topper</h3>
+          <a href="https://www.topperpay.com/" target="_blank" rel="noopener noreferrer" data-text="open">Get a quote ↗</a>
+          <label for="save-topper" data-text="received">Final BTC received</label><input id="save-topper" inputmode="decimal" maxlength="22" autocomplete="off" placeholder="0.00000000">
+          <p class="quote-rate" id="topper-rate">Quote required</p>
+        </article>
+      </div>
+      <label class="confirmation"><input id="save-confirm" type="checkbox"><span data-text="confirm">Both quotes are current and use the same total payment, currency, payment method and network.</span></label>
+      <button id="save-compare" class="primary" type="button" data-text="compare">Compare quotes</button>
+      <div id="save-result" class="result" role="status" aria-live="polite">Enter both quotes to compare.</div>
+      <button id="save-clear" class="secondary" type="button" data-text="clear">Clear quotes</button>
+    </section>
+    <details class="method">
+      <summary data-text="method">How the comparison works</summary>
+      <p data-text="formula">Effective cost per BTC = total payment ÷ final BTC received. The difference is shown in satoshis (1 BTC = 100,000,000 sats). More BTC for the same payment means a lower effective cost in these entered quotes.</p>
+      <p data-text="limits">This does not isolate provider fees or spread, verify your quotes, or predict future savings. Bank charges outside a quote are not included. Compare the final provider checkout before purchasing.</p>
+      <p><a href="https://support.topperpay.com/hc/en-us/articles/8926549324444-Topper-costs-and-fees" data-text="topperFees">Topper fee information</a> · <a href="https://support.moonpay.com/en/articles/380500-how-do-i-buy-cryptocurrency-with-moonpay" data-text="moonpayHelp">MoonPay quote guidance</a></p>
+    </details>
+    <footer><p data-text="privacy">Calculations stay in this page. Quotes are not saved or sent to BTC2G. Provider links open external sites; BTC2G does not process purchases.</p><a href="index.html#calculator" data-text="home">Explore the BTC ↔ gold calculator</a></footer>
+    <noscript>This calculator requires JavaScript. Provider links remain available.</noscript>
+  </main>
+</body>
+</html>

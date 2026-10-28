@@ -4,16 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bitcoin Gold Ratio Explained | BTC2G</title>
-  <meta name="description" content="Learn what the Bitcoin Gold Ratio means, how BTC2G uses it for model-based comparison, and why relative valuation can help long-term research." />
+  <meta name="description" content="Understand the BTC/Gold ratio in troy ounces per Bitcoin, with a worked example, gold-futures units and the BTC2G reference calculator." />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
   <style>
     body {
       margin: 0;
@@ -48,7 +41,7 @@
     }
 
     a {
-      color: #87cefa;
+      color: #ffe27a;
       font-weight: bold;
       text-decoration: none;
     }
@@ -123,7 +116,16 @@
     <h1>Bitcoin Gold Ratio</h1>
     <p>The Bitcoin Gold Ratio is a simple way to compare Bitcoin against gold. Instead of looking only at the dollar price of BTC, the ratio asks how Bitcoin is performing relative to a traditional store-of-value asset.</p>
 
-    <p class="formula">Bitcoin Gold Ratio = Bitcoin price / Gold price</p>
+    <p class="formula">BTC/Gold ratio = BTC price (USD per BTC) / gold price (USD per troy ounce)</p>
+    <p>The result is troy ounces per BTC. BTC2G uses GC=F gold futures as a reference, not a physical-gold exchange quote.</p>
+
+    <h2>A simple example</h2>
+    <p>With hypothetical prices of $100,000 per BTC and $4,000 per troy ounce, the ratio is 25 troy ounces per BTC. At those same prices, 0.1 BTC represents 2.5 troy ounces, and 1 troy ounce represents 0.04 BTC. These are example prices, not current quotes.</p>
+    <p><a href="index.html#calculator">Try the BTC ↔ gold reference calculator</a> with the published market date. Estimates exclude fees, spreads and taxes.</p>
+
+    <h2>Data and units</h2>
+    <p>BTC2G compares BTC-USD and GC=F daily price observations on dates available for both series. Check the market date shown by the calculator; the chart generation time is a separate timestamp.</p>
+    <p>A standard GC futures contract covers 100 troy ounces, but its price is quoted per ounce. The ratio uses that per-ounce price, not the value of a whole contract. See the <a href="https://www.cmegroup.com/market-regulation/files/gold-futures-and-options-fact-card.pdf">CME Group contract specifications (PDF)</a>.</p>
 
     <h2>What the ratio can show</h2>
     <p>When the ratio rises, Bitcoin is gaining value relative to gold. When the ratio falls, Bitcoin is weakening relative to gold. This can help users study broad market phases, but it should not be treated as a short-term trading signal by itself.</p>

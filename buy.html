@@ -6,13 +6,6 @@
   <meta name="theme-color" content="#071426" />
   <title>Buy BTC</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -202,7 +195,8 @@
       <p id="topper-message" class="topper-message" role="status" aria-live="polite"></p>
     </div>
 
-    <p class="footer-text" id="footer-text">Powered by MoonPay and Topper</p>
+    <p><a id="save-link" class="back-home" href="save.html">Compare final BTC quotes →</a></p>
+    <p class="footer-text" id="footer-text">Provider availability depends on country.</p>
   </div>
 
   <script>
@@ -376,6 +370,9 @@
       document.getElementById('topper-btn').textContent = `Topper — ${notice.soon}`;
       document.getElementById('back-home').textContent = notice.home;
       document.getElementById('footer-text').textContent = notice.footer;
+      const saveLabels = { en: 'Compare final BTC quotes →', ru: 'Сравнить итоговые котировки BTC →', he: 'השוואת הצעות BTC סופיות ←', de: 'Endgültige BTC-Angebote vergleichen →', fr: 'Comparer les offres finales en BTC →', es: 'Comparar cotizaciones finales de BTC →', zh: '比较最终 BTC 报价 →' };
+      document.getElementById('save-link').textContent = saveLabels[lang] || saveLabels.en;
+      document.getElementById('save-link').href = 'save.html?lang=' + (['en', 'ru', 'he'].includes(lang) ? lang : 'en');
     }
 
     window.setLang = setLang;
