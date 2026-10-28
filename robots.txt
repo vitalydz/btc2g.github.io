@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://btc2g.com/sitemap.xml
