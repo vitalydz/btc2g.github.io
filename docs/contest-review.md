@@ -1,6 +1,6 @@
 # BTC2G community ideas contest — LOCAL DEMONSTRATION / owner review
 
-Base: `60208380675c6c5164f506c76d33041986c66172` (fetched origin/main). Branch `codex/contest-review`, isolated worktree `C:\Users\vitly\PycharmProjects\MPA_04\tmp\btc2g-contest-review`. The unpublished `codex/services-launch` work remains untouched in its original checkout. Owner subsequently authorized version update and push on 27 October 2026. Release 2026.10.27-contest-preview.3 publishes the static preparation page only; public submissions/voting remain disabled. No payment, provider contact or external profile change is authorized. The loopback demonstration backend is not deployed.
+Base: `60208380675c6c5164f506c76d33041986c66172` (fetched origin/main). Branch `codex/contest-review`, isolated worktree `C:\Users\vitly\PycharmProjects\MPA_04\tmp\btc2g-contest-review`. The unpublished `codex/services-launch` work remains untouched in its original checkout. Owner subsequently authorized version update and push on 27 October 2026. Release 2026.10.28-contest-preview.4 publishes the static preparation page only; public submissions/voting remain disabled. No payment, provider contact or external profile change is authorized. The loopback demonstration backend is not deployed.
 
 ## Implemented
 
@@ -91,3 +91,7 @@ Chrome: demo-code login, submission confirmation, private queue, approval, detai
 4. Select and approve real identity plus persistent HTTPS hosting; implement provider verification, backup/deletion and audit/abuse/appeal controls. Remove all demo codes, fixture data and loopback server assumptions. Do not expose this server publicly.
 5. Repeat concurrency/security/deadline/recovery tests on the actual deployment, test Android and restore a backup. Approve production configuration/rules and a public opening as a separate decision.
 6. Only then use owner-approved permitted promotion drafts. Traffic, contest votes, Topper orders and commissions are separate metrics.
+
+## 2026-10-28 wording release
+
+Published the requested English Rules and Russian Правила проекта labels, with refreshed script cache URLs. No contest behavior, provider links, forecast data or public availability changed. Next work: production hosting remains dependent on the owner Cloudflare login and configured identity/storage.
