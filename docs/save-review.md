@@ -27,3 +27,7 @@ Validation: four existing Node suites passed, all 19 language selections rendere
 ## Shared branch — additional SAVE languages
 
 Added German, French, Spanish and Chinese to SAVE, matching the seven languages of the buying page. Additional strings load in a separate asset; existing EN/RU/HE behavior and arithmetic remain unchanged. Both JavaScript files passed syntax checks. Chrome rendered all four translations without empty text and calculated the same 1,000-satoshi difference with localized numbers. German at 360px was visually inspected with no horizontal overflow. This shared-branch change awaits integration with Cloud's homepage/buy work: those entry links must preserve all seven locales and the SAVE language badge must be updated. It is not yet a published release.
+
+## Prepared arithmetic for two purchases versus one
+
+The quote module now accepts two independently entered final quotes and one combined quote. It requires equal total payment and currency, sums integer minor units/satoshis, and reports a signed BTC difference. It does not multiply a presumed fixed fee or assume a combined purchase wins. Five quote tests pass, including combined better/worse/equal outcomes, decimal totals, mismatched currencies/totals, missing values and unsafe integer sums. This helper is not exposed by the public UI yet. Next step: a small localized opt-in scenario form, explicit same-time comparable-quote confirmation and a warning that waiting changes market prices. No release or completed scenario UI is claimed.

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { units, compare } = require('../assets/js/quote-compare.js');
+const { units, compare, comparePurchases } = require('../assets/js/quote-compare.js');
 
 test('compare final delivered BTC for equal total payment', () => {
   const result = compare('50', '0.00045', '0.00046');
@@ -28,4 +28,27 @@ test('integer satoshis and decimal commas preserve precision', () => {
   assert.equal(units('50,25', 2), 5025);
   assert.equal(compare('50.25', '0.00000001', '0.00000002').differenceSats, 1);
   assert.equal(compare('100', '0.0009', '0.00092').differenceSats, 2000);
+});
+
+test('two independent quotes versus one combined quote never assume fixed fees', () => {
+  const q = (amount, btc, currency = 'USD') => ({ amount, btc, currency });
+  const first = q('50', '0.00045');
+  const second = q('50', '0.00044');
+  const result = comparePurchases(first, second, q('100', '0.00091'));
+  assert.equal(result.status, 'ready');
+  assert.equal(result.separateSats, 89000);
+  assert.equal(result.combinedSats, 91000);
+  assert.equal(result.differenceSats, 2000);
+  assert.equal(comparePurchases(first, second, q('100', '0.00088')).differenceSats, -1000);
+  assert.equal(comparePurchases(first, second, q('100', '0.00089')).differenceSats, 0);
+});
+
+test('purchase scenarios require equal totals and matching currencies', () => {
+  const q = (amount, btc, currency = 'USD') => ({ amount, btc, currency });
+  assert.equal(comparePurchases(q('50', '0.001'), q('50', '0.001'), q('99.99', '0.002')).status, 'amount-mismatch');
+  assert.equal(comparePurchases(q('50', '0.001'), q('50', '0.001', 'EUR'), q('100', '0.002')).status, 'currency-mismatch');
+  assert.equal(comparePurchases(q('0.10', '0.00000001'), q('0.20', '0.00000001'), q('0.30', '0.00000003')).differenceSats, 1);
+  assert.equal(comparePurchases(null, q('50', '0.001'), q('100', '0.002')).status, 'incomplete');
+  assert.equal(comparePurchases(q('50', ''), q('50', '0.001'), q('100', '0.002')).status, 'incomplete');
+  assert.equal(comparePurchases(q('50', '90000000'), q('50', '90000000'), q('100', '1')).status, 'incomplete');
 });
