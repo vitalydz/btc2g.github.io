@@ -17,3 +17,9 @@ Validation: three new arithmetic/invalid-input tests plus seven existing Node ch
 Also completed the previously prepared ratio article: explicit oz t per BTC units, hypothetical example, calculator link and CME contract-unit source. Its mobile layout was inspected after the local preview was restored. Removed unconfigured analytics from the two changed legacy pages (buy and ratio article). Forecast PNG/JSON, Premium, contest dates and backend state are outside this change.
 
 Remaining: real quote API access and permitted terms; comparable multi-purchase scenarios; full SAVE localization; verified partner rewards; authenticated private statistics; production contest identity/storage. No public contest or reward ledger enabled.
+
+## Homepage entry — 2026.10.28-save.2
+
+After Daily Builder review, added one compact SAVE card between the chart and reference calculator. It states that comparison is manual and uses equal total payment; it promises no saving before quotes are entered. All 19 homepage languages have title, explanation and action text. A visible EN/RU/HE tag identifies the languages currently available in SAVE. The link preserves those three languages and otherwise opens English. The card uses a restrained teal border and yellow/white text, stacks on mobile, and preserves the chart and calculator.
+
+Validation: four existing Node suites passed, all 19 language selections rendered the expected title and target in Chrome, 390px Russian and 360px Hebrew RTL layouts inspected, no horizontal overflow. Release/cache identifiers updated together. Prior release ff329a6 deployed successfully; live calculation and secondary-copy preservation were verified.

@@ -40,6 +40,9 @@
     text('site-purpose', t.intro);
     text('subtitle', t.subtitle);
     text('calculator-jump', t.calculator);
+    text('save-entry-title', t.saveTitle);
+    text('save-entry-note', t.saveNote);
+    text('save-entry-link', t.saveAction);
     text('chart-method', t.chart);
     text('signal-confidence-label', t.score);
     text('signal-updated-label', t.marketDate);
