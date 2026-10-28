@@ -35,6 +35,7 @@
       rate: 'עלות אפקטיבית', equal: 'שתי ההצעות מספקות אותה כמות BTC.', more: '{provider} מספקת {sats} סאטושי נוספים ({percent}% יותר BTC) עבור אותו תשלום כולל בהצעות שהוזנו.', reminder: 'השוואה ידנית בלבד. בדקו שוב את ההצעות הסופיות לפני התשלום.'
     }
   };
+  Object.assign(texts, window.BTC2GSaveLocales || {});
   const byId = id => document.getElementById(id);
   let lang = 'en';
   let compared = false;
