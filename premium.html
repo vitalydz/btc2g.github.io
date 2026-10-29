@@ -3,19 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BTC2G Premium Signals - Bitcoin vs Gold Forecast</title>
-  <meta name="description" content="BTC2G Premium Signals provides extended BTC model signal history, forecast updates, model notes, and weekly updates." />
-  <meta property="og:title" content="BTC2G Premium Signals" />
-  <meta property="og:description" content="Extended Bitcoin vs Gold signal history, model notes, forecast updates, and weekly updates." />
+  <title>BTC2G Premium Research - Bitcoin vs Gold Model Context</title>
+  <meta name="description" content="Preview the planned BTC2G Premium research layer: deeper Bitcoin vs Gold model context, signal history, methodology notes, and weekly summaries. Join early access." />
+  <meta property="og:title" content="BTC2G Premium Research" />
+  <meta property="og:description" content="A clearer research layer for the BTC2G Bitcoin vs Gold model. Explore the planned workflow and join early access." />
   <meta property="og:url" content="https://btc2g.com/premium.html" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://btc2g.com/assets/btc_gold_forecast.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="BTC2G Premium Signals" />
-  <meta name="twitter:description" content="Extended Bitcoin vs Gold signal history, model notes, forecast updates, and weekly updates." />
+  <meta name="twitter:title" content="BTC2G Premium Research" />
+  <meta name="twitter:description" content="Preview planned Bitcoin vs Gold model context, history, and research notes. Join early access." />
   <meta name="twitter:image" content="https://btc2g.com/assets/btc_gold_forecast.png" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -24,322 +26,451 @@
     gtag('config', 'G-XXXXXXXXXX');
   </script>
   <style>
-    body {
-      margin: 0;
-      background: #071426;
-      color: #ffffff;
-      font-family: 'Roboto', sans-serif;
-      line-height: 1.7;
+    :root {
+      color-scheme: dark;
+      --page: #071426;
+      --surface: #0c1b2f;
+      --surface-raised: #10233b;
+      --border: #1d3654;
+      --text: #f7f9fc;
+      --muted: #b4bfce;
+      --quiet: #8795a8;
+      --blue: #5f7cff;
+      --blue-dark: #3454c8;
+      --gold: #e3be57;
+      --green: #66d29a;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
     }
 
-    main {
-      max-width: 1040px;
-      margin: 0 auto;
-      padding: 24px 20px 32px;
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 82% 6%, rgba(95, 124, 255, 0.13), transparent 31rem),
+        radial-gradient(circle at 12% 24%, rgba(227, 190, 87, 0.08), transparent 25rem),
+        var(--page);
+      color: var(--text);
+      font-family: 'Roboto', sans-serif;
+      line-height: 1.65;
     }
+    a { color: inherit; }
+    button, input { font: inherit; }
+    main, .site-footer { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
 
     .site-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 28px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #1d3654;
+      gap: 24px;
+      min-height: 76px;
+      border-bottom: 1px solid rgba(86, 115, 151, 0.32);
     }
-
-    .brand,
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-size: 1.12rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+    }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(227, 190, 87, 0.55);
+      border-radius: 50%;
+      background: rgba(227, 190, 87, 0.1);
+      color: var(--gold);
+      place-items: center;
+    }
+    nav { display: flex; flex-wrap: wrap; gap: 4px; }
     nav a {
-      color: #ffffff;
+      padding: 9px 11px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
       font-weight: 700;
       text-decoration: none;
     }
+    nav a:hover, nav a[aria-current="page"] { background: rgba(95, 124, 255, 0.1); color: var(--text); }
 
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+      gap: 52px;
+      align-items: center;
+      padding: 84px 0 68px;
     }
-
-    nav a {
-      padding: 7px 10px;
-      border-radius: 6px;
-      color: #d6dce7;
-      font-size: 0.95rem;
-    }
-
-    nav a:hover,
-    .text-link:hover {
-      background: #10233b;
-      color: #ffffff;
-    }
-
-    .intro,
-    .product-card,
-    .details,
-    .share-section {
-      margin-top: 24px;
-      padding: 18px;
-      border: 1px solid #1d3654;
-      border-radius: 8px;
-      background: #0c1b2f;
-    }
-
-    .intro {
-      margin-top: 0;
-    }
-
-    h1,
-    h2 {
-      margin: 0 0 10px;
-      line-height: 1.2;
-    }
-
-    h1 {
-      font-size: clamp(2rem, 4vw, 3rem);
-    }
-
-    p {
-      margin: 0;
-      color: #d6dce7;
-    }
-
-    .price {
-      margin: 10px 0 14px;
-      color: #e3be57;
-      font-size: 2.4rem;
+    .eyebrow, .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      border: 1px solid rgba(102, 210, 154, 0.35);
+      border-radius: 999px;
+      background: rgba(102, 210, 154, 0.08);
+      color: #94e5ba;
+      font-size: 0.82rem;
       font-weight: 700;
-      line-height: 1;
-    }
-
-    .price span {
-      color: #d6dce7;
-      font-size: 1rem;
-      font-weight: 400;
-    }
-
-    .feature-table {
-      width: 100%;
-      margin: 16px 0;
-      border-collapse: collapse;
-      color: #d6dce7;
-    }
-
-    .feature-table th,
-    .feature-table td {
-      padding: 12px;
-      border-bottom: 1px solid #1d3654;
-      text-align: left;
-    }
-
-    .feature-table th {
-      color: #ffffff;
-      font-size: 0.92rem;
+      letter-spacing: 0.04em;
+      padding: 6px 10px;
       text-transform: uppercase;
     }
-
-    .cta-button,
-    .share-button {
+    .eyebrow::before, .status-pill::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      content: '';
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 760px;
+      margin: 18px 0 20px;
+      font-size: clamp(2.6rem, 6vw, 4.7rem);
+      letter-spacing: -0.045em;
+      line-height: 1.02;
+    }
+    h1 span { color: var(--gold); }
+    .hero-copy > p {
+      max-width: 690px;
+      margin-bottom: 26px;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2vw, 1.22rem);
+    }
+    .hero-actions, .share-buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+    .button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: fit-content;
-      min-width: 240px;
-      max-width: 100%;
-      height: 48px;
       min-height: 48px;
-      box-sizing: border-box;
       padding: 0 18px;
-      border: 1px solid #3454c8;
-      border-radius: 6px;
-      background: #3454c8;
-      color: #ffffff;
+      border: 1px solid var(--blue-dark);
+      border-radius: 9px;
+      background: var(--blue-dark);
+      color: #fff;
       cursor: pointer;
-      font: inherit;
-      font-size: 0.95rem;
       font-weight: 700;
       line-height: 1;
       text-decoration: none;
-      white-space: nowrap;
     }
+    .button:hover { border-color: var(--blue); background: var(--blue); }
+    .button.secondary { border-color: var(--border); background: rgba(12, 27, 47, 0.75); color: var(--muted); }
+    .button.secondary:hover { border-color: #345477; background: var(--surface-raised); color: var(--text); }
+    .hero-note { margin-top: 14px; color: var(--quiet); font-size: 0.9rem; }
 
-    .cta-button {
-      border-color: #3454c8;
-      background: #3454c8;
-      color: #ffffff;
+    .preview-card {
+      position: relative;
+      overflow: hidden;
+      padding: 24px;
+      border: 1px solid #294667;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(16, 35, 59, 0.98), rgba(8, 23, 41, 0.98));
+      box-shadow: var(--shadow);
     }
-
-    .cta-button:hover,
-    .share-button:hover {
-      background: #2944ad;
-      border-color: #2944ad;
+    .preview-card::after {
+      position: absolute;
+      top: -80px;
+      right: -70px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(95, 124, 255, 0.12);
+      content: '';
     }
-
-    .notice,
-    .disclaimer {
-      margin-top: 14px;
-      color: #98a3b5;
-      font-size: 0.95rem;
-    }
-
-    .details p + h2 {
-      margin-top: 22px;
-    }
-
-    .share-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .share-status {
-      min-height: 20px;
-      margin: 10px 0 0;
-      color: #a8e6bf;
+    .preview-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+    .preview-label, .section-label {
+      margin-bottom: 5px;
+      color: var(--gold);
+      font-size: 0.8rem;
       font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
-
-    .native-share-button[hidden] {
-      display: none;
+    .preview-header h2 { margin-bottom: 0; font-size: 1.3rem; }
+    .preview-badge { padding: 5px 8px; border: 1px solid var(--border); border-radius: 7px; color: var(--quiet); font-size: 0.75rem; white-space: nowrap; }
+    .research-stack { display: grid; gap: 12px; }
+    .research-row {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid rgba(65, 93, 127, 0.6);
+      border-radius: 11px;
+      background: rgba(7, 20, 38, 0.58);
     }
+    .research-icon { display: grid; width: 36px; height: 36px; border-radius: 9px; background: rgba(95, 124, 255, 0.12); color: #aebcff; font-weight: 700; place-items: center; }
+    .research-row strong { display: block; margin-bottom: 2px; color: var(--text); font-size: 0.94rem; }
+    .research-row span { color: var(--quiet); font-size: 0.86rem; }
 
+    .section { padding: 72px 0; border-top: 1px solid rgba(86, 115, 151, 0.24); }
+    .section-heading { max-width: 720px; margin-bottom: 32px; }
+    .section-heading h2 { margin-bottom: 12px; font-size: clamp(1.8rem, 4vw, 2.7rem); letter-spacing: -0.025em; line-height: 1.13; }
+    .section-heading p, .feature-card p, .method-card p, .faq-item p, .early-access-copy p, .share-section p { color: var(--muted); }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feature-card, .method-card, .faq-item, .share-section {
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(12, 27, 47, 0.78);
+    }
+    .feature-number { display: grid; width: 36px; height: 36px; margin-bottom: 18px; border: 1px solid rgba(227, 190, 87, 0.3); border-radius: 10px; background: rgba(227, 190, 87, 0.08); color: var(--gold); font-weight: 700; place-items: center; }
+    .feature-card h3, .method-card h3, .faq-item h3 { margin-bottom: 8px; font-size: 1.08rem; }
+    .feature-card p, .method-card p, .faq-item p { margin-bottom: 0; font-size: 0.95rem; }
+
+    .comparison-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: rgba(12, 27, 47, 0.78); }
+    .comparison-table { width: 100%; min-width: 660px; border-collapse: collapse; }
+    .comparison-table th, .comparison-table td { padding: 16px 18px; border-bottom: 1px solid var(--border); text-align: left; }
+    .comparison-table th { color: var(--quiet); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; }
+    .comparison-table td { color: var(--muted); }
+    .comparison-table td:first-child { color: var(--text); font-weight: 700; }
+    .comparison-table tr:last-child td { border-bottom: 0; }
+    .available { color: var(--green); font-weight: 700; }
+    .planned { color: #aebcff; font-weight: 700; }
+
+    .method-grid, .faq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .method-card ul { margin: 14px 0 0; padding-left: 20px; color: var(--muted); }
+    .method-card li + li { margin-top: 8px; }
+
+    .early-access {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(340px, 1.1fr);
+      gap: 42px;
+      align-items: center;
+      padding: 36px;
+      border: 1px solid #2a4a70;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(16, 35, 59, 0.98), rgba(11, 31, 53, 0.98));
+      box-shadow: var(--shadow);
+    }
+    .early-access-copy h2 { margin: 10px 0 12px; font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.13; }
+    .signup-form { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    .signup-form input { min-width: 0; min-height: 50px; padding: 0 15px; border: 1px solid #345477; border-radius: 9px; outline: none; background: #07182b; color: var(--text); }
+    .signup-form input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(95, 124, 255, 0.16); }
+    .form-help, .form-status { grid-column: 1 / -1; margin: 0; color: var(--quiet); font-size: 0.86rem; }
+    .form-help a { color: var(--muted); }
+    .form-status { min-height: 22px; color: var(--green); font-weight: 700; }
+    .form-status.error { color: #ff9f9f; }
+
+    .share-section { display: flex; align-items: center; justify-content: space-between; gap: 28px; margin-top: 24px; }
+    .share-section h2 { margin-bottom: 5px; font-size: 1.25rem; }
+    .share-section p, .share-status { margin-bottom: 0; }
+    .share-status { min-height: 20px; color: var(--green); font-size: 0.88rem; }
+    [hidden] { display: none !important; }
+    .disclaimer { margin-top: 18px; padding: 18px; border-left: 3px solid var(--gold); border-radius: 0 10px 10px 0; background: rgba(227, 190, 87, 0.06); color: var(--muted); font-size: 0.92rem; }
+
+    .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 30px 0 40px; color: var(--quiet); font-size: 0.9rem; }
+    .site-footer p { margin: 0; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 16px; }
+    .footer-links a:hover { color: var(--text); }
+
+    @media (max-width: 900px) {
+      .hero, .early-access { grid-template-columns: 1fr; }
+      .hero { gap: 34px; padding-top: 58px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .early-access { gap: 24px; }
+    }
     @media (max-width: 640px) {
-      main {
-        padding: 16px 14px 24px;
-      }
-
-      .site-header {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      nav,
-      .share-buttons {
-        width: 100%;
-      }
-
-      .cta-button,
-      .share-button {
-        width: 100%;
-      }
-
-      .feature-table th,
-      .feature-table td {
-        padding: 10px 8px;
-      }
+      main, .site-footer { width: min(100% - 28px, 1120px); }
+      .site-header { align-items: flex-start; flex-direction: column; gap: 12px; padding: 16px 0; }
+      nav { width: 100%; }
+      nav a { padding: 7px 8px; }
+      .hero { padding: 48px 0 54px; }
+      h1 { font-size: clamp(2.35rem, 13vw, 3.3rem); }
+      .hero-actions, .share-buttons, .share-section, .site-footer { align-items: stretch; flex-direction: column; }
+      .hero-actions .button, .share-buttons .button { width: 100%; }
+      .section { padding: 54px 0; }
+      .method-grid, .faq-grid { grid-template-columns: 1fr; }
+      .early-access { padding: 24px 18px; }
+      .signup-form { grid-template-columns: 1fr; }
+      .signup-form .button { width: 100%; }
     }
   </style>
 </head>
 <body>
   <main>
     <header class="site-header">
-      <a class="brand" href="index.html">BTC2G</a>
+      <a class="brand" href="index.html" aria-label="BTC2G home"><span class="brand-mark" aria-hidden="true">₿</span>BTC2G</a>
       <nav aria-label="Premium page navigation">
         <a href="index.html">Home</a>
         <a href="index.html#forecast">Forecast</a>
-        <a href="premium.html">Premium</a>
+        <a href="premium.html" aria-current="page">Premium</a>
         <a href="buy.html">Buy BTC</a>
       </nav>
     </header>
 
-    <section class="intro">
-      <h1>Premium Signals</h1>
-      <p>Extended signal history, model notes, and weekly Bitcoin vs Gold forecast updates.</p>
-    </section>
-
-    <section class="product-card" aria-labelledby="premium-price-title">
-      <h2 id="premium-price-title">Premium access</h2>
-      <p class="price">$4.99 <span>/ month</span></p>
-      <table class="feature-table">
-        <thead>
-          <tr>
-            <th scope="col">Feature</th>
-            <th scope="col">Included</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>BTC model signals</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>Forecast updates</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>Weekly updates</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>Signal history</td>
-            <td>Coming soon</td>
-          </tr>
-        </tbody>
-      </table>
-      <a class="cta-button" href="index.html#subscribe-form">Join early access</a>
-      <p class="notice">Payments are not enabled yet.</p>
-    </section>
-
-    <section class="details">
-      <h2>Product focus</h2>
-      <p>BTC2G Premium is planned as a research layer for reviewing model context, signal history, and forecast updates without short-term trading promises.</p>
-
-      <h2>Important note</h2>
-      <p>Premium is not a guarantee, a trading command, or a replacement for independent research. Market conditions can change quickly, and model-based signals can be wrong.</p>
-
-      <p class="disclaimer">BTC2G Premium Signals are model-based and for informational purposes only. They are not financial advice and do not guarantee profit.</p>
-    </section>
-
-    <section class="share-section" aria-labelledby="share-title">
-      <h2 id="share-title">Share BTC2G</h2>
-      <p id="share-text">BTC2G: Bitcoin vs Gold forecast and model-based BTC signal</p>
-      <div class="share-buttons">
-        <button id="native-share-btn" class="share-button native-share-button" type="button" hidden>Share</button>
-        <button id="copy-link-btn" class="share-button" type="button">Copy link</button>
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">In development · Early access</span>
+        <h1>More context behind the <span>BTC vs Gold</span> model.</h1>
+        <p>BTC2G Premium is being designed as a focused research layer: see what changed, understand the model inputs, and review signals in context instead of acting on a single label.</p>
+        <div class="hero-actions">
+          <a class="button" href="#early-access">Join early access</a>
+          <a class="button secondary" href="index.html#forecast">View public dashboard</a>
+        </div>
+        <p class="hero-note">No payment is collected. Early-access subscribers will be notified when previews and launch details are ready.</p>
       </div>
-      <p id="share-status" class="share-status" role="status" aria-live="polite"></p>
+
+      <aside class="preview-card" aria-label="Planned Premium research view">
+        <div class="preview-header">
+          <div><p class="preview-label">Planned research view</p><h2>Model context at a glance</h2></div>
+          <span class="preview-badge">Preview</span>
+        </div>
+        <div class="research-stack">
+          <div class="research-row"><span class="research-icon" aria-hidden="true">01</span><div><strong>Relative-value snapshot</strong><span>BTC/Gold ratio, model direction, confidence, and data timestamp.</span></div></div>
+          <div class="research-row"><span class="research-icon" aria-hidden="true">02</span><div><strong>Change log</strong><span>A timestamped record of model-state changes and the context around them.</span></div></div>
+          <div class="research-row"><span class="research-icon" aria-hidden="true">03</span><div><strong>Research notes</strong><span>Plain-language explanations of methodology, limitations, and unusual data conditions.</span></div></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" aria-labelledby="why-premium-title">
+      <div class="section-heading">
+        <p class="section-label">A calmer research workflow</p>
+        <h2 id="why-premium-title">Move from a signal to an informed review.</h2>
+        <p>The public dashboard keeps the latest model state simple. Premium is planned to add the history and explanations needed to evaluate that state without implying certainty.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card"><span class="feature-number">1</span><h3>Understand the current state</h3><p>Review the ratio, comparison window, signal direction, confidence, source, and update time together.</p></article>
+        <article class="feature-card"><span class="feature-number">2</span><h3>Trace what changed</h3><p>Compare the latest model state with earlier observations instead of treating each update as an isolated call.</p></article>
+        <article class="feature-card"><span class="feature-number">3</span><h3>Read the limitations</h3><p>See concise notes about delayed markets, model assumptions, and conditions that can weaken a relative-value signal.</p></article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="included-title">
+      <div class="section-heading">
+        <p class="section-label">Product roadmap</p>
+        <h2 id="included-title">What is public now—and what Premium is planned to add.</h2>
+        <p>This is a transparent early-access preview, not a live subscription promise. Planned items may evolve based on data quality and reader feedback.</p>
+      </div>
+      <div class="comparison-wrap">
+        <table class="comparison-table">
+          <thead><tr><th scope="col">Research capability</th><th scope="col">Public dashboard</th><th scope="col">Premium roadmap</th></tr></thead>
+          <tbody>
+            <tr><td>Latest BTC vs Gold model state</td><td><span class="available">Available</span></td><td>Included with added context</td></tr>
+            <tr><td>Signal and ratio history</td><td>Latest state only</td><td><span class="planned">Planned</span></td></tr>
+            <tr><td>Timestamped model notes</td><td>Short summary</td><td><span class="planned">Planned</span></td></tr>
+            <tr><td>Weekly research digest</td><td>—</td><td><span class="planned">Planned</span></td></tr>
+            <tr><td>Methodology and source details</td><td>Core explanation</td><td>Expanded notes</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="method-title">
+      <div class="section-heading">
+        <p class="section-label">Built for transparency</p>
+        <h2 id="method-title">Useful context without trading promises.</h2>
+        <p>The product direction stays anchored to the same cautious principles as the public BTC2G model.</p>
+      </div>
+      <div class="method-grid">
+        <article class="method-card"><h3>What the model is designed to show</h3><ul><li>Bitcoin’s relative valuation against gold using market-source price data.</li><li>How the latest ratio compares with a rolling historical window.</li><li>When the underlying data and model output were last updated.</li></ul></article>
+        <article class="method-card"><h3>What the model does not show</h3><ul><li>A guaranteed entry or exit point.</li><li>A short-term Bitcoin, gold, or portfolio return forecast.</li><li>Advice tailored to a reader’s finances, objectives, or risk tolerance.</li></ul></article>
+      </div>
+      <p class="disclaimer"><strong>Disclaimer:</strong> BTC2G Premium content and signals are model-based and provided for informational and educational purposes only. They are not financial advice, an offer to buy or sell an asset, or a guarantee of profit. Market data can be delayed or incomplete, assumptions can fail, and model signals can be wrong. Always conduct independent research and consider professional advice where appropriate.</p>
+    </section>
+
+    <section class="section" aria-labelledby="faq-title">
+      <div class="section-heading"><p class="section-label">Questions, answered plainly</p><h2 id="faq-title">Before you join early access.</h2></div>
+      <div class="faq-grid">
+        <article class="faq-item"><h3>Is Premium live today?</h3><p>No. The product is in development. This page describes the planned research experience and collects interest for early access.</p></article>
+        <article class="faq-item"><h3>Will I be charged?</h3><p>No. There is no payment flow on this page. Joining early access only adds your email to the product-update list.</p></article>
+        <article class="faq-item"><h3>Does Premium predict returns?</h3><p>No. BTC2G compares Bitcoin with gold through a model. It cannot guarantee prices, performance, or profitable decisions.</p></article>
+        <article class="faq-item"><h3>When will it launch?</h3><p>A launch date has not been announced. Early-access subscribers will receive material product updates when they are available.</p></article>
+      </div>
+    </section>
+
+    <section id="early-access" class="section" aria-labelledby="early-access-title">
+      <div class="early-access">
+        <div class="early-access-copy">
+          <span class="status-pill">Early access list</span>
+          <h2 id="early-access-title">Help shape a more useful research layer.</h2>
+          <p>Join for occasional updates about previews, methodology improvements, and launch plans. No financial alerts, payment, or guaranteed access date.</p>
+        </div>
+        <form id="early-access-form" class="signup-form" novalidate>
+          <input id="early-access-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" aria-label="Email address" aria-describedby="form-help form-status" required />
+          <input type="hidden" name="source" value="btc2g-premium-early-access" />
+          <button id="early-access-button" class="button" type="submit">Join early access</button>
+          <p id="form-help" class="form-help">By subscribing, you agree to receive BTC2G product updates. Read the <a href="privacy.html">Privacy Policy</a>.</p>
+          <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <section class="share-section" aria-labelledby="share-title">
+        <div><h2 id="share-title">Know someone who compares Bitcoin with gold?</h2><p>Share this early-access preview with them.</p><p id="share-status" class="share-status" role="status" aria-live="polite"></p></div>
+        <div class="share-buttons"><button id="native-share-btn" class="button secondary" type="button" hidden>Share</button><button id="copy-link-btn" class="button secondary" type="button">Copy link</button></div>
+      </section>
     </section>
   </main>
 
+  <footer class="site-footer">
+    <p>© 2026 BTC2G</p>
+    <div class="footer-links"><a href="about.html">About</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
+  </footer>
+
   <script>
-    function getSharePayload() {
-      return {
-        title: 'BTC2G - Bitcoin vs Gold Forecast',
-        text: 'BTC2G: Bitcoin vs Gold forecast and model-based BTC signal',
-        url: window.location.href,
-      };
-    }
+    const SUBSCRIPTION_ENDPOINT = 'https://formspree.io/f/mkoyjwkr';
 
-    function updateShareLinks() {
-      document.getElementById('native-share-btn').hidden = !navigator.share;
+    function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+    function setFormStatus(message, isError = false) {
+      const status = document.getElementById('form-status');
+      status.textContent = message;
+      status.classList.toggle('error', isError);
     }
-
-    async function copyCurrentLink() {
-      const statusEl = document.getElementById('share-status');
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        statusEl.textContent = 'Link copied';
-      } catch (error) {
-        console.log('Copy link failed.', error);
-        statusEl.textContent = window.location.href;
-      }
-    }
-
-    async function shareWithNativeApi() {
-      if (!navigator.share) {
-        await copyCurrentLink();
+    async function submitEarlyAccess(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const emailInput = document.getElementById('early-access-email');
+      const button = document.getElementById('early-access-button');
+      const email = emailInput.value.trim();
+      if (!isValidEmail(email)) {
+        setFormStatus('Enter a valid email address.', true);
+        emailInput.focus();
         return;
       }
 
+      button.disabled = true;
+      button.textContent = 'Joining…';
+      setFormStatus('');
       try {
-        await navigator.share(getSharePayload());
+        const response = await fetch(SUBSCRIPTION_ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error(`Subscription request failed with status ${response.status}`);
+        form.reset();
+        setFormStatus('You’re on the early-access list. Thank you.');
+        if (typeof window.gtag === 'function') window.gtag('event', 'premium_early_access_signup');
       } catch (error) {
-        console.log('Native share was not completed.', error);
+        console.log('Early-access signup failed.', error);
+        setFormStatus('Signup is unavailable right now. Please try again later.', true);
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Join early access';
       }
     }
 
-    updateShareLinks();
+    function getSharePayload() {
+      return { title: 'BTC2G Premium Research', text: 'Preview BTC2G Premium: deeper context for the Bitcoin vs Gold model.', url: window.location.href };
+    }
+    async function copyCurrentLink() {
+      const status = document.getElementById('share-status');
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        status.textContent = 'Link copied';
+      } catch (error) {
+        console.log('Copy link failed.', error);
+        status.textContent = window.location.href;
+      }
+    }
+    async function shareWithNativeApi() {
+      if (!navigator.share) { await copyCurrentLink(); return; }
+      try { await navigator.share(getSharePayload()); } catch (error) { console.log('Native share was not completed.', error); }
+    }
+
+    document.getElementById('native-share-btn').hidden = !navigator.share;
+    document.getElementById('early-access-form').addEventListener('submit', submitEarlyAccess);
     document.getElementById('native-share-btn').addEventListener('click', shareWithNativeApi);
     document.getElementById('copy-link-btn').addEventListener('click', copyCurrentLink);
   </script>
