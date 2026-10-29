@@ -20,6 +20,13 @@ test('research page links all three official records and homepage stays market-f
   assert.match(homepage, /href="research\.html"/);
 });
 
+test('homepage places TimeT research between Buy BTC and Account in the primary navigation', () => {
+  assert.match(
+    homepage,
+    /<a id="nav-buy"[^>]*>Buy BTC<\/a>\s*<a id="nav-research" href="research\.html">TimeT research<\/a>\s*<a id="nav-account"/,
+  );
+});
+
 test('support block states the exact asset, network, address, and safety boundaries', () => {
   assert.match(researchPage, /Tether \(USDT\) · TRON network \(TRC-20\)/);
   assert.match(researchPage, new RegExp(address));
