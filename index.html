@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/index.css?v=20261029-3" />
+  <link rel="stylesheet" href="assets/css/index.css?v=20261029-4" />
   <link rel="canonical" href="https://btc2g.com/" />
 </head>
 <body>
@@ -227,6 +227,46 @@
       <p id="share-status" class="share-status" role="status" aria-live="polite"></p>
     </section>
 
+    <section class="research-section" aria-labelledby="research-title">
+      <div class="research-heading">
+        <p id="research-eyebrow" class="research-eyebrow">INDEPENDENT RESEARCH</p>
+        <h2 id="research-title">TimeT research series</h2>
+        <p id="research-intro">Three public preprints by Vitaly Dziubov explore a speculative time-field framework. This work is separate from BTC2G market research.</p>
+      </div>
+      <div class="research-layout">
+        <a class="research-figure-link" href="https://zenodo.org/records/17748957" target="_blank" rel="noopener noreferrer">
+          <img src="assets/images/timet-document-2-figure-no-logo.png" width="1055" height="1491" loading="lazy" alt="TimeT illustration showing discrete temporal transitions in a time-field framework" id="research-image" />
+        </a>
+        <div>
+          <h3 id="research-papers-title">Publications on Zenodo</h3>
+          <ol class="research-papers">
+            <li><a href="https://zenodo.org/records/17603069" target="_blank" rel="noopener noreferrer"><span id="research-paper-one">Document 1: Time as a Physical Condition</span> ↗</a></li>
+            <li><a href="https://zenodo.org/records/17748957" target="_blank" rel="noopener noreferrer"><span id="research-paper-two">Document 2: Discrete Temporal Transitions</span> ↗</a></li>
+            <li><a href="https://zenodo.org/records/18002304" target="_blank" rel="noopener noreferrer"><span id="research-paper-three">Document 3: Experimental Signatures</span> ↗</a></li>
+          </ol>
+          <p id="research-figure-note" class="research-note">Illustration adapted from Document 2. Open the record for the complete paper and metadata.</p>
+        </div>
+      </div>
+
+      <div class="research-support" aria-labelledby="research-support-title">
+        <div>
+          <h3 id="research-support-title">Support independent experiments</h3>
+          <p id="research-support-intro">Voluntary contributions help fund experiments and continued research into the proposed time-field framework.</p>
+        </div>
+        <dl class="research-wallet">
+          <div><dt id="research-network-label">Asset and network</dt><dd>Tether (USDT) · TRON network (TRC-20)</dd></div>
+          <div><dt id="research-address-label">Receiving address</dt><dd><code id="research-address">TKWzm9cXYEM5hqsDboj9Uh2NDLZUgBzaN4</code></dd></div>
+        </dl>
+        <div class="research-support-actions">
+          <button id="research-copy-address" type="button">Copy address</button>
+          <a id="research-explorer-link" href="https://tronscan.org/#/address/TKWzm9cXYEM5hqsDboj9Uh2NDLZUgBzaN4" target="_blank" rel="noopener noreferrer">View on TRONSCAN ↗</a>
+        </div>
+        <p id="research-copy-status" class="research-copy-status" role="status" aria-live="polite"></p>
+        <p id="research-network-warning" class="research-warning"><strong>Verify before sending:</strong> send only USDT on the TRON network (TRC-20) to this address. Crypto transfers are irreversible.</p>
+        <p id="research-support-disclaimer" class="research-note">This is a voluntary contribution, not an investment or purchase. It provides no ownership, financial return, tax benefit, delivery date, or guarantee of successful results. BTC2G does not process or custody the transfer.</p>
+      </div>
+    </section>
+
     <nav class="seo-links" aria-label="Bitcoin vs Gold articles">
       <span id="learn-more-text">Learn more:</span>
       <a href="bitcoin-vs-gold.html" id="seo-bitcoin-gold-link">Bitcoin vs Gold</a>
@@ -277,6 +317,7 @@
   <script src="assets/js/audience-text.js?v=20261028-2"></script>
   <script src="assets/js/ratio-tools.js?v=20261028-2"></script>
   <script src="assets/js/subscription-request.js?v=20261029-1"></script>
+  <script src="assets/js/research-support.js?v=20261029-1"></script>
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
@@ -2189,6 +2230,7 @@
       document.getElementById('privacy-link').textContent = text.privacy;
       document.getElementById('terms-link').textContent = text.terms;
       document.getElementById('support-link').textContent = text.support;
+      window.BTC2GResearch?.setLanguage(lang);
       renderSignal();
       renderMeta();
       renderPremiumState();
