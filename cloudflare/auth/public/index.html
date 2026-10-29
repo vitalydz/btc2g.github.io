@@ -34,10 +34,12 @@
       </div>
       <form id="account-form">
         <label>Username
-          <input id="username" name="username" autocomplete="username" minlength="3" maxlength="32" pattern="[A-Za-z][A-Za-z0-9_]{2,31}" required>
+          <input id="username" name="username" autocomplete="username" minlength="3" maxlength="32" pattern="[A-Za-z][A-Za-z0-9_]{2,31}" aria-describedby="username-hint" required>
+          <small class="field-hint" id="username-hint">3–32 characters. Start with a letter; use letters, numbers, or underscores.</small>
         </label>
         <label>Password
-          <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required>
+          <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" aria-describedby="password-hint" required>
+          <small class="field-hint" id="password-hint">Use at least 12 characters.</small>
         </label>
         <label class="terms" id="terms-row">
           <input id="accepted-terms" name="acceptedTerms" type="checkbox">

@@ -6,6 +6,7 @@ const submitButton = document.querySelector('#submit-button');
 const termsRow = document.querySelector('#terms-row');
 const termsCheckbox = document.querySelector('#accepted-terms');
 const password = document.querySelector('#password');
+const passwordHint = document.querySelector('#password-hint');
 const signedIn = document.querySelector('#signed-in');
 let mode = 'register';
 
@@ -50,6 +51,7 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
   termsRow.hidden = mode === 'login';
   termsCheckbox.required = mode === 'register';
   password.autocomplete = mode === 'register' ? 'new-password' : 'current-password';
+  passwordHint.textContent = mode === 'register' ? 'Use at least 12 characters.' : 'Enter the password for this account.';
   submitButton.textContent = mode === 'register' ? 'Create account' : 'Sign in';
   setMessage('');
 }));

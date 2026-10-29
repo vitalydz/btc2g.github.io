@@ -21,6 +21,7 @@ h1 { margin:.25rem 0 .65rem; font-size:clamp(2rem,8vw,3.7rem); line-height:1.02;
 .tab.active { border-color:#795d24; color:var(--gold); background:#1b170e; }
 form { display:grid; gap:16px; }
 label { display:grid; gap:7px; color:#d8dee8; font-size:.9rem; font-weight:700; }
+.field-hint { color:var(--muted); font-size:.78rem; font-weight:500; }
 input[type=text],input[type=password],input:not([type]) { width:100%; border:1px solid #343d4b; border-radius:10px; background:#090c12; color:var(--text); padding:13px 14px; font:inherit; outline:none; }
 input:focus { border-color:var(--gold); box-shadow:0 0 0 3px #f4b94222; }
 .terms { grid-template-columns:auto 1fr; align-items:start; font-size:.82rem; font-weight:500; color:var(--muted); }

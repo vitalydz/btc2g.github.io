@@ -45,7 +45,7 @@ const snapshot = {
 test('account statistics recover from failure and never leave stale figures visible', async () => {
   const ui = page('../public/index.html');
   let failure = false;
-  const source = readFileSync(new URL('../public/account.js', import.meta.url), 'utf8').replace(/^import .*;\n/, '');
+  const source = readFileSync(new URL('../public/account.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/, '');
   const context = vm.createContext({ document: ui.document, formatCount, measurementNote,
     request: async path => {
       if (path === '/api/me') return { user: null };
@@ -72,7 +72,7 @@ test('account statistics recover from failure and never leave stale figures visi
 test('admin refresh clears stale totals and private lists on failure', async () => {
   const ui = page('../public/admin/index.html');
   let failure = false;
-  const source = readFileSync(new URL('../public/admin/admin.js', import.meta.url), 'utf8').replace(/^import .*;\n/, '');
+  const source = readFileSync(new URL('../public/admin/admin.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/, '');
   const context = vm.createContext({ document: ui.document, formatCount, percentage, measurementNote,
     request: async path => {
       if (path === '/api/me') return { user: null };
@@ -95,7 +95,7 @@ test('admin refresh clears stale totals and private lists on failure', async () 
 test('out-of-order admin responses cannot overwrite a newer reporting range', async () => {
   const ui = page('../public/admin/index.html');
   const pending = [];
-  const source = readFileSync(new URL('../public/admin/admin.js', import.meta.url), 'utf8').replace(/^import .*;\n/, '');
+  const source = readFileSync(new URL('../public/admin/admin.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/, '');
   const context = vm.createContext({ document: ui.document, formatCount, percentage, measurementNote,
     request: path => path === '/api/me' ? Promise.resolve({ user: null }) : new Promise(resolve => pending.push(resolve))
   });

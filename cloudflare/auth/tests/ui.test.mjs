@@ -11,6 +11,15 @@ test('preserves hidden authenticated state and offers useful public tools', asyn
   assert.match(html, /https:\/\/btc2g.com\/index.html#calculator/);
 });
 
+test('registration fields explain their accepted format before submission', async () => {
+  const [html, script] = await Promise.all(['index.html', 'account.js'].map(path => readFile(new URL(path, root), 'utf8')));
+  assert.match(html, /aria-describedby="username-hint"/);
+  assert.match(html, /id="username-hint">3–32 characters/);
+  assert.match(html, /aria-describedby="password-hint"/);
+  assert.match(html, /id="password-hint">Use at least 12 characters/);
+  assert.match(script, /Enter the password for this account/);
+});
+
 test('homepage form receipt does not claim confirmation and Premium CTA uses existing form', async () => {
   const source = await readFile(new URL('../../../index.html', import.meta.url), 'utf8');
   assert.equal((source.match(/subscribeSuccess:/g) || []).length, 19);
