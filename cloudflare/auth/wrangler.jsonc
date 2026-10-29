@@ -5,6 +5,10 @@
   "compatibility_date": "2026-10-29",
   "workers_dev": true,
   "preview_urls": false,
+  "routes": [
+    { "pattern": "https://btc2g.com/api/visit*", "zone_name": "btc2g.com" },
+    { "pattern": "https://btc2g.com/api/stats*", "zone_name": "btc2g.com" }
+  ],
   "assets": {
     "directory": "public",
     "binding": "ASSETS",
