@@ -31,7 +31,7 @@
       <nav id="primary-navigation" class="main-nav" aria-label="Primary navigation">
         <a id="nav-home" href="index.html">Home</a>
         <a id="nav-forecast" href="#forecast">Forecast</a>
-        <a id="nav-premium" href="premium.html">Premium</a>
+        <a id="nav-premium" href="premium.html?v=20261029-21">Premium</a>
         <a id="nav-save" href="save.html">SAVE</a>
         <a id="nav-buy" href="buy.html">Buy BTC</a>
         <a id="nav-account" href="https://btc2g-accounts.btc2g.workers.dev/">Account</a>
@@ -169,7 +169,7 @@
       <h2 id="premium-title">Premium Signals</h2>
       <p id="premium-subtitle">Extended signal history, model notes, and weekly updates.</p>
       <div class="premium-actions">
-        <a id="premium-page-link" class="premium-page-link" href="premium.html">View Premium</a>
+        <a id="premium-page-link" class="premium-page-link" href="premium.html?v=20261029-21">View Premium</a>
         <button id="premium-unlock-btn" class="premium-button" type="button">Join early access</button>
       </div>
     </section>
@@ -2104,6 +2104,7 @@
       setTextById('nav-home', text.navHome);
       setTextById('nav-forecast', text.navForecast);
       setTextById('nav-premium', text.navPremium);
+      document.getElementById('nav-premium').href = 'premium.html?v=20261029-21&lang=' + encodeURIComponent(lang);
       setTextById('nav-buy', text.navBuy);
       setTextById('nav-account', text.navAccount);
       document.getElementById('nav-save').href = 'save.html?lang=' + encodeURIComponent(lang);
@@ -2137,6 +2138,7 @@
       setTextById('premium-item-history', text.premiumHistory);
       document.getElementById('premium-unlock-btn').textContent = text.premiumUnlock;
       document.getElementById('premium-page-link').textContent = text.premiumPageLink;
+      document.getElementById('premium-page-link').href = document.getElementById('nav-premium').href;
       document.getElementById('premium-modal-title').textContent = text.premiumModalTitle;
       document.getElementById('premium-modal-intro').textContent = text.premiumModalIntro;
       document.getElementById('premium-modal-breakdown').textContent = text.premiumBreakdown;
@@ -2381,7 +2383,7 @@
 
     document.getElementById('premium-unlock-btn').addEventListener('click', () => {
       trackEvent('premium_click');
-      window.location.href = 'premium.html?lang=' + encodeURIComponent(currentLang) + '#early-access';
+      window.location.href = 'premium.html?v=20261029-21&lang=' + encodeURIComponent(currentLang) + '#early-access';
     });
     document.getElementById('premium-modal-close').addEventListener('click', closePremiumModal);
     document.getElementById('premium-modal').addEventListener('click', (event) => {

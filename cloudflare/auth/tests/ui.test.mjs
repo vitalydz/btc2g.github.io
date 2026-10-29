@@ -25,7 +25,7 @@ test('homepage form receipt does not claim confirmation and Premium CTA uses exi
   assert.equal((source.match(/subscribeSuccess:/g) || []).length, 19);
   assert.doesNotMatch(source, /successEventName: 'email_subscribe'/);
   assert.match(source, /successEventName: 'subscription_request_received'/);
-  assert.match(source, /window.location.href = 'premium.html\?lang='/);
+  assert.match(source, /window.location.href = 'premium.html\?v=20261029-21&lang='/);
 });
 
 test('Product Hunt attribution is forwarded only through the account registration flow', async () => {
