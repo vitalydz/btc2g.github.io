@@ -4,22 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#071426" />
-  <title>BTC2G - Bitcoin vs Gold Forecast</title><meta name="btc2g-release" content="2026.10.28-save.2">
-  <meta name="description" content="BTC2G compares Bitcoin with gold and shows a model-based BTC signal for long-term market context." />
-  <meta property="og:title" content="BTC2G - Bitcoin vs Gold Forecast" />
-  <meta property="og:description" content="Bitcoin vs Gold forecast chart with a model-based BTC signal and compact research dashboard." />
+  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.29.3">
+  <meta name="description" content="Track the published Bitcoin-to-gold ratio, daily market data, model direction, history chart, and BTC ↔ gold calculator." />
+  <meta property="og:title" content="BTC2G - Bitcoin vs Gold Ratio" />
+  <meta property="og:description" content="Published BTC/Gold ratio data, model context, interactive history, and a reference calculator." />
   <meta property="og:url" content="https://btc2g.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://btc2g.com/assets/btc_gold_forecast.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="BTC2G - Bitcoin vs Gold Forecast" />
-  <meta name="twitter:description" content="Bitcoin vs Gold forecast chart with a model-based BTC signal and compact research dashboard." />
+  <meta name="twitter:title" content="BTC2G - Bitcoin vs Gold Ratio" />
+  <meta name="twitter:description" content="Published BTC/Gold ratio data, model context, interactive history, and a reference calculator." />
   <meta name="twitter:image" content="https://btc2g.com/assets/btc_gold_forecast.png" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/index.css?v=20261029-4" />
+  <link rel="stylesheet" href="assets/css/index.css?v=20261029-5" />
   <link rel="canonical" href="https://btc2g.com/" />
 </head>
 <body>
@@ -62,18 +62,29 @@
       </div>
     </header>
 
-    <h1 id="title" class="page-title">Bitcoin vs Gold Forecast</h1>
-    <p id="subtitle">From 2016 to <span id="current-date"></span>, with projection to 2030</p>
-    <p id="site-purpose" class="plain-explanation">Compare Bitcoin with gold over time: see how many troy ounces one BTC represents, then explore the chart and reference calculator.</p>
-    <p class="plain-explanation"><a id="calculator-jump" href="#calculator">BTC ↔ gold reference calculator</a></p>
+    <section class="market-hero" aria-labelledby="title">
+      <div class="market-hero-copy">
+        <p class="hero-eyebrow">BTC / GOLD RESEARCH DASHBOARD</p>
+        <h1 id="title" class="page-title">Bitcoin vs Gold Ratio</h1>
+        <p id="site-purpose" class="plain-explanation">Compare Bitcoin with gold over time: see how many troy ounces one BTC represents, then explore the chart and reference calculator.</p>
+      </div>
+      <div class="hero-ratio" aria-live="polite">
+        <span id="ratio-label" class="stat-label">BTC/Gold ratio</span>
+        <strong id="ratio-value">Ratio temporarily unavailable</strong>
+        <span id="ratio-change" class="ratio-change">7-day change unavailable</span>
+        <span id="subtitle" class="hero-market-date">Market date unavailable</span>
+      </div>
+      <p id="data-freshness" class="data-freshness hero-data-warning" role="status" hidden></p>
+      <div class="hero-actions">
+        <a id="hero-subscribe-link" class="hero-button hero-button-primary" href="#subscribe">Get model updates</a>
+        <a id="hero-premium-link" class="hero-button" href="premium.html">View Premium</a>
+        <a id="calculator-jump" class="hero-text-link" href="#calculator">BTC ↔ gold calculator</a>
+      </div>
+    </section>
 
-    <p class="plain-explanation"><a id="contest-entry" href="contest.html">Community ideas · contest in preparation</a></p>
+    <p class="plain-explanation secondary-entry"><a id="contest-entry" href="contest.html">Community ideas · contest in preparation</a></p>
 
     <section class="signal-card" aria-labelledby="signal-title">
-      <div class="signal-detail">
-        <p id="ratio-label" class="stat-label">BTC/Gold ratio</p>
-        <p id="ratio-value" class="signal-meta">Ratio temporarily unavailable</p>
-      </div>
       <div class="signal-main">
         <h2 id="signal-title">BTC Model Signal</h2>
         <div id="signal-value" class="signal-value signal-unavailable">...</div>
@@ -87,7 +98,6 @@
         <p id="signal-updated" class="signal-meta">Unavailable</p>
       </div>
       <p id="signal-note" class="signal-note"></p>
-      <p id="data-freshness" class="data-freshness" role="status" hidden></p>
       <p id="signal-disclaimer" class="signal-disclaimer">Model-based signal. Not financial advice.</p>
       <button id="signal-toggle" class="signal-toggle" type="button" aria-expanded="false" aria-controls="signal-explanation">What is this?</button>
       <p id="signal-explanation" class="signal-explanation">This signal is derived from the BTC vs Gold ratio model. It reflects relative valuation, not short-term price predictions.</p>
@@ -98,12 +108,20 @@
     </section>
 
     <section id="forecast" class="chart-section" aria-labelledby="forecast-title">
-      <h2 id="forecast-title">BTC vs Gold Forecast</h2>
-      <img
-        id="forecastChart"
-        src="assets/btc_gold_forecast.png"
-        alt="BTC vs Gold Forecast"
-      />
+      <div class="chart-heading">
+        <div><p class="chart-kicker">PUBLISHED DAILY MARKET DATA</p><h2 id="forecast-title">BTC vs Gold history</h2></div>
+        <div class="chart-modes" role="group" aria-label="Chart metric">
+          <button type="button" class="chart-mode active" data-chart-mode="ratio">Ratio</button>
+          <button type="button" class="chart-mode" data-chart-mode="btc">BTC price</button>
+          <button type="button" class="chart-mode" data-chart-mode="gold">Gold price</button>
+          <button type="button" class="chart-mode" data-chart-mode="score">Model score</button>
+        </div>
+      </div>
+      <div class="interactive-chart-wrap">
+        <canvas id="market-history-chart" width="1100" height="460" aria-label="BTC2G market history chart"></canvas>
+        <p id="market-history-status" role="status">Loading published history…</p>
+      </div>
+      <p id="market-price-strip" class="market-price-strip">BTC and gold prices unavailable.</p>
       <p id="chart-error" class="chart-error">The BTC vs Gold Forecast chart is unavailable right now. Please try refreshing it.</p>
       <p id="chart-method" class="plain-explanation">Solid lines show historical USD closes; dashed lines are polynomial scenarios, not reliable price targets. The model score is not a probability of profit.</p>
       <section class="chart-explanation" aria-labelledby="why-title">
@@ -117,6 +135,27 @@
         </svg>
         <span id="refresh-chart-text">Update chart manually</span>
       </button>
+      <details class="forecast-static">
+        <summary>View long-term scenario chart</summary>
+        <img id="forecastChart" src="assets/btc_gold_forecast.png" alt="BTC vs Gold long-term scenario chart" />
+      </details>
+    </section>
+
+    <section id="subscribe" class="subscribe-section subscribe-primary" aria-labelledby="subscribe-title">
+      <div>
+        <h2 id="subscribe-title">Get the model signal when it changes</h2>
+        <p id="subscribe-subtitle">A short email only when direction changes or the ratio moves significantly. No daily spam.</p>
+      </div>
+      <label id="subscriber-email-label" for="subscriber-email">Email address</label>
+      <form id="subscribe-form" class="subscribe-form" novalidate>
+        <input id="subscriber-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="subscribe-message subscribe-trust" />
+        <button id="subscribe-button" type="submit">Subscribe free</button>
+      </form>
+      <p id="subscribe-trust" class="subscribe-trust">One-click unsubscribe. Subscriber count is shown only when a verified source is available.</p>
+      <p id="subscribe-message" class="subscribe-message" role="status" aria-live="polite"></p>
+      <aside class="email-preview" aria-label="Example BTC2G update email">
+        <span>EXAMPLE EMAIL</span><strong>BTC2G Signal Update</strong><p>Ratio and model score changes, the market date, source links, and a direct link back to the chart.</p>
+      </aside>
     </section>
 
     <section class="save-entry" aria-labelledby="save-entry-title">
@@ -143,8 +182,14 @@
         </label>
       </div>
       <output id="calculator-result" for="calculator-amount calculator-direction" role="status" aria-live="polite">Conversion unavailable until current data is verified.</output>
+      <p id="calculator-equivalents" class="calculator-equivalents"></p>
+      <div class="calculator-actions">
+        <button id="calculator-copy" type="button">Copy result</button>
+        <button id="calculator-share" type="button">Share</button>
+      </div>
+      <p id="calculator-action-status" class="calculator-source" role="status" aria-live="polite"></p>
       <p id="calculator-source" class="calculator-source">Source and market date unavailable.</p>
-      <p class="calculator-source"><a href="assets/btc_signal.json">btc_signal.json</a> · <a href="assets/btc_gold_forecast_meta.json">btc_gold_forecast_meta.json</a></p>
+      <p class="calculator-source"><a href="assets/btc_signal.json">Latest values</a> · <a href="assets/btc_gold_history.json">Published history</a> · <a href="assets/btc_gold_forecast_meta.json">Source metadata</a></p>
     </section>
 
     <section class="insights-section" aria-labelledby="insights-title">
@@ -172,25 +217,6 @@
         <a id="premium-page-link" class="premium-page-link" href="premium.html?v=20261029-21">View Premium</a>
         <button id="premium-unlock-btn" class="premium-button" type="button">Join early access</button>
       </div>
-    </section>
-
-    <section class="subscribe-section" aria-labelledby="subscribe-title">
-      <h2 id="subscribe-title">Get forecast updates</h2>
-      <p id="subscribe-subtitle">Receive compact BTC2G updates when the model changes.</p>
-      <label id="subscriber-email-label" for="subscriber-email">Email address</label>
-      <form id="subscribe-form" class="subscribe-form" novalidate>
-        <input
-          id="subscriber-email"
-          name="email"
-          type="email"
-          autocomplete="email"
-          placeholder="you@example.com"
-          aria-describedby="subscribe-message subscribe-trust"
-        />
-        <button id="subscribe-button" type="submit">Subscribe</button>
-      </form>
-      <p id="subscribe-trust" class="subscribe-trust">No spam. Unsubscribe anytime.</p>
-      <p id="subscribe-message" class="subscribe-message" role="status" aria-live="polite"></p>
     </section>
 
     <section class="buy-cta" aria-labelledby="buy-title">
@@ -225,46 +251,6 @@
         <button id="copy-link-btn" class="share-button" type="button">Copy link</button>
       </div>
       <p id="share-status" class="share-status" role="status" aria-live="polite"></p>
-    </section>
-
-    <section class="research-section" aria-labelledby="research-title">
-      <div class="research-heading">
-        <p id="research-eyebrow" class="research-eyebrow">INDEPENDENT RESEARCH</p>
-        <h2 id="research-title">TimeT research series</h2>
-        <p id="research-intro">Three public preprints by Vitaly Dziubov explore a speculative time-field framework. This work is separate from BTC2G market research.</p>
-      </div>
-      <div class="research-layout">
-        <a class="research-figure-link" href="https://zenodo.org/records/17748957" target="_blank" rel="noopener noreferrer">
-          <img src="assets/images/timet-document-2-figure-no-logo.png" width="1055" height="1491" loading="lazy" alt="TimeT illustration showing discrete temporal transitions in a time-field framework" id="research-image" />
-        </a>
-        <div>
-          <h3 id="research-papers-title">Publications on Zenodo</h3>
-          <ol class="research-papers">
-            <li><a href="https://zenodo.org/records/17603069" target="_blank" rel="noopener noreferrer"><span id="research-paper-one">Document 1: Time as a Physical Condition</span> ↗</a></li>
-            <li><a href="https://zenodo.org/records/17748957" target="_blank" rel="noopener noreferrer"><span id="research-paper-two">Document 2: Discrete Temporal Transitions</span> ↗</a></li>
-            <li><a href="https://zenodo.org/records/18002304" target="_blank" rel="noopener noreferrer"><span id="research-paper-three">Document 3: Experimental Signatures</span> ↗</a></li>
-          </ol>
-          <p id="research-figure-note" class="research-note">Illustration adapted from Document 2. Open the record for the complete paper and metadata.</p>
-        </div>
-      </div>
-
-      <div class="research-support" aria-labelledby="research-support-title">
-        <div>
-          <h3 id="research-support-title">Support independent experiments</h3>
-          <p id="research-support-intro">Voluntary contributions help fund experiments and continued research into the proposed time-field framework.</p>
-        </div>
-        <dl class="research-wallet">
-          <div><dt id="research-network-label">Asset and network</dt><dd>Tether (USDT) · TRON network (TRC-20)</dd></div>
-          <div><dt id="research-address-label">Receiving address</dt><dd><code id="research-address">TKWzm9cXYEM5hqsDboj9Uh2NDLZUgBzaN4</code></dd></div>
-        </dl>
-        <div class="research-support-actions">
-          <button id="research-copy-address" type="button">Copy address</button>
-          <a id="research-explorer-link" href="https://tronscan.org/#/address/TKWzm9cXYEM5hqsDboj9Uh2NDLZUgBzaN4" target="_blank" rel="noopener noreferrer">View on TRONSCAN ↗</a>
-        </div>
-        <p id="research-copy-status" class="research-copy-status" role="status" aria-live="polite"></p>
-        <p id="research-network-warning" class="research-warning"><strong>Verify before sending:</strong> send only USDT on the TRON network (TRC-20) to this address. Crypto transfers are irreversible.</p>
-        <p id="research-support-disclaimer" class="research-note">This is a voluntary contribution, not an investment or purchase. It provides no ownership, financial return, tax benefit, delivery date, or guarantee of successful results. BTC2G does not process or custody the transfer.</p>
-      </div>
     </section>
 
     <nav class="seo-links" aria-label="Bitcoin vs Gold articles">
@@ -309,6 +295,7 @@
       <a href="privacy.html" id="privacy-link">Privacy Policy</a> |
       <a href="terms.html" id="terms-link">Terms of Service</a> |
       <a href="support.html" id="support-link">Support</a>
+      | <a href="research.html">TimeT research</a>
     </p>
     <p>© 2026 BTC2G</p>
   </footer>
@@ -317,7 +304,8 @@
   <script src="assets/js/audience-text.js?v=20261028-2"></script>
   <script src="assets/js/ratio-tools.js?v=20261028-2"></script>
   <script src="assets/js/subscription-request.js?v=20261029-1"></script>
-  <script src="assets/js/research-support.js?v=20261029-1"></script>
+  <script src="assets/js/home-v2-text.js?v=20261029-1"></script>
+  <script src="assets/js/market-chart.js?v=20261029-1"></script>
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
@@ -349,6 +337,7 @@
       id: 'id-ID',
       vi: 'vi-VN',
     };
+    const RATIO_TITLES = {en:'Bitcoin vs Gold Ratio',ru:'Соотношение Биткоина и золота',he:'יחס ביטקוין לזהב',de:'Bitcoin-Gold-Verhältnis',fr:'Ratio Bitcoin / Or',es:'Ratio Bitcoin / Oro',zh:'比特币/黄金比率',it:'Rapporto Bitcoin / Oro',pt:'Relação Bitcoin / Ouro',ar:'نسبة بيتكوين إلى الذهب',hi:'बिटकॉइन/सोना अनुपात',ja:'ビットコイン／金 比率',ko:'비트코인/금 비율',tr:'Bitcoin / Altın Oranı',pl:'Stosunek Bitcoin / Złoto',nl:'Bitcoin-goudverhouding',uk:'Співвідношення Біткоїна й золота',id:'Rasio Bitcoin / Emas',vi:'Tỷ lệ Bitcoin / Vàng'};
 
     function getUtcDateStamp(date = new Date()) {
       const yyyy = date.getUTCFullYear();
@@ -397,7 +386,8 @@
     }
 
     const todayStr = getUtcDateStamp();
-    document.getElementById('current-date').textContent = formatLocalizedDate(todayStr, 'en');
+    const legacyCurrentDate = document.getElementById('current-date');
+    if (legacyCurrentDate) legacyCurrentDate.textContent = formatLocalizedDate(todayStr, 'en');
 
     function trackEvent(eventName) {
       if (typeof window.gtag === 'function') {
@@ -456,6 +446,8 @@
       const unavailable = currentLang === 'ru' ? 'Данные временно недоступны' : 'Ratio temporarily unavailable';
       setTextById('ratio-value', unavailable);
       setTextById('insight-ratio-value', unavailable);
+      setTextById('ratio-change', currentLang === 'ru' ? 'Изменение за 7 дней недоступно' : '7-day change unavailable');
+      document.getElementById('ratio-value').classList.add?.('is-unavailable');
       renderFreshness('unavailable');
     }
 
@@ -472,6 +464,21 @@
         : fallback;
       setTextById('ratio-value', value);
       setTextById('insight-ratio-value', value);
+      if (typeof document !== 'undefined') document.getElementById('ratio-value')?.classList.toggle('is-unavailable', !available);
+      const change = currentSignalData?.ratio_change_7d_pct;
+      const changeElement = typeof document !== 'undefined' ? document.getElementById('ratio-change') : null;
+      if (Number.isFinite(change) && changeElement) {
+        const sign = change > 0 ? '+' : '';
+        changeElement.textContent = `${sign}${new Intl.NumberFormat(LOCALE_BY_LANGUAGE[currentLang] || 'en-US', {maximumFractionDigits: 2}).format(change)}% · 7d`;
+        changeElement.className = `ratio-change ${change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral'}`;
+      } else if (changeElement) {
+        changeElement.textContent = currentLang === 'ru' ? 'Изменение за 7 дней недоступно' : '7-day change unavailable';
+        changeElement.className = 'ratio-change neutral';
+      }
+      const freshness = typeof getSignalFreshness === 'function' ? getSignalFreshness(currentSignalData?.last_updated) : 'unknown';
+      const audience = typeof BTC2GAudienceText !== 'undefined' ? BTC2GAudienceText : {en:{marketDate:'Market date (UTC)'}};
+      const marketDate = freshness === 'unknown' || typeof formatLocalizedDate !== 'function' ? '--' : `${audience[currentLang]?.marketDate || audience.en.marketDate}: ${formatLocalizedDate(currentSignalData.last_updated, currentLang)}`;
+      setTextById('subtitle', marketDate);
     }
 
     function getSignalFreshness(dateValue, now = new Date()) {
@@ -599,7 +606,8 @@
       try {
         const version = String(Date.now());
         setChartSrc(version);
-        await Promise.all([loadSignal(version), loadMeta(version)]);
+        const marketRefresh = typeof window !== 'undefined' ? window.BTC2GMarketChart?.load(version) : undefined;
+        await Promise.all([loadSignal(version), loadMeta(version), marketRefresh]);
         // Resolve the metadata fallback after both requests have completed.
         renderMeta();
       } finally {
@@ -2160,8 +2168,7 @@
       document.getElementById('language-select').value = lang;
       document.getElementById('language-select').setAttribute('aria-label', text.languageLabel);
       document.getElementById('language-select').title = text.languageLabel;
-      document.getElementById('title').textContent = text.title;
-      document.getElementById('subtitle').textContent = text.subtitle.replace('{date}', localizedToday);
+      document.getElementById('title').textContent = RATIO_TITLES[lang] || RATIO_TITLES.en;
       setTextById('nav-home', text.navHome);
       setTextById('nav-forecast', text.navForecast);
       setTextById('nav-premium', text.navPremium);
@@ -2230,7 +2237,7 @@
       document.getElementById('privacy-link').textContent = text.privacy;
       document.getElementById('terms-link').textContent = text.terms;
       document.getElementById('support-link').textContent = text.support;
-      window.BTC2GResearch?.setLanguage(lang);
+      window.BTC2GHomeV2Text?.setLanguage(lang);
       renderSignal();
       renderMeta();
       renderPremiumState();

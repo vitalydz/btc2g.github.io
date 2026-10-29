@@ -1,4 +1,4 @@
-(function () {
+(function (root) {
   'use strict';
 
   const ADDRESS = 'TKWzm9cXYEM5hqsDboj9Uh2NDLZUgBzaN4';
@@ -49,5 +49,19 @@
   }
 
   document.getElementById('research-copy-address')?.addEventListener('click', copyAddress);
+  const selector = document.getElementById('research-language');
+  const initialLanguage = new URLSearchParams(root.location?.search || '').get('lang') || root.localStorage?.getItem('lang') || 'en';
+  setLanguage(initialLanguage);
+  if (selector) {
+    selector.value = translations[initialLanguage] ? initialLanguage : 'en';
+    selector.addEventListener('change', () => {
+      root.localStorage?.setItem('lang', selector.value);
+      document.documentElement.lang = selector.value;
+      document.documentElement.dir = ['he', 'ar'].includes(selector.value) ? 'rtl' : 'ltr';
+      setLanguage(selector.value);
+    });
+    document.documentElement.lang = selector.value;
+    document.documentElement.dir = ['he', 'ar'].includes(selector.value) ? 'rtl' : 'ltr';
+  }
   window.BTC2GResearch = { ADDRESS, translations, setLanguage, copyAddress };
-})();
+})(window);

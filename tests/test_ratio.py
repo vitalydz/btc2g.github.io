@@ -5,7 +5,7 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 
-from scripts.update_btc_gold_chart import build_chart, build_signal
+from scripts.update_btc_gold_chart import build_chart, build_history, build_signal
 
 
 class RatioTests(unittest.TestCase):
@@ -20,7 +20,18 @@ class RatioTests(unittest.TestCase):
         self.assertEqual(signal["ratio"], 40.0)
         self.assertEqual(signal["signal"], "HOLD")
         self.assertEqual(signal["confidence"], 0.5)
+        self.assertEqual(signal["btc_price_usd"], 100000.0)
+        self.assertEqual(signal["gold_price_usd"], 2500.0)
+        self.assertEqual(signal["ratio_change_7d_pct"], 0.0)
         json.dumps(signal, allow_nan=False)
+
+    def test_history_publishes_only_finite_source_values(self):
+        history = build_history(self.prices(), limit=30)
+        self.assertEqual(history["source"], "yfinance")
+        self.assertEqual(len(history["series"]), 30)
+        self.assertEqual(history["series"][-1]["ratio"], 40.0)
+        self.assertEqual(history["series"][-1]["model_score"], 50)
+        json.dumps(history, allow_nan=False)
 
     def test_date_uses_latest_common_quote_even_if_unsorted(self):
         prices = self.prices()

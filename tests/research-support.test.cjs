@@ -6,31 +6,36 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const homepage = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const researchPage = fs.readFileSync(path.join(root, 'research.html'), 'utf8');
 const script = fs.readFileSync(path.join(root, 'assets/js/research-support.js'), 'utf8');
 const address = 'TKWzm9cXYEM5hqsDboj9Uh2NDLZUgBzaN4';
 
-test('homepage links all three official research records safely', () => {
+test('research page links all three official records and homepage stays market-focused', () => {
   for (const record of ['17603069', '17748957', '18002304']) {
-    assert.match(homepage, new RegExp(`https://zenodo\\.org/records/${record}`));
+    assert.match(researchPage, new RegExp(`https://zenodo\\.org/records/${record}`));
   }
-  assert.match(homepage, /timet-document-2-figure-no-logo\.png/);
-  assert.equal((homepage.match(/rel="noopener noreferrer"/g) || []).length >= 5, true);
+  assert.match(researchPage, /timet-document-2-figure-no-logo\.png/);
+  assert.equal((researchPage.match(/rel="noopener noreferrer"/g) || []).length >= 5, true);
+  assert.doesNotMatch(homepage, /id="research-support-title"/);
+  assert.match(homepage, /href="research\.html"/);
 });
 
 test('support block states the exact asset, network, address, and safety boundaries', () => {
-  assert.match(homepage, /Tether \(USDT\) · TRON network \(TRC-20\)/);
-  assert.match(homepage, new RegExp(address));
-  assert.match(homepage, new RegExp(`https://tronscan\\.org/#/address/${address}`));
-  assert.match(homepage, /Crypto transfers are irreversible/);
-  assert.match(homepage, /not an investment or purchase/);
-  assert.match(homepage, /no ownership, financial return, tax benefit, delivery date, or guarantee/);
-  assert.doesNotMatch(homepage, /connect wallet|guaranteed return|tax-deductible/i);
+  assert.match(researchPage, /Tether \(USDT\) · TRON network \(TRC-20\)/);
+  assert.match(researchPage, new RegExp(address));
+  assert.match(researchPage, new RegExp(`https://tronscan\\.org/#/address/${address}`));
+  assert.match(researchPage, /Crypto transfers are irreversible/);
+  assert.match(researchPage, /not an investment or purchase/);
+  assert.match(researchPage, /no ownership, financial return, tax benefit, delivery date, or guarantee/);
+  assert.doesNotMatch(researchPage, /connect wallet|guaranteed return|tax-deductible/i);
 });
 
 test('copy control uses the exact address and has all 19 translations', async () => {
   const nodes = new Map();
   const document = {
+    documentElement: {},
     getElementById(id) {
+      if (id === 'research-language') return null;
       if (!nodes.has(id)) nodes.set(id, { textContent: '', addEventListener() {} });
       return nodes.get(id);
     },
@@ -39,7 +44,8 @@ test('copy control uses the exact address and has all 19 translations', async ()
   const context = {
     document,
     navigator: { clipboard: { async writeText(value) { copied = value; } } },
-    window: {},
+    URLSearchParams,
+    window: { location: {search: ''} },
   };
   vm.createContext(context);
   vm.runInContext(script, context);

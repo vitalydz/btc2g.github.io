@@ -1,5 +1,5 @@
 {
-  "last_updated_utc": "2026-10-29T09:57:34.068808+00:00",
+  "last_updated_utc": "2026-10-29T20:48:13.019319+00:00",
   "status": "ok",
   "source": "yfinance",
   "tickers": {
@@ -7,5 +7,6 @@
     "Bitcoin": "BTC-USD"
   },
   "chart": "assets/btc_gold_forecast.png",
-  "signal": "assets/btc_signal.json"
+  "signal": "assets/btc_signal.json",
+  "history": "assets/btc_gold_history.json"
 }

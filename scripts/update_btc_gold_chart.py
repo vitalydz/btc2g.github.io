@@ -27,6 +27,7 @@ ASSETS_DIR = REPO_ROOT / "assets"
 CHART_PATH = ASSETS_DIR / "btc_gold_forecast.png"
 META_PATH = ASSETS_DIR / "btc_gold_forecast_meta.json"
 SIGNAL_PATH = ASSETS_DIR / "btc_signal.json"
+HISTORY_PATH = ASSETS_DIR / "btc_gold_history.json"
 
 
 def utc_today() -> datetime:
@@ -123,12 +124,54 @@ def build_signal(df: pd.DataFrame) -> dict:
             signal = "HOLD"
             note = "BTC appears neutral compared to gold based on the model"
 
+    seven_day_cutoff = ratio.index[-1] - pd.Timedelta(days=7)
+    earlier = ratio.loc[:seven_day_cutoff]
+    ratio_7d_ago = float(earlier.iloc[-1]) if not earlier.empty else None
+    change_7d_pct = (
+        round((latest_ratio / ratio_7d_ago - 1) * 100, 2)
+        if ratio_7d_ago and np.isfinite(ratio_7d_ago) and ratio_7d_ago > 0
+        else None
+    )
+
     return {
         "signal": signal,
         "confidence": confidence,
         "ratio": published_ratio,
+        "ratio_7d_ago": round(ratio_7d_ago, 3) if ratio_7d_ago else None,
+        "ratio_change_7d_pct": change_7d_pct,
+        "btc_price_usd": round(float(prices["Bitcoin"].iloc[-1]), 2),
+        "gold_price_usd": round(float(prices["Gold"].iloc[-1]), 2),
         "last_updated": ratio.index[-1].strftime("%Y-%m-%d"),
         "note": note,
+    }
+
+
+def build_history(df: pd.DataFrame, limit: int = 730) -> dict:
+    prices = df[["Bitcoin", "Gold"]].dropna().sort_index()
+    ratio = prices["Bitcoin"] / prices["Gold"]
+    rolling_mean = ratio.rolling(365, min_periods=365).mean()
+    rolling_std = ratio.rolling(365, min_periods=365).std()
+    rows = []
+    for date, value in ratio.tail(limit).items():
+        mean = rolling_mean.loc[date]
+        std = rolling_std.loc[date]
+        score = None
+        if np.isfinite(mean) and np.isfinite(std):
+            z_score = 0.0 if std <= 0 else (value - mean) / std
+            score = round(min(0.95, 0.5 + min(abs(z_score), 2.0) * 0.2) * 100)
+        rows.append({
+            "date": date.strftime("%Y-%m-%d"),
+            "ratio": round(float(value), 4),
+            "btc_usd": round(float(prices.loc[date, "Bitcoin"]), 2),
+            "gold_usd": round(float(prices.loc[date, "Gold"]), 2),
+            "model_score": score,
+        })
+    return {
+        "source": "yfinance",
+        "tickers": TICKERS,
+        "units": {"ratio": "troy ounces per BTC", "btc_usd": "USD", "gold_usd": "USD per troy ounce", "model_score": "0-100 model score"},
+        "updated_for_market_date": rows[-1]["date"],
+        "series": rows,
     }
 
 
@@ -141,6 +184,7 @@ def build_chart() -> None:
     if df.empty:
         raise RuntimeError("Combined BTC/Gold dataset is empty.")
     signal = build_signal(df)
+    history = build_history(df)
 
     gold_future_dates, gold_forecast = forecast_polyfit(df.index, df["Gold"], FUTURE_DAYS)
     btc_future_dates, btc_forecast = forecast_polyfit(df.index, df["Bitcoin"], FUTURE_DAYS)
@@ -193,6 +237,7 @@ def build_chart() -> None:
 
     os.replace(temp_chart_path, CHART_PATH)
     SIGNAL_PATH.write_text(json.dumps(signal, indent=2) + "\n", encoding="utf-8")
+    HISTORY_PATH.write_text(json.dumps(history, indent=2) + "\n", encoding="utf-8")
 
     META_PATH.write_text(
         json.dumps(
@@ -203,6 +248,7 @@ def build_chart() -> None:
                 "tickers": TICKERS,
                 "chart": str(CHART_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
                 "signal": str(SIGNAL_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
+                "history": str(HISTORY_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
             },
             indent=2,
         )
@@ -211,6 +257,7 @@ def build_chart() -> None:
     )
     print(f"Chart saved to: {CHART_PATH}")
     print(f"Signal saved to: {SIGNAL_PATH}")
+    print(f"History saved to: {HISTORY_PATH}")
 
 
 def main() -> int:

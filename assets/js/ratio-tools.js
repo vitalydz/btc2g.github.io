@@ -32,13 +32,13 @@
   let signal = null;
   let meta = null;
   let language = 'en';
+  let shareText = '';
   const words = () => root.BTC2GAudienceText[language] || root.BTC2GAudienceText.en;
   const text = (id, value) => { byId(id).textContent = value; };
 
   function render() {
     const t = words();
     text('site-purpose', t.intro);
-    text('subtitle', t.subtitle);
     text('calculator-jump', t.calculator);
     text('save-entry-title', t.saveTitle);
     text('save-entry-note', t.saveNote);
@@ -67,9 +67,15 @@
       const formatter = new Intl.NumberFormat(language, { maximumFractionDigits: digits });
       const amount = result.result > 0 && result.result < minimum
         ? `< ${formatter.format(minimum)}` : formatter.format(result.result);
+      shareText = `BTC2G: ${byId('calculator-amount').value} ${byId('calculator-direction').value === 'btc' ? 'BTC' : 'oz t'} ≈ ${amount} ${result.unit} · ${signal.last_updated} UTC · yfinance BTC-USD / GC=F`;
       text('calculator-result', `≈ ${amount} ${result.unit}`);
+      const reciprocal = 1 / signal.ratio;
+      const kilograms = signal.ratio * 0.0311034768;
+      text('calculator-equivalents', `1 BTC = ${signal.ratio.toFixed(3)} oz t = ${kilograms.toFixed(3)} kg gold · 1 oz t gold = ${reciprocal.toFixed(8)} BTC · BTC ${new Intl.NumberFormat(language, {style:'currency',currency:'USD',maximumFractionDigits:0}).format(signal.btc_price_usd)} · Gold ${new Intl.NumberFormat(language, {style:'currency',currency:'USD',maximumFractionDigits:2}).format(signal.gold_price_usd)}/oz`);
     } else {
+      shareText = '';
       text('calculator-result', result.status === 'invalid' ? t.invalid : t.unavailable);
+      text('calculator-equivalents', '');
     }
   }
 
@@ -83,6 +89,23 @@
   };
   byId('calculator-amount').addEventListener('input', render);
   byId('calculator-direction').addEventListener('change', render);
+  byId('calculator-copy').addEventListener('click', async () => {
+    if (!shareText) return;
+    try {
+      await navigator.clipboard.writeText(shareText);
+      text('calculator-action-status', language === 'ru' ? 'Результат скопирован.' : 'Result copied.');
+    } catch (error) {
+      text('calculator-action-status', shareText);
+    }
+  });
+  byId('calculator-share').addEventListener('click', async () => {
+    if (!shareText) return;
+    if (navigator.share) {
+      try { await navigator.share({title:'BTC2G calculator', text:shareText, url:location.href}); } catch (error) {}
+    } else {
+      try { await navigator.clipboard.writeText(shareText); text('calculator-action-status', language === 'ru' ? 'Результат скопирован.' : 'Result copied.'); } catch (error) { text('calculator-action-status', shareText); }
+    }
+  });
   // Recheck age on return to a long-lived page and at UTC date boundaries.
   doc.addEventListener('visibilitychange', () => { if (!doc.hidden) render(); });
   root.setInterval(render, 60000);
