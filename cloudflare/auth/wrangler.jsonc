@@ -3,6 +3,8 @@
   "name": "btc2g-accounts",
   "main": "src/worker.js",
   "compatibility_date": "2026-10-29",
+  "workers_dev": true,
+  "preview_urls": false,
   "assets": {
     "directory": "public",
     "binding": "ASSETS",
@@ -20,7 +22,7 @@
     }
   ],
   "vars": {
-    "APP_ORIGIN": "https://btc2g-accounts.workers.dev",
+    "APP_ORIGIN": "https://btc2g-accounts.btc2g.workers.dev",
     "PUBLIC_SITE_ORIGIN": "https://btc2g.com",
     "TERMS_VERSION": "2026-10-29",
     "REGISTRATION_LIMIT_PER_HOUR": "5",

@@ -53,13 +53,24 @@ async function hmacSha256(secret, value) {
 }
 
 async function passwordHash(password, salt, iterations = PASSWORD_ITERATIONS) {
-  const key = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', hash: 'SHA-256', salt: encoder.encode(salt), iterations },
-    key,
-    256
-  );
-  return bytesToBase64Url(new Uint8Array(bits));
+  // Workers cap one PBKDF2 operation at 100k iterations. Chain supported
+  // rounds so the stored work factor remains 210k without exceeding the API cap.
+  let material = encoder.encode(password);
+  let remaining = iterations;
+  let round = 0;
+  while (remaining > 0) {
+    const roundIterations = Math.min(remaining, 100000);
+    const key = await crypto.subtle.importKey('raw', material, 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', hash: 'SHA-256', salt: encoder.encode(`${salt}:${round}`), iterations: roundIterations },
+      key,
+      256
+    );
+    material = new Uint8Array(bits);
+    remaining -= roundIterations;
+    round += 1;
+  }
+  return bytesToBase64Url(material);
 }
 
 function constantTimeEqual(left, right) {
