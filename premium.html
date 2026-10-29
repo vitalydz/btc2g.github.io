@@ -237,7 +237,9 @@
     .available { color: var(--green); font-weight: 700; }
     .planned { color: #aebcff; font-weight: 700; }
 
-    .method-grid, .faq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .method-grid, .faq-grid { display: grid; gap: 16px; }
+    .method-grid { grid-template-columns: repeat(2, 1fr); }
+    .faq-grid { grid-template-columns: repeat(3, 1fr); }
     .method-card ul { margin: 14px 0 0; padding-left: 20px; color: var(--muted); }
     .method-card li + li { margin-top: 8px; }
 
@@ -277,6 +279,7 @@
       .hero, .early-access { grid-template-columns: 1fr; }
       .hero { gap: 34px; padding-top: 58px; }
       .feature-grid { grid-template-columns: 1fr; }
+      .faq-grid { grid-template-columns: 1fr; }
       .early-access { gap: 24px; }
     }
     @media (max-width: 640px) {
@@ -398,7 +401,6 @@
         <article class="faq-item"><h3>Is Premium live today?</h3><p>No. The product is in development. This page describes the planned research experience and collects interest for early access.</p></article>
         <article class="faq-item"><h3>Will I be charged?</h3><p>No. There is no payment flow on this page. Submitting the form only records your request for product updates.</p></article>
         <article class="faq-item"><h3>Does Premium predict returns?</h3><p>No. BTC2G compares Bitcoin with gold through a model. It cannot guarantee prices, performance, or profitable decisions.</p></article>
-        <article class="faq-item"><h3>When will it launch?</h3><p>A launch date has not been announced. Updates will be published when plans are ready; the form records interest in email updates.</p></article>
       </div>
     </section>
 
