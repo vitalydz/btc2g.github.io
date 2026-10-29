@@ -11,9 +11,9 @@ This Cloudflare Worker hosts a same-origin account page and API backed by D1. Pu
 - Reserved public names, including `Codex_admin`.
 - One-time administrator bootstrap protected by a Cloudflare secret and disabled after the first admin exists.
 - Explicit Terms and Privacy Policy acceptance recorded with a version and timestamp.
-- Daily traffic uses a salted hash of IP + user agent; raw IP addresses and user-agent strings are not stored.
+- Daily traffic uses a salted hash of IP + user agent; raw IP addresses and user-agent strings are not stored. Product Hunt attribution uses a signed same-day token tied to that daily estimate and stores only the normalized source label.
 
-The protected `/admin/` dashboard shows visitor estimates, page views, registrations, registration/visitor ratios, daily history, top paths, and recent usernames. Only a live session for a D1 user with `role = 'admin'` can read `/api/admin/stats`.
+The protected `/admin/` dashboard shows visitor estimates, page views, registrations, registration/visitor ratios, Product Hunt-attributed visits and accounts, daily history, top paths, and recent usernames. Only a live session for a D1 user with `role = 'admin'` can read `/api/admin/stats`.
 
 ### Reading statistics correctly
 
@@ -29,7 +29,7 @@ The protected `/admin/` dashboard shows visitor estimates, page views, registrat
 
 Run `npm test` with Node 24 (the SQL integration tests use built-in `node:sqlite`). Tests run the Worker against an in-memory SQLite database, including both migrations. Fixtures never write to production or send emails.
 
-This patch does not require a new D1 migration. The existing `0001_initial.sql` and `0002_traffic_metrics.sql` must already have been applied. Deploy the Worker and its assets together with `npm run auth:deploy`, then read `/api/stats` and the protected dashboard to verify `measuredAt`, the reporting day and the separated metrics. Confirm that a forced *local* request failure clears the display; do not submit production test forms or page-view events. Live deployment requires an authorized Cloudflare session and is separate from a GitHub source commit.
+Apply `0001_initial.sql`, `0002_traffic_metrics.sql`, and `0003_acquisition_attribution.sql`. Deploy the Worker and its assets together with `npm run auth:deploy`, then read `/api/stats` and the protected dashboard to verify `measuredAt`, the reporting day and the separated metrics. Confirm that a forced *local* request failure clears the display; do not submit production test forms or page-view events. Live deployment requires an authorized Cloudflare session and is separate from a GitHub source commit.
 
 This is an account count, not an identity-verification system. A verified-human metric requires an email or identity provider and is intentionally not claimed.
 

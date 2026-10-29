@@ -1,6 +1,7 @@
 import {
   PASSWORD_ITERATIONS,
   SESSION_MAX_AGE_SECONDS,
+  acquisitionSource,
   clearSessionCookie,
   jerusalemDay,
   normalizePagePath,
@@ -83,6 +84,26 @@ function constantTimeEqual(left, right) {
   return difference === 0;
 }
 
+async function requestVisitorHash(request, env, day) {
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const userAgent = (request.headers.get('User-Agent') || 'unknown').slice(0, 256);
+  return hmacSha256(env.IP_HASH_SECRET, `${day}:${ip}:${userAgent}`);
+}
+
+async function createAttributionToken(env, day, visitorHash, source) {
+  const signature = await hmacSha256(env.IP_HASH_SECRET, `${day}:${visitorHash}:${source}`);
+  return `${day}.${source}.${signature}`;
+}
+
+async function verifiedAttributionSource(request, env, token) {
+  if (!env.IP_HASH_SECRET || typeof token !== 'string') return null;
+  const [day, source, signature, extra] = token.split('.');
+  if (extra !== undefined || day !== jerusalemDay() || source !== 'producthunt' || !signature) return null;
+  const visitorHash = await requestVisitorHash(request, env, day);
+  const expected = await hmacSha256(env.IP_HASH_SECRET, `${day}:${visitorHash}:${source}`);
+  return constantTimeEqual(signature, expected) ? source : null;
+}
+
 function sameOrigin(request, env) {
   const origin = request.headers.get('Origin');
   return !origin || origin === env.APP_ORIGIN || origin === new URL(request.url).origin;
@@ -141,15 +162,16 @@ async function register(request, env, { admin = false } = {}) {
   const hash = await passwordHash(input.password, salt);
   const now = Math.floor(Date.now() / 1000);
   const id = crypto.randomUUID();
+  const source = admin ? null : await verifiedAttributionSource(request, env, input?.attribution);
   try {
     await env.DB.prepare(`
       INSERT INTO users
         (id, username, username_key, password_hash, password_salt, password_iterations, role,
-         created_at, created_day, accepted_terms_at, terms_version)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         created_at, created_day, accepted_terms_at, terms_version, acquisition_source)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       id, validation.username, validation.usernameKey, hash, salt, PASSWORD_ITERATIONS,
-      admin ? 'admin' : 'user', now, jerusalemDay(now * 1000), now, env.TERMS_VERSION
+      admin ? 'admin' : 'user', now, jerusalemDay(now * 1000), now, env.TERMS_VERSION, source
     ).run();
   } catch (error) {
     if (String(error).toLowerCase().includes('unique')) return json({ error: 'That username is already registered.' }, 409);
@@ -244,26 +266,27 @@ async function recordVisit(request, env) {
   if (!pagePath) return json({ error: 'Invalid page path.' }, 400, cors);
 
   const day = jerusalemDay();
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const userAgent = (request.headers.get('User-Agent') || 'unknown').slice(0, 256);
-  const visitorHash = await hmacSha256(env.IP_HASH_SECRET, `${day}:${ip}:${userAgent}`);
+  const source = acquisitionSource(input?.referrer);
+  const visitorHash = await requestVisitorHash(request, env, day);
   const now = Math.floor(Date.now() / 1000);
   await env.DB.batch([
     env.DB.prepare(`
       INSERT INTO daily_visitors
-        (day, visitor_hash, first_path, last_path, first_seen_at, last_seen_at, views)
-      VALUES (?, ?, ?, ?, ?, ?, 1)
+        (day, visitor_hash, first_path, last_path, first_seen_at, last_seen_at, views, acquisition_source)
+      VALUES (?, ?, ?, ?, ?, ?, 1, ?)
       ON CONFLICT(day, visitor_hash) DO UPDATE SET
         last_path = excluded.last_path,
         last_seen_at = excluded.last_seen_at,
+        acquisition_source = COALESCE(daily_visitors.acquisition_source, excluded.acquisition_source),
         views = daily_visitors.views + 1
-    `).bind(day, visitorHash, pagePath, pagePath, now, now),
+    `).bind(day, visitorHash, pagePath, pagePath, now, now, source),
     env.DB.prepare(`
       INSERT INTO daily_pageviews (day, page_path, views) VALUES (?, ?, 1)
       ON CONFLICT(day, page_path) DO UPDATE SET views = daily_pageviews.views + 1
     `).bind(day, pagePath)
   ]);
-  return json({ ok: true }, 202, cors);
+  const attribution = source ? await createAttributionToken(env, day, visitorHash, source) : null;
+  return json({ ok: true, attribution }, 202, cors);
 }
 
 async function adminStats(request, env) {
@@ -280,9 +303,11 @@ async function adminStats(request, env) {
         (SELECT MIN(first_seen_at) FROM daily_visitors) AS first_seen_at,
         (SELECT COUNT(*) FROM daily_visitors WHERE day = ?) AS visitors_today,
         (SELECT COALESCE(SUM(views), 0) FROM daily_pageviews WHERE day = ?) AS views_today,
+        (SELECT COUNT(*) FROM daily_visitors WHERE day = ? AND acquisition_source = 'producthunt') AS producthunt_visitors_today,
         (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL) AS registered_total,
-        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND created_day = ?) AS registered_today
-    `).bind(today, today, today).first(),
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND created_day = ?) AS registered_today,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND created_day = ? AND acquisition_source = 'producthunt') AS producthunt_registered_today
+    `).bind(today, today, today, today, today).first(),
     env.DB.prepare(`
       WITH RECURSIVE dates(day) AS (
         SELECT date(?, '-' || ? || ' day')
@@ -290,16 +315,20 @@ async function adminStats(request, env) {
       ), coverage AS (
         SELECT MIN(day) AS first_day FROM daily_visitors
       ), traffic AS (
-        SELECT day, COUNT(*) AS visitors, COALESCE(SUM(views), 0) AS views
+        SELECT day, COUNT(*) AS visitors, COALESCE(SUM(views), 0) AS views,
+               SUM(CASE WHEN acquisition_source = 'producthunt' THEN 1 ELSE 0 END) AS producthunt_visitors
         FROM daily_visitors GROUP BY day
       ), registrations AS (
-        SELECT created_day AS day, COUNT(*) AS registrations
+        SELECT created_day AS day, COUNT(*) AS registrations,
+               SUM(CASE WHEN acquisition_source = 'producthunt' THEN 1 ELSE 0 END) AS producthunt_registrations
         FROM users WHERE role = 'user' AND disabled_at IS NULL GROUP BY created_day
       )
       SELECT dates.day,
              CASE WHEN dates.day >= coverage.first_day THEN COALESCE(traffic.visitors, 0) ELSE NULL END AS visitors,
              CASE WHEN dates.day >= coverage.first_day THEN COALESCE(traffic.views, 0) ELSE NULL END AS views,
-             COALESCE(registrations.registrations, 0) AS registrations
+             COALESCE(registrations.registrations, 0) AS registrations,
+             CASE WHEN dates.day >= coverage.first_day THEN COALESCE(traffic.producthunt_visitors, 0) ELSE NULL END AS producthunt_visitors,
+             COALESCE(registrations.producthunt_registrations, 0) AS producthunt_registrations
       FROM dates
       CROSS JOIN coverage
       LEFT JOIN traffic ON traffic.day = dates.day
@@ -322,6 +351,9 @@ async function adminStats(request, env) {
   const traffic = trafficMetrics(summary);
   const visitorsToday = traffic.visitorsToday;
   const registeredToday = Number(summary?.registered_today || 0);
+  const productHuntVisitorsToday = traffic.status === 'available'
+    ? Number(summary?.producthunt_visitors_today || 0) : null;
+  const productHuntRegisteredToday = Number(summary?.producthunt_registered_today || 0);
   return json({
     rangeDays: days,
     day: today,
@@ -335,12 +367,15 @@ async function adminStats(request, env) {
       viewsToday: traffic.viewsToday,
       registeredToday,
       registeredTotal: Number(summary?.registered_total || 0),
-      conversionToday: registrationRatio(registeredToday, visitorsToday)
+      conversionToday: registrationRatio(registeredToday, visitorsToday),
+      productHuntVisitorsToday,
+      productHuntRegisteredToday,
+      productHuntConversionToday: registrationRatio(productHuntRegisteredToday, productHuntVisitorsToday)
     },
     daily: dailyResult.results || [],
     topPaths: pathsResult.results || [],
     recentRegistrations: recentResult.results || [],
-    methodology: 'Visitors are daily IP + browser hash estimates, not verified people. Raw IP addresses are not stored. The registration/visitor ratio is not attributed conversion. Days before the earliest retained visit have no traffic data. Account registrations are not confirmed email subscriptions.'
+    methodology: 'Visitors are daily IP + browser hash estimates, not verified people. Raw IP addresses are not stored. Product Hunt is detected from the browser-reported referrer; a registration is attributed only when a signed same-day token matches the same browser/network estimate. Other registration/visitor ratios are not attributed conversion. Days before the earliest retained visit have no traffic data. Account registrations are not confirmed email subscriptions.'
   });
 }
 

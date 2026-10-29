@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   clearSessionCookie,
+  acquisitionSource,
   jerusalemDay,
   normalizePagePath,
   normalizeUsername,
@@ -61,4 +62,12 @@ test('accepts only bounded same-site page paths for traffic metrics', () => {
   assert.equal(normalizePagePath('https://example.com/'), null);
   assert.equal(normalizePagePath('//example.com'), null);
   assert.equal(normalizePagePath(`/${'x'.repeat(300)}`), null);
+});
+
+test('normalizes only HTTPS Product Hunt referrers for attribution', () => {
+  assert.equal(acquisitionSource('https://www.producthunt.com/posts/btc2g'), 'producthunt');
+  assert.equal(acquisitionSource('https://producthunt.com/'), 'producthunt');
+  assert.equal(acquisitionSource('https://example.com/?next=producthunt.com'), null);
+  assert.equal(acquisitionSource('http://producthunt.com/'), null);
+  assert.equal(acquisitionSource('not a URL'), null);
 });

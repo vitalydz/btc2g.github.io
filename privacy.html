@@ -64,6 +64,7 @@
 
     <h2>Analytics</h2>
     <p>BTC2G counts aggregate page views and daily unique visitors using Cloudflare. A daily salted hash derived from IP address and browser user agent is used to prevent duplicate counts; the raw IP address and full user-agent string are not stored in the BTC2G database, and the daily hash is not intended to identify a person across days.</p>
+    <p>When a browser reports that a visit came from Product Hunt, BTC2G stores the source label <code>producthunt</code>, not the referring URL. A short-lived signed attribution token may be passed to the account page so a same-day registration can be counted as Product Hunt-attributed. The token does not contain the raw IP address or user-agent string.</p>
     <p>Aggregate traffic records are automatically removed after 400 days.</p>
 
     <h2>Contact</h2>

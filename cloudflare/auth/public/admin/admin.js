@@ -26,10 +26,16 @@ async function loadStats() {
     document.querySelector('#registered-total').textContent = formatCount(data.summary.registeredTotal);
     document.querySelector('#confirmed-subscribers').textContent = formatCount(data.confirmedSubscribers?.total);
     document.querySelector('#conversion-today').textContent = percentage(data.summary.conversionToday);
+    document.querySelector('#producthunt-visitors').textContent = formatCount(data.summary.productHuntVisitorsToday);
+    document.querySelector('#producthunt-registrations').textContent = formatCount(data.summary.productHuntRegisteredToday);
+    document.querySelector('#producthunt-conversion').textContent = percentage(data.summary.productHuntConversionToday);
     document.querySelector('#daily-body').replaceChildren(...data.daily.map(row => {
       const tr = document.createElement('tr');
       const conversion = Number.isFinite(row.visitors) && row.visitors > 0 ? row.registrations / row.visitors : null;
-      [row.day, formatCount(row.visitors), formatCount(row.views), formatCount(row.registrations), percentage(conversion)].forEach(value => {
+      const productHuntConversion = Number.isFinite(row.producthunt_visitors) && row.producthunt_visitors > 0
+        ? row.producthunt_registrations / row.producthunt_visitors : null;
+      [row.day, formatCount(row.visitors), formatCount(row.views), formatCount(row.registrations), percentage(conversion),
+        formatCount(row.producthunt_visitors), formatCount(row.producthunt_registrations), percentage(productHuntConversion)].forEach(value => {
         const td = document.createElement('td'); td.textContent = value; tr.append(td);
       });
       return tr;

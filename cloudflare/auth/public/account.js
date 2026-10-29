@@ -64,7 +64,8 @@ form.addEventListener('submit', async event => {
     const payload = {
       username: form.username.value,
       password: form.password.value,
-      acceptedTerms: mode === 'register' ? termsCheckbox.checked : undefined
+      acceptedTerms: mode === 'register' ? termsCheckbox.checked : undefined,
+      attribution: mode === 'register' ? new URLSearchParams(location.search).get('attribution') : undefined
     };
     const data = await request(`/api/${mode}`, {
       method: 'POST',

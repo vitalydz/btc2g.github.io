@@ -12,7 +12,7 @@ import { formatCount, measurementNote, percentage } from '../public/metrics-view
 function database(t) {
   const db = new DatabaseSync(':memory:');
   t.after(() => db.close());
-  for (const file of ['0001_initial.sql', '0002_traffic_metrics.sql']) {
+  for (const file of ['0001_initial.sql', '0002_traffic_metrics.sql', '0003_acquisition_attribution.sql']) {
     db.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), 'utf8'));
   }
   return {
@@ -112,6 +112,32 @@ test('repeated page visits deduplicate daily visitor estimate but count each vie
   assert.equal(report.topPaths[0].views, 2);
 });
 
+test('attributes a same-day Product Hunt registration with a signed browser-bound token', async t => {
+  const { env, db } = database(t);
+  const commonHeaders = {
+    'CF-Connecting-IP': '192.0.2.44', 'User-Agent': 'producthunt-local-test'
+  };
+  const visit = await worker.fetch(new Request('https://metrics.test/api/visit', {
+    method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: '/', referrer: 'https://www.producthunt.com/posts/btc2g' })
+  }), env);
+  const { attribution } = await visit.json();
+  assert.equal(visit.status, 202);
+  assert.match(attribution, /^\d{4}-\d{2}-\d{2}\.producthunt\./);
+
+  const registration = await worker.fetch(new Request('https://metrics.test/api/register', {
+    method: 'POST', headers: { ...commonHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'ProductHunter', password: 'LongEnoughPass9', acceptedTerms: true, attribution })
+  }), { ...env, TERMS_VERSION: 'test' });
+  assert.equal(registration.status, 201);
+  assert.equal(db.prepare("SELECT acquisition_source FROM users WHERE username_key = 'producthunter'").get().acquisition_source, 'producthunt');
+
+  const report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: admin(db) }), env)).json();
+  assert.equal(report.summary.productHuntVisitorsToday, 1);
+  assert.equal(report.summary.productHuntRegisteredToday, 1);
+  assert.equal(report.summary.productHuntConversionToday, 1);
+});
+
 test('empty historical traffic and zero denominators are unavailable', async t => {
   const { env, db } = database(t);
   const headers = admin(db);
@@ -120,6 +146,8 @@ test('empty historical traffic and zero denominators are unavailable', async t =
   assert.equal(result.status, 200);
   assert.equal(report.summary.conversionToday, null);
   assert.equal(report.summary.visitorsToday, null);
+  assert.equal(report.summary.productHuntVisitorsToday, null);
+  assert.equal(report.summary.productHuntConversionToday, null);
   assert.ok(report.daily.every(row => row.visitors === null && row.views === null));
 });
 

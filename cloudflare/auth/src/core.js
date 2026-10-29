@@ -76,3 +76,14 @@ export function normalizePagePath(value) {
   if (!path.startsWith('/') || path.startsWith('//') || path.length > 256) return null;
   return path.split(/[?#]/, 1)[0] || '/';
 }
+
+export function acquisitionSource(referrer) {
+  try {
+    const url = new URL(String(referrer || ''));
+    if (url.protocol !== 'https:') return null;
+    const host = url.hostname.toLowerCase();
+    return host === 'producthunt.com' || host.endsWith('.producthunt.com') ? 'producthunt' : null;
+  } catch {
+    return null;
+  }
+}

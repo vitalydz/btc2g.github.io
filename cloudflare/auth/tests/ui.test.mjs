@@ -27,3 +27,14 @@ test('homepage form receipt does not claim confirmation and Premium CTA uses exi
   assert.match(source, /successEventName: 'subscription_request_received'/);
   assert.match(source, /window.location.href = 'premium.html\?lang='/);
 });
+
+test('Product Hunt attribution is forwarded only through the account registration flow', async () => {
+  const [traffic, account] = await Promise.all([
+    readFile(new URL('../../../assets/js/traffic.js', import.meta.url), 'utf8'),
+    readFile(new URL('account.js', root), 'utf8')
+  ]);
+  assert.match(traffic, /document\.referrer/);
+  assert.match(traffic, /sessionStorage\.setItem\(storageKey, data\.attribution\)/);
+  assert.match(traffic, /url\.searchParams\.set\('attribution'/);
+  assert.match(account, /attribution: mode === 'register'/);
+});
