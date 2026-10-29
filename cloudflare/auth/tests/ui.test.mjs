@@ -16,5 +16,5 @@ test('homepage form receipt does not claim confirmation and Premium CTA uses exi
   assert.equal((source.match(/subscribeSuccess:/g) || []).length, 19);
   assert.doesNotMatch(source, /successEventName: 'email_subscribe'/);
   assert.match(source, /successEventName: 'subscription_request_received'/);
-  assert.match(source, /window.location.href = 'premium.html#early-access'/);
+  assert.match(source, /window.location.href = 'premium.html\?lang='/);
 });

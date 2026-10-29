@@ -405,6 +405,7 @@
     <div class="footer-links"><a href="about.html">About</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
   </footer>
 
+  <script src="assets/js/premium-language.js"></script>
   <script>
     const SUBSCRIPTION_ENDPOINT = 'https://formspree.io/f/mkoyjwkr';
 
@@ -421,26 +422,26 @@
       const button = document.getElementById('early-access-button');
       const email = emailInput.value.trim();
       if (!isValidEmail(email)) {
-        setFormStatus('Enter a valid email address.', true);
+        setFormStatus(window.BTC2GPremiumText.invalid, true);
         emailInput.focus();
         return;
       }
 
       button.disabled = true;
-      button.textContent = 'Joining…';
+      button.textContent = window.BTC2GPremiumText.sending;
       setFormStatus('');
       try {
         const response = await fetch(SUBSCRIPTION_ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
         if (!response.ok) throw new Error(`Subscription request failed with status ${response.status}`);
         form.reset();
-        setFormStatus('Request received. Thank you for your interest in BTC2G.');
+        setFormStatus(window.BTC2GPremiumText.received);
         if (typeof window.gtag === 'function') window.gtag('event', 'premium_early_access_signup');
       } catch (error) {
         console.log('Early-access signup failed.', error);
-        setFormStatus('Signup is unavailable right now. Please try again later.', true);
+        setFormStatus(window.BTC2GPremiumText.error, true);
       } finally {
         button.disabled = false;
-        button.textContent = 'Join early access';
+        button.textContent = window.BTC2GPremiumText.button;
       }
     }
 

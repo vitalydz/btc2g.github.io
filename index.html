@@ -2372,7 +2372,7 @@
 
     document.getElementById('premium-unlock-btn').addEventListener('click', () => {
       trackEvent('premium_click');
-      window.location.href = 'premium.html#early-access';
+      window.location.href = 'premium.html?lang=' + encodeURIComponent(currentLang) + '#early-access';
     });
     document.getElementById('premium-modal-close').addEventListener('click', closePremiumModal);
     document.getElementById('premium-modal').addEventListener('click', (event) => {
