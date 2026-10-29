@@ -70,3 +70,20 @@ test('administrator UI supports passkey enrollment and second-factor sign-in', a
   assert.match(client, /navigator\.credentials\.create/);
   assert.match(client, /navigator\.credentials\.get/);
 });
+
+test('idea submission is private, email-gated, and available to administrators for review', async () => {
+  const [html, accountScript, adminHtml, adminScript] = await Promise.all([
+    readFile(new URL('index.html', root), 'utf8'),
+    readFile(new URL('account.js', root), 'utf8'),
+    readFile(new URL('admin/index.html', root), 'utf8'),
+    readFile(new URL('admin/admin.js', root), 'utf8')
+  ]);
+  assert.match(html, /visible only to you and BTC2G administrators/);
+  assert.match(html, /id="idea-form"/);
+  assert.match(accountScript, /user\.emailVerified/);
+  assert.match(accountScript, /\/api\/ideas\/mine/);
+  assert.match(accountScript, /Idempotency-Key/);
+  assert.match(adminHtml, /PRIVATE · ADMIN ONLY/);
+  assert.match(adminScript, /\/api\/admin\/ideas/);
+  assert.doesNotMatch(html, /public idea list/i);
+});

@@ -30,6 +30,8 @@ const LOGIN_IDENTITY_LIMIT = 20;
 const LOGIN_IP_LIMIT = 30;
 const WEBAUTHN_CHALLENGE_SECONDS = 5 * 60;
 const WEBAUTHN_ALGORITHMS = [-7, -257];
+const IDEA_LIMIT_PER_ACCOUNT = 3;
+const IDEA_ATTEMPT_LIMIT_PER_MINUTE = 5;
 
 function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -134,10 +136,36 @@ function userView(user) {
   };
 }
 
+function ideaView(idea) {
+  return {
+    id: idea.id,
+    title: idea.title,
+    audience: idea.audience,
+    problem: idea.problem,
+    solution: idea.solution,
+    status: idea.status,
+    moderationNote: idea.moderation_note || null,
+    createdAt: idea.created_at,
+    updatedAt: idea.updated_at
+  };
+}
+
 async function body(request) {
   const type = request.headers.get('content-type') || '';
   if (!type.includes('application/json')) throw new Error('Content-Type must be application/json.');
   return request.json();
+}
+
+function ideaText(value, name, minimum, maximum) {
+  if (typeof value !== 'string') throw new Error(`${name} is required.`);
+  const text = value.trim().replace(/\r\n?/g, '\n');
+  if (text.length < minimum || text.length > maximum) {
+    throw new Error(`${name} must be ${minimum}–${maximum} characters.`);
+  }
+  if (/\0|[\u0001-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(text)) {
+    throw new Error(`${name} contains unsupported characters.`);
+  }
+  return text;
 }
 
 async function enforceRegistrationLimit(request, env) {
@@ -534,7 +562,8 @@ async function finishPasskeyRegistration(request, env) {
       credentialDeviceType, credentialBackedUp ? 1 : 0, displayName, now
     ).run();
   } catch (error) {
-    if (String(error).toLowerCase().includes('unique')) {
+    const storageError = String(error).toLowerCase();
+    if (storageError.includes('unique')) {
       return json({ error: 'This passkey is already registered.' }, 409);
     }
     throw error;
@@ -887,10 +916,144 @@ async function adminStats(request, env) {
   });
 }
 
+async function privateIdeasForUser(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'Sign in required.' }, 401);
+  if (user.role !== 'user') return json({ error: 'Use the administrator review queue.' }, 403);
+  const result = await env.DB.prepare(`
+    SELECT id, title, audience, problem, solution, status, moderation_note, created_at, updated_at
+    FROM private_ideas WHERE user_id = ? ORDER BY created_at DESC
+  `).bind(user.id).all();
+  return json({ ideas: result.results.map(ideaView), limit: IDEA_LIMIT_PER_ACCOUNT });
+}
+
+async function enforceIdeaLimit(env, userId, now) {
+  const windowStart = Math.floor(now / 60) * 60;
+  const attempt = await env.DB.prepare(`
+    INSERT INTO private_idea_attempts (user_id, window_start, attempt_count)
+    VALUES (?, ?, 1)
+    ON CONFLICT(user_id, window_start)
+    DO UPDATE SET attempt_count = attempt_count + 1
+    RETURNING attempt_count
+  `).bind(userId, windowStart).first();
+  return Number(attempt?.attempt_count || 1) <= IDEA_ATTEMPT_LIMIT_PER_MINUTE;
+}
+
+async function submitPrivateIdea(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'Sign in required.' }, 401);
+  if (user.role !== 'user') return json({ error: 'Administrator accounts cannot submit ideas.' }, 403);
+  if (!user.email_verified_at) return json({ error: 'Verify your account email before submitting an idea.' }, 403);
+  const idempotencyKey = request.headers.get('Idempotency-Key') || '';
+  if (!/^[A-Za-z0-9_-]{16,100}$/.test(idempotencyKey)) {
+    return json({ error: 'A valid submission key is required.' }, 400);
+  }
+  const existing = await env.DB.prepare(`
+    SELECT id, title, audience, problem, solution, status, moderation_note, created_at, updated_at
+    FROM private_ideas WHERE user_id = ? AND idempotency_key = ?
+  `).bind(user.id, idempotencyKey).first();
+  if (existing) return json({ idea: ideaView(existing), duplicate: true });
+  const now = Math.floor(Date.now() / 1000);
+  if (!await enforceIdeaLimit(env, user.id, now)) {
+    return json({ error: 'Too many submission attempts. Try again in one minute.' }, 429, { 'retry-after': '60' });
+  }
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  let title; let audience; let problem; let solution;
+  try {
+    title = ideaText(input?.title, 'Title', 5, 100);
+    audience = ideaText(input?.audience, 'Intended users', 3, 300);
+    problem = ideaText(input?.problem, 'Problem', 10, 800);
+    solution = ideaText(input?.solution, 'Proposed solution', 10, 1200);
+  } catch (error) { return json({ error: error.message }, 400); }
+  if (input?.reviewConsent !== true) {
+    return json({ error: 'Confirm that BTC2G may privately review this submission.' }, 400);
+  }
+  const count = await env.DB.prepare('SELECT COUNT(*) AS count FROM private_ideas WHERE user_id = ?')
+    .bind(user.id).first();
+  if (Number(count?.count || 0) >= IDEA_LIMIT_PER_ACCOUNT) {
+    return json({ error: `Each account may submit up to ${IDEA_LIMIT_PER_ACCOUNT} ideas.` }, 409);
+  }
+  const idea = {
+    id: crypto.randomUUID(), title, audience, problem, solution,
+    status: 'submitted', moderation_note: null, created_at: now, updated_at: now
+  };
+  try {
+    await env.DB.prepare(`
+      INSERT INTO private_ideas
+        (id, user_id, title, audience, problem, solution, status, idempotency_key,
+         accepted_terms_version, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, 'submitted', ?, ?, ?, ?)
+    `).bind(idea.id, user.id, title, audience, problem, solution, idempotencyKey,
+      env.TERMS_VERSION || 'unknown', now, now).run();
+  } catch (error) {
+    if (String(error).toLowerCase().includes('unique')) {
+      const duplicate = await env.DB.prepare(`
+        SELECT id, title, audience, problem, solution, status, moderation_note, created_at, updated_at
+        FROM private_ideas WHERE user_id = ? AND idempotency_key = ?
+      `).bind(user.id, idempotencyKey).first();
+      if (duplicate) return json({ idea: ideaView(duplicate), duplicate: true });
+    }
+    if (storageError.includes('idea_limit_reached')) {
+      return json({ error: `Each account may submit up to ${IDEA_LIMIT_PER_ACCOUNT} ideas.` }, 409);
+    }
+    throw error;
+  }
+  return json({ idea: ideaView(idea) }, 201);
+}
+
+async function adminIdeas(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  const result = await env.DB.prepare(`
+    SELECT private_ideas.id, private_ideas.title, private_ideas.audience,
+           private_ideas.problem, private_ideas.solution, private_ideas.status,
+           private_ideas.moderation_note, private_ideas.created_at, private_ideas.updated_at,
+           users.username
+    FROM private_ideas JOIN users ON users.id = private_ideas.user_id
+    ORDER BY CASE private_ideas.status
+      WHEN 'submitted' THEN 0 WHEN 'reviewing' THEN 1 ELSE 2 END,
+      private_ideas.created_at DESC LIMIT 100
+  `).all();
+  return json({
+    ideas: result.results.map(idea => ({ ...ideaView(idea), username: idea.username })),
+    visibility: 'private'
+  });
+}
+
+async function reviewPrivateIdea(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  if (typeof input?.ideaId !== 'string' || !/^[0-9a-f-]{36}$/i.test(input.ideaId)) {
+    return json({ error: 'Invalid idea identifier.' }, 400);
+  }
+  if (!['reviewing', 'accepted', 'declined'].includes(input?.status)) {
+    return json({ error: 'Invalid review status.' }, 400);
+  }
+  let note = null;
+  if (input.note != null && String(input.note).trim()) {
+    try { note = ideaText(String(input.note), 'Review note', 2, 500); }
+    catch (error) { return json({ error: error.message }, 400); }
+  }
+  if (input.status === 'declined' && !note) {
+    return json({ error: 'Add a short private note before declining an idea.' }, 400);
+  }
+  const now = Math.floor(Date.now() / 1000);
+  const result = await env.DB.prepare(`
+    UPDATE private_ideas SET status = ?, moderation_note = ?, updated_at = ?
+    WHERE id = ? RETURNING id
+  `).bind(input.status, note, now, input.ideaId).first();
+  return result ? json({ ok: true }) : json({ error: 'Idea not found.' }, 404);
+}
+
 async function api(request, env) {
   const url = new URL(request.url);
   if (request.method === 'GET' && url.pathname === '/api/stats') return stats(env);
   if (request.method === 'GET' && url.pathname === '/api/admin/stats') return adminStats(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/admin/ideas') return adminIdeas(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/ideas/mine') return privateIdeasForUser(request, env);
   if (request.method === 'GET' && url.pathname === '/api/passkeys') return listPasskeys(request, env);
   if (request.method === 'GET' && url.pathname === '/api/me') {
     const user = await currentUser(request, env);
@@ -907,6 +1070,8 @@ async function api(request, env) {
     if (url.pathname === '/api/passkeys/registration/options') return beginPasskeyRegistration(request, env);
     if (url.pathname === '/api/passkeys/registration/verify') return finishPasskeyRegistration(request, env);
     if (url.pathname === '/api/passkeys/authenticate') return finishPasskeyAuthentication(request, env);
+    if (url.pathname === '/api/ideas') return submitPrivateIdea(request, env);
+    if (url.pathname === '/api/admin/ideas/review') return reviewPrivateIdea(request, env);
     if (url.pathname === '/api/bootstrap-admin') return bootstrapAdmin(request, env);
   }
   if (request.method === 'OPTIONS' && url.pathname === '/api/visit') {
@@ -939,6 +1104,7 @@ export default {
       env.DB.prepare('DELETE FROM email_verification_tokens WHERE expires_at <= ?').bind(now),
       env.DB.prepare('DELETE FROM login_rate_limits WHERE last_failed_at < ?').bind(now - 86400),
       env.DB.prepare('DELETE FROM webauthn_challenges WHERE expires_at <= ?').bind(now),
+      env.DB.prepare('DELETE FROM private_idea_attempts WHERE window_start < ?').bind(now - 86400),
       env.DB.prepare("DELETE FROM daily_visitors WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays),
       env.DB.prepare("DELETE FROM daily_pageviews WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays)
     ]);

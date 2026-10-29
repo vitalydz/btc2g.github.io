@@ -15,6 +15,7 @@ This Cloudflare Worker hosts a same-origin account page and API backed by D1. Pu
 - Mandatory account-email verification for new public registrations through Resend. Only token hashes are stored; links expire after 30 minutes. Pending accounts can sign in to request another message but are not counted as completed registrations. A verified account email is not marketing consent and does not activate Premium.
 - Explicit Terms and Privacy Policy acceptance recorded with a version and timestamp.
 - Daily traffic uses a salted hash of IP + user agent; raw IP addresses and user-agent strings are not stored. Product Hunt attribution uses a signed same-day token tied to that daily estimate and stores only the normalized source label.
+- Email-verified ordinary users can privately submit up to three ideas. D1 stores the text, status and private moderation note. Only the author can read their own submissions; only an administrator can read the review queue. No public list or voting endpoint exists.
 
 The protected `/admin/` dashboard shows visitor estimates, page views, registrations, registration/visitor ratios, Product Hunt-attributed visits and accounts, daily history, top paths, and recent usernames. Only a live session for a D1 user with `role = 'admin'` can read `/api/admin/stats`.
 
@@ -32,7 +33,7 @@ The protected `/admin/` dashboard shows visitor estimates, page views, registrat
 
 Run `npm test` with Node 24 (the SQL integration tests use built-in `node:sqlite`). Tests run the Worker against an in-memory SQLite database, including all migrations. Fixtures never write to production or send emails.
 
-Apply all migrations through `0004_email_verification.sql`. Deploy the Worker and its assets together with `npm run auth:deploy`, then read `/api/stats` and the protected dashboard to verify `measuredAt`, the reporting day and the separated metrics. Confirm that a forced *local* request failure clears the display; do not submit production test forms or page-view events. Live deployment requires an authorized Cloudflare session and is separate from a GitHub source commit.
+Apply all migrations through `0007_private_ideas.sql`. Deploy the Worker and its assets together with `npm run auth:deploy`, then read `/api/stats` and the protected dashboard to verify `measuredAt`, the reporting day and the separated metrics. Confirm that a forced *local* request failure clears the display; do not submit production test forms, ideas, or page-view events. Live deployment requires an authorized Cloudflare session and is separate from a GitHub source commit.
 
 ### Free email provider setup
 

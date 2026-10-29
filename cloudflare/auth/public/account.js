@@ -15,7 +15,14 @@ const emailForm = document.querySelector('#email-form');
 const emailInput = document.querySelector('#account-email');
 const emailSubmit = document.querySelector('#email-submit');
 const emailMessage = document.querySelector('#email-message');
+const ideaPanel = document.querySelector('#idea-panel');
+const ideaForm = document.querySelector('#idea-form');
+const ideaSubmit = document.querySelector('#idea-submit');
+const ideaMessage = document.querySelector('#idea-message');
+const ideaAccess = document.querySelector('#idea-access');
+const ideaList = document.querySelector('#idea-list');
 let mode = 'register';
+let ideaSubmissionKey = '';
 
 function setMessage(text, success = false) {
   message.textContent = text;
@@ -40,6 +47,36 @@ async function refreshStats() {
 
 document.querySelector('#refresh-stats').addEventListener('click', refreshStats);
 
+function renderIdeas(ideas) {
+  if (!ideas.length) {
+    const empty = document.createElement('li');
+    empty.textContent = 'No ideas submitted yet.';
+    ideaList.replaceChildren(empty);
+    return;
+  }
+  ideaList.replaceChildren(...ideas.map(idea => {
+    const item = document.createElement('li');
+    const heading = document.createElement('strong');
+    heading.textContent = idea.title;
+    const status = document.createElement('span');
+    status.textContent = idea.status;
+    const date = document.createElement('small');
+    date.textContent = new Date(idea.createdAt * 1000).toLocaleDateString();
+    item.append(heading, status, date);
+    if (idea.moderationNote) {
+      const note = document.createElement('p');
+      note.textContent = `BTC2G note: ${idea.moderationNote}`;
+      item.append(note);
+    }
+    return item;
+  }));
+}
+
+async function loadMyIdeas() {
+  const data = await request('/api/ideas/mine');
+  renderIdeas(data.ideas);
+}
+
 function showUser(user) {
   form.hidden = true;
   document.querySelector('.tabs').hidden = true;
@@ -51,7 +88,42 @@ function showUser(user) {
     ? `Verified: ${user.email}`
     : displayedEmail ? `Verification pending for ${displayedEmail}.` : 'No verified email is attached.';
   if (displayedEmail) emailInput.value = displayedEmail;
+  ideaPanel.hidden = user.role !== 'user';
+  if (user.role === 'user') {
+    ideaForm.hidden = !user.emailVerified;
+    ideaAccess.textContent = user.emailVerified
+      ? 'Your verified account can submit ideas privately.'
+      : 'Verify your email above to unlock private idea submission.';
+    loadMyIdeas().catch(error => { ideaMessage.textContent = error.message; });
+  }
 }
+
+ideaForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  ideaSubmit.disabled = true;
+  ideaMessage.textContent = '';
+  ideaMessage.classList.remove('success');
+  const data = new FormData(ideaForm);
+  if (!ideaSubmissionKey) ideaSubmissionKey = crypto.randomUUID();
+  try {
+    await request('/api/ideas', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'Idempotency-Key': ideaSubmissionKey },
+      body: JSON.stringify({
+        title: data.get('title'), audience: data.get('audience'),
+        problem: data.get('problem'), solution: data.get('solution'),
+        reviewConsent: data.get('reviewConsent') === 'on'
+      })
+    });
+    ideaSubmissionKey = crypto.randomUUID();
+    ideaForm.reset();
+    ideaMessage.textContent = 'Idea submitted privately. It is not visible on the public site.';
+    ideaMessage.classList.add('success');
+    await loadMyIdeas();
+  } catch (error) {
+    ideaMessage.textContent = error.message;
+  } finally { ideaSubmit.disabled = false; }
+});
 
 emailForm.addEventListener('submit', async event => {
   event.preventDefault();

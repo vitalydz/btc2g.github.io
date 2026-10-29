@@ -67,6 +67,37 @@
           </form>
           <p class="field-hint">Verification identifies your account email only. It does not subscribe you to marketing or activate Premium.</p>
         </section>
+        <section class="idea-panel" id="idea-panel" aria-labelledby="idea-title">
+          <p class="eyebrow">PRIVATE FEEDBACK</p>
+          <h2 id="idea-title">Submit an idea for BTC2G</h2>
+          <p>Your submission is visible only to you and BTC2G administrators. It is not published, entered into a contest, or opened for voting.</p>
+          <p class="idea-access" id="idea-access" role="status"></p>
+          <form id="idea-form">
+            <label>Short title
+              <input id="idea-title-input" name="title" type="text" minlength="5" maxlength="100" required>
+            </label>
+            <label>Who would use it?
+              <input name="audience" type="text" minlength="3" maxlength="300" required>
+            </label>
+            <label>What problem does it solve?
+              <textarea name="problem" minlength="10" maxlength="800" rows="4" required></textarea>
+            </label>
+            <label>How should it work?
+              <textarea name="solution" minlength="10" maxlength="1200" rows="6" required></textarea>
+            </label>
+            <label class="terms">
+              <input name="reviewConsent" type="checkbox" required>
+              <span>I own or am authorized to share this text and permit BTC2G to review it privately under the Terms.</span>
+            </label>
+            <button class="primary" id="idea-submit" type="submit">Submit privately</button>
+            <p class="message" id="idea-message" role="status" aria-live="polite"></p>
+          </form>
+          <div class="idea-history">
+            <h3>Your submissions</h3>
+            <p class="field-hint">Up to three ideas per account. Only your own submissions appear here.</p>
+            <ul id="idea-list"></ul>
+          </div>
+        </section>
         <p><a href="https://btc2g.com/save.html">Compare Bitcoin quotes</a> · <a href="https://btc2g.com/index.html#calculator">Open BTC ↔ gold calculator</a> · <a href="https://btc2g.com/support.html">Contact support</a></p>
         <button class="secondary" id="logout-button" type="button">Sign out</button>
       </div>

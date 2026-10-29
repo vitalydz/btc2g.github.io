@@ -13,7 +13,8 @@ function database(t) {
   const db = new DatabaseSync(':memory:');
   t.after(() => db.close());
   for (const file of ['0001_initial.sql', '0002_traffic_metrics.sql', '0003_acquisition_attribution.sql',
-    '0004_email_verification.sql', '0005_login_rate_limits.sql', '0006_admin_passkeys.sql']) {
+    '0004_email_verification.sql', '0005_login_rate_limits.sql', '0006_admin_passkeys.sql',
+    '0007_private_ideas.sql']) {
     db.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), 'utf8'));
   }
   return {
@@ -53,6 +54,20 @@ function admin(db) {
   const token = 'local-admin-session';
   db.prepare('INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)')
     .run(createHash('sha256').update(token).digest('base64url'), 'admin', now, now + 3600);
+  return { Cookie: `btc2g_session=${token}` };
+}
+
+function verifiedUser(db, id, username) {
+  const now = Math.floor(Date.now() / 1000);
+  db.prepare(`INSERT INTO users (id, username, username_key, password_hash,
+    password_salt, password_iterations, role, created_at, created_day,
+    accepted_terms_at, terms_version, email, email_key, email_verified_at, email_verified_day)
+    VALUES (?, ?, ?, '', '', 1, 'user', ?, ?, ?, 'test', ?, ?, ?, ?)`)
+    .run(id, username, username.toLowerCase(), now, jerusalemDay(), now,
+      `${username.toLowerCase()}@example.com`, `${username.toLowerCase()}@example.com`, now, jerusalemDay());
+  const token = `local-${id}-session`;
+  db.prepare('INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)')
+    .run(createHash('sha256').update(token).digest('base64url'), id, now, now + 3600);
   return { Cookie: `btc2g_session=${token}` };
 }
 
@@ -208,6 +223,85 @@ test('admin details stay protected and untrusted origins cannot record visits', 
   const blocked = await worker.fetch(new Request('https://metrics.test/api/visit', {
     method: 'POST', headers: { Origin: 'https://other.test', 'Content-Type': 'application/json' },
     body: JSON.stringify({ path: '/' })
+  }), env);
+  assert.equal(blocked.status, 403);
+});
+
+test('verified users submit private ideas and can read only their own records', async t => {
+  const { env, db } = database(t);
+  const first = verifiedUser(db, 'user-one', 'Alice');
+  const second = verifiedUser(db, 'user-two', 'Bob');
+  const submit = (headers, key, title) => worker.fetch(new Request('https://metrics.test/api/ideas', {
+    method: 'POST',
+    headers: { ...headers, Origin: env.APP_ORIGIN, 'Content-Type': 'application/json', 'Idempotency-Key': key },
+    body: JSON.stringify({
+      title, audience: 'Bitcoin researchers', problem: 'The workflow is difficult to compare.',
+      solution: 'Add a private comparison workspace with clear source labels.', reviewConsent: true
+    })
+  }), env);
+
+  const created = await submit(first, 'idea-request-key-0001', 'Private comparison workspace');
+  assert.equal(created.status, 201);
+  const createdIdea = (await created.json()).idea;
+  assert.equal(createdIdea.status, 'submitted');
+
+  const duplicate = await submit(first, 'idea-request-key-0001', 'Ignored duplicate title');
+  assert.equal(duplicate.status, 200);
+  assert.equal((await duplicate.json()).idea.id, createdIdea.id);
+  assert.equal(db.prepare('SELECT COUNT(*) AS count FROM private_ideas').get().count, 1);
+
+  await submit(second, 'idea-request-key-0002', 'Second private workspace');
+  const mine = await worker.fetch(new Request('https://metrics.test/api/ideas/mine', { headers: first }), env);
+  const mineData = await mine.json();
+  assert.equal(mine.status, 200);
+  assert.deepEqual(mineData.ideas.map(idea => idea.title), ['Private comparison workspace']);
+  assert.equal(mineData.limit, 3);
+
+  const noPublicList = await worker.fetch(new Request('https://metrics.test/api/ideas'), env);
+  assert.equal(noPublicList.status, 404);
+  assert.equal((await worker.fetch(new Request('https://metrics.test/api/admin/ideas'), env)).status, 403);
+});
+
+test('private ideas require verified email, enforce account limit, and support admin review', async t => {
+  const { env, db } = database(t);
+  const userHeaders = verifiedUser(db, 'user-three', 'Carla');
+  const submit = (key, title) => worker.fetch(new Request('https://metrics.test/api/ideas', {
+    method: 'POST',
+    headers: { ...userHeaders, Origin: env.APP_ORIGIN, 'Content-Type': 'application/json', 'Idempotency-Key': key },
+    body: JSON.stringify({ title, audience: 'Researchers', problem: 'A sufficiently described problem.',
+      solution: 'A sufficiently described private solution.', reviewConsent: true })
+  }), env);
+  for (let index = 1; index <= 3; index += 1) {
+    assert.equal((await submit(`limit-key-0000000${index}`, `Private idea number ${index}`)).status, 201);
+  }
+  assert.equal((await submit('limit-key-00000004', 'Private idea number four')).status, 409);
+
+  const adminHeaders = admin(db);
+  const queue = await worker.fetch(new Request('https://metrics.test/api/admin/ideas', { headers: adminHeaders }), env);
+  const ideas = (await queue.json()).ideas;
+  assert.equal(queue.status, 200);
+  assert.equal(ideas.length, 3);
+  assert.ok(ideas.every(idea => idea.username === 'Carla'));
+
+  const declinedWithoutNote = await worker.fetch(new Request('https://metrics.test/api/admin/ideas/review', {
+    method: 'POST', headers: { ...adminHeaders, Origin: env.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ideaId: ideas[0].id, status: 'declined', note: '' })
+  }), env);
+  assert.equal(declinedWithoutNote.status, 400);
+  const reviewed = await worker.fetch(new Request('https://metrics.test/api/admin/ideas/review', {
+    method: 'POST', headers: { ...adminHeaders, Origin: env.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ideaId: ideas[0].id, status: 'declined', note: 'Outside the current BTC2G scope.' })
+  }), env);
+  assert.equal(reviewed.status, 200);
+  const mine = await (await worker.fetch(new Request('https://metrics.test/api/ideas/mine', { headers: userHeaders }), env)).json();
+  assert.equal(mine.ideas.find(idea => idea.id === ideas[0].id).moderationNote, 'Outside the current BTC2G scope.');
+
+  const pendingId = 'pending-user';
+  const pendingHeaders = verifiedUser(db, pendingId, 'Pending');
+  db.prepare('UPDATE users SET email_verified_at = NULL, email_verified_day = NULL WHERE id = ?').run(pendingId);
+  const blocked = await worker.fetch(new Request('https://metrics.test/api/ideas', {
+    method: 'POST', headers: { ...pendingHeaders, Origin: env.APP_ORIGIN, 'Content-Type': 'application/json', 'Idempotency-Key': 'pending-key-000001' },
+    body: JSON.stringify({ title: 'Pending idea', audience: 'Users', problem: 'Long enough problem.', solution: 'Long enough solution.', reviewConsent: true })
   }), env);
   assert.equal(blocked.status, 403);
 });

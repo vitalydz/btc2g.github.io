@@ -36,10 +36,22 @@ li span { float:right; color:var(--gold); font-weight:800; }
 .methodology { color:#778294; font-size:.78rem; text-align:center; }
 #stats-status { color:var(--muted); min-height:1.5em; }
 #refresh-stats { border:1px solid var(--line); border-radius:9px; background:#0b0f16; color:var(--text); padding:10px 14px; cursor:pointer; }
+#refresh-ideas { border:1px solid var(--line); border-radius:9px; background:#0b0f16; color:var(--text); padding:9px 12px; cursor:pointer; }
 #add-passkey { border:0; border-radius:9px; background:linear-gradient(135deg,#f4b942,#df8d24); color:#171006; padding:11px 14px; font-weight:900; cursor:pointer; }
 #add-passkey:disabled { opacity:.6; cursor:wait; }
 .passkey-copy { text-align:left; margin-top:0; }
 .passkey-password { max-width:420px; margin-bottom:12px; }
 .message.success { color:#72d6a1; }
+.panel-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.idea-copy { text-align:left; }
+#idea-queue { display:grid; gap:12px; }
+.idea-status { min-height:1.4em; margin-bottom:0; color:var(--muted); }
+.idea-card { padding:16px; border:1px solid var(--line); border-radius:12px; background:#0b0f16; }
+.idea-card h3 { margin:0; }
+.idea-card p { margin:.55rem 0; white-space:pre-wrap; overflow-wrap:anywhere; }
+.idea-meta { color:var(--gold); font-size:.8rem; }
+.idea-card textarea { width:100%; margin:8px 0; border:1px solid #354052; border-radius:9px; background:#090c12; color:var(--text); padding:12px; font:inherit; resize:vertical; }
+.idea-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.idea-actions button { border:1px solid var(--line); border-radius:8px; background:#151b25; color:var(--text); padding:8px 11px; cursor:pointer; }
 @media (max-width:880px) { .cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.title-row{align-items:flex-end} }
 @media (max-width:540px) { .shell{width:min(100% - 20px,1120px)}.cards{grid-template-columns:1fr}.title-row{align-items:flex-start;flex-direction:column}.login{margin-top:50px}.panel{padding:15px} }

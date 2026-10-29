@@ -8,7 +8,7 @@ const read = file => readFileSync(path.join(root, file), 'utf8');
 
 test('Terms describe current accounts, passkeys, providers, forecasts, and support boundaries', () => {
   const terms = read('terms.html');
-  assert.match(terms, /Version 2026-10-29\.2/);
+  assert.match(terms, /Version 2026-10-29\.3/);
   assert.match(terms, /No Financial Advice/);
   assert.match(terms, /Administrator passkeys/);
   assert.match(terms, /Joining an email list or verifying an account email does not purchase or activate Premium/);
@@ -16,6 +16,8 @@ test('Terms describe current accounts, passkeys, providers, forecasts, and suppo
   assert.match(terms, /no response time is guaranteed/i);
   assert.match(terms, /Never email a password, passkey/);
   assert.match(terms, /support\.html/);
+  assert.match(terms, /Private Idea Submissions/);
+  assert.match(terms, /not automatically published, entered into a contest, or opened for voting/);
 });
 
 test('Support routes requests without asking users to disclose secrets', () => {
@@ -36,5 +38,5 @@ test('Support is discoverable and new account acceptance uses the current Terms 
   assert.match(homepage, /id="support-link"/);
   assert.equal((homepage.match(/support:\s*'/g) || []).length, 19);
   assert.match(sitemap, /https:\/\/btc2g\.com\/support\.html/);
-  assert.match(workerConfig, /"TERMS_VERSION": "2026-10-29\.2"/);
+  assert.match(workerConfig, /"TERMS_VERSION": "2026-10-29\.3"/);
 });

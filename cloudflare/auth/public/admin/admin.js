@@ -36,6 +36,73 @@ async function loadPasskeys() {
   renderPasskeys(data.passkeys);
 }
 
+function renderPrivateIdeas(ideas) {
+  const queue = document.querySelector('#idea-queue');
+  if (!ideas.length) {
+    const empty = document.createElement('p');
+    empty.textContent = 'No private ideas have been submitted.';
+    queue.replaceChildren(empty);
+    return;
+  }
+  queue.replaceChildren(...ideas.map(idea => {
+    const card = document.createElement('article');
+    card.className = 'idea-card';
+    const heading = document.createElement('h3');
+    heading.textContent = idea.title;
+    const meta = document.createElement('p');
+    meta.className = 'idea-meta';
+    meta.textContent = `${idea.username} · ${new Date(idea.createdAt * 1000).toLocaleString()} · ${idea.status}`;
+    const audience = document.createElement('p');
+    audience.textContent = `Users: ${idea.audience}`;
+    const problem = document.createElement('p');
+    problem.textContent = `Problem: ${idea.problem}`;
+    const solution = document.createElement('p');
+    solution.textContent = `Proposed solution: ${idea.solution}`;
+    const note = document.createElement('textarea');
+    note.maxLength = 500;
+    note.rows = 3;
+    note.placeholder = 'Private note to the author (required when declining)';
+    note.value = idea.moderationNote || '';
+    const actions = document.createElement('div');
+    actions.className = 'idea-actions';
+    for (const [status, label] of [['reviewing', 'Mark reviewing'], ['accepted', 'Accept privately'], ['declined', 'Decline']]) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.addEventListener('click', () => reviewIdea(idea.id, status, note.value, button));
+      actions.append(button);
+    }
+    card.append(heading, meta, audience, problem, solution, note, actions);
+    return card;
+  }));
+}
+
+async function loadPrivateIdeas() {
+  const message = document.querySelector('#ideas-message');
+  message.textContent = 'Loading private ideas…';
+  try {
+    const data = await request('/api/admin/ideas');
+    renderPrivateIdeas(data.ideas);
+    message.textContent = `${data.ideas.length} private submission${data.ideas.length === 1 ? '' : 's'}.`;
+  } catch (error) {
+    document.querySelector('#idea-queue').replaceChildren();
+    message.textContent = error.message;
+  }
+}
+
+async function reviewIdea(ideaId, status, note, button) {
+  button.disabled = true;
+  const message = document.querySelector('#ideas-message');
+  try {
+    await request('/api/admin/ideas/review', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ ideaId, status, note })
+    });
+    await loadPrivateIdeas();
+  } catch (error) { message.textContent = error.message; }
+  finally { button.disabled = false; }
+}
+
 async function loadStats() {
   const version = ++requestVersion;
   const status = document.querySelector('#stats-status');
@@ -104,12 +171,13 @@ document.querySelector('#login-form').addEventListener('submit', async event => 
       await request('/api/logout', { method:'POST', headers:{'content-type':'application/json'}, body:'{}' });
       throw new Error('Administrator access required.');
     }
-    showAdmin(data.user); await Promise.all([loadStats(), loadPasskeys()]);
+    showAdmin(data.user); await Promise.all([loadStats(), loadPasskeys(), loadPrivateIdeas()]);
   } catch (error) { loginMessage.textContent = error.message; }
 });
 
 document.querySelector('#range').addEventListener('change', loadStats);
 document.querySelector('#refresh-stats').addEventListener('click', loadStats);
+document.querySelector('#refresh-ideas').addEventListener('click', loadPrivateIdeas);
 document.querySelector('#add-passkey').addEventListener('click', async event => {
   const button = event.currentTarget;
   const message = document.querySelector('#passkey-message');
@@ -139,5 +207,5 @@ document.querySelector('#logout').addEventListener('click', async () => {
 
 request('/api/me').then(async data => {
   if (data.user?.role !== 'admin') return;
-  showAdmin(data.user); await Promise.all([loadStats(), loadPasskeys()]);
+  showAdmin(data.user); await Promise.all([loadStats(), loadPasskeys(), loadPrivateIdeas()]);
 }).catch(() => {});
