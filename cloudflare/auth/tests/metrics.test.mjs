@@ -115,28 +115,67 @@ test('repeated page visits deduplicate daily visitor estimate but count each vie
 
 test('attributes a same-day Product Hunt registration with a signed browser-bound token', async t => {
   const { env, db } = database(t);
+  let sent;
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    sent = JSON.parse(options.body);
+    return new Response(JSON.stringify({ id: 'local-email' }), { status: 200 });
+  });
+  const configured = {
+    ...env,
+    TERMS_VERSION: 'test',
+    RESEND_API_KEY: 'local-test-key',
+    EMAIL_FROM: 'BTC2G <accounts@btc2g.com>'
+  };
   const commonHeaders = {
     'CF-Connecting-IP': '192.0.2.44', 'User-Agent': 'producthunt-local-test'
   };
   const visit = await worker.fetch(new Request('https://metrics.test/api/visit', {
     method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
     body: JSON.stringify({ path: '/', referrer: 'https://www.producthunt.com/posts/btc2g' })
-  }), env);
+  }), configured);
   const { attribution } = await visit.json();
   assert.equal(visit.status, 202);
   assert.match(attribution, /^\d{4}-\d{2}-\d{2}\.producthunt\./);
 
   const registration = await worker.fetch(new Request('https://metrics.test/api/register', {
     method: 'POST', headers: { ...commonHeaders, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: 'ProductHunter', password: 'LongEnoughPass9', acceptedTerms: true, attribution })
-  }), { ...env, TERMS_VERSION: 'test' });
+    body: JSON.stringify({ username: 'ProductHunter', email: 'hunter@example.com', password: 'LongEnoughPass9', acceptedTerms: true, attribution })
+  }), configured);
   assert.equal(registration.status, 201);
   assert.equal(db.prepare("SELECT acquisition_source FROM users WHERE username_key = 'producthunter'").get().acquisition_source, 'producthunt');
+  const duplicatePending = await worker.fetch(new Request('https://metrics.test/api/register', {
+    method: 'POST', headers: { ...commonHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'AnotherHunter', email: 'HUNTER@example.com', password: 'LongEnoughPass9', acceptedTerms: true })
+  }), configured);
+  assert.equal(duplicatePending.status, 409);
 
-  const report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: admin(db) }), env)).json();
+  const adminHeaders = admin(db);
+  let report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: adminHeaders }), configured)).json();
   assert.equal(report.summary.productHuntVisitorsToday, 1);
+  assert.equal(report.summary.productHuntRegisteredToday, 0);
+  assert.equal(report.summary.pendingEmailTotal, 1);
+  const pendingPublic = await (await worker.fetch(new Request('https://metrics.test/api/stats'), configured)).json();
+  assert.equal(pendingPublic.totalAccounts, 0);
+
+  const token = new URL(sent.text.match(/https:\/\/\S+/)[0]).searchParams.get('token');
+  const confirmed = await worker.fetch(new Request('https://metrics.test/api/email-verification/confirm', {
+    method: 'POST',
+    headers: {
+      Cookie: registration.headers.get('set-cookie'),
+      Origin: configured.APP_ORIGIN,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ token })
+  }), configured);
+  assert.equal(confirmed.status, 200);
+
+  report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: adminHeaders }), configured)).json();
   assert.equal(report.summary.productHuntRegisteredToday, 1);
   assert.equal(report.summary.productHuntConversionToday, 1);
+  assert.equal(report.summary.pendingEmailTotal, 0);
+  const completedPublic = await (await worker.fetch(new Request('https://metrics.test/api/stats'), configured)).json();
+  assert.equal(completedPublic.totalAccounts, 1);
+  assert.equal(completedPublic.newToday, 1);
 });
 
 test('empty historical traffic and zero denominators are unavailable', async t => {
@@ -214,7 +253,7 @@ test('signed-in users can verify an email without creating marketing consent', a
   assert.ok(account.email_verified_at > 0);
   assert.equal(db.prepare('SELECT COUNT(*) AS count FROM email_verification_tokens').get().count, 0);
   const report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers }), configured)).json();
-  assert.equal(report.summary.verifiedEmailTotal, 1);
+  assert.equal(report.summary.verifiedEmailTotal, 0);
   assert.equal(report.confirmedSubscribers.total, null);
 });
 

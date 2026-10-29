@@ -26,6 +26,7 @@ export function validateRegistration(input, { allowReserved = false } = {}) {
   const username = String(input?.username || '').trim();
   const password = String(input?.password || '');
   const acceptedTerms = input?.acceptedTerms === true;
+  const emailValidation = validateEmail(input?.email);
   const errors = [];
 
   if (!USERNAME_PATTERN.test(username)) {
@@ -43,8 +44,18 @@ export function validateRegistration(input, { allowReserved = false } = {}) {
   if (!acceptedTerms) {
     errors.push('You must accept the Terms and Privacy Policy.');
   }
+  if (!allowReserved && !emailValidation.ok) {
+    errors.push('A valid email address is required.');
+  }
 
-  return { ok: errors.length === 0, errors, username, usernameKey: normalizeUsername(username) };
+  return {
+    ok: errors.length === 0,
+    errors,
+    username,
+    usernameKey: normalizeUsername(username),
+    email: emailValidation.email,
+    emailKey: emailValidation.emailKey
+  };
 }
 
 export function jerusalemDay(timestampMs = Date.now()) {
@@ -81,7 +92,7 @@ export function publicStats(totalAccounts, newToday, goal = 100) {
     newToday: today,
     dailyGoal: goal,
     remainingToday: Math.max(0, goal - today),
-    countingMethod: 'D1 account rows; no estimated or fabricated users'
+    countingMethod: 'Email-verified D1 account rows; no estimated or fabricated users'
   };
 }
 

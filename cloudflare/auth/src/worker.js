@@ -168,6 +168,15 @@ async function register(request, env, { admin = false } = {}) {
     } catch {
       return json({ error: 'Registration is temporarily unavailable.' }, 503);
     }
+    const duplicateEmail = await env.DB.prepare(`
+      SELECT id FROM users WHERE email_key = ? AND disabled_at IS NULL LIMIT 1
+    `).bind(validation.emailKey).first();
+    if (duplicateEmail) return json({ error: 'That email is already attached to an account.' }, 409);
+    const pendingEmail = await env.DB.prepare(`
+      SELECT user_id FROM email_verification_tokens
+      WHERE email_key = ? AND expires_at > ? LIMIT 1
+    `).bind(validation.emailKey, Math.floor(Date.now() / 1000)).first();
+    if (pendingEmail) return json({ error: 'That email is awaiting verification for another account.' }, 409);
   }
 
   const salt = randomToken(16);
@@ -190,8 +199,28 @@ async function register(request, env, { admin = false } = {}) {
     throw error;
   }
   const token = await createSession(env, id);
+  let verificationEmailSent = false;
+  if (!admin) {
+    try {
+      await issueEmailVerification(env, { id, username: validation.username }, {
+        ok: true, email: validation.email, emailKey: validation.emailKey
+      }, { checkDuplicate: false });
+      verificationEmailSent = true;
+    } catch {
+      // Keep the pending account accessible so the owner can sign in and retry delivery.
+    }
+  }
   return json(
-    { user: { username: validation.username, role: admin ? 'admin' : 'user', email: null, emailVerified: false } },
+    {
+      user: {
+        username: validation.username,
+        role: admin ? 'admin' : 'user',
+        email: null,
+        emailVerified: false,
+        pendingEmail: admin ? null : validation.email
+      },
+      verificationEmailSent
+    },
     201,
     { 'set-cookie': sessionCookie(token) }
   );
@@ -258,18 +287,26 @@ async function sendVerificationEmail(env, user, email, token) {
   if (!response.ok) throw new Error('Email delivery failed.');
 }
 
-async function requestEmailVerification(request, env) {
-  const user = await currentUser(request, env);
-  if (!user) return json({ error: 'Sign in before adding an email.' }, 401);
-  let input;
-  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
-  const validation = validateEmail(input?.email);
-  if (!validation.ok) return json({ error: 'Enter a valid email address.' }, 400);
-
-  const duplicate = await env.DB.prepare(`
-    SELECT id FROM users WHERE email_key = ? AND id <> ? AND disabled_at IS NULL LIMIT 1
-  `).bind(validation.emailKey, user.id).first();
-  if (duplicate) return json({ error: 'That email is already attached to an account.' }, 409);
+async function issueEmailVerification(env, user, validation, { checkDuplicate = true } = {}) {
+  if (checkDuplicate) {
+    const duplicate = await env.DB.prepare(`
+      SELECT id FROM users WHERE email_key = ? AND id <> ? AND disabled_at IS NULL LIMIT 1
+    `).bind(validation.emailKey, user.id).first();
+    if (duplicate) {
+      const error = new Error('That email is already attached to an account.');
+      error.status = 409;
+      throw error;
+    }
+    const pendingDuplicate = await env.DB.prepare(`
+      SELECT user_id FROM email_verification_tokens
+      WHERE email_key = ? AND user_id <> ? AND expires_at > ? LIMIT 1
+    `).bind(validation.emailKey, user.id, Math.floor(Date.now() / 1000)).first();
+    if (pendingDuplicate) {
+      const error = new Error('That email is awaiting verification for another account.');
+      error.status = 409;
+      throw error;
+    }
+  }
 
   const now = Math.floor(Date.now() / 1000);
   const recent = await env.DB.prepare(`
@@ -277,7 +314,9 @@ async function requestEmailVerification(request, env) {
     WHERE user_id = ? AND created_at >= ?
   `).bind(user.id, now - 3600).first();
   if (Number(recent?.count || 0) >= 5) {
-    return json({ error: 'Too many verification emails. Try again later.' }, 429);
+    const error = new Error('Too many verification emails. Try again later.');
+    error.status = 429;
+    throw error;
   }
 
   const token = randomToken();
@@ -292,9 +331,27 @@ async function requestEmailVerification(request, env) {
     await sendVerificationEmail(env, user, validation.email, token);
   } catch {
     await env.DB.prepare('DELETE FROM email_verification_tokens WHERE token_hash = ?').bind(tokenHash).run();
-    return json({ error: 'Verification email could not be sent. Try again later.' }, 503);
+    const error = new Error('Verification email could not be sent. Try again later.');
+    error.status = 503;
+    throw error;
   }
-  return json({ ok: true, expiresIn: EMAIL_VERIFICATION_MAX_AGE_SECONDS });
+  return { expiresIn: EMAIL_VERIFICATION_MAX_AGE_SECONDS };
+}
+
+async function requestEmailVerification(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'Sign in before adding an email.' }, 401);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  const validation = validateEmail(input?.email);
+  if (!validation.ok) return json({ error: 'Enter a valid email address.' }, 400);
+
+  try {
+    const result = await issueEmailVerification(env, user, validation);
+    return json({ ok: true, ...result });
+  } catch (error) {
+    return json({ error: error.message }, error.status || 503);
+  }
 }
 
 async function confirmEmailVerification(request, env) {
@@ -340,8 +397,9 @@ async function stats(env) {
   const day = jerusalemDay();
   const row = await env.DB.prepare(`
     SELECT COUNT(*) AS total_accounts,
-           SUM(CASE WHEN created_day = ? THEN 1 ELSE 0 END) AS new_today
-    FROM users WHERE disabled_at IS NULL AND role = 'user'
+           SUM(CASE WHEN email_verified_day = ? THEN 1 ELSE 0 END) AS new_today
+    FROM users
+    WHERE disabled_at IS NULL AND role = 'user' AND email_verified_at IS NOT NULL
   `).bind(day).first();
   let traffic;
   try {
@@ -413,10 +471,11 @@ async function adminStats(request, env) {
         (SELECT COUNT(*) FROM daily_visitors WHERE day = ?) AS visitors_today,
         (SELECT COALESCE(SUM(views), 0) FROM daily_pageviews WHERE day = ?) AS views_today,
         (SELECT COUNT(*) FROM daily_visitors WHERE day = ? AND acquisition_source = 'producthunt') AS producthunt_visitors_today,
-        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL) AS registered_total,
-        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND created_day = ?) AS registered_today,
-        (SELECT COUNT(*) FROM users WHERE email_verified_at IS NOT NULL AND disabled_at IS NULL) AS verified_email_total,
-        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND created_day = ? AND acquisition_source = 'producthunt') AS producthunt_registered_today
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NOT NULL) AS registered_total,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_day = ?) AS registered_today,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NOT NULL) AS verified_email_total,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NULL) AS pending_email_total,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_day = ? AND acquisition_source = 'producthunt') AS producthunt_registered_today
     `).bind(today, today, today, today, today).first(),
     env.DB.prepare(`
       WITH RECURSIVE dates(day) AS (
@@ -429,9 +488,11 @@ async function adminStats(request, env) {
                SUM(CASE WHEN acquisition_source = 'producthunt' THEN 1 ELSE 0 END) AS producthunt_visitors
         FROM daily_visitors GROUP BY day
       ), registrations AS (
-        SELECT created_day AS day, COUNT(*) AS registrations,
+        SELECT email_verified_day AS day, COUNT(*) AS registrations,
                SUM(CASE WHEN acquisition_source = 'producthunt' THEN 1 ELSE 0 END) AS producthunt_registrations
-        FROM users WHERE role = 'user' AND disabled_at IS NULL GROUP BY created_day
+        FROM users
+        WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NOT NULL
+        GROUP BY email_verified_day
       )
       SELECT dates.day,
              CASE WHEN dates.day >= coverage.first_day THEN COALESCE(traffic.visitors, 0) ELSE NULL END AS visitors,
@@ -452,9 +513,10 @@ async function adminStats(request, env) {
       GROUP BY page_path ORDER BY views DESC, page_path ASC LIMIT 10
     `).bind(today, days - 1).all(),
     env.DB.prepare(`
-      SELECT username, created_at, created_day, email_verified_at IS NOT NULL AS email_verified
-      FROM users WHERE role = 'user' AND disabled_at IS NULL
-      ORDER BY created_at DESC LIMIT 20
+      SELECT username, email_verified_at AS created_at, email_verified_day AS created_day, 1 AS email_verified
+      FROM users
+      WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NOT NULL
+      ORDER BY email_verified_at DESC LIMIT 20
     `).all()
   ]);
 
@@ -478,6 +540,7 @@ async function adminStats(request, env) {
       registeredToday,
       registeredTotal: Number(summary?.registered_total || 0),
       verifiedEmailTotal: Number(summary?.verified_email_total || 0),
+      pendingEmailTotal: Number(summary?.pending_email_total || 0),
       conversionToday: registrationRatio(registeredToday, visitorsToday),
       productHuntVisitorsToday,
       productHuntRegisteredToday,
@@ -486,7 +549,7 @@ async function adminStats(request, env) {
     daily: dailyResult.results || [],
     topPaths: pathsResult.results || [],
     recentRegistrations: recentResult.results || [],
-    methodology: 'Visitors are daily IP + browser hash estimates, not verified people. Raw IP addresses are not stored. Product Hunt is detected from the browser-reported referrer; a registration is attributed only when a signed same-day token matches the same browser/network estimate. Other registration/visitor ratios are not attributed conversion. Days before the earliest retained visit have no traffic data. Account registrations are not confirmed email subscriptions.'
+    methodology: 'Visitors are daily IP + browser hash estimates, not verified people. Raw IP addresses are not stored. A registration is counted only after the account email is verified. Product Hunt is detected from the browser-reported referrer; a registration is attributed only when a signed same-day token matches the same browser/network estimate. Other registration/visitor ratios are not attributed conversion. Days before the earliest retained visit have no traffic data. Verified account emails are not marketing subscriptions.'
   });
 }
 

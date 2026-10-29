@@ -38,7 +38,7 @@ const snapshot = {
   newToday: 2, totalAccounts: 3,
   traffic: { visitorsToday: 4, viewsToday: 9 },
   confirmedSubscribers: { total: null },
-  summary: { visitorsToday: 4, viewsToday: 9, registeredToday: 2, registeredTotal: 3, verifiedEmailTotal: 1, conversionToday: .5,
+  summary: { visitorsToday: 4, viewsToday: 9, registeredToday: 2, registeredTotal: 3, verifiedEmailTotal: 3, pendingEmailTotal: 1, conversionToday: .5,
     productHuntVisitorsToday: 2, productHuntRegisteredToday: 1, productHuntConversionToday: .5 },
   daily: [], topPaths: [], recentRegistrations: [], methodology: 'Local test data'
 };
@@ -86,6 +86,7 @@ test('admin refresh clears stale totals and private lists on failure', async () 
   assert.equal(ui.nodes.get('#visitors-today').textContent, '4');
   assert.equal(ui.nodes.get('#confirmed-subscribers').textContent, 'Data unavailable');
   assert.equal(ui.nodes.get('#producthunt-registrations').textContent, '1');
+  assert.equal(ui.nodes.get('#pending-email-total').textContent, '1');
   ui.nodes.get('#recent-users').children = ['old private list'];
   failure = true;
   await context.loadStats();

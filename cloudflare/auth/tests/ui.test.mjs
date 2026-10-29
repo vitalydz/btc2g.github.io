@@ -17,6 +17,9 @@ test('registration fields explain their accepted format before submission', asyn
   assert.match(html, /id="username-hint">3–32 characters/);
   assert.match(html, /aria-describedby="password-hint"/);
   assert.match(html, /id="password-hint">Use at least 12 characters/);
+  assert.match(html, /id="registration-email"[^>]+type="email"[^>]+required/);
+  assert.match(html, /Registration is complete only after you verify this address/);
+  assert.match(script, /email: mode === 'register'/);
   assert.match(script, /Enter the password for this account/);
 });
 

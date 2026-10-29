@@ -14,7 +14,7 @@
     <section class="hero">
       <p class="eyebrow">EARLY ACCESS</p>
       <h1>Your BTC2G account</h1>
-      <p>Save a username for future research features. No payment details are collected.</p>
+      <p>Create an account with a verified email for future research features. No payment details are collected.</p>
     </section>
 
     <section class="stats" aria-labelledby="stats-title">
@@ -36,6 +36,10 @@
         <label>Username
           <input id="username" name="username" autocomplete="username" minlength="3" maxlength="32" pattern="[A-Za-z][A-Za-z0-9_]{2,31}" aria-describedby="username-hint" required>
           <small class="field-hint" id="username-hint">3–32 characters. Start with a letter; use letters, numbers, or underscores.</small>
+        </label>
+        <label id="registration-email-row">Email address
+          <input id="registration-email" name="email" type="email" autocomplete="email" maxlength="254" aria-describedby="registration-email-hint" required>
+          <small class="field-hint" id="registration-email-hint">Required. Registration is complete only after you verify this address.</small>
         </label>
         <label>Password
           <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" aria-describedby="password-hint" required>
@@ -68,7 +72,7 @@
       </div>
     </section>
 
-    <p class="disclaimer">BTC2G provides informational research, not financial advice. Account totals represent database registrations, not verified investors or customers.</p>
+    <p class="disclaimer">BTC2G provides informational research, not financial advice. Account totals include email-verified registrations, not verified investors or customers.</p>
   </main>
   <script type="module" src="/account.js"></script>
 </body>

@@ -1,6 +1,6 @@
 # BTC2G Accounts Worker
 
-This Cloudflare Worker hosts a same-origin account page and API backed by D1. Public totals count only active `user` rows; the bootstrap administrator is deliberately excluded from growth metrics.
+This Cloudflare Worker hosts a same-origin account page and API backed by D1. Public totals count only active, email-verified `user` rows; pending accounts and the bootstrap administrator are deliberately excluded from growth metrics.
 
 ## Security model
 
@@ -10,7 +10,7 @@ This Cloudflare Worker hosts a same-origin account page and API backed by D1. Pu
 - Hourly registration limits keyed by an HMAC-like salted hash of the Cloudflare client IP. Raw IP addresses are never stored.
 - Reserved public names, including `Codex_admin`.
 - One-time administrator bootstrap protected by a Cloudflare secret and disabled after the first admin exists.
-- Optional account-email verification through Resend. Only token hashes are stored; links expire after 30 minutes. A verified account email is not marketing consent and does not activate Premium.
+- Mandatory account-email verification for new public registrations through Resend. Only token hashes are stored; links expire after 30 minutes. Pending accounts can sign in to request another message but are not counted as completed registrations. A verified account email is not marketing consent and does not activate Premium.
 - Explicit Terms and Privacy Policy acceptance recorded with a version and timestamp.
 - Daily traffic uses a salted hash of IP + user agent; raw IP addresses and user-agent strings are not stored. Product Hunt attribution uses a signed same-day token tied to that daily estimate and stores only the normalized source label.
 
@@ -19,7 +19,7 @@ The protected `/admin/` dashboard shows visitor estimates, page views, registrat
 ### Reading statistics correctly
 
 - Use `https://btc2g-accounts.btc2g.workers.dev/api/stats` for the public summary. GitHub Pages does not route `https://btc2g.com/api/stats` to this Worker.
-- The public account page and protected dashboard show traffic estimates, recorded page views, account registrations and confirmed email subscriptions separately.
+- The public account page and protected dashboard show traffic estimates, recorded page views, completed email-verified registrations, pending accounts and confirmed email subscriptions separately.
 - Responses include `source`, `measuredAt`, `day` and `timeZone` (`Asia/Jerusalem`). Traffic before the earliest retained recorded visit is unknown, not zero. `firstRecordedVisitAt` is the earliest retained evidence, not a claim that full-day collection began then.
 - IP/browser hashes estimate browsers, not unique people. Ad blockers, shared networks and automated traffic affect counts. Registration/visitor ratios are aggregate ratios, not attributed conversions.
 - `confirmedSubscribers.status` is `unavailable` and counts are `null` until a confirmed email subscription source is connected. Account creation and Formspree acceptance are not subscription confirmation. The old `dailyGoal`/`remainingToday` fields refer only to accounts and are retained for API compatibility; they do not measure the owner's confirmed-subscriber goal.
@@ -40,7 +40,7 @@ BTC2G uses the Resend HTTP API. Its free plan currently supports 100 transaction
 2. Create a sending-only API key and store it with `npx wrangler secret put RESEND_API_KEY --config cloudflare/auth/wrangler.jsonc`.
 3. Apply migration `0004_email_verification.sql` remotely, deploy, and verify using the owner's real account. Never commit the key or verification token.
 
-If `RESEND_API_KEY` is absent or delivery fails, the API returns an unavailable message and does not claim that mail was sent.
+If `RESEND_API_KEY` is absent or delivery fails, the pending account remains accessible so its owner can retry, but it is not counted as a completed registration and the UI does not claim that mail was sent.
 
 This is an account count, not an identity-verification system. A verified-human metric requires an email or identity provider and is intentionally not claimed.
 

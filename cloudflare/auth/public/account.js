@@ -5,6 +5,8 @@ const message = document.querySelector('#message');
 const submitButton = document.querySelector('#submit-button');
 const termsRow = document.querySelector('#terms-row');
 const termsCheckbox = document.querySelector('#accepted-terms');
+const registrationEmailRow = document.querySelector('#registration-email-row');
+const registrationEmail = document.querySelector('#registration-email');
 const password = document.querySelector('#password');
 const passwordHint = document.querySelector('#password-hint');
 const signedIn = document.querySelector('#signed-in');
@@ -43,10 +45,11 @@ function showUser(user) {
   signedIn.hidden = false;
   document.querySelector('#signed-in-name').textContent = user.username;
   document.querySelector('#admin-link').hidden = user.role !== 'admin';
+  const displayedEmail = user.email || user.pendingEmail;
   document.querySelector('#email-status').textContent = user.emailVerified && user.email
     ? `Verified: ${user.email}`
-    : 'No verified email is attached.';
-  if (user.email) emailInput.value = user.email;
+    : displayedEmail ? `Verification pending for ${displayedEmail}.` : 'No verified email is attached.';
+  if (displayedEmail) emailInput.value = displayedEmail;
 }
 
 emailForm.addEventListener('submit', async event => {
@@ -78,6 +81,8 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
   });
   termsRow.hidden = mode === 'login';
   termsCheckbox.required = mode === 'register';
+  registrationEmailRow.hidden = mode === 'login';
+  registrationEmail.required = mode === 'register';
   password.autocomplete = mode === 'register' ? 'new-password' : 'current-password';
   passwordHint.textContent = mode === 'register' ? 'Use at least 12 characters.' : 'Enter the password for this account.';
   submitButton.textContent = mode === 'register' ? 'Create account' : 'Sign in';
@@ -91,6 +96,7 @@ form.addEventListener('submit', async event => {
   try {
     const payload = {
       username: form.username.value,
+      email: mode === 'register' ? registrationEmail.value : undefined,
       password: form.password.value,
       acceptedTerms: mode === 'register' ? termsCheckbox.checked : undefined,
       attribution: mode === 'register' ? new URLSearchParams(location.search).get('attribution') : undefined
@@ -100,8 +106,13 @@ form.addEventListener('submit', async event => {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    setMessage(mode === 'register' ? 'Account created.' : 'Signed in.', true);
     showUser(data.user);
+    if (mode === 'register') {
+      emailMessage.textContent = data.verificationEmailSent
+        ? 'Verification email sent. Open the link within 30 minutes to complete registration.'
+        : 'Your account is pending. We could not send the verification email; use the button above to retry.';
+      emailMessage.classList.toggle('success', data.verificationEmailSent);
+    }
     await refreshStats();
   } catch (error) {
     setMessage(error.message);

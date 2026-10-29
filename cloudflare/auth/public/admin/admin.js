@@ -25,6 +25,7 @@ async function loadStats() {
     document.querySelector('#registered-today').textContent = formatCount(data.summary.registeredToday);
     document.querySelector('#registered-total').textContent = formatCount(data.summary.registeredTotal);
     document.querySelector('#verified-email-total').textContent = formatCount(data.summary.verifiedEmailTotal);
+    document.querySelector('#pending-email-total').textContent = formatCount(data.summary.pendingEmailTotal);
     document.querySelector('#confirmed-subscribers').textContent = formatCount(data.confirmedSubscribers?.total);
     document.querySelector('#conversion-today').textContent = percentage(data.summary.conversionToday);
     document.querySelector('#producthunt-visitors').textContent = formatCount(data.summary.productHuntVisitorsToday);

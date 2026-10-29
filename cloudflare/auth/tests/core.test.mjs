@@ -29,19 +29,30 @@ test('validates and normalizes account email addresses', () => {
 });
 
 test('validates public registration and protects reserved usernames', () => {
-  const valid = validateRegistration({ username: 'Satoshi_21', password: 'LongEnoughPass9', acceptedTerms: true });
+  const valid = validateRegistration({ username: 'Satoshi_21', email: 'satoshi@example.com', password: 'LongEnoughPass9', acceptedTerms: true });
   assert.equal(valid.ok, true);
   assert.equal(valid.usernameKey, 'satoshi_21');
 
-  const reserved = validateRegistration({ username: 'Codex_admin', password: 'LongEnoughPass9', acceptedTerms: true });
+  const reserved = validateRegistration({ username: 'Codex_admin', email: 'admin@example.com', password: 'LongEnoughPass9', acceptedTerms: true });
   assert.equal(reserved.ok, false);
   assert.match(reserved.errors.join(' '), /reserved/);
 });
 
 test('requires strong-enough passwords and explicit terms acceptance', () => {
-  const result = validateRegistration({ username: 'valid_user', password: 'weak', acceptedTerms: false });
+  const result = validateRegistration({ username: 'valid_user', email: 'valid@example.com', password: 'weak', acceptedTerms: false });
   assert.equal(result.ok, false);
   assert.equal(result.errors.length, 3);
+});
+
+test('requires a valid email for ordinary registrations but not admin bootstrap', () => {
+  const ordinary = validateRegistration({ username: 'ordinary', password: 'LongEnoughPass9', acceptedTerms: true });
+  assert.equal(ordinary.ok, false);
+  assert.match(ordinary.errors.join(' '), /email address is required/);
+  const bootstrap = validateRegistration(
+    { username: 'Codex_admin', password: 'LongEnoughPass9', acceptedTerms: true },
+    { allowReserved: true }
+  );
+  assert.equal(bootstrap.ok, true);
 });
 
 test('calculates the registration day in Asia/Jerusalem', () => {
@@ -63,7 +74,7 @@ test('reports only stored account totals and a non-negative goal remainder', () 
     newToday: 3,
     dailyGoal: 100,
     remainingToday: 97,
-    countingMethod: 'D1 account rows; no estimated or fabricated users'
+    countingMethod: 'Email-verified D1 account rows; no estimated or fabricated users'
   });
   assert.equal(publicStats(140, 120).remainingToday, 0);
 });
