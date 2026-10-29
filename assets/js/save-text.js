@@ -28,7 +28,8 @@ window.BTC2GSaveText = {
     "rate": "Effective cost",
     "equal": "Both entered quotes deliver the same BTC.",
     "more": "{provider} delivers {sats} more sats ({percent}% more BTC) for the same total payment in your entered quotes.",
-    "reminder": "Manual comparison only. Recheck the final quotes before payment."
+    "reminder": "Manual comparison only. Recheck the final quotes before payment.",
+    "languageLabel": "Language"
   },
   "ru": {
     "eyebrow": "Больше ясности перед покупкой",
@@ -59,7 +60,8 @@ window.BTC2GSaveText = {
     "rate": "Итоговая стоимость",
     "equal": "Обе введённые котировки дают одинаковое количество BTC.",
     "more": "{provider} даёт на {sats} сатоши больше ({percent}% больше BTC) за одну полную сумму в введённых котировках.",
-    "reminder": "Сравнение введённых данных. Проверьте итоговые котировки перед оплатой."
+    "reminder": "Сравнение введённых данных. Проверьте итоговые котировки перед оплатой.",
+    "languageLabel": "Язык"
   },
   "he": {
     "eyebrow": "יותר בהירות לפני הקנייה",
@@ -90,7 +92,8 @@ window.BTC2GSaveText = {
     "rate": "עלות אפקטיבית",
     "equal": "שתי ההצעות מספקות אותה כמות BTC.",
     "more": "{provider} מספקת {sats} סאטושי נוספים ({percent}% יותר BTC) עבור אותו תשלום כולל בהצעות שהוזנו.",
-    "reminder": "השוואה ידנית בלבד. בדקו שוב את ההצעות הסופיות לפני התשלום."
+    "reminder": "השוואה ידנית בלבד. בדקו שוב את ההצעות הסופיות לפני התשלום.",
+    "languageLabel": "שפה"
   },
   "de": {
     "eyebrow": "Klarheit vor dem Kauf",
@@ -121,7 +124,8 @@ window.BTC2GSaveText = {
     "rate": "Effektiver Preis",
     "equal": "Beide Angebote liefern gleich viele BTC.",
     "more": "{provider} liefert {sats} zusätzliche Satoshis ({percent}% mehr BTC) für dieselbe Gesamtzahlung.",
-    "reminder": "Manueller Vergleich. Endgültige Angebote vor der Zahlung prüfen."
+    "reminder": "Manueller Vergleich. Endgültige Angebote vor der Zahlung prüfen.",
+    "languageLabel": "Sprache"
   },
   "fr": {
     "eyebrow": "Plus de clarté avant l’achat",
@@ -152,7 +156,8 @@ window.BTC2GSaveText = {
     "rate": "Coût effectif",
     "equal": "Les deux offres donnent autant de BTC.",
     "more": "{provider} donne {sats} satoshis supplémentaires ({percent}% de BTC en plus) pour le même paiement total.",
-    "reminder": "Comparaison manuelle. Revérifiez les offres avant de payer."
+    "reminder": "Comparaison manuelle. Revérifiez les offres avant de payer.",
+    "languageLabel": "Langue"
   },
   "es": {
     "eyebrow": "Claridad antes de comprar",
@@ -183,7 +188,8 @@ window.BTC2GSaveText = {
     "rate": "Coste efectivo",
     "equal": "Ambas ofertas entregan los mismos BTC.",
     "more": "{provider} entrega {sats} satoshis más ({percent}% más BTC) por el mismo pago total.",
-    "reminder": "Comparación manual. Revisa las ofertas finales antes de pagar."
+    "reminder": "Comparación manual. Revisa las ofertas finales antes de pagar.",
+    "languageLabel": "Idioma"
   },
   "zh": {
     "eyebrow": "购买前看得更清楚",
@@ -214,7 +220,8 @@ window.BTC2GSaveText = {
     "rate": "实际成本",
     "equal": "两份报价的 BTC 数量相同。",
     "more": "相同总付款下，{provider} 多提供 {sats} 聪（BTC 多 {percent}%）。",
-    "reminder": "仅为手动比较。付款前重新核对最终报价。"
+    "reminder": "仅为手动比较。付款前重新核对最终报价。",
+    "languageLabel": "语言"
   },
   "it": {
     "eyebrow": "Chiarezza prima dell’acquisto",
@@ -245,7 +252,8 @@ window.BTC2GSaveText = {
     "rate": "Costo effettivo",
     "equal": "Le offerte danno la stessa quantità di BTC.",
     "more": "{provider} offre {sats} satoshi in più ({percent}% di BTC in più) per lo stesso pagamento totale.",
-    "reminder": "Confronto manuale. Ricontrolla le offerte prima del pagamento."
+    "reminder": "Confronto manuale. Ricontrolla le offerte prima del pagamento.",
+    "languageLabel": "Lingua"
   },
   "pt": {
     "eyebrow": "Clareza antes de comprar",
@@ -276,7 +284,8 @@ window.BTC2GSaveText = {
     "rate": "Custo efetivo",
     "equal": "As ofertas entregam a mesma quantidade de BTC.",
     "more": "{provider} entrega mais {sats} satoshis ({percent}% mais BTC) pelo mesmo pagamento total.",
-    "reminder": "Comparação manual. Confira as ofertas finais antes de pagar."
+    "reminder": "Comparação manual. Confira as ofertas finais antes de pagar.",
+    "languageLabel": "Idioma"
   },
   "ar": {
     "eyebrow": "وضوح أكبر قبل الشراء",
@@ -307,7 +316,8 @@ window.BTC2GSaveText = {
     "rate": "التكلفة الفعلية",
     "equal": "العرضان يعطيان نفس كمية BTC.",
     "more": "يقدم {provider} مقدار {sats} ساتوشي إضافية ({percent}% أكثر من BTC) لنفس إجمالي الدفع.",
-    "reminder": "مقارنة يدوية فقط. راجع العروض النهائية قبل الدفع."
+    "reminder": "مقارنة يدوية فقط. راجع العروض النهائية قبل الدفع.",
+    "languageLabel": "اللغة"
   },
   "hi": {
     "eyebrow": "खरीद से पहले स्पष्टता",
@@ -338,7 +348,8 @@ window.BTC2GSaveText = {
     "rate": "प्रभावी लागत",
     "equal": "दोनों प्रस्ताव समान BTC देते हैं।",
     "more": "समान कुल भुगतान पर {provider} से {sats} अतिरिक्त सातोशी ({percent}% अधिक BTC) मिलते हैं।",
-    "reminder": "केवल मैन्युअल तुलना। भुगतान से पहले अंतिम प्रस्ताव जाँचें।"
+    "reminder": "केवल मैन्युअल तुलना। भुगतान से पहले अंतिम प्रस्ताव जाँचें।",
+    "languageLabel": "भाषा"
   },
   "ja": {
     "eyebrow": "購入前に明確な比較を",
@@ -369,7 +380,8 @@ window.BTC2GSaveText = {
     "rate": "実効単価",
     "equal": "両方の見積もりのBTC数量は同じです。",
     "more": "同じ支払総額で{provider}は{sats} satoshi多く提供します（BTCが{percent}%増）。",
-    "reminder": "手動比較です。支払前に最終見積もりを再確認してください。"
+    "reminder": "手動比較です。支払前に最終見積もりを再確認してください。",
+    "languageLabel": "言語"
   },
   "ko": {
     "eyebrow": "구매 전 명확한 비교",
@@ -400,7 +412,8 @@ window.BTC2GSaveText = {
     "rate": "실질 비용",
     "equal": "두 견적의 BTC 수량이 같습니다.",
     "more": "같은 총 결제액에서 {provider}가 {sats} 사토시를 더 제공합니다 (BTC {percent}% 증가).",
-    "reminder": "수동 비교입니다. 결제 전 최종 견적을 다시 확인하세요."
+    "reminder": "수동 비교입니다. 결제 전 최종 견적을 다시 확인하세요.",
+    "languageLabel": "언어"
   },
   "tr": {
     "eyebrow": "Satın almadan önce netlik",
@@ -431,7 +444,8 @@ window.BTC2GSaveText = {
     "rate": "Etkin maliyet",
     "equal": "İki teklif aynı miktarda BTC verir.",
     "more": "Aynı toplam ödemede {provider}, {sats} fazla satoshi (%{percent} daha fazla BTC) verir.",
-    "reminder": "Yalnızca manuel karşılaştırma. Ödeme öncesi son teklifleri kontrol edin."
+    "reminder": "Yalnızca manuel karşılaştırma. Ödeme öncesi son teklifleri kontrol edin.",
+    "languageLabel": "Dil"
   },
   "pl": {
     "eyebrow": "Jasność przed zakupem",
@@ -462,7 +476,8 @@ window.BTC2GSaveText = {
     "rate": "Efektywny koszt",
     "equal": "Obie oferty dają tyle samo BTC.",
     "more": "{provider} daje o {sats} satoshi więcej ({percent}% więcej BTC) przy tej samej pełnej płatności.",
-    "reminder": "Porównanie ręczne. Sprawdź końcowe oferty przed płatnością."
+    "reminder": "Porównanie ręczne. Sprawdź końcowe oferty przed płatnością.",
+    "languageLabel": "Język"
   },
   "nl": {
     "eyebrow": "Duidelijkheid vóór aankoop",
@@ -493,7 +508,8 @@ window.BTC2GSaveText = {
     "rate": "Effectieve kosten",
     "equal": "Beide offertes leveren evenveel BTC.",
     "more": "{provider} levert {sats} extra satoshi ({percent}% meer BTC) voor dezelfde totale betaling.",
-    "reminder": "Handmatige vergelijking. Controleer de offertes vóór betaling."
+    "reminder": "Handmatige vergelijking. Controleer de offertes vóór betaling.",
+    "languageLabel": "Taal"
   },
   "uk": {
     "eyebrow": "Більше ясності перед купівлею",
@@ -524,7 +540,8 @@ window.BTC2GSaveText = {
     "rate": "Ефективна вартість",
     "equal": "Обидві пропозиції дають однакові BTC.",
     "more": "{provider} дає на {sats} сатоші більше ({percent}% більше BTC) за однакову повну оплату.",
-    "reminder": "Ручне порівняння. Перевірте кінцеві пропозиції перед оплатою."
+    "reminder": "Ручне порівняння. Перевірте кінцеві пропозиції перед оплатою.",
+    "languageLabel": "Мова"
   },
   "id": {
     "eyebrow": "Lebih jelas sebelum membeli",
@@ -555,7 +572,8 @@ window.BTC2GSaveText = {
     "rate": "Biaya efektif",
     "equal": "Kedua penawaran memberi BTC yang sama.",
     "more": "{provider} memberi {sats} satoshi lebih banyak ({percent}% lebih banyak BTC) untuk total pembayaran yang sama.",
-    "reminder": "Perbandingan manual. Periksa penawaran akhir sebelum membayar."
+    "reminder": "Perbandingan manual. Periksa penawaran akhir sebelum membayar.",
+    "languageLabel": "Bahasa"
   },
   "vi": {
     "eyebrow": "Rõ ràng hơn trước khi mua",
@@ -586,6 +604,7 @@ window.BTC2GSaveText = {
     "rate": "Chi phí thực tế",
     "equal": "Hai báo giá cung cấp cùng lượng BTC.",
     "more": "{provider} cung cấp thêm {sats} satoshi ({percent}% BTC nhiều hơn) cho cùng tổng thanh toán.",
-    "reminder": "So sánh thủ công. Kiểm tra báo giá cuối cùng trước khi trả tiền."
+    "reminder": "So sánh thủ công. Kiểm tra báo giá cuối cùng trước khi trả tiền.",
+    "languageLabel": "Ngôn ngữ"
   }
 };

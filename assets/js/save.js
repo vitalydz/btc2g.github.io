@@ -43,6 +43,8 @@
     document.documentElement.lang = lang;
     document.documentElement.dir = ['he', 'ar'].includes(lang) ? 'rtl' : 'ltr';
     byId('save-language').value = lang;
+    byId('save-language').setAttribute('aria-label', t().languageLabel);
+    document.querySelectorAll('.presets').forEach(e => e.setAttribute('aria-label', t().amount));
     try { localStorage.setItem('lang', lang); } catch {}
     document.title = t().title + ' | BTC2G SAVE';
     document.querySelector('meta[name=description]').content = t().intro;
