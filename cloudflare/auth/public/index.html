@@ -18,11 +18,14 @@
     </section>
 
     <section class="stats" aria-labelledby="stats-title">
-      <div><span id="today-count">—</span><small id="stats-title">new accounts today</small></div>
-      <div><span id="remaining-count">—</span><small>to today’s community goal</small></div>
-      <div><span id="total-count">—</span><small>total active accounts</small></div>
+      <div><span id="today-count" data-count>—</span><small id="stats-title">new accounts today</small></div>
+      <div><span id="total-count" data-count>—</span><small>total active accounts</small></div>
+      <div><span id="subscribers-count" data-count>Data unavailable</span><small>confirmed email subscribers</small></div>
+      <div><span id="visitors-count" data-count>—</span><small>estimated visitors today</small></div>
+      <div><span id="views-count" data-count>—</span><small>recorded page views today</small></div>
       <p id="stats-note">Loading live D1 totals…</p>
     </section>
+    <p><button class="secondary" id="refresh-stats" type="button">Refresh statistics</button></p>
 
     <section class="card" id="account-card">
       <div class="tabs" role="tablist" aria-label="Account action">

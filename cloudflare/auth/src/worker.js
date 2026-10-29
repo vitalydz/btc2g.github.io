@@ -10,6 +10,7 @@ import {
   sessionCookie,
   validateRegistration
 } from './core.js';
+import { confirmedSubscriptions, registrationRatio, trafficMetrics } from './metrics.js';
 
 const encoder = new TextEncoder();
 
@@ -211,7 +212,24 @@ async function stats(env) {
            SUM(CASE WHEN created_day = ? THEN 1 ELSE 0 END) AS new_today
     FROM users WHERE disabled_at IS NULL AND role = 'user'
   `).bind(day).first();
-  return json({ ...publicStats(row?.total_accounts, row?.new_today), day, timeZone: 'Asia/Jerusalem' });
+  let traffic;
+  try {
+    const trafficRow = await env.DB.prepare(`
+      SELECT
+        (SELECT MIN(first_seen_at) FROM daily_visitors) AS first_seen_at,
+        (SELECT COUNT(*) FROM daily_visitors WHERE day = ?) AS visitors_today,
+        (SELECT COALESCE(SUM(views), 0) FROM daily_pageviews WHERE day = ?) AS views_today
+    `).bind(day, day).first();
+    traffic = trafficMetrics(trafficRow);
+  } catch {
+    traffic = { status: 'unavailable', visitorsToday: null, viewsToday: null,
+      firstRecordedVisitAt: null, reason: 'Traffic storage is unavailable.' };
+  }
+  return json({
+    ...publicStats(row?.total_accounts, row?.new_today), day, timeZone: 'Asia/Jerusalem',
+    measuredAt: new Date().toISOString(), source: 'Cloudflare D1',
+    traffic, confirmedSubscribers: confirmedSubscriptions()
+  });
 }
 
 async function recordVisit(request, env) {
@@ -259,6 +277,7 @@ async function adminStats(request, env) {
   const [summary, dailyResult, pathsResult, recentResult] = await Promise.all([
     env.DB.prepare(`
       SELECT
+        (SELECT MIN(first_seen_at) FROM daily_visitors) AS first_seen_at,
         (SELECT COUNT(*) FROM daily_visitors WHERE day = ?) AS visitors_today,
         (SELECT COALESCE(SUM(views), 0) FROM daily_pageviews WHERE day = ?) AS views_today,
         (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL) AS registered_total,
@@ -268,6 +287,8 @@ async function adminStats(request, env) {
       WITH RECURSIVE dates(day) AS (
         SELECT date(?, '-' || ? || ' day')
         UNION ALL SELECT date(day, '+1 day') FROM dates WHERE day < ?
+      ), coverage AS (
+        SELECT MIN(day) AS first_day FROM daily_visitors
       ), traffic AS (
         SELECT day, COUNT(*) AS visitors, COALESCE(SUM(views), 0) AS views
         FROM daily_visitors GROUP BY day
@@ -276,10 +297,11 @@ async function adminStats(request, env) {
         FROM users WHERE role = 'user' AND disabled_at IS NULL GROUP BY created_day
       )
       SELECT dates.day,
-             COALESCE(traffic.visitors, 0) AS visitors,
-             COALESCE(traffic.views, 0) AS views,
+             CASE WHEN dates.day >= coverage.first_day THEN COALESCE(traffic.visitors, 0) ELSE NULL END AS visitors,
+             CASE WHEN dates.day >= coverage.first_day THEN COALESCE(traffic.views, 0) ELSE NULL END AS views,
              COALESCE(registrations.registrations, 0) AS registrations
       FROM dates
+      CROSS JOIN coverage
       LEFT JOIN traffic ON traffic.day = dates.day
       LEFT JOIN registrations ON registrations.day = dates.day
       ORDER BY dates.day DESC
@@ -297,23 +319,28 @@ async function adminStats(request, env) {
     `).all()
   ]);
 
-  const visitorsToday = Number(summary?.visitors_today || 0);
+  const traffic = trafficMetrics(summary);
+  const visitorsToday = traffic.visitorsToday;
   const registeredToday = Number(summary?.registered_today || 0);
   return json({
     rangeDays: days,
     day: today,
     timeZone: 'Asia/Jerusalem',
+    measuredAt: new Date().toISOString(),
+    source: 'Cloudflare D1',
+    traffic,
+    confirmedSubscribers: confirmedSubscriptions(),
     summary: {
       visitorsToday,
-      viewsToday: Number(summary?.views_today || 0),
+      viewsToday: traffic.viewsToday,
       registeredToday,
       registeredTotal: Number(summary?.registered_total || 0),
-      conversionToday: visitorsToday ? registeredToday / visitorsToday : 0
+      conversionToday: registrationRatio(registeredToday, visitorsToday)
     },
     daily: dailyResult.results || [],
     topPaths: pathsResult.results || [],
     recentRegistrations: recentResult.results || [],
-    methodology: 'Unique visitors are daily salted hashes of IP + user agent. Raw IP addresses are not stored.'
+    methodology: 'Visitors are daily IP + browser hash estimates, not verified people. Raw IP addresses are not stored. The registration/visitor ratio is not attributed conversion. Days before the earliest retained visit have no traffic data. Account registrations are not confirmed email subscriptions.'
   });
 }
 

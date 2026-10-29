@@ -1,3 +1,5 @@
+import { formatCount, measurementNote, request } from './metrics-view.js';
+
 const form = document.querySelector('#account-form');
 const message = document.querySelector('#message');
 const submitButton = document.querySelector('#submit-button');
@@ -12,24 +14,23 @@ function setMessage(text, success = false) {
   message.classList.toggle('success', success);
 }
 
-async function request(path, options = {}) {
-  const response = await fetch(path, options);
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || 'Request failed.');
-  return data;
-}
-
 async function refreshStats() {
   try {
     const data = await request('/api/stats');
-    document.querySelector('#today-count').textContent = data.newToday.toLocaleString();
-    document.querySelector('#remaining-count').textContent = data.remainingToday.toLocaleString();
-    document.querySelector('#total-count').textContent = data.totalAccounts.toLocaleString();
-    document.querySelector('#stats-note').textContent = `Live D1 rows for ${data.day} (${data.timeZone}); no estimated users.`;
+    const note = measurementNote(data);
+    document.querySelector('#today-count').textContent = formatCount(data.newToday);
+    document.querySelector('#total-count').textContent = formatCount(data.totalAccounts);
+    document.querySelector('#visitors-count').textContent = formatCount(data.traffic?.visitorsToday);
+    document.querySelector('#views-count').textContent = formatCount(data.traffic?.viewsToday);
+    document.querySelector('#subscribers-count').textContent = formatCount(data.confirmedSubscribers?.total);
+    document.querySelector('#stats-note').textContent = `${note} Visitors are daily browser/IP estimates, not verified people. Accounts are not email subscriptions.`;
   } catch {
-    document.querySelector('#stats-note').textContent = 'Live totals are temporarily unavailable.';
+    document.querySelectorAll('.stats [data-count]').forEach(item => { item.textContent = 'Data unavailable'; });
+    document.querySelector('#stats-note').textContent = 'Data unavailable. The statistics service could not be reached. Retry below.';
   }
 }
+
+document.querySelector('#refresh-stats').addEventListener('click', refreshStats);
 
 function showUser(user) {
   form.hidden = true;
