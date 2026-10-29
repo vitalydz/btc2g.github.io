@@ -177,6 +177,7 @@
     <section class="subscribe-section" aria-labelledby="subscribe-title">
       <h2 id="subscribe-title">Get forecast updates</h2>
       <p id="subscribe-subtitle">Receive compact BTC2G updates when the model changes.</p>
+      <label id="subscriber-email-label" for="subscriber-email">Email address</label>
       <form id="subscribe-form" class="subscribe-form" novalidate>
         <input
           id="subscriber-email"
@@ -274,6 +275,7 @@
   <script src="assets/js/contest-text.js?v=20261028-1"></script>
   <script src="assets/js/audience-text.js?v=20261028-2"></script>
   <script src="assets/js/ratio-tools.js?v=20261028-2"></script>
+  <script src="assets/js/subscription-request.js?v=20261029-1"></script>
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
@@ -2125,6 +2127,7 @@
       document.getElementById('subscribe-title').textContent = text.subscribeTitle;
       document.getElementById('subscribe-subtitle').textContent = text.subscribeSubtitle;
       document.getElementById('subscriber-email').placeholder = text.subscribePlaceholder;
+      document.getElementById('subscriber-email-label').textContent = window.BTC2GSubscription.text(currentLang).email;
       document.getElementById('subscribe-button').textContent = text.subscribeButton;
       document.getElementById('subscribe-trust').textContent = text.subscribeTrust;
       document.getElementById('premium-title').textContent = text.premiumTitle;
@@ -2220,15 +2223,20 @@
     async function submitEmailSubscription(config) {
       const emailInput = document.getElementById(config.emailInputId);
       const submitButton = document.getElementById(config.buttonId);
+      if (submitButton.disabled) return;
       const email = emailInput.value.trim();
       const text = getCurrentText();
 
       if (!email) {
+        emailInput.setAttribute('aria-invalid', 'true');
+        emailInput.focus();
         setFormMessage(config.messageId, text.subscribeEmpty, true);
         return;
       }
 
       if (!isValidEmail(email)) {
+        emailInput.setAttribute('aria-invalid', 'true');
+        emailInput.focus();
         setFormMessage(config.messageId, text.subscribeInvalid, true);
         return;
       }
@@ -2240,11 +2248,12 @@
       }
 
       submitButton.disabled = true;
+      emailInput.removeAttribute('aria-invalid');
       submitButton.textContent = text.subscribeSending;
       setFormMessage(config.messageId, '');
 
       try {
-        const response = await fetch(SUBSCRIPTION_ENDPOINT, {
+        const response = await window.BTC2GSubscription.send(SUBSCRIPTION_ENDPOINT, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -2268,7 +2277,7 @@
         setFormMessage(config.messageId, text[config.successTextKey]);
       } catch (error) {
         console.log('Subscription failed.', error);
-        setFormMessage(config.messageId, text.subscribeError, true);
+        setFormMessage(config.messageId, error.name === 'TimeoutError' ? window.BTC2GSubscription.text(currentLang).uncertain : text.subscribeError, true);
       } finally {
         submitButton.disabled = false;
         submitButton.textContent = getCurrentText()[config.buttonTextKey];

@@ -405,6 +405,7 @@
     <div class="footer-links"><a href="about.html">About</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
   </footer>
 
+  <script src="assets/js/subscription-request.js?v=20261029-1"></script>
   <script src="assets/js/premium-language.js"></script>
   <script>
     const SUBSCRIPTION_ENDPOINT = 'https://formspree.io/f/mkoyjwkr';
@@ -420,25 +421,28 @@
       const form = event.currentTarget;
       const emailInput = document.getElementById('early-access-email');
       const button = document.getElementById('early-access-button');
+      if (button.disabled) return;
       const email = emailInput.value.trim();
       if (!isValidEmail(email)) {
+        emailInput.setAttribute('aria-invalid', 'true');
         setFormStatus(window.BTC2GPremiumText.invalid, true);
         emailInput.focus();
         return;
       }
 
       button.disabled = true;
+      emailInput.removeAttribute('aria-invalid');
       button.textContent = window.BTC2GPremiumText.sending;
       setFormStatus('');
       try {
-        const response = await fetch(SUBSCRIPTION_ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        const response = await window.BTC2GSubscription.send(SUBSCRIPTION_ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
         if (!response.ok) throw new Error(`Subscription request failed with status ${response.status}`);
         form.reset();
         setFormStatus(window.BTC2GPremiumText.received);
         if (typeof window.gtag === 'function') window.gtag('event', 'premium_early_access_signup');
       } catch (error) {
         console.log('Early-access signup failed.', error);
-        setFormStatus(window.BTC2GPremiumText.error, true);
+        setFormStatus(error.name === 'TimeoutError' ? window.BTC2GSubscription.text(document.getElementById('early-access').lang).uncertain : window.BTC2GPremiumText.error, true);
       } finally {
         button.disabled = false;
         button.textContent = window.BTC2GPremiumText.button;
