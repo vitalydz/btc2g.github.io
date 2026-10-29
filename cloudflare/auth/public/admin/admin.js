@@ -111,6 +111,7 @@ async function loadStats() {
     const data = await request(`/api/admin/stats?days=${document.querySelector('#range').value}`);
     if (version !== requestVersion) return;
     const note = measurementNote(data);
+    document.querySelector('#app-version').textContent = data.appVersion || 'Unavailable';
     document.querySelector('#visitors-today').textContent = formatCount(data.summary.visitorsToday);
     document.querySelector('#views-today').textContent = formatCount(data.summary.viewsToday);
     document.querySelector('#registered-today').textContent = formatCount(data.summary.registeredToday);
@@ -150,6 +151,7 @@ async function loadStats() {
     document.querySelector('#top-paths').replaceChildren();
     document.querySelector('#recent-users').replaceChildren();
     document.querySelector('#methodology').textContent = '';
+    document.querySelector('#app-version').textContent = 'Unavailable';
     status.textContent = `Data unavailable. ${error.message} Use Refresh statistics to retry.`;
   }
 }

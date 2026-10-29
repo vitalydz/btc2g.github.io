@@ -87,3 +87,18 @@ test('idea submission is private, email-gated, and available to administrators f
   assert.match(adminScript, /\/api\/admin\/ideas/);
   assert.doesNotMatch(html, /public idea list/i);
 });
+
+test('administrator UI shows the configured application version', async () => {
+  const [html, adminScript, worker, config, version] = await Promise.all([
+    readFile(new URL('admin/index.html', root), 'utf8'),
+    readFile(new URL('admin/admin.js', root), 'utf8'),
+    readFile(new URL('../src/worker.js', root), 'utf8'),
+    readFile(new URL('../wrangler.jsonc', root), 'utf8'),
+    readFile(new URL('../../../VERSION', import.meta.url), 'utf8')
+  ]);
+  const expected = version.trim();
+  assert.match(html, /id="app-version"/);
+  assert.match(adminScript, /data\.appVersion/);
+  assert.match(worker, /appVersion: env\.APP_VERSION/);
+  assert.match(config, new RegExp(`"APP_VERSION": "${expected.replaceAll('.', '\\.') }"`));
+});

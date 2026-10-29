@@ -33,6 +33,7 @@ function page(htmlPath) {
 }
 
 const snapshot = {
+  appVersion: '2026.10.29.1',
   source: 'Cloudflare D1', measuredAt: '2026-10-29T06:00:00Z',
   day: '2026-10-29', timeZone: 'Asia/Jerusalem',
   newToday: 2, totalAccounts: 3,
@@ -88,11 +89,13 @@ test('admin refresh clears stale totals and private lists on failure', async () 
   assert.equal(ui.nodes.get('#confirmed-subscribers').textContent, 'Data unavailable');
   assert.equal(ui.nodes.get('#producthunt-registrations').textContent, '1');
   assert.equal(ui.nodes.get('#pending-email-total').textContent, '1');
+  assert.equal(ui.nodes.get('#app-version').textContent, '2026.10.29.1');
   ui.nodes.get('#recent-users').children = ['old private list'];
   failure = true;
   await context.loadStats();
   assert.equal(ui.nodes.get('#visitors-today').textContent, 'Data unavailable');
   assert.equal(ui.nodes.get('#recent-users').children.length, 0);
+  assert.equal(ui.nodes.get('#app-version').textContent, 'Unavailable');
   assert.match(ui.nodes.get('#stats-status').textContent, /403/);
 });
 

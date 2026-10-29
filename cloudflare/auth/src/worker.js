@@ -890,6 +890,7 @@ async function adminStats(request, env) {
     ? Number(summary?.producthunt_visitors_today || 0) : null;
   const productHuntRegisteredToday = Number(summary?.producthunt_registered_today || 0);
   return json({
+    appVersion: env.APP_VERSION || 'unknown',
     rangeDays: days,
     day: today,
     timeZone: 'Asia/Jerusalem',

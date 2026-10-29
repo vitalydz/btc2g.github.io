@@ -2,6 +2,8 @@
 
 This Cloudflare Worker hosts a same-origin account page and API backed by D1. Public totals count only active, email-verified `user` rows; pending accounts and the bootstrap administrator are deliberately excluded from growth metrics.
 
+The release version is stored in the repository-root `VERSION` file and mirrored by `APP_VERSION` in `wrangler.jsonc`. The protected administrator dashboard reads it from `/api/admin/stats`, so the GUI reports the deployed Worker version rather than a browser-only label.
+
 ## Security model
 
 - PBKDF2-SHA-256 passwords with a unique random salt and 210,000 iterations.
