@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "btc2g-accounts",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-29",
+  "assets": {
+    "directory": "public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "btc2g-users",
+      "database_id": "c84b5fe0-b86e-4a79-bfaf-097d424e0a87",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "APP_ORIGIN": "https://btc2g-accounts.workers.dev",
+    "TERMS_VERSION": "2026-10-29",
+    "REGISTRATION_LIMIT_PER_HOUR": "5"
+  }
+}

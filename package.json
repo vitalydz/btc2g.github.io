@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "test": "node --test tests cloudflare/auth/tests",
+    "auth:dev": "npx --yes wrangler@4.68.0 dev --config cloudflare/auth/wrangler.jsonc",
+    "auth:deploy": "npx --yes wrangler@4.68.0 deploy --config cloudflare/auth/wrangler.jsonc"
+  },
   "dependencies": {
     "@moonpay/moonpay-js": "^0.7.4",
     "jose": "^6.2.3",

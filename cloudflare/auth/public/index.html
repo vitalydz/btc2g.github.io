@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>BTC2G Account</title>
+  <meta name="description" content="Create or access a BTC2G account and view transparent registration progress.">
+  <link rel="stylesheet" href="/account.css">
+</head>
+<body>
+  <main class="shell">
+    <a class="brand" href="https://btc2g.com/" aria-label="Back to BTC2G">₿<span>BTC2G</span></a>
+    <section class="hero">
+      <p class="eyebrow">EARLY ACCESS</p>
+      <h1>Your BTC2G account</h1>
+      <p>Save a username for future research features. No payment details are collected.</p>
+    </section>
+
+    <section class="stats" aria-labelledby="stats-title">
+      <div><span id="today-count">—</span><small id="stats-title">new accounts today</small></div>
+      <div><span id="remaining-count">—</span><small>to today’s community goal</small></div>
+      <div><span id="total-count">—</span><small>total active accounts</small></div>
+      <p id="stats-note">Loading live D1 totals…</p>
+    </section>
+
+    <section class="card" id="account-card">
+      <div class="tabs" role="tablist" aria-label="Account action">
+        <button class="tab active" type="button" data-mode="register" role="tab" aria-selected="true">Create account</button>
+        <button class="tab" type="button" data-mode="login" role="tab" aria-selected="false">Sign in</button>
+      </div>
+      <form id="account-form">
+        <label>Username
+          <input id="username" name="username" autocomplete="username" minlength="3" maxlength="32" pattern="[A-Za-z][A-Za-z0-9_]{2,31}" required>
+        </label>
+        <label>Password
+          <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required>
+        </label>
+        <label class="terms" id="terms-row">
+          <input id="accepted-terms" name="acceptedTerms" type="checkbox">
+          <span>I accept the <a href="https://btc2g.com/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="https://btc2g.com/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+        </label>
+        <button class="primary" id="submit-button" type="submit">Create account</button>
+        <p class="message" id="message" role="status" aria-live="polite"></p>
+      </form>
+      <div id="signed-in" hidden>
+        <p>Signed in as <strong id="signed-in-name"></strong>.</p>
+        <button class="secondary" id="logout-button" type="button">Sign out</button>
+      </div>
+    </section>
+
+    <p class="disclaimer">BTC2G provides informational research, not financial advice. Account totals represent database registrations, not verified investors or customers.</p>
+  </main>
+  <script type="module" src="/account.js"></script>
+</body>
+</html>
