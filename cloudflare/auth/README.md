@@ -17,7 +17,7 @@ The protected `/admin/` dashboard shows visitor estimates, page views, registrat
 
 ### Reading statistics correctly
 
-- Use `https://btc2g-accounts.btc2g.workers.dev/api/stats` for the public summary. GitHub Pages does not route `https://btc2g.com/api/stats` to this Worker.
+- Before the first-party route deployment, the public summary is at `https://btc2g-accounts.btc2g.workers.dev/api/stats`. After deploying the two configured Worker routes, use `https://btc2g.com/api/stats`. GitHub Pages alone cannot route this API. Follow [the deployment order](../../docs/first-party-counter.md) before publishing the new collector; keep it unpublished if the first-party endpoint does not return the expected JSON.
 - The public account page and protected dashboard show traffic estimates, recorded page views, account registrations and confirmed email subscriptions separately.
 - Responses include `source`, `measuredAt`, `day` and `timeZone` (`Asia/Jerusalem`). Traffic before the earliest retained recorded visit is unknown, not zero. `firstRecordedVisitAt` is the earliest retained evidence, not a claim that full-day collection began then.
 - IP/browser hashes estimate browsers, not unique people. Ad blockers, shared networks and automated traffic affect counts. Registration/visitor ratios are aggregate ratios, not attributed conversions.
