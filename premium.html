@@ -79,6 +79,7 @@
       color: var(--gold);
       place-items: center;
     }
+    .header-tools { display: flex; align-items: center; gap: 12px; }
     nav { display: flex; flex-wrap: wrap; gap: 4px; }
     nav a {
       padding: 9px 11px;
@@ -89,6 +90,17 @@
       text-decoration: none;
     }
     nav a:hover, nav a[aria-current="page"] { background: rgba(95, 124, 255, 0.1); color: var(--text); }
+    .language-select {
+      min-height: 40px;
+      padding: 0 34px 0 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%23b4bfce' d='m1 1 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 11px center;
+      color: var(--text);
+      cursor: pointer;
+      appearance: none;
+    }
+    [dir="rtl"] .language-select { padding: 0 11px 0 34px; background-position: left 11px center; }
 
     .hero {
       display: grid;
@@ -270,8 +282,10 @@
     @media (max-width: 640px) {
       main, .site-footer { width: min(100% - 28px, 1120px); }
       .site-header { align-items: flex-start; flex-direction: column; gap: 12px; padding: 16px 0; }
+      .header-tools { width: 100%; align-items: stretch; flex-direction: column; }
       nav { width: 100%; }
       nav a { padding: 7px 8px; }
+      .language-select { width: 100%; }
       .hero { padding: 48px 0 54px; }
       h1 { font-size: clamp(2.35rem, 13vw, 3.3rem); }
       .hero-actions, .share-buttons, .share-section, .site-footer { align-items: stretch; flex-direction: column; }
@@ -288,12 +302,23 @@
   <main>
     <header class="site-header">
       <a class="brand" href="index.html" aria-label="BTC2G home"><span class="brand-mark" aria-hidden="true">₿</span>BTC2G</a>
-      <nav aria-label="Premium page navigation">
-        <a href="index.html">Home</a>
-        <a href="index.html#forecast">Forecast</a>
-        <a href="premium.html" aria-current="page">Premium</a>
-        <a href="buy.html">Buy BTC</a>
-      </nav>
+      <div class="header-tools">
+        <nav aria-label="Premium page navigation">
+          <a href="index.html">Home</a>
+          <a href="index.html#forecast">Forecast</a>
+          <a href="premium.html" aria-current="page">Premium</a>
+          <a href="buy.html">Buy BTC</a>
+        </nav>
+        <select id="premium-language" class="language-select" aria-label="Language">
+          <option value="en">English</option><option value="ru">Русский</option><option value="he">עברית</option>
+          <option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option>
+          <option value="zh">中文</option><option value="it">Italiano</option><option value="pt">Português</option>
+          <option value="ar">العربية</option><option value="hi">हिन्दी</option><option value="ja">日本語</option>
+          <option value="ko">한국어</option><option value="tr">Türkçe</option><option value="pl">Polski</option>
+          <option value="nl">Nederlands</option><option value="uk">Українська</option><option value="id">Bahasa Indonesia</option>
+          <option value="vi">Tiếng Việt</option>
+        </select>
+      </div>
     </header>
 
     <section class="hero">
@@ -406,7 +431,7 @@
   </footer>
 
   <script src="assets/js/subscription-request.js?v=20261029-1"></script>
-  <script src="assets/js/premium-language.js?v=20261029-19"></script>
+  <script src="assets/js/premium-language.js?v=20261029-20"></script>
   <script>
     const SUBSCRIPTION_ENDPOINT = 'https://formspree.io/f/mkoyjwkr';
 
@@ -450,16 +475,16 @@
     }
 
     function getSharePayload() {
-      return { title: 'BTC2G Premium Research', text: 'Preview BTC2G Premium: deeper context for the Bitcoin vs Gold model.', url: window.location.href };
+      return { title: window.BTC2GPremiumText.documentTitle, text: window.BTC2GPremiumText.shareIntro, url: window.location.href };
     }
     async function copyCurrentLink() {
       const status = document.getElementById('share-status');
       try {
         await navigator.clipboard.writeText(window.location.href);
-        status.textContent = 'Link copied';
+        status.textContent = window.BTC2GPremiumText.copied;
       } catch (error) {
         console.log('Copy link failed.', error);
-        status.textContent = window.location.href;
+        status.textContent = window.BTC2GPremiumText.copyFailed;
       }
     }
     async function shareWithNativeApi() {
