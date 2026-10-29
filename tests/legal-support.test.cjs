@@ -38,5 +38,7 @@ test('Support is discoverable and new account acceptance uses the current Terms 
   assert.match(homepage, /id="support-link"/);
   assert.equal((homepage.match(/support:\s*'/g) || []).length, 19);
   assert.match(sitemap, /https:\/\/btc2g\.com\/support\.html/);
+  assert.match(sitemap, /https:\/\/btc2g\.com\/premium\.html/);
+  assert.match(sitemap, /https:\/\/btc2g\.com\/bitcoin-vs-gold-forecast-2026\.html/);
   assert.match(workerConfig, /"TERMS_VERSION": "2026-10-29\.3"/);
 });
