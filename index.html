@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#071426" />
-  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.29.4">
+  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.29.5">
   <meta name="description" content="Track the published Bitcoin-to-gold ratio, daily market data, model direction, history chart, and BTC ↔ gold calculator." />
   <meta property="og:title" content="BTC2G - Bitcoin vs Gold Ratio" />
   <meta property="og:description" content="Published BTC/Gold ratio data, model context, interactive history, and a reference calculator." />
@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/index.css?v=20261029-5" />
+  <link rel="stylesheet" href="assets/css/index.css?v=20261029-6" />
   <link rel="canonical" href="https://btc2g.com/" />
 </head>
 <body>
@@ -141,20 +141,35 @@
     </section>
 
     <section id="subscribe" class="subscribe-section subscribe-primary" aria-labelledby="subscribe-title">
-      <div>
+      <div id="subscribe-intro">
         <h2 id="subscribe-title">Get the model signal when it changes</h2>
         <p id="subscribe-subtitle">A short email only when direction changes or the ratio moves significantly. No daily spam.</p>
       </div>
       <label id="subscriber-email-label" for="subscriber-email">Email address</label>
       <form id="subscribe-form" class="subscribe-form" novalidate>
         <input id="subscriber-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="subscribe-message subscribe-trust" />
-        <button id="subscribe-button" type="submit">Subscribe free</button>
+        <button id="subscribe-button" type="submit">Get free signal updates</button>
       </form>
-      <p id="subscribe-trust" class="subscribe-trust">One-click unsubscribe. Subscriber count is shown only when a verified source is available.</p>
+      <p id="subscribe-trust" class="subscribe-trust">One-click unsubscribe.</p>
+      <p id="subscriber-proof" class="subscriber-proof" hidden></p>
       <p id="subscribe-message" class="subscribe-message" role="status" aria-live="polite"></p>
-      <aside class="email-preview" aria-label="Example BTC2G update email">
-        <span>EXAMPLE EMAIL</span><strong>BTC2G Signal Update</strong><p>Ratio and model score changes, the market date, source links, and a direct link back to the chart.</p>
+      <aside id="email-preview" class="email-preview" aria-label="Example BTC2G update email">
+        <span id="email-preview-label">EXAMPLE EMAIL</span>
+        <strong id="email-preview-subject">Subject: BTC2G Signal Update</strong>
+        <p><span id="email-preview-ratio">BTC/Gold ratio: unavailable</span><br><span id="email-preview-score">Model score: unavailable</span><br><span id="email-preview-date">Market date: unavailable</span></p>
+        <a id="email-preview-link" href="#forecast">View full chart →</a>
       </aside>
+      <section id="subscribe-thanks" class="subscribe-thanks" aria-labelledby="subscribe-thanks-title" hidden>
+        <h2 id="subscribe-thanks-title">You’re in.</h2>
+        <p id="subscribe-thanks-text">You will receive an email only when the model signal changes.</p>
+        <form id="digest-preferences-form" class="digest-preferences-form">
+          <label><input id="weekly-digest-choice" type="checkbox" name="weekly_digest" value="yes" /> <span id="weekly-digest-choice-label">Yes, send me the short Sunday digest too. You can turn it off at any time.</span></label>
+          <button id="save-digest-preferences" type="submit">Save preferences</button>
+        </form>
+        <p id="digest-preferences-status" role="status" aria-live="polite"></p>
+        <div class="thanks-share"><span id="thanks-share-label">Share BTC2G with friends</span><button id="thanks-share-button" type="button">Share</button><button id="thanks-copy-button" type="button">Copy link</button></div>
+        <p id="thanks-share-status" role="status" aria-live="polite"></p>
+      </section>
     </section>
 
     <section class="save-entry" aria-labelledby="save-entry-title">
@@ -303,7 +318,7 @@
   <script src="assets/js/audience-text.js?v=20261028-2"></script>
   <script src="assets/js/ratio-tools.js?v=20261028-2"></script>
   <script src="assets/js/subscription-request.js?v=20261029-1"></script>
-  <script src="assets/js/home-v2-text.js?v=20261029-1"></script>
+  <script src="assets/js/home-v2-text.js?v=20261029-2"></script>
   <script src="assets/js/market-chart.js?v=20261029-1"></script>
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';
@@ -409,6 +424,13 @@
         return currentLang === 'ru' ? 'Модель показывает нейтральное состояние BTC по отношению к золоту.' : note;
       }
       return getCurrentText().signalNotes[note] || note;
+    }
+
+    function signalGuidance(signal, confidence) {
+      if (signal !== 'HOLD') return localizeSignalNote(currentSignalData?.note);
+      const score = Math.round(confidence * 100);
+      if (currentLang === 'ru') return `ДЕРЖАТЬ — ${score}/100\nНейтральная зона.\nСильный сигнал обычно появляется при оценке выше 70 или ниже 40.`;
+      return `HOLD — ${score}/100\nNeutral zone.\nA strong signal usually appears when the score is above 70 or below 40.`;
     }
 
     function getCurrentText() {
@@ -533,7 +555,13 @@
       const localizedSignalDate = freshness === 'unknown' ? '--' : formatLocalizedDate(currentSignalData.last_updated, currentLang);
       document.getElementById('signal-confidence').textContent = `${Math.round(confidence * 100)}%`;
       document.getElementById('signal-updated').textContent = localizedSignalDate;
-      document.getElementById('signal-note').textContent = localizeSignalNote(currentSignalData.note);
+      document.getElementById('signal-note').textContent = signalGuidance(signal, confidence);
+      const ratio = currentSignalData.ratio;
+      const ratioChange = currentSignalData.ratio_change_7d_pct;
+      document.getElementById('email-preview-subject').textContent = `Subject: BTC2G Signal Update — Ratio ${ratio.toFixed(2)} oz`;
+      document.getElementById('email-preview-ratio').textContent = `BTC/Gold ratio: ${ratio.toFixed(3)} oz t${Number.isFinite(ratioChange) ? ` (${ratioChange >= 0 ? '+' : ''}${ratioChange.toFixed(2)}% / 7d)` : ''}`;
+      document.getElementById('email-preview-score').textContent = `Model score: ${Math.round(confidence * 100)}/100 → ${text.signalLabels[signal]}`;
+      document.getElementById('email-preview-date').textContent = `Market date: ${localizedSignalDate}`;
       document.getElementById('insight-direction-value').textContent = text.signalLabels[signal];
       renderRatio();
       if (!currentMetaData?.last_updated_utc) {
@@ -2237,6 +2265,20 @@
       document.getElementById('terms-link').textContent = text.terms;
       document.getElementById('support-link').textContent = text.support;
       window.BTC2GHomeV2Text?.setLanguage(lang);
+      const conversionText = {
+        en: ['You’re in.', 'You will receive an email only when the model signal changes.', 'Yes, send me the short Sunday digest too. You can turn it off at any time.', 'Save preferences', 'Share BTC2G with friends'],
+        ru: ['Готово.', 'Вы будете получать письмо только при изменении сигнала модели.', 'Да, присылать короткий еженедельный дайджест по воскресеньям. Его можно отключить в любой момент.', 'Сохранить настройки', 'Поделиться BTC2G с друзьями'],
+        he: ['נרשמת.', 'תקבלו מייל רק כאשר איתות המודל משתנה.', 'כן, שלחו גם תקציר קצר בימי ראשון. אפשר לבטל בכל עת.', 'שמירת העדפות', 'שיתוף BTC2G עם חברים']
+      }[lang] || null;
+      const saveLabels = {de:'Einstellungen speichern',fr:'Enregistrer les préférences',es:'Guardar preferencias',zh:'保存偏好',it:'Salva preferenze',pt:'Guardar preferências',ar:'حفظ التفضيلات',hi:'प्राथमिकताएँ सहेजें',ja:'設定を保存',ko:'환경설정 저장',tr:'Tercihleri kaydet',pl:'Zapisz preferencje',nl:'Voorkeuren opslaan',uk:'Зберегти налаштування',id:'Simpan preferensi',vi:'Lưu tùy chọn'};
+      const conversion = conversionText || [text.subscribeSuccess, text.subscribeSubtitle, text.premiumWeekly, saveLabels[lang] || 'Save preferences', text.shareTitle];
+      setTextById('subscribe-thanks-title', conversion[0]);
+      setTextById('subscribe-thanks-text', conversion[1]);
+      setTextById('weekly-digest-choice-label', conversion[2]);
+      setTextById('save-digest-preferences', conversion[3]);
+      setTextById('thanks-share-label', conversion[4]);
+      setTextById('thanks-share-button', text.nativeShare);
+      setTextById('thanks-copy-button', text.copyLink);
       renderSignal();
       renderMeta();
       renderPremiumState();
@@ -2283,6 +2325,16 @@
 
     function isValidEmail(email) {
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    let subscribedEmail = '';
+
+    function showSubscriptionThanks(email) {
+      subscribedEmail = email;
+      ['subscribe-intro', 'subscriber-email-label', 'subscribe-form', 'subscribe-trust', 'subscriber-proof', 'subscribe-message', 'email-preview'].forEach((id) => {
+        document.getElementById(id).hidden = true;
+      });
+      document.getElementById('subscribe-thanks').hidden = false;
     }
 
     function setFormMessage(messageId, message, isError = false) {
@@ -2346,6 +2398,7 @@
           trackEvent(config.successEventName);
         }
         setFormMessage(config.messageId, text[config.successTextKey]);
+        if (config.showThankYou) showSubscriptionThanks(email);
       } catch (error) {
         console.log('Subscription failed.', error);
         setFormMessage(config.messageId, error.name === 'TimeoutError' ? window.BTC2GSubscription.text(currentLang).uncertain : text.subscribeError, true);
@@ -2370,8 +2423,57 @@
       buttonTextKey: 'subscribeButton',
       successTextKey: 'subscribeSuccess',
       successEventName: 'subscription_request_received',
+      showThankYou: true,
       source: 'BTC2G homepage',
     });
+
+    document.getElementById('digest-preferences-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const button = document.getElementById('save-digest-preferences');
+      const status = document.getElementById('digest-preferences-status');
+      button.disabled = true;
+      status.textContent = '';
+      try {
+        const response = await window.BTC2GSubscription.send(SUBSCRIPTION_ENDPOINT, {
+          method: 'POST', headers: {Accept: 'application/json', 'Content-Type': 'application/json'},
+          body: JSON.stringify({email: subscribedEmail, weekly_digest: document.getElementById('weekly-digest-choice').checked ? 'yes' : 'no', source: 'BTC2G homepage preferences'})
+        });
+        if (!response.ok) throw new Error(`Preference request failed with status ${response.status}`);
+        status.textContent = currentLang === 'ru' ? 'Настройки сохранены.' : getCurrentText().subscribeSuccess;
+        trackEvent('weekly_digest_preference_saved');
+      } catch (error) {
+        console.log('Preference request failed.', error);
+        status.textContent = currentLang === 'ru' ? 'Не удалось сохранить настройки. Попробуйте ещё раз.' : getCurrentText().subscribeError;
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById('thanks-share-button').addEventListener('click', async () => {
+      if (navigator.share) await navigator.share(getSharePayload());
+      else document.getElementById('thanks-share-status').textContent = window.location.href;
+    });
+    document.getElementById('thanks-copy-button').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        document.getElementById('thanks-share-status').textContent = getCurrentText().linkCopied;
+      } catch (error) {
+        document.getElementById('thanks-share-status').textContent = window.location.href;
+      }
+    });
+
+    async function loadSubscriberProof() {
+      const proof = document.getElementById('subscriber-proof');
+      try {
+        const response = await fetch('https://btc2g-accounts.btc2g.workers.dev/api/stats', {headers: {Accept: 'application/json'}});
+        const data = response.ok ? await response.json() : null;
+        const total = data?.confirmedSubscribers?.status === 'available' ? data.confirmedSubscribers.total : null;
+        proof.hidden = !(Number.isInteger(total) && total > 0);
+        if (!proof.hidden) proof.textContent = currentLang === 'ru' ? `${total} читателей уже получают обновления.` : `${total} readers already receive updates.`;
+      } catch (error) {
+        proof.hidden = true;
+      }
+    }
 
     async function createPremiumCheckout() {
       const emailInput = document.getElementById('premium-email');
@@ -2478,6 +2580,7 @@
       setLang('en');
     }
     refreshForecast();
+    loadSubscriberProof();
     // Re-evaluate the UTC day when returning to a tab left open overnight.
     document.addEventListener('visibilitychange', () => { if (!document.hidden) renderSignal(); });
     setInterval(renderSignal, 60000);

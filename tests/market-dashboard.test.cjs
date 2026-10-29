@@ -38,7 +38,12 @@ test('homepage is data-first without fabricated audience totals', () => {
   assert.match(html, /id="forecastChart"[^>]+assets\/btc_gold_forecast\.png/);
   assert.ok(html.indexOf('id="forecastChart"') < html.indexOf('class="signal-card"'));
   assert.ok(html.indexOf('class="signal-card"') < html.indexOf('</details>'));
-  assert.doesNotMatch(html, /1[\s ]247|already receive|уже получают/i);
+  assert.ok(html.indexOf('class="signal-card"') < html.indexOf('id="subscribe"'));
+  assert.match(html, /id="subscribe-thanks"[^>]+hidden/);
+  assert.match(html, /id="email-preview-ratio"/);
+  assert.match(html, /confirmedSubscribers\?\.status === 'available'/);
+  assert.doesNotMatch(html, /1[\s ]247/);
+  assert.doesNotMatch(html, /380\+|380 readers|380 читателей/i);
   assert.doesNotMatch(html, /id="research-support-title"/);
 });
 

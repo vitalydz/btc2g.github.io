@@ -46,7 +46,7 @@ function harness(page, response) {
   const status = element(page === 'home' ? 'subscribe-message' : 'form-status');
   const form = { reset() { email.value = ''; } };
   const submit = () => page === 'home'
-    ? context.submitEmailSubscription({ emailInputId: 'subscriber-email', buttonId: 'subscribe-button', messageId: 'subscribe-message', buttonTextKey: 'subscribeButton', successTextKey: 'subscribeSuccess', source: 'test' })
+    ? context.submitEmailSubscription({ emailInputId: 'subscriber-email', buttonId: 'subscribe-button', messageId: 'subscribe-message', buttonTextKey: 'subscribeButton', successTextKey: 'subscribeSuccess', showThankYou: true, source: 'test' })
     : context.submitEarlyAccess({ preventDefault() {}, currentTarget: form });
   return { context, timers, calls, email, button, status, submit };
 }
@@ -73,6 +73,7 @@ for (const page of ['home', 'premium']) {
     await h.submit();
     assert.equal(h.email.value, '');
     assert.equal(h.status.textContent, 'received');
+    if (page === 'home') assert.equal(h.context.document.getElementById('subscribe-thanks').hidden, false);
     assert.equal(h.button.disabled, false);
     assert.equal(h.timers.size, 0);
   });
