@@ -9,6 +9,7 @@ This Cloudflare Worker hosts a same-origin account page and API backed by D1. Pu
 - Same-origin checks on browser mutations.
 - Hourly registration limits keyed by an HMAC-like salted hash of the Cloudflare client IP. Raw IP addresses are never stored.
 - Failed sign-ins are rate-limited across hashed login/network pairs, hashed usernames and hashed networks. Five pair failures trigger a 15-minute lock; broader limits slow distributed password spraying without storing raw IP addresses or attempted usernames.
+- Administrators can enroll WebAuthn passkeys from an authenticated dashboard after confirming their password. Once the first passkey is enrolled, password verification alone never creates an administrator session; Windows Hello, a phone, or a FIDO2 security key must also verify the five-minute, one-time challenge. Enrollment marks the current session as passkey-verified and revokes the account's other sessions. Additional passkeys require a session that was itself passkey-verified.
 - Reserved public names, including `Codex_admin`.
 - One-time administrator bootstrap protected by a Cloudflare secret and disabled after the first admin exists.
 - Mandatory account-email verification for new public registrations through Resend. Only token hashes are stored; links expire after 30 minutes. Pending accounts can sign in to request another message but are not counted as completed registrations. A verified account email is not marketing consent and does not activate Premium.

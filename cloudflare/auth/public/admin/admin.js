@@ -1,4 +1,5 @@
 import { formatCount, measurementNote, percentage, request } from '../metrics-view.js';
+import { authenticatePasskey, createPasskey } from '../passkey-client.js';
 
 const loginPanel = document.querySelector('#login-panel');
 const dashboard = document.querySelector('#dashboard');
@@ -10,6 +11,29 @@ function showAdmin(user) {
   dashboard.hidden = false;
   document.querySelector('#admin-name').textContent = user.username;
   document.querySelector('#logout').hidden = false;
+}
+
+function renderPasskeys(passkeys) {
+  const list = document.querySelector('#passkey-list');
+  if (!passkeys.length) {
+    const item = document.createElement('li');
+    item.textContent = 'No passkey enrolled — administrator sign-in is still password-only.';
+    list.replaceChildren(item);
+    return;
+  }
+  list.replaceChildren(...passkeys.map(passkey => {
+    const item = document.createElement('li');
+    item.textContent = `${passkey.name}${passkey.backedUp ? ' · synced' : ''}`;
+    const date = document.createElement('span');
+    date.textContent = new Date(passkey.createdAt * 1000).toLocaleDateString();
+    item.append(date);
+    return item;
+  }));
+}
+
+async function loadPasskeys() {
+  const data = await request('/api/passkeys');
+  renderPasskeys(data.passkeys);
 }
 
 async function loadStats() {
@@ -67,22 +91,53 @@ document.querySelector('#login-form').addEventListener('submit', async event => 
   event.preventDefault(); loginMessage.textContent = '';
   const form = event.currentTarget;
   try {
-    const data = await request('/api/login', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ username:form.username.value, password:form.password.value }) });
+    let data = await request('/api/login', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ username:form.username.value, password:form.password.value }) });
+    if (data.passkeyRequired) {
+      loginMessage.textContent = 'Confirm sign-in with your passkey.';
+      const credential = await authenticatePasskey(data.options);
+      data = await request('/api/passkeys/authenticate', {
+        method:'POST', headers:{'content-type':'application/json'},
+        body:JSON.stringify({ challengeId:data.challengeId, credential })
+      });
+    }
     if (data.user.role !== 'admin') {
       await request('/api/logout', { method:'POST', headers:{'content-type':'application/json'}, body:'{}' });
       throw new Error('Administrator access required.');
     }
-    showAdmin(data.user); await loadStats();
+    showAdmin(data.user); await Promise.all([loadStats(), loadPasskeys()]);
   } catch (error) { loginMessage.textContent = error.message; }
 });
 
 document.querySelector('#range').addEventListener('change', loadStats);
 document.querySelector('#refresh-stats').addEventListener('click', loadStats);
+document.querySelector('#add-passkey').addEventListener('click', async event => {
+  const button = event.currentTarget;
+  const message = document.querySelector('#passkey-message');
+  const password = document.querySelector('#passkey-password');
+  button.disabled = true; message.textContent = '';
+  try {
+    const setup = await request('/api/passkeys/registration/options', {
+      method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ password:password.value })
+    });
+    const credential = await createPasskey(setup.options);
+    const result = await request('/api/passkeys/registration/verify', {
+      method:'POST', headers:{'content-type':'application/json'},
+      body:JSON.stringify({ challengeId:setup.challengeId, credential })
+    });
+    renderPasskeys(result.passkeys);
+    password.value = '';
+    message.textContent = 'Passkey added. Future administrator sign-ins now require it.';
+    message.classList.add('success');
+  } catch (error) {
+    message.textContent = error.message;
+    message.classList.remove('success');
+  } finally { button.disabled = false; }
+});
 document.querySelector('#logout').addEventListener('click', async () => {
   await request('/api/logout', { method:'POST', headers:{'content-type':'application/json'}, body:'{}' }); location.reload();
 });
 
 request('/api/me').then(async data => {
   if (data.user?.role !== 'admin') return;
-  showAdmin(data.user); await loadStats();
+  showAdmin(data.user); await Promise.all([loadStats(), loadPasskeys()]);
 }).catch(() => {});

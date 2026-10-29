@@ -36,5 +36,10 @@ li span { float:right; color:var(--gold); font-weight:800; }
 .methodology { color:#778294; font-size:.78rem; text-align:center; }
 #stats-status { color:var(--muted); min-height:1.5em; }
 #refresh-stats { border:1px solid var(--line); border-radius:9px; background:#0b0f16; color:var(--text); padding:10px 14px; cursor:pointer; }
+#add-passkey { border:0; border-radius:9px; background:linear-gradient(135deg,#f4b942,#df8d24); color:#171006; padding:11px 14px; font-weight:900; cursor:pointer; }
+#add-passkey:disabled { opacity:.6; cursor:wait; }
+.passkey-copy { text-align:left; margin-top:0; }
+.passkey-password { max-width:420px; margin-bottom:12px; }
+.message.success { color:#72d6a1; }
 @media (max-width:880px) { .cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.title-row{align-items:flex-end} }
 @media (max-width:540px) { .shell{width:min(100% - 20px,1120px)}.cards{grid-template-columns:1fr}.title-row{align-items:flex-start;flex-direction:column}.login{margin-top:50px}.panel{padding:15px} }

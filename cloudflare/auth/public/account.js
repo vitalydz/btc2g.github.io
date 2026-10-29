@@ -1,4 +1,5 @@
 import { formatCount, measurementNote, request } from './metrics-view.js';
+import { authenticatePasskey } from './passkey-client.js';
 
 const form = document.querySelector('#account-form');
 const message = document.querySelector('#message');
@@ -101,11 +102,20 @@ form.addEventListener('submit', async event => {
       acceptedTerms: mode === 'register' ? termsCheckbox.checked : undefined,
       attribution: mode === 'register' ? new URLSearchParams(location.search).get('attribution') : undefined
     };
-    const data = await request(`/api/${mode}`, {
+    let data = await request(`/api/${mode}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(payload)
     });
+    if (data.passkeyRequired) {
+      setMessage('Confirm this administrator sign-in with your passkey.');
+      const credential = await authenticatePasskey(data.options);
+      data = await request('/api/passkeys/authenticate', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ challengeId: data.challengeId, credential })
+      });
+    }
     showUser(data.user);
     if (mode === 'register') {
       emailMessage.textContent = data.verificationEmailSent

@@ -15,6 +15,12 @@ import {
   validateRegistration
 } from './core.js';
 import { confirmedSubscriptions, registrationRatio, trafficMetrics } from './metrics.js';
+import {
+  generateAuthenticationOptions,
+  generateRegistrationOptions,
+  verifyAuthenticationResponse,
+  verifyRegistrationResponse
+} from '@simplewebauthn/server';
 
 const encoder = new TextEncoder();
 const LOGIN_WINDOW_SECONDS = 15 * 60;
@@ -22,6 +28,8 @@ const LOGIN_LOCK_SECONDS = 15 * 60;
 const LOGIN_PAIR_LIMIT = 5;
 const LOGIN_IDENTITY_LIMIT = 20;
 const LOGIN_IP_LIMIT = 30;
+const WEBAUTHN_CHALLENGE_SECONDS = 5 * 60;
+const WEBAUTHN_ALGORITHMS = [-7, -257];
 
 function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -213,12 +221,78 @@ async function clearLoginFailures(env, scopes) {
     .bind(scopes[0].key, scopes[1].key).run();
 }
 
-async function createSession(env, userId) {
+function passkeyConfiguration(env) {
+  if (!env.WEBAUTHN_RP_ID || !env.WEBAUTHN_RP_NAME || !env.APP_ORIGIN) {
+    throw new Error('Passkey authentication is not configured.');
+  }
+  return { rpID: env.WEBAUTHN_RP_ID, rpName: env.WEBAUTHN_RP_NAME, origin: env.APP_ORIGIN };
+}
+
+function transports(value) {
+  try {
+    const parsed = JSON.parse(value || '[]');
+    return Array.isArray(parsed) ? parsed.filter(item => typeof item === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+async function userPasskeys(env, userId) {
+  const result = await env.DB.prepare(`
+    SELECT credential_id, public_key, counter, transports, device_type, backed_up,
+           display_name, created_at, last_used_at
+    FROM passkeys WHERE user_id = ? ORDER BY created_at ASC
+  `).bind(userId).all();
+  return result.results || [];
+}
+
+async function saveWebAuthnChallenge(env, userId, purpose, challenge) {
+  const challengeId = randomToken(24);
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM webauthn_challenges WHERE user_id = ? AND purpose = ?')
+      .bind(userId, purpose),
+    env.DB.prepare(`
+      INSERT INTO webauthn_challenges
+        (challenge_id, user_id, purpose, challenge, created_at, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(challengeId, userId, purpose, challenge, now, now + WEBAUTHN_CHALLENGE_SECONDS)
+  ]);
+  return challengeId;
+}
+
+async function consumeWebAuthnChallenge(env, challengeId, purpose, userId = null) {
+  const now = Math.floor(Date.now() / 1000);
+  return env.DB.prepare(`
+    DELETE FROM webauthn_challenges
+    WHERE challenge_id = ? AND purpose = ? AND expires_at > ?
+      AND (? IS NULL OR user_id = ?)
+    RETURNING challenge_id, user_id, challenge
+  `).bind(challengeId, purpose, now, userId, userId).first();
+}
+
+async function beginPasskeyAuthentication(env, user) {
+  const config = passkeyConfiguration(env);
+  const keys = await userPasskeys(env, user.id);
+  if (!keys.length) return null;
+  const options = await generateAuthenticationOptions({
+    rpID: config.rpID,
+    allowCredentials: keys.map(key => ({ id: key.credential_id, transports: transports(key.transports) })),
+    userVerification: 'required'
+  });
+  const challengeId = await saveWebAuthnChallenge(env, user.id, 'authentication', options.challenge);
+  return { passkeyRequired: true, challengeId, options };
+}
+
+async function createSession(env, userId, { passkeyVerified = false } = {}) {
   const token = randomToken();
   const tokenHash = await sha256(token);
   const now = Math.floor(Date.now() / 1000);
-  await env.DB.prepare('INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)')
-    .bind(tokenHash, userId, now, now + SESSION_MAX_AGE_SECONDS).run();
+  await env.DB.prepare(`
+    INSERT INTO sessions
+      (token_hash, user_id, created_at, expires_at, passkey_verified_at)
+    VALUES (?, ?, ?, ?, ?)
+  `).bind(tokenHash, userId, now, now + SESSION_MAX_AGE_SECONDS, passkeyVerified ? now : null).run();
   return token;
 }
 
@@ -337,6 +411,10 @@ async function login(request, env) {
     }
     return json({ error: 'Invalid username or password.' }, 401);
   }
+  if (user.role === 'admin') {
+    const passkey = await beginPasskeyAuthentication(env, user);
+    if (passkey) return json(passkey);
+  }
   await clearLoginFailures(env, scopes);
   const token = await createSession(env, user.id);
   return json({ user: userView(user) }, 200, { 'set-cookie': sessionCookie(token) });
@@ -348,10 +426,174 @@ async function currentUser(request, env) {
   const tokenHash = await sha256(token);
   const now = Math.floor(Date.now() / 1000);
   return env.DB.prepare(`
-    SELECT users.id, users.username, users.role, users.email, users.email_verified_at
+    SELECT users.id, users.username, users.role, users.email, users.email_verified_at,
+           sessions.passkey_verified_at
     FROM sessions JOIN users ON users.id = sessions.user_id
     WHERE sessions.token_hash = ? AND sessions.expires_at > ? AND users.disabled_at IS NULL
   `).bind(tokenHash, now).first();
+}
+
+function passkeyView(key) {
+  return {
+    id: key.credential_id.slice(-12),
+    name: key.display_name,
+    deviceType: key.device_type || null,
+    backedUp: Boolean(key.backed_up),
+    createdAt: key.created_at,
+    lastUsedAt: key.last_used_at || null
+  };
+}
+
+async function listPasskeys(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  return json({ passkeys: (await userPasskeys(env, user.id)).map(passkeyView) });
+}
+
+async function beginPasskeyRegistration(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  const config = passkeyConfiguration(env);
+  const keys = await userPasskeys(env, user.id);
+  if (keys.length && !user.passkey_verified_at) {
+    return json({ error: 'Sign out and sign in with an existing passkey before adding another.' }, 403);
+  }
+  const account = await env.DB.prepare(`
+    SELECT password_hash, password_salt, password_iterations FROM users WHERE id = ?
+  `).bind(user.id).first();
+  const suppliedPassword = String(input?.password || '');
+  const candidate = suppliedPassword.length <= 128 ? suppliedPassword : '[invalid-password-length]';
+  const hash = await passwordHash(candidate, account.password_salt, account.password_iterations);
+  if (suppliedPassword.length > 128 || !constantTimeEqual(hash, account.password_hash)) {
+    const now = Math.floor(Date.now() / 1000);
+    const scopes = await loginScopes(request, env, normalizeUsername(user.username));
+    const blockedUntil = await recordLoginFailure(env, scopes, now);
+    if (blockedUntil > now) {
+      return json({ error: 'Too many password attempts. Try again in 15 minutes.' }, 429, { 'retry-after': '900' });
+    }
+    return json({ error: 'Administrator password is incorrect.' }, 401);
+  }
+  await clearLoginFailures(env, await loginScopes(request, env, normalizeUsername(user.username)));
+  const options = await generateRegistrationOptions({
+    rpName: config.rpName,
+    rpID: config.rpID,
+    userID: encoder.encode(user.id),
+    userName: user.username,
+    userDisplayName: user.username,
+    attestationType: 'none',
+    excludeCredentials: keys.map(key => ({ id: key.credential_id, transports: transports(key.transports) })),
+    authenticatorSelection: { residentKey: 'preferred', userVerification: 'required' },
+    supportedAlgorithmIDs: WEBAUTHN_ALGORITHMS
+  });
+  const challengeId = await saveWebAuthnChallenge(env, user.id, 'registration', options.challenge);
+  return json({ challengeId, options });
+}
+
+async function finishPasskeyRegistration(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  if (typeof input?.challengeId !== 'string' || !input?.credential || JSON.stringify(input).length > 20000) {
+    return json({ error: 'Invalid passkey registration response.' }, 400);
+  }
+  const pending = await consumeWebAuthnChallenge(env, input.challengeId, 'registration', user.id);
+  if (!pending) return json({ error: 'Passkey setup expired. Start again.' }, 400);
+  const config = passkeyConfiguration(env);
+  let verification;
+  try {
+    verification = await verifyRegistrationResponse({
+      response: input.credential,
+      expectedChallenge: pending.challenge,
+      expectedOrigin: config.origin,
+      expectedRPID: config.rpID,
+      requireUserVerification: true,
+      supportedAlgorithmIDs: WEBAUTHN_ALGORITHMS
+    });
+  } catch {
+    return json({ error: 'Passkey registration could not be verified.' }, 400);
+  }
+  if (!verification.verified || !verification.registrationInfo) {
+    return json({ error: 'Passkey registration could not be verified.' }, 400);
+  }
+  const { credential, credentialDeviceType, credentialBackedUp } = verification.registrationInfo;
+  const now = Math.floor(Date.now() / 1000);
+  const displayName = String(input.name || `Passkey ${new Date().toISOString().slice(0, 10)}`)
+    .trim().slice(0, 50) || 'Passkey';
+  try {
+    await env.DB.prepare(`
+      INSERT INTO passkeys
+        (credential_id, user_id, public_key, counter, transports, device_type,
+         backed_up, display_name, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      credential.id, user.id, credential.publicKey, credential.counter,
+      JSON.stringify(credential.transports || input.credential?.response?.transports || []),
+      credentialDeviceType, credentialBackedUp ? 1 : 0, displayName, now
+    ).run();
+  } catch (error) {
+    if (String(error).toLowerCase().includes('unique')) {
+      return json({ error: 'This passkey is already registered.' }, 409);
+    }
+    throw error;
+  }
+  const sessionToken = parseCookies(request.headers.get('Cookie')).btc2g_session;
+  const sessionHash = await sha256(sessionToken);
+  await env.DB.batch([
+    env.DB.prepare('UPDATE sessions SET passkey_verified_at = ? WHERE token_hash = ? AND user_id = ?')
+      .bind(now, sessionHash, user.id),
+    env.DB.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?')
+      .bind(user.id, sessionHash)
+  ]);
+  return json({ ok: true, passkeys: (await userPasskeys(env, user.id)).map(passkeyView) });
+}
+
+async function finishPasskeyAuthentication(request, env) {
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  if (typeof input?.challengeId !== 'string' || typeof input?.credential?.id !== 'string'
+      || JSON.stringify(input).length > 20000) {
+    return json({ error: 'Invalid passkey response.' }, 400);
+  }
+  const pending = await consumeWebAuthnChallenge(env, input.challengeId, 'authentication');
+  if (!pending) return json({ error: 'Passkey request expired. Sign in again.' }, 400);
+  const key = await env.DB.prepare(`
+    SELECT passkeys.credential_id, passkeys.public_key, passkeys.counter, passkeys.transports,
+           users.id AS user_id, users.username, users.role, users.email, users.email_verified_at
+    FROM passkeys JOIN users ON users.id = passkeys.user_id
+    WHERE passkeys.credential_id = ? AND passkeys.user_id = ?
+      AND users.disabled_at IS NULL AND users.role = 'admin'
+  `).bind(input.credential.id, pending.user_id).first();
+  if (!key) return json({ error: 'Passkey authentication failed.' }, 401);
+  const config = passkeyConfiguration(env);
+  let verification;
+  try {
+    verification = await verifyAuthenticationResponse({
+      response: input.credential,
+      expectedChallenge: pending.challenge,
+      expectedOrigin: config.origin,
+      expectedRPID: config.rpID,
+      credential: {
+        id: key.credential_id,
+        publicKey: new Uint8Array(key.public_key),
+        counter: Number(key.counter || 0),
+        transports: transports(key.transports)
+      },
+      requireUserVerification: true
+    });
+  } catch {
+    return json({ error: 'Passkey authentication failed.' }, 401);
+  }
+  if (!verification.verified) return json({ error: 'Passkey authentication failed.' }, 401);
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.prepare('UPDATE passkeys SET counter = ?, last_used_at = ? WHERE credential_id = ?')
+    .bind(verification.authenticationInfo.newCounter, now, key.credential_id).run();
+  const scopes = await loginScopes(request, env, normalizeUsername(key.username));
+  await clearLoginFailures(env, scopes);
+  const token = await createSession(env, key.user_id, { passkeyVerified: true });
+  return json({ user: userView(key) }, 200, { 'set-cookie': sessionCookie(token) });
 }
 
 async function sendVerificationEmail(env, user, email, token) {
@@ -648,6 +890,7 @@ async function api(request, env) {
   const url = new URL(request.url);
   if (request.method === 'GET' && url.pathname === '/api/stats') return stats(env);
   if (request.method === 'GET' && url.pathname === '/api/admin/stats') return adminStats(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/passkeys') return listPasskeys(request, env);
   if (request.method === 'GET' && url.pathname === '/api/me') {
     const user = await currentUser(request, env);
     return user ? json({ user: userView(user) }) : json({ user: null }, 401);
@@ -660,6 +903,9 @@ async function api(request, env) {
     if (url.pathname === '/api/logout') return logout(request, env);
     if (url.pathname === '/api/email-verification/request') return requestEmailVerification(request, env);
     if (url.pathname === '/api/email-verification/confirm') return confirmEmailVerification(request, env);
+    if (url.pathname === '/api/passkeys/registration/options') return beginPasskeyRegistration(request, env);
+    if (url.pathname === '/api/passkeys/registration/verify') return finishPasskeyRegistration(request, env);
+    if (url.pathname === '/api/passkeys/authenticate') return finishPasskeyAuthentication(request, env);
     if (url.pathname === '/api/bootstrap-admin') return bootstrapAdmin(request, env);
   }
   if (request.method === 'OPTIONS' && url.pathname === '/api/visit') {
@@ -691,6 +937,7 @@ export default {
       env.DB.prepare('DELETE FROM registration_attempts WHERE window_start < ?').bind(now - 86400),
       env.DB.prepare('DELETE FROM email_verification_tokens WHERE expires_at <= ?').bind(now),
       env.DB.prepare('DELETE FROM login_rate_limits WHERE last_failed_at < ?').bind(now - 86400),
+      env.DB.prepare('DELETE FROM webauthn_challenges WHERE expires_at <= ?').bind(now),
       env.DB.prepare("DELETE FROM daily_visitors WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays),
       env.DB.prepare("DELETE FROM daily_pageviews WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays)
     ]);

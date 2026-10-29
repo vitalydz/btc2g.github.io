@@ -27,6 +27,8 @@
     "TERMS_VERSION": "2026-10-29",
     "REGISTRATION_LIMIT_PER_HOUR": "5",
     "EMAIL_FROM": "BTC2G <accounts@btc2g.com>",
+    "WEBAUTHN_RP_ID": "btc2g-accounts.btc2g.workers.dev",
+    "WEBAUTHN_RP_NAME": "BTC2G",
     "METRICS_RETENTION_DAYS": "400"
   }
 }

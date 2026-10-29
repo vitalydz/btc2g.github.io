@@ -54,3 +54,19 @@ test('signed-in account UI separates email verification from Premium and marketi
   assert.match(verification, /id="confirm-email"/);
   assert.match(verification, /no-referrer/);
 });
+
+test('administrator UI supports passkey enrollment and second-factor sign-in', async () => {
+  const [html, adminScript, accountScript, client] = await Promise.all([
+    readFile(new URL('admin/index.html', root), 'utf8'),
+    readFile(new URL('admin/admin.js', root), 'utf8'),
+    readFile(new URL('account.js', root), 'utf8'),
+    readFile(new URL('passkey-client.js', root), 'utf8')
+  ]);
+  assert.match(html, /id="add-passkey"/);
+  assert.match(html, /both the password and Windows Hello/);
+  assert.match(adminScript, /passkeys\/registration\/options/);
+  assert.match(adminScript, /passkeys\/authenticate/);
+  assert.match(accountScript, /passkeys\/authenticate/);
+  assert.match(client, /navigator\.credentials\.create/);
+  assert.match(client, /navigator\.credentials\.get/);
+});

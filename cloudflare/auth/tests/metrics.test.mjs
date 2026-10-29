@@ -13,13 +13,14 @@ function database(t) {
   const db = new DatabaseSync(':memory:');
   t.after(() => db.close());
   for (const file of ['0001_initial.sql', '0002_traffic_metrics.sql', '0003_acquisition_attribution.sql',
-    '0004_email_verification.sql', '0005_login_rate_limits.sql']) {
+    '0004_email_verification.sql', '0005_login_rate_limits.sql', '0006_admin_passkeys.sql']) {
     db.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), 'utf8'));
   }
   return {
     db,
     env: {
       APP_ORIGIN: 'https://metrics.test', PUBLIC_SITE_ORIGIN: 'https://btc2g.com', IP_HASH_SECRET: 'local-test-only',
+      WEBAUTHN_RP_ID: 'metrics.test', WEBAUTHN_RP_NAME: 'BTC2G Test',
       DB: {
         prepare(sql) {
           const statement = db.prepare(sql);
@@ -50,7 +51,7 @@ function admin(db) {
     accepted_terms_at, terms_version) VALUES ('admin', 'Admin', 'admin', '', '', 1, 'admin', ?, ?, ?, 'test')`)
     .run(now, jerusalemDay(), now);
   const token = 'local-admin-session';
-  db.prepare('INSERT INTO sessions VALUES (?, ?, ?, ?)')
+  db.prepare('INSERT INTO sessions (token_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)')
     .run(createHash('sha256').update(token).digest('base64url'), 'admin', now, now + 3600);
   return { Cookie: `btc2g_session=${token}` };
 }
@@ -250,6 +251,62 @@ test('login fails closed when the rate-limit secret is missing', async t => {
     body: JSON.stringify({ username: 'Admin', password: 'anything' })
   }), env);
   assert.equal(response.status, 503);
+});
+
+test('an enrolled administrator receives no session until passkey verification', async t => {
+  const { env, db } = database(t);
+  t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify({ id: 'local-email' }), { status: 200 }));
+  const configured = {
+    ...env, TERMS_VERSION: 'test', RESEND_API_KEY: 'local-test-key',
+    EMAIL_FROM: 'BTC2G <accounts@btc2g.com>'
+  };
+  const registration = await worker.fetch(new Request('https://metrics.test/api/register', {
+    method: 'POST',
+    headers: { Origin: env.APP_ORIGIN, 'Content-Type': 'application/json', 'CF-Connecting-IP': '192.0.2.120' },
+    body: JSON.stringify({
+      username: 'SecureAdmin', email: 'secure-admin@example.com',
+      password: 'LongEnoughPass9', acceptedTerms: true
+    })
+  }), configured);
+  assert.equal(registration.status, 201);
+  const sessionCookie = registration.headers.get('set-cookie');
+  const user = db.prepare("SELECT id FROM users WHERE username_key = 'secureadmin'").get();
+  db.prepare("UPDATE users SET role = 'admin' WHERE id = ?").run(user.id);
+  const setup = await worker.fetch(new Request('https://metrics.test/api/passkeys/registration/options', {
+    method: 'POST',
+    headers: {
+      Cookie: sessionCookie, Origin: env.APP_ORIGIN,
+      'Content-Type': 'application/json', 'CF-Connecting-IP': '192.0.2.120'
+    },
+    body: JSON.stringify({ password: 'LongEnoughPass9' })
+  }), configured);
+  assert.equal(setup.status, 200);
+  const setupData = await setup.json();
+  assert.equal(setupData.options.rp.id, 'metrics.test');
+  assert.equal(setupData.options.authenticatorSelection.userVerification, 'required');
+  const rejectedSetup = await worker.fetch(new Request('https://metrics.test/api/passkeys/registration/verify', {
+    method: 'POST', headers: { Cookie: sessionCookie, Origin: env.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ challengeId: setupData.challengeId, credential: { id: 'invalid' } })
+  }), configured);
+  assert.equal(rejectedSetup.status, 400);
+  assert.equal(db.prepare("SELECT COUNT(*) AS count FROM webauthn_challenges WHERE purpose = 'registration'").get().count, 0);
+  db.prepare(`INSERT INTO passkeys
+    (credential_id, user_id, public_key, counter, transports, display_name, created_at)
+    VALUES (?, ?, ?, 0, '[]', 'Local test passkey', ?)`)
+    .run('local-credential-id', user.id, new Uint8Array([1, 2, 3]), Math.floor(Date.now() / 1000));
+
+  const login = await worker.fetch(new Request('https://metrics.test/api/login', {
+    method: 'POST',
+    headers: { Origin: env.APP_ORIGIN, 'Content-Type': 'application/json', 'CF-Connecting-IP': '192.0.2.120' },
+    body: JSON.stringify({ username: 'SecureAdmin', password: 'LongEnoughPass9' })
+  }), configured);
+  assert.equal(login.status, 200);
+  assert.equal(login.headers.get('set-cookie'), null);
+  const data = await login.json();
+  assert.equal(data.passkeyRequired, true);
+  assert.equal(data.options.userVerification, 'required');
+  assert.deepEqual(data.options.allowCredentials.map(item => item.id), ['local-credential-id']);
+  assert.equal(db.prepare("SELECT COUNT(*) AS count FROM webauthn_challenges WHERE purpose = 'authentication'").get().count, 1);
 });
 
 test('signed-in users can verify an email without creating marketing consent', async t => {
