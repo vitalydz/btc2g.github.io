@@ -1,11 +1,25 @@
 export const USERNAME_PATTERN = /^[A-Za-z][A-Za-z0-9_]{2,31}$/;
 export const PASSWORD_ITERATIONS = 210000;
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
+export const EMAIL_VERIFICATION_MAX_AGE_SECONDS = 60 * 30;
 
 const RESERVED_USERNAMES = new Set(['admin', 'administrator', 'codex_admin', 'btc2g']);
 
 export function normalizeUsername(username) {
   return String(username || '').trim().toLocaleLowerCase('en-US');
+}
+
+export function normalizeEmail(email) {
+  return String(email || '').trim().toLocaleLowerCase('en-US');
+}
+
+export function validateEmail(email) {
+  const value = String(email || '').trim();
+  const normalized = normalizeEmail(value);
+  const valid = value.length <= 254
+    && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+    && !value.includes('..');
+  return { ok: valid, email: value, emailKey: normalized };
 }
 
 export function validateRegistration(input, { allowReserved = false } = {}) {

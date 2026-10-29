@@ -1,14 +1,17 @@
 import {
+  EMAIL_VERIFICATION_MAX_AGE_SECONDS,
   PASSWORD_ITERATIONS,
   SESSION_MAX_AGE_SECONDS,
   acquisitionSource,
   clearSessionCookie,
   jerusalemDay,
+  normalizeEmail,
   normalizePagePath,
   normalizeUsername,
   parseCookies,
   publicStats,
   sessionCookie,
+  validateEmail,
   validateRegistration
 } from './core.js';
 import { confirmedSubscriptions, registrationRatio, trafficMetrics } from './metrics.js';
@@ -109,6 +112,15 @@ function sameOrigin(request, env) {
   return !origin || origin === env.APP_ORIGIN || origin === new URL(request.url).origin;
 }
 
+function userView(user) {
+  return {
+    username: user.username,
+    role: user.role,
+    email: user.email || null,
+    emailVerified: Boolean(user.email_verified_at)
+  };
+}
+
 async function body(request) {
   const type = request.headers.get('content-type') || '';
   if (!type.includes('application/json')) throw new Error('Content-Type must be application/json.');
@@ -179,7 +191,7 @@ async function register(request, env, { admin = false } = {}) {
   }
   const token = await createSession(env, id);
   return json(
-    { user: { username: validation.username, role: admin ? 'admin' : 'user' } },
+    { user: { username: validation.username, role: admin ? 'admin' : 'user', email: null, emailVerified: false } },
     201,
     { 'set-cookie': sessionCookie(token) }
   );
@@ -199,14 +211,15 @@ async function login(request, env) {
   let input;
   try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
   const user = await env.DB.prepare(`
-    SELECT id, username, role, password_hash, password_salt, password_iterations
+    SELECT id, username, role, email, email_verified_at,
+           password_hash, password_salt, password_iterations
     FROM users WHERE username_key = ? AND disabled_at IS NULL
   `).bind(normalizeUsername(input?.username)).first();
   if (!user) return json({ error: 'Invalid username or password.' }, 401);
   const hash = await passwordHash(String(input?.password || ''), user.password_salt, user.password_iterations);
   if (!constantTimeEqual(hash, user.password_hash)) return json({ error: 'Invalid username or password.' }, 401);
   const token = await createSession(env, user.id);
-  return json({ user: { username: user.username, role: user.role } }, 200, { 'set-cookie': sessionCookie(token) });
+  return json({ user: userView(user) }, 200, { 'set-cookie': sessionCookie(token) });
 }
 
 async function currentUser(request, env) {
@@ -215,10 +228,106 @@ async function currentUser(request, env) {
   const tokenHash = await sha256(token);
   const now = Math.floor(Date.now() / 1000);
   return env.DB.prepare(`
-    SELECT users.username, users.role
+    SELECT users.id, users.username, users.role, users.email, users.email_verified_at
     FROM sessions JOIN users ON users.id = sessions.user_id
     WHERE sessions.token_hash = ? AND sessions.expires_at > ? AND users.disabled_at IS NULL
   `).bind(tokenHash, now).first();
+}
+
+async function sendVerificationEmail(env, user, email, token) {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM || !env.APP_ORIGIN) {
+    throw new Error('Email delivery is not configured.');
+  }
+  const link = new URL('/verify-email.html', env.APP_ORIGIN);
+  link.searchParams.set('token', token);
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'content-type': 'application/json',
+      'idempotency-key': `btc2g-email-verification/${await sha256(token)}`
+    },
+    body: JSON.stringify({
+      from: env.EMAIL_FROM,
+      to: [email],
+      subject: 'Verify your BTC2G email',
+      text: `Hello ${user.username},\n\nConfirm this email for your BTC2G account:\n${link}\n\nThe link expires in 30 minutes. This does not subscribe you to marketing or activate Premium.`,
+      html: `<p>Hello ${user.username},</p><p>Confirm this email for your BTC2G account:</p><p><a href="${link}">Verify email</a></p><p>The link expires in 30 minutes. This does not subscribe you to marketing or activate Premium.</p>`
+    })
+  });
+  if (!response.ok) throw new Error('Email delivery failed.');
+}
+
+async function requestEmailVerification(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'Sign in before adding an email.' }, 401);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  const validation = validateEmail(input?.email);
+  if (!validation.ok) return json({ error: 'Enter a valid email address.' }, 400);
+
+  const duplicate = await env.DB.prepare(`
+    SELECT id FROM users WHERE email_key = ? AND id <> ? AND disabled_at IS NULL LIMIT 1
+  `).bind(validation.emailKey, user.id).first();
+  if (duplicate) return json({ error: 'That email is already attached to an account.' }, 409);
+
+  const now = Math.floor(Date.now() / 1000);
+  const recent = await env.DB.prepare(`
+    SELECT COUNT(*) AS count FROM email_verification_tokens
+    WHERE user_id = ? AND created_at >= ?
+  `).bind(user.id, now - 3600).first();
+  if (Number(recent?.count || 0) >= 5) {
+    return json({ error: 'Too many verification emails. Try again later.' }, 429);
+  }
+
+  const token = randomToken();
+  const tokenHash = await sha256(token);
+  await env.DB.prepare(`
+    INSERT INTO email_verification_tokens
+      (token_hash, user_id, email, email_key, created_at, expires_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).bind(tokenHash, user.id, validation.email, validation.emailKey, now,
+    now + EMAIL_VERIFICATION_MAX_AGE_SECONDS).run();
+  try {
+    await sendVerificationEmail(env, user, validation.email, token);
+  } catch {
+    await env.DB.prepare('DELETE FROM email_verification_tokens WHERE token_hash = ?').bind(tokenHash).run();
+    return json({ error: 'Verification email could not be sent. Try again later.' }, 503);
+  }
+  return json({ ok: true, expiresIn: EMAIL_VERIFICATION_MAX_AGE_SECONDS });
+}
+
+async function confirmEmailVerification(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'Sign in to confirm this email.' }, 401);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  if (typeof input?.token !== 'string' || input.token.length < 32 || input.token.length > 128) {
+    return json({ error: 'Invalid verification link.' }, 400);
+  }
+  const tokenHash = await sha256(input.token);
+  const now = Math.floor(Date.now() / 1000);
+  const pending = await env.DB.prepare(`
+    SELECT email, email_key FROM email_verification_tokens
+    WHERE token_hash = ? AND user_id = ? AND expires_at > ?
+  `).bind(tokenHash, user.id, now).first();
+  if (!pending) return json({ error: 'This verification link is invalid or expired.' }, 400);
+
+  try {
+    await env.DB.batch([
+      env.DB.prepare(`
+        UPDATE users SET email = ?, email_key = ?, email_verified_at = ?, email_verified_day = ?
+        WHERE id = ? AND disabled_at IS NULL
+      `).bind(pending.email, normalizeEmail(pending.email_key), now, jerusalemDay(now * 1000), user.id),
+      env.DB.prepare('DELETE FROM email_verification_tokens WHERE user_id = ?').bind(user.id)
+    ]);
+  } catch (error) {
+    if (String(error).toLowerCase().includes('unique')) {
+      return json({ error: 'That email is already attached to an account.' }, 409);
+    }
+    throw error;
+  }
+  return json({ user: { ...userView(user), email: pending.email, emailVerified: true } });
 }
 
 async function logout(request, env) {
@@ -306,6 +415,7 @@ async function adminStats(request, env) {
         (SELECT COUNT(*) FROM daily_visitors WHERE day = ? AND acquisition_source = 'producthunt') AS producthunt_visitors_today,
         (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL) AS registered_total,
         (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND created_day = ?) AS registered_today,
+        (SELECT COUNT(*) FROM users WHERE email_verified_at IS NOT NULL AND disabled_at IS NULL) AS verified_email_total,
         (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND created_day = ? AND acquisition_source = 'producthunt') AS producthunt_registered_today
     `).bind(today, today, today, today, today).first(),
     env.DB.prepare(`
@@ -342,7 +452,7 @@ async function adminStats(request, env) {
       GROUP BY page_path ORDER BY views DESC, page_path ASC LIMIT 10
     `).bind(today, days - 1).all(),
     env.DB.prepare(`
-      SELECT username, created_at, created_day
+      SELECT username, created_at, created_day, email_verified_at IS NOT NULL AS email_verified
       FROM users WHERE role = 'user' AND disabled_at IS NULL
       ORDER BY created_at DESC LIMIT 20
     `).all()
@@ -367,6 +477,7 @@ async function adminStats(request, env) {
       viewsToday: traffic.viewsToday,
       registeredToday,
       registeredTotal: Number(summary?.registered_total || 0),
+      verifiedEmailTotal: Number(summary?.verified_email_total || 0),
       conversionToday: registrationRatio(registeredToday, visitorsToday),
       productHuntVisitorsToday,
       productHuntRegisteredToday,
@@ -385,7 +496,7 @@ async function api(request, env) {
   if (request.method === 'GET' && url.pathname === '/api/admin/stats') return adminStats(request, env);
   if (request.method === 'GET' && url.pathname === '/api/me') {
     const user = await currentUser(request, env);
-    return user ? json({ user }) : json({ user: null }, 401);
+    return user ? json({ user: userView(user) }) : json({ user: null }, 401);
   }
   if (request.method === 'POST') {
     if (url.pathname === '/api/visit') return recordVisit(request, env);
@@ -393,6 +504,8 @@ async function api(request, env) {
     if (url.pathname === '/api/register') return register(request, env);
     if (url.pathname === '/api/login') return login(request, env);
     if (url.pathname === '/api/logout') return logout(request, env);
+    if (url.pathname === '/api/email-verification/request') return requestEmailVerification(request, env);
+    if (url.pathname === '/api/email-verification/confirm') return confirmEmailVerification(request, env);
     if (url.pathname === '/api/bootstrap-admin') return bootstrapAdmin(request, env);
   }
   if (request.method === 'OPTIONS' && url.pathname === '/api/visit') {
@@ -422,6 +535,7 @@ export default {
     await env.DB.batch([
       env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(now),
       env.DB.prepare('DELETE FROM registration_attempts WHERE window_start < ?').bind(now - 86400),
+      env.DB.prepare('DELETE FROM email_verification_tokens WHERE expires_at <= ?').bind(now),
       env.DB.prepare("DELETE FROM daily_visitors WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays),
       env.DB.prepare("DELETE FROM daily_pageviews WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays)
     ]);

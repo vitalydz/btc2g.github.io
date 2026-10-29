@@ -10,6 +10,7 @@ This Cloudflare Worker hosts a same-origin account page and API backed by D1. Pu
 - Hourly registration limits keyed by an HMAC-like salted hash of the Cloudflare client IP. Raw IP addresses are never stored.
 - Reserved public names, including `Codex_admin`.
 - One-time administrator bootstrap protected by a Cloudflare secret and disabled after the first admin exists.
+- Optional account-email verification through Resend. Only token hashes are stored; links expire after 30 minutes. A verified account email is not marketing consent and does not activate Premium.
 - Explicit Terms and Privacy Policy acceptance recorded with a version and timestamp.
 - Daily traffic uses a salted hash of IP + user agent; raw IP addresses and user-agent strings are not stored. Product Hunt attribution uses a signed same-day token tied to that daily estimate and stores only the normalized source label.
 
@@ -27,9 +28,19 @@ The protected `/admin/` dashboard shows visitor estimates, page views, registrat
 
 ### Validation and release of metrics changes
 
-Run `npm test` with Node 24 (the SQL integration tests use built-in `node:sqlite`). Tests run the Worker against an in-memory SQLite database, including both migrations. Fixtures never write to production or send emails.
+Run `npm test` with Node 24 (the SQL integration tests use built-in `node:sqlite`). Tests run the Worker against an in-memory SQLite database, including all migrations. Fixtures never write to production or send emails.
 
-Apply `0001_initial.sql`, `0002_traffic_metrics.sql`, and `0003_acquisition_attribution.sql`. Deploy the Worker and its assets together with `npm run auth:deploy`, then read `/api/stats` and the protected dashboard to verify `measuredAt`, the reporting day and the separated metrics. Confirm that a forced *local* request failure clears the display; do not submit production test forms or page-view events. Live deployment requires an authorized Cloudflare session and is separate from a GitHub source commit.
+Apply all migrations through `0004_email_verification.sql`. Deploy the Worker and its assets together with `npm run auth:deploy`, then read `/api/stats` and the protected dashboard to verify `measuredAt`, the reporting day and the separated metrics. Confirm that a forced *local* request failure clears the display; do not submit production test forms or page-view events. Live deployment requires an authorized Cloudflare session and is separate from a GitHub source commit.
+
+### Free email provider setup
+
+BTC2G uses the Resend HTTP API. Its free plan currently supports 100 transactional emails per day. Before deploying email verification:
+
+1. Create the owner's Resend account and verify `btc2g.com` (or change `EMAIL_FROM` to an address on another verified domain).
+2. Create a sending-only API key and store it with `npx wrangler secret put RESEND_API_KEY --config cloudflare/auth/wrangler.jsonc`.
+3. Apply migration `0004_email_verification.sql` remotely, deploy, and verify using the owner's real account. Never commit the key or verification token.
+
+If `RESEND_API_KEY` is absent or delivery fails, the API returns an unavailable message and does not claim that mail was sent.
 
 This is an account count, not an identity-verification system. A verified-human metric requires an email or identity provider and is intentionally not claimed.
 

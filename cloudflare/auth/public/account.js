@@ -8,6 +8,10 @@ const termsCheckbox = document.querySelector('#accepted-terms');
 const password = document.querySelector('#password');
 const passwordHint = document.querySelector('#password-hint');
 const signedIn = document.querySelector('#signed-in');
+const emailForm = document.querySelector('#email-form');
+const emailInput = document.querySelector('#account-email');
+const emailSubmit = document.querySelector('#email-submit');
+const emailMessage = document.querySelector('#email-message');
 let mode = 'register';
 
 function setMessage(text, success = false) {
@@ -39,7 +43,31 @@ function showUser(user) {
   signedIn.hidden = false;
   document.querySelector('#signed-in-name').textContent = user.username;
   document.querySelector('#admin-link').hidden = user.role !== 'admin';
+  document.querySelector('#email-status').textContent = user.emailVerified && user.email
+    ? `Verified: ${user.email}`
+    : 'No verified email is attached.';
+  if (user.email) emailInput.value = user.email;
 }
+
+emailForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  emailSubmit.disabled = true;
+  emailMessage.textContent = '';
+  emailMessage.classList.remove('success');
+  try {
+    await request('/api/email-verification/request', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: emailInput.value })
+    });
+    emailMessage.textContent = 'Verification email sent. The link expires in 30 minutes.';
+    emailMessage.classList.add('success');
+  } catch (error) {
+    emailMessage.textContent = error.message;
+  } finally {
+    emailSubmit.disabled = false;
+  }
+});
 
 document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
   mode = tab.dataset.mode;

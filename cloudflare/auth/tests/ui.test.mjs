@@ -38,3 +38,16 @@ test('Product Hunt attribution is forwarded only through the account registratio
   assert.match(traffic, /url\.searchParams\.set\('attribution'/);
   assert.match(account, /attribution: mode === 'register'/);
 });
+
+test('signed-in account UI separates email verification from Premium and marketing', async () => {
+  const [html, script, verification] = await Promise.all([
+    readFile(new URL('index.html', root), 'utf8'),
+    readFile(new URL('account.js', root), 'utf8'),
+    readFile(new URL('verify-email.html', root), 'utf8')
+  ]);
+  assert.match(html, /id="email-form"/);
+  assert.match(html, /does not subscribe you to marketing or activate Premium/);
+  assert.match(script, /\/api\/email-verification\/request/);
+  assert.match(verification, /id="confirm-email"/);
+  assert.match(verification, /no-referrer/);
+});

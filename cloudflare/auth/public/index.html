@@ -51,6 +51,18 @@
       <div id="signed-in" hidden>
         <p>Signed in as <strong id="signed-in-name"></strong>.</p>
         <a class="admin-link" id="admin-link" href="/admin/" hidden>Open admin dashboard</a>
+        <section class="email-panel" aria-labelledby="email-title">
+          <h2 id="email-title">Account email</h2>
+          <p id="email-status">No verified email is attached.</p>
+          <form id="email-form">
+            <label>Email address
+              <input id="account-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+            </label>
+            <button class="primary" id="email-submit" type="submit">Send verification email</button>
+            <p class="message" id="email-message" role="status" aria-live="polite"></p>
+          </form>
+          <p class="field-hint">Verification identifies your account email only. It does not subscribe you to marketing or activate Premium.</p>
+        </section>
         <p><a href="https://btc2g.com/save.html">Compare Bitcoin quotes</a> · <a href="https://btc2g.com/index.html#calculator">Open BTC ↔ gold calculator</a></p>
         <button class="secondary" id="logout-button" type="button">Sign out</button>
       </div>

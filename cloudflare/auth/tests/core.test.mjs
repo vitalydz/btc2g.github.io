@@ -5,15 +5,27 @@ import {
   acquisitionSource,
   jerusalemDay,
   normalizePagePath,
+  normalizeEmail,
   normalizeUsername,
   parseCookies,
   publicStats,
   sessionCookie,
+  validateEmail,
   validateRegistration
 } from '../src/core.js';
 
 test('normalizes usernames without changing the display value', () => {
   assert.equal(normalizeUsername('  Codex_Admin '), 'codex_admin');
+});
+
+test('validates and normalizes account email addresses', () => {
+  assert.deepEqual(validateEmail(' Owner@Example.com '), {
+    ok: true, email: 'Owner@Example.com', emailKey: 'owner@example.com'
+  });
+  assert.equal(normalizeEmail(' A@Example.COM '), 'a@example.com');
+  for (const value of ['', 'missing-at.example', 'a@b', 'a..b@example.com']) {
+    assert.equal(validateEmail(value).ok, false);
+  }
 });
 
 test('validates public registration and protects reserved usernames', () => {

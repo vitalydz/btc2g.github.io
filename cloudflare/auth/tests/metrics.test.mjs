@@ -12,13 +12,14 @@ import { formatCount, measurementNote, percentage } from '../public/metrics-view
 function database(t) {
   const db = new DatabaseSync(':memory:');
   t.after(() => db.close());
-  for (const file of ['0001_initial.sql', '0002_traffic_metrics.sql', '0003_acquisition_attribution.sql']) {
+  for (const file of ['0001_initial.sql', '0002_traffic_metrics.sql', '0003_acquisition_attribution.sql',
+    '0004_email_verification.sql']) {
     db.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), 'utf8'));
   }
   return {
     db,
     env: {
-      PUBLIC_SITE_ORIGIN: 'https://btc2g.com', IP_HASH_SECRET: 'local-test-only',
+      APP_ORIGIN: 'https://metrics.test', PUBLIC_SITE_ORIGIN: 'https://btc2g.com', IP_HASH_SECRET: 'local-test-only',
       DB: {
         prepare(sql) {
           const statement = db.prepare(sql);
@@ -169,4 +170,61 @@ test('admin details stay protected and untrusted origins cannot record visits', 
     body: JSON.stringify({ path: '/' })
   }), env);
   assert.equal(blocked.status, 403);
+});
+
+test('signed-in users can verify an email without creating marketing consent', async t => {
+  const { env, db } = database(t);
+  const headers = admin(db);
+  let sent;
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    sent = JSON.parse(options.body);
+    return new Response(JSON.stringify({ id: 'local-email' }), { status: 200 });
+  });
+  const configured = {
+    ...env,
+    RESEND_API_KEY: 'local-test-key',
+    EMAIL_FROM: 'BTC2G <accounts@btc2g.com>'
+  };
+  const requested = await worker.fetch(new Request('https://metrics.test/api/email-verification/request', {
+    method: 'POST',
+    headers: { ...headers, Origin: configured.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'Owner@Example.com' })
+  }), configured);
+  assert.equal(requested.status, 200);
+  assert.deepEqual(sent.to, ['Owner@Example.com']);
+  assert.match(sent.text, /does not subscribe you to marketing or activate Premium/);
+  const token = new URL(sent.text.match(/https:\/\/\S+/)[0]).searchParams.get('token');
+  assert.ok(token);
+
+  const unsigned = await worker.fetch(new Request('https://metrics.test/api/email-verification/confirm', {
+    method: 'POST', headers: { Origin: configured.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  }), configured);
+  assert.equal(unsigned.status, 401);
+
+  const confirmed = await worker.fetch(new Request('https://metrics.test/api/email-verification/confirm', {
+    method: 'POST',
+    headers: { ...headers, Origin: configured.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  }), configured);
+  assert.equal(confirmed.status, 200);
+  const account = db.prepare("SELECT email, email_key, email_verified_at FROM users WHERE id = 'admin'").get();
+  assert.equal(account.email, 'Owner@Example.com');
+  assert.equal(account.email_key, 'owner@example.com');
+  assert.ok(account.email_verified_at > 0);
+  assert.equal(db.prepare('SELECT COUNT(*) AS count FROM email_verification_tokens').get().count, 0);
+  const report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers }), configured)).json();
+  assert.equal(report.summary.verifiedEmailTotal, 1);
+  assert.equal(report.confirmedSubscribers.total, null);
+});
+
+test('email verification fails closed when delivery is not configured', async t => {
+  const { env, db } = database(t);
+  const response = await worker.fetch(new Request('https://metrics.test/api/email-verification/request', {
+    method: 'POST',
+    headers: { ...admin(db), Origin: env.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'owner@example.com' })
+  }), env);
+  assert.equal(response.status, 503);
+  assert.equal(db.prepare('SELECT COUNT(*) AS count FROM email_verification_tokens').get().count, 0);
 });

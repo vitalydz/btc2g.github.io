@@ -38,7 +38,7 @@ const snapshot = {
   newToday: 2, totalAccounts: 3,
   traffic: { visitorsToday: 4, viewsToday: 9 },
   confirmedSubscribers: { total: null },
-  summary: { visitorsToday: 4, viewsToday: 9, registeredToday: 2, registeredTotal: 3, conversionToday: .5,
+  summary: { visitorsToday: 4, viewsToday: 9, registeredToday: 2, registeredTotal: 3, verifiedEmailTotal: 1, conversionToday: .5,
     productHuntVisitorsToday: 2, productHuntRegisteredToday: 1, productHuntConversionToday: .5 },
   daily: [], topPaths: [], recentRegistrations: [], methodology: 'Local test data'
 };

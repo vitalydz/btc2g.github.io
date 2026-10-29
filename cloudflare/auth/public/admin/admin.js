@@ -24,6 +24,7 @@ async function loadStats() {
     document.querySelector('#views-today').textContent = formatCount(data.summary.viewsToday);
     document.querySelector('#registered-today').textContent = formatCount(data.summary.registeredToday);
     document.querySelector('#registered-total').textContent = formatCount(data.summary.registeredTotal);
+    document.querySelector('#verified-email-total').textContent = formatCount(data.summary.verifiedEmailTotal);
     document.querySelector('#confirmed-subscribers').textContent = formatCount(data.confirmedSubscribers?.total);
     document.querySelector('#conversion-today').textContent = percentage(data.summary.conversionToday);
     document.querySelector('#producthunt-visitors').textContent = formatCount(data.summary.productHuntVisitorsToday);
@@ -45,7 +46,7 @@ async function loadStats() {
       const span = document.createElement('span'); span.textContent = formatCount(row.views); li.append(span); return li;
     }));
     document.querySelector('#recent-users').replaceChildren(...data.recentRegistrations.map(row => {
-      const li = document.createElement('li'); li.textContent = row.username;
+      const li = document.createElement('li'); li.textContent = `${row.username}${row.email_verified ? ' · email verified' : ''}`;
       const span = document.createElement('span'); span.textContent = row.created_day; li.append(span); return li;
     }));
     document.querySelector('#methodology').textContent = data.methodology;

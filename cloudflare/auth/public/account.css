@@ -31,6 +31,9 @@ input:focus { border-color:var(--gold); box-shadow:0 0 0 3px #f4b94222; }
 .message { min-height:1.4em; margin:0; color:var(--red); font-size:.9rem; }
 .message.success { color:var(--green); }
 #signed-in { text-align:center; }
+.email-panel { margin:20px 0; padding:18px; border:1px solid var(--line); border-radius:14px; background:#0b0f16; text-align:left; }
+.email-panel h2 { margin:0 0 6px; font-size:1.1rem; }
+.email-panel>p { color:var(--muted); }
 .admin-link { display:block; width:max-content; margin:0 auto 14px; font-weight:800; }
 .disclaimer { margin:24px auto 0; max-width:620px; color:#778294; font-size:.78rem; text-align:center; }
 @media (max-width:560px) { .shell{width:min(100% - 20px,720px);padding-top:18px}.hero{padding:40px 8px 24px}.stats{grid-template-columns:1fr}.stats>p{grid-column:auto}.card{padding:18px}.stats>div{padding:14px 10px} }
