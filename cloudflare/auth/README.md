@@ -42,6 +42,8 @@ BTC2G uses the Resend HTTP API. Its free plan currently supports 100 transaction
 2. Create a sending-only API key and store it with `npx wrangler secret put RESEND_API_KEY --config cloudflare/auth/wrangler.jsonc`.
 3. Apply migration `0004_email_verification.sql` remotely, deploy, and verify using the owner's real account. Never commit the key or verification token.
 
+Verification mail sets `support@btc2g.com` as its reply address. Incoming support mail is expected to use the domain's configured mail-forwarding service; Resend remains the transactional sender, not the support inbox.
+
 If `RESEND_API_KEY` is absent or delivery fails, the pending account remains accessible so its owner can retry, but it is not counted as a completed registration and the UI does not claim that mail was sent.
 
 This is an account count, not an identity-verification system. A verified-human metric requires an email or identity provider and is intentionally not claimed.

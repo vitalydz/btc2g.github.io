@@ -612,6 +612,7 @@ async function sendVerificationEmail(env, user, email, token) {
     body: JSON.stringify({
       from: env.EMAIL_FROM,
       to: [email],
+      reply_to: 'support@btc2g.com',
       subject: 'Verify your BTC2G email',
       text: `Hello ${user.username},\n\nConfirm this email for your BTC2G account:\n${link}\n\nThe link expires in 30 minutes. This does not subscribe you to marketing or activate Premium.`,
       html: `<p>Hello ${user.username},</p><p>Confirm this email for your BTC2G account:</p><p><a href="${link}">Verify email</a></p><p>The link expires in 30 minutes. This does not subscribe you to marketing or activate Premium.</p>`

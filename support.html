@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact BTC2G support for account, passkey, privacy, security, and service questions.">
+  <title>Support - BTC2G</title>
+  <style>
+    :root { color-scheme: dark; --panel:#111827; --line:#2d3a4d; --text:#f5f7fb; --muted:#b3bfd0; --link:#8fc8ff; --warn:#ffd27a; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:40px 20px; background:radial-gradient(circle at 50% 0,#17233a,#070a10 48%); color:var(--text); font:16px/1.6 Inter,system-ui,-apple-system,Segoe UI,sans-serif; }
+    main { max-width:900px; margin:auto; }
+    .panel { margin:18px 0; padding:24px; border:1px solid var(--line); border-radius:16px; background:rgba(17,24,39,.94); }
+    h1,h2 { line-height:1.2; }
+    h1 { font-size:clamp(2rem,7vw,3.5rem); margin:.2em 0; }
+    h2 { margin-top:0; font-size:1.2rem; }
+    p,li { color:var(--muted); }
+    a { color:var(--link); }
+    .actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .action { display:block; padding:16px; border:1px solid var(--line); border-radius:12px; background:#0b111d; text-decoration:none; font-weight:800; }
+    .warning { color:var(--warn); }
+    code { overflow-wrap:anywhere; }
+    @media (max-width:640px) { body{padding:24px 12px}.panel{padding:18px}.actions{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <main>
+    <p><a href="index.html">₿ BTC2G</a></p>
+    <h1>BTC2G Support</h1>
+    <p>Email <a href="mailto:support@btc2g.com?subject=BTC2G%20Support">support@btc2g.com</a>. Choose a topic below so the request can be identified quickly.</p>
+
+    <section class="panel actions" aria-label="Support topics">
+      <a class="action" href="mailto:support@btc2g.com?subject=%5BBTC2G%20Account%5D%20Access%20or%20verification">Account, email, or passkey</a>
+      <a class="action" href="mailto:support@btc2g.com?subject=%5BBTC2G%20Privacy%5D%20Data%20request">Privacy or data request</a>
+      <a class="action" href="mailto:support@btc2g.com?subject=%5BBTC2G%20Security%5D%20Responsible%20report">Security or abuse report</a>
+      <a class="action" href="mailto:support@btc2g.com?subject=%5BBTC2G%20Feedback%5D%20Question%20or%20suggestion">Question or feedback</a>
+    </section>
+
+    <section class="panel">
+      <h2>What to include</h2>
+      <ul>
+        <li>Your BTC2G username and the email address already associated with the account.</li>
+        <li>The page URL, approximate time and time zone, and the exact error message.</li>
+        <li>A screenshot only after hiding personal, payment, wallet, and authentication information.</li>
+        <li>For privacy requests, state whether you want access, correction, or deletion. BTC2G may request reasonable account verification before acting.</li>
+      </ul>
+    </section>
+
+    <section class="panel" id="security">
+      <h2>Security reports</h2>
+      <p>Describe the affected URL, expected and observed behavior, and safe reproduction steps. Do not access, alter, retain, or disclose another person's data; disrupt the service; or demand payment. A report does not authorize testing beyond your own account and data.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Transactions handled by external providers</h2>
+      <p>For a MoonPay, Topper, Stripe, bank, card, or blockchain transaction, contact the provider named on the receipt first. BTC2G does not process, reverse, settle, or custody those transactions. Support can clarify which BTC2G link was used but cannot override a provider's decision.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Never send secrets by email</h2>
+      <p class="warning"><strong>Do not send</strong> passwords, passkeys, one-time verification links or codes, private keys, wallet seed phrases, recovery codes, full payment-card numbers, or identity documents. BTC2G support will not ask for these by ordinary email.</p>
+      <p>Support is not monitored as an emergency service and no response time is guaranteed. It does not provide financial, trading, legal, or tax advice.</p>
+    </section>
+
+    <p><a href="terms.html">Terms of Service</a> · <a href="privacy.html">Privacy Policy</a> · <a href="index.html">Back to Home</a></p>
+  </main>
+  <script src="assets/js/traffic.js" defer></script>
+</body>
+</html>

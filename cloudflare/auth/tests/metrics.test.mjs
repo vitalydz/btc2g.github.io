@@ -329,6 +329,7 @@ test('signed-in users can verify an email without creating marketing consent', a
   }), configured);
   assert.equal(requested.status, 200);
   assert.deepEqual(sent.to, ['Owner@Example.com']);
+  assert.equal(sent.reply_to, 'support@btc2g.com');
   assert.match(sent.text, /does not subscribe you to marketing or activate Premium/);
   const token = new URL(sent.text.match(/https:\/\/\S+/)[0]).searchParams.get('token');
   assert.ok(token);

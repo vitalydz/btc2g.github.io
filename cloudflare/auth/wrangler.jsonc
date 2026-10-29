@@ -24,7 +24,7 @@
   "vars": {
     "APP_ORIGIN": "https://btc2g-accounts.btc2g.workers.dev",
     "PUBLIC_SITE_ORIGIN": "https://btc2g.com",
-    "TERMS_VERSION": "2026-10-29",
+    "TERMS_VERSION": "2026-10-29.2",
     "REGISTRATION_LIMIT_PER_HOUR": "5",
     "EMAIL_FROM": "BTC2G <accounts@btc2g.com>",
     "WEBAUTHN_RP_ID": "btc2g-accounts.btc2g.workers.dev",
