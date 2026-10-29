@@ -13,7 +13,23 @@ This Cloudflare Worker hosts a same-origin account page and API backed by D1. Pu
 - Explicit Terms and Privacy Policy acceptance recorded with a version and timestamp.
 - Daily traffic uses a salted hash of IP + user agent; raw IP addresses and user-agent strings are not stored.
 
-The protected `/admin/` dashboard shows unique visitors, page views, registrations, conversion, daily history, top paths, and recent usernames. Only a live session for a D1 user with `role = 'admin'` can read `/api/admin/stats`.
+The protected `/admin/` dashboard shows visitor estimates, page views, registrations, registration/visitor ratios, daily history, top paths, and recent usernames. Only a live session for a D1 user with `role = 'admin'` can read `/api/admin/stats`.
+
+### Reading statistics correctly
+
+- Use `https://btc2g-accounts.btc2g.workers.dev/api/stats` for the public summary. GitHub Pages does not route `https://btc2g.com/api/stats` to this Worker.
+- The public account page and protected dashboard show traffic estimates, recorded page views, account registrations and confirmed email subscriptions separately.
+- Responses include `source`, `measuredAt`, `day` and `timeZone` (`Asia/Jerusalem`). Traffic before the earliest retained recorded visit is unknown, not zero. `firstRecordedVisitAt` is the earliest retained evidence, not a claim that full-day collection began then.
+- IP/browser hashes estimate browsers, not unique people. Ad blockers, shared networks and automated traffic affect counts. Registration/visitor ratios are aggregate ratios, not attributed conversions.
+- `confirmedSubscribers.status` is `unavailable` and counts are `null` until a confirmed email subscription source is connected. Account creation and Formspree acceptance are not subscription confirmation. The old `dailyGoal`/`remainingToday` fields refer only to accounts and are retained for API compatibility; they do not measure the owner's confirmed-subscriber goal.
+- Use **Refresh statistics** to recheck. A failed request clears visible values to **Data unavailable**, rather than displaying stale numbers as current. No traffic event or test email is needed to read the counters.
+- If Cloudflare returns an access error (for example `403 / 1010`), the counters are unavailable from that client. Do not infer zero or bypass the restriction; deployment/access configuration must be checked through the authorized Cloudflare account.
+
+### Validation and release of metrics changes
+
+Run `npm test` with Node 24 (the SQL integration tests use built-in `node:sqlite`). Tests run the Worker against an in-memory SQLite database, including both migrations. Fixtures never write to production or send emails.
+
+This patch does not require a new D1 migration. The existing `0001_initial.sql` and `0002_traffic_metrics.sql` must already have been applied. Deploy the Worker and its assets together with `npm run auth:deploy`, then read `/api/stats` and the protected dashboard to verify `measuredAt`, the reporting day and the separated metrics. Confirm that a forced *local* request failure clears the display; do not submit production test forms or page-view events. Live deployment requires an authorized Cloudflare session and is separate from a GitHub source commit.
 
 This is an account count, not an identity-verification system. A verified-human metric requires an email or identity provider and is intentionally not claimed.
 

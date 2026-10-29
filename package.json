@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "node --test tests cloudflare/auth/tests",
+    "test": "node --test \"tests/*.test.cjs\" \"cloudflare/auth/tests/*.test.mjs\"",
     "auth:dev": "npx --yes wrangler@4.68.0 dev --config cloudflare/auth/wrangler.jsonc",
     "auth:deploy": "npx --yes wrangler@4.68.0 deploy --config cloudflare/auth/wrangler.jsonc"
   },
