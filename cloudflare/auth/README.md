@@ -11,6 +11,9 @@ This Cloudflare Worker hosts a same-origin account page and API backed by D1. Pu
 - Reserved public names, including `Codex_admin`.
 - One-time administrator bootstrap protected by a Cloudflare secret and disabled after the first admin exists.
 - Explicit Terms and Privacy Policy acceptance recorded with a version and timestamp.
+- Daily traffic uses a salted hash of IP + user agent; raw IP addresses and user-agent strings are not stored.
+
+The protected `/admin/` dashboard shows unique visitors, page views, registrations, conversion, daily history, top paths, and recent usernames. Only a live session for a D1 user with `role = 'admin'` can read `/api/admin/stats`.
 
 This is an account count, not an identity-verification system. A verified-human metric requires an email or identity provider and is intentionally not claimed.
 

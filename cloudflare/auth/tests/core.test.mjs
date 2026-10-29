@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   clearSessionCookie,
   jerusalemDay,
+  normalizePagePath,
   normalizeUsername,
   parseCookies,
   publicStats,
@@ -52,4 +53,12 @@ test('reports only stored account totals and a non-negative goal remainder', () 
     countingMethod: 'D1 account rows; no estimated or fabricated users'
   });
   assert.equal(publicStats(140, 120).remainingToday, 0);
+});
+
+test('accepts only bounded same-site page paths for traffic metrics', () => {
+  assert.equal(normalizePagePath('/bitcoin-gold-ratio.html?campaign=x'), '/bitcoin-gold-ratio.html');
+  assert.equal(normalizePagePath('/'), '/');
+  assert.equal(normalizePagePath('https://example.com/'), null);
+  assert.equal(normalizePagePath('//example.com'), null);
+  assert.equal(normalizePagePath(`/${'x'.repeat(300)}`), null);
 });

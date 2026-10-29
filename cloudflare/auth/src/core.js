@@ -70,3 +70,9 @@ export function publicStats(totalAccounts, newToday, goal = 100) {
     countingMethod: 'D1 account rows; no estimated or fabricated users'
   };
 }
+
+export function normalizePagePath(value) {
+  const path = String(value || '').trim();
+  if (!path.startsWith('/') || path.startsWith('//') || path.length > 256) return null;
+  return path.split(/[?#]/, 1)[0] || '/';
+}

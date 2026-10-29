@@ -36,6 +36,7 @@ function showUser(user) {
   document.querySelector('.tabs').hidden = true;
   signedIn.hidden = false;
   document.querySelector('#signed-in-name').textContent = user.username;
+  document.querySelector('#admin-link').hidden = user.role !== 'admin';
 }
 
 document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {

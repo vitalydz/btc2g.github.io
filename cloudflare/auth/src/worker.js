@@ -3,6 +3,7 @@ import {
   SESSION_MAX_AGE_SECONDS,
   clearSessionCookie,
   jerusalemDay,
+  normalizePagePath,
   normalizeUsername,
   parseCookies,
   publicStats,
@@ -19,6 +20,17 @@ function json(data, status = 200, headers = {}) {
   });
 }
 
+function corsHeaders(origin, env) {
+  if (!origin || origin !== env.PUBLIC_SITE_ORIGIN) return {};
+  return {
+    'access-control-allow-origin': origin,
+    'access-control-allow-methods': 'POST, OPTIONS',
+    'access-control-allow-headers': 'content-type',
+    'access-control-max-age': '86400',
+    vary: 'Origin'
+  };
+}
+
 function bytesToBase64Url(bytes) {
   let binary = '';
   for (const byte of bytes) binary += String.fromCharCode(byte);
@@ -31,6 +43,13 @@ function randomToken(byteLength = 32) {
 
 async function sha256(value) {
   return bytesToBase64Url(new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(value))));
+}
+
+async function hmacSha256(secret, value) {
+  const key = await crypto.subtle.importKey(
+    'raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  return bytesToBase64Url(new Uint8Array(await crypto.subtle.sign('HMAC', key, encoder.encode(value))));
 }
 
 async function passwordHash(password, salt, iterations = PASSWORD_ITERATIONS) {
@@ -184,19 +203,130 @@ async function stats(env) {
   return json({ ...publicStats(row?.total_accounts, row?.new_today), day, timeZone: 'Asia/Jerusalem' });
 }
 
+async function recordVisit(request, env) {
+  const origin = request.headers.get('Origin');
+  const cors = corsHeaders(origin, env);
+  if (!cors['access-control-allow-origin']) return json({ error: 'Origin not allowed.' }, 403);
+  if (!env.IP_HASH_SECRET) return json({ error: 'Metrics are temporarily unavailable.' }, 503, cors);
+
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400, cors); }
+  const pagePath = normalizePagePath(input?.path);
+  if (!pagePath) return json({ error: 'Invalid page path.' }, 400, cors);
+
+  const day = jerusalemDay();
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const userAgent = (request.headers.get('User-Agent') || 'unknown').slice(0, 256);
+  const visitorHash = await hmacSha256(env.IP_HASH_SECRET, `${day}:${ip}:${userAgent}`);
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.batch([
+    env.DB.prepare(`
+      INSERT INTO daily_visitors
+        (day, visitor_hash, first_path, last_path, first_seen_at, last_seen_at, views)
+      VALUES (?, ?, ?, ?, ?, ?, 1)
+      ON CONFLICT(day, visitor_hash) DO UPDATE SET
+        last_path = excluded.last_path,
+        last_seen_at = excluded.last_seen_at,
+        views = daily_visitors.views + 1
+    `).bind(day, visitorHash, pagePath, pagePath, now, now),
+    env.DB.prepare(`
+      INSERT INTO daily_pageviews (day, page_path, views) VALUES (?, ?, 1)
+      ON CONFLICT(day, page_path) DO UPDATE SET views = daily_pageviews.views + 1
+    `).bind(day, pagePath)
+  ]);
+  return json({ ok: true }, 202, cors);
+}
+
+async function adminStats(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  const url = new URL(request.url);
+  const requestedDays = Number.parseInt(url.searchParams.get('days') || '7', 10);
+  const days = [7, 30, 90].includes(requestedDays) ? requestedDays : 7;
+  const today = jerusalemDay();
+
+  const [summary, dailyResult, pathsResult, recentResult] = await Promise.all([
+    env.DB.prepare(`
+      SELECT
+        (SELECT COUNT(*) FROM daily_visitors WHERE day = ?) AS visitors_today,
+        (SELECT COALESCE(SUM(views), 0) FROM daily_pageviews WHERE day = ?) AS views_today,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL) AS registered_total,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND created_day = ?) AS registered_today
+    `).bind(today, today, today).first(),
+    env.DB.prepare(`
+      WITH RECURSIVE dates(day) AS (
+        SELECT date(?, '-' || ? || ' day')
+        UNION ALL SELECT date(day, '+1 day') FROM dates WHERE day < ?
+      ), traffic AS (
+        SELECT day, COUNT(*) AS visitors, COALESCE(SUM(views), 0) AS views
+        FROM daily_visitors GROUP BY day
+      ), registrations AS (
+        SELECT created_day AS day, COUNT(*) AS registrations
+        FROM users WHERE role = 'user' AND disabled_at IS NULL GROUP BY created_day
+      )
+      SELECT dates.day,
+             COALESCE(traffic.visitors, 0) AS visitors,
+             COALESCE(traffic.views, 0) AS views,
+             COALESCE(registrations.registrations, 0) AS registrations
+      FROM dates
+      LEFT JOIN traffic ON traffic.day = dates.day
+      LEFT JOIN registrations ON registrations.day = dates.day
+      ORDER BY dates.day DESC
+    `).bind(today, days - 1, today).all(),
+    env.DB.prepare(`
+      SELECT page_path AS path, SUM(views) AS views
+      FROM daily_pageviews
+      WHERE day >= date(?, '-' || ? || ' day')
+      GROUP BY page_path ORDER BY views DESC, page_path ASC LIMIT 10
+    `).bind(today, days - 1).all(),
+    env.DB.prepare(`
+      SELECT username, created_at, created_day
+      FROM users WHERE role = 'user' AND disabled_at IS NULL
+      ORDER BY created_at DESC LIMIT 20
+    `).all()
+  ]);
+
+  const visitorsToday = Number(summary?.visitors_today || 0);
+  const registeredToday = Number(summary?.registered_today || 0);
+  return json({
+    rangeDays: days,
+    day: today,
+    timeZone: 'Asia/Jerusalem',
+    summary: {
+      visitorsToday,
+      viewsToday: Number(summary?.views_today || 0),
+      registeredToday,
+      registeredTotal: Number(summary?.registered_total || 0),
+      conversionToday: visitorsToday ? registeredToday / visitorsToday : 0
+    },
+    daily: dailyResult.results || [],
+    topPaths: pathsResult.results || [],
+    recentRegistrations: recentResult.results || [],
+    methodology: 'Unique visitors are daily salted hashes of IP + user agent. Raw IP addresses are not stored.'
+  });
+}
+
 async function api(request, env) {
   const url = new URL(request.url);
   if (request.method === 'GET' && url.pathname === '/api/stats') return stats(env);
+  if (request.method === 'GET' && url.pathname === '/api/admin/stats') return adminStats(request, env);
   if (request.method === 'GET' && url.pathname === '/api/me') {
     const user = await currentUser(request, env);
     return user ? json({ user }) : json({ user: null }, 401);
   }
   if (request.method === 'POST') {
+    if (url.pathname === '/api/visit') return recordVisit(request, env);
     if (!sameOrigin(request, env)) return json({ error: 'Origin not allowed.' }, 403);
     if (url.pathname === '/api/register') return register(request, env);
     if (url.pathname === '/api/login') return login(request, env);
     if (url.pathname === '/api/logout') return logout(request, env);
     if (url.pathname === '/api/bootstrap-admin') return bootstrapAdmin(request, env);
+  }
+  if (request.method === 'OPTIONS' && url.pathname === '/api/visit') {
+    const headers = corsHeaders(request.headers.get('Origin'), env);
+    return headers['access-control-allow-origin']
+      ? new Response(null, { status: 204, headers })
+      : json({ error: 'Origin not allowed.' }, 403);
   }
   return json({ error: 'Not found.' }, 404);
 }
@@ -215,9 +345,12 @@ export default {
 
   async scheduled(_event, env) {
     const now = Math.floor(Date.now() / 1000);
+    const retentionDays = Math.max(30, Number(env.METRICS_RETENTION_DAYS || 400));
     await env.DB.batch([
       env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(now),
-      env.DB.prepare('DELETE FROM registration_attempts WHERE window_start < ?').bind(now - 86400)
+      env.DB.prepare('DELETE FROM registration_attempts WHERE window_start < ?').bind(now - 86400),
+      env.DB.prepare("DELETE FROM daily_visitors WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays),
+      env.DB.prepare("DELETE FROM daily_pageviews WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays)
     ]);
   }
 };
