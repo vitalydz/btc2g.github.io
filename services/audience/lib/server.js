@@ -3,6 +3,7 @@ const digest = value => createHash('sha256').update(value).digest('hex');
 const dayAt = now => new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
 const tokenPattern = /^[a-f0-9]{64}$/;
 const genericReceipt = {status:'request_received', confirmed:false};
+const {messages,language} = require('./language');
 
 function createHandler(route, {db = require('./db'), env = process.env, send = globalThis.fetch, now = () => new Date(), random = () => randomBytes(32).toString('hex')} = {}) {
  return async (req, res) => {
@@ -10,11 +11,12 @@ function createHandler(route, {db = require('./db'), env = process.env, send = g
   res.setHeader('Referrer-Policy','no-referrer');
   res.setHeader('X-Content-Type-Options','nosniff');
   const json = (status, body) => { res.statusCode=status; res.setHeader('Content-Type','application/json; charset=utf-8'); res.end(JSON.stringify(body)); };
+  let lang = language(new URL(req.url,'https://local.invalid').searchParams.get('lang'));
   const html = (status, body) => {
    res.statusCode=status;
    res.setHeader('Content-Type','text/html; charset=utf-8');
    res.setHeader('Content-Security-Policy',"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
-   res.end('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>BTC2G subscription</title><body>'+body+'</body></html>');
+   res.end('<!doctype html><html lang="'+lang+'" dir="'+(lang==='he'?'rtl':'ltr')+'"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>BTC2G subscription</title><body>'+body+'</body></html>');
   };
   try {
    const site = new URL(env.SITE_ORIGIN || 'https://btc2g.com').origin;
@@ -55,14 +57,23 @@ function createHandler(route, {db = require('./db'), env = process.env, send = g
    }
    if (route==='confirm' || route==='unsubscribe') {
     const token = req.method==='GET' ? new URL(req.url,'https://local.invalid').searchParams.get('token') : body.token;
-    if (typeof token!=='string' || !tokenPattern.test(token)) return html(400,'<p>Invalid link.</p>');
-    // GET never confirms: mail security scanners must not become subscribers.
-    if (req.method==='GET') return html(200,`<h1>BTC2G</h1><p>${route==='confirm'?'Confirm your subscription to BTC2G product updates.':'Unsubscribe from BTC2G product updates.'}</p><form method="post"><input type="hidden" name="token" value="${token}"><button type="submit">${route==='confirm'?'Confirm subscription':'Unsubscribe'}</button></form>`);
+    if (typeof token!=='string' || !tokenPattern.test(token)) return html(400,'<p>'+messages[lang].invalid+'</p>');
+    // Read language even for expired/used tokens; GET never mutates subscription state.
+    const found=await db.query(`SELECT language FROM audience_tokens WHERE ${route==='confirm'?'token_hash':'unsubscribe_hash'}=$1`,[digest(token)]);
+    if(found.rows.length) lang=language(found.rows[0].language);
+    const t=messages[lang];
+    if (req.method==='GET') return html(200,`<h1>BTC2G</h1><p>${route==='confirm'?t.prompt:t.leave}</p><form method="post"><input type="hidden" name="token" value="${token}"><button type="submit">${route==='confirm'?t.confirm:t.unsubscribe}</button></form>`);
     const result = route==='confirm'
-     ? await db.query(`UPDATE audience_subscriptions SET confirmed_at=now(), token_hash=NULL, token_expires_at=NULL WHERE token_hash=$1 AND token_expires_at>now() AND confirmed_at IS NULL AND unsubscribed_at IS NULL RETURNING email`,[digest(token)])
-     : await db.query(`UPDATE audience_subscriptions SET unsubscribed_at=coalesce(unsubscribed_at,now()), token_hash=NULL, token_expires_at=NULL WHERE unsubscribe_hash=$1 RETURNING email`,[digest(token)]);
-    if (!result.rows.length) return html(400,'<p>This link has expired or was already used.</p>');
-    return html(200,route==='confirm'?'<p>Your BTC2G subscription is confirmed.</p>':'<p>You have unsubscribed.</p>');
+     ? await db.query(`WITH consumed AS (
+       UPDATE audience_tokens SET used_at=now() WHERE token_hash=$1 AND expires_at>now() AND used_at IS NULL RETURNING email
+      ) UPDATE audience_subscriptions s SET confirmed_at=coalesce(s.confirmed_at,now()),token_hash=NULL,token_expires_at=NULL
+       FROM consumed c WHERE s.email=c.email AND s.unsubscribed_at IS NULL RETURNING s.email`,[digest(token)])
+     : await db.query(`WITH target AS (SELECT email FROM audience_tokens WHERE unsubscribe_hash=$1),
+       invalidated AS (UPDATE audience_tokens SET used_at=coalesce(used_at,now()) WHERE email IN (SELECT email FROM target))
+       UPDATE audience_subscriptions SET unsubscribed_at=coalesce(unsubscribed_at,now()), token_hash=NULL,token_expires_at=NULL
+       WHERE email IN (SELECT email FROM target) RETURNING email`,[digest(token)]);
+    if (!result.rows.length) return html(400,'<p>'+t.invalid+'</p>');
+    return html(200,'<p>'+(route==='confirm'?t.confirmed:t.left)+'</p>');
    }
    if (!env.VISITOR_HASH_SECRET || env.VISITOR_HASH_SECRET.length<32) return json(503,{error:'service_not_configured'});
    // Deploy only on Vercel, which supplies x-forwarded-for. Do not expose behind an untrusted proxy.
@@ -86,14 +97,33 @@ function createHandler(route, {db = require('./db'), env = process.env, send = g
    const bucket=hash('subscribe\n'+ip+'\n'+stamp.toISOString().slice(0,13));
    const rate=await db.query(`INSERT INTO audience_rate_limits(bucket,expires_at) VALUES($1,now()+interval '2 hours') ON CONFLICT(bucket) DO UPDATE SET attempts=audience_rate_limits.attempts+1 RETURNING attempts`,[bucket]);
    if (rate.rows[0].attempts>5) return json(429,{error:'rate_limited'});
-   const token=random(), unsubscribe=random();
-   const inserted=await db.query(`INSERT INTO audience_subscriptions(email,consent_version,token_hash,token_expires_at,unsubscribe_hash) VALUES($1,$2,$3,now()+interval '24 hours',$4)
-    ON CONFLICT(email) DO UPDATE SET requested_at=now(),consent_version=excluded.consent_version,token_hash=excluded.token_hash,token_expires_at=excluded.token_expires_at,unsubscribe_hash=excluded.unsubscribe_hash,confirmed_at=NULL,unsubscribed_at=NULL
-    WHERE (audience_subscriptions.confirmed_at IS NULL OR audience_subscriptions.unsubscribed_at IS NOT NULL) AND audience_subscriptions.requested_at<now()-interval '15 minutes' RETURNING email`,[email,body.consentVersion,digest(token),digest(unsubscribe)]);
-   if (!inserted.rows.length) return json(202,genericReceipt);
+   lang=language(body.lang);
+   const t=messages[lang], token=random(), unsubscribe=random(), attempt=digest(token);
+   const inserted=await db.query(`INSERT INTO audience_subscriptions(email,consent_version,token_hash,token_expires_at,unsubscribe_hash,language,delivery_state,last_attempt_hash)
+    VALUES($1,$2,NULL,NULL,$4,$5,'pending',$3)
+    ON CONFLICT(email) DO UPDATE SET requested_at=now(),consent_version=excluded.consent_version,language=excluded.language,
+     delivery_state='pending',last_attempt_hash=excluded.last_attempt_hash,confirmed_at=NULL,unsubscribed_at=NULL
+    WHERE (audience_subscriptions.confirmed_at IS NULL OR audience_subscriptions.unsubscribed_at IS NOT NULL)
+     AND audience_subscriptions.requested_at < now() - CASE audience_subscriptions.delivery_state
+      WHEN 'failed' THEN interval '1 minute' WHEN 'pending' THEN interval '2 minutes' ELSE interval '15 minutes' END
+    RETURNING email`,[email,body.consentVersion,attempt,digest(unsubscribe),lang]);
+   // Do not turn an unsent/cooldown retry into a successful receipt.
+   // Generic response for active subscriptions too, to avoid exposing membership.
+   if (!inserted.rows.length) {res.setHeader('Retry-After','900');return json(429,{error:'request_not_sent',retryAfterSeconds:900,confirmed:false});}
+   await db.query(`INSERT INTO audience_tokens(token_hash,unsubscribe_hash,email,language,expires_at) VALUES($1,$2,$3,$4,now()+interval '24 hours')`,[attempt,digest(unsubscribe),email,lang]);
    const base=new URL(env.API_ORIGIN).origin;
-   const response=await send('https://api.resend.com/emails',{method:'POST',signal:AbortSignal.timeout(10000),headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':'btc2g-'+digest(token)},body:JSON.stringify({from:env.MAIL_FROM,to:[email],subject:'Confirm your BTC2G subscription',text:`You requested BTC2G product updates. Open this link and press Confirm subscription within 24 hours:\n${base}/api/confirm?token=${token}\n\nIf you did not request this, ignore this email.\nUnsubscribe: ${base}/api/unsubscribe?token=${unsubscribe}`})});
-   if (!response.ok) throw new Error('Mail unavailable');
+   let state='unknown';
+   try {
+    const response=await send('https://api.resend.com/emails',{method:'POST',signal:AbortSignal.timeout(10000),headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':'btc2g-'+attempt},body:JSON.stringify({from:env.MAIL_FROM,to:[email],subject:t.subject,text:`${t.intro}\n${base}/api/confirm?token=${token}&lang=${lang}\n\n${t.ignore}\n${t.unsubscribe}: ${base}/api/unsubscribe?token=${unsubscribe}&lang=${lang}`})});
+    state=response.ok?'accepted':(response.status>=400 && response.status<500 && response.status!==408?'failed':'unknown');
+   } catch {} // Timeout is ambiguous: retain this token and every earlier valid link.
+   await db.query(`UPDATE audience_tokens SET delivery_state=$2 WHERE token_hash=$1`,[attempt,state]);
+   await db.query(`UPDATE audience_subscriptions SET delivery_state=$2 WHERE email=$1 AND last_attempt_hash=$3`,[email,state,attempt]);
+   if(state!=='accepted') {
+    const retry=state==='failed'?60:900;
+    res.setHeader('Retry-After',String(retry));
+    return json(503,{error:'mail_'+state,confirmed:false,retryAfterSeconds:retry,message:'Receipt could not be confirmed. Retry only by explicit user action after the stated delay.'});
+   }
    return json(202,genericReceipt);
   } catch (error) {
    if (error instanceof SyntaxError) return json(400,{error:'invalid_body'});

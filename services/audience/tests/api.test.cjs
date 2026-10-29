@@ -25,21 +25,21 @@ test('subscribe stores hashes, sends one confirmation and reports no confirmatio
 });
 test('repeat or already active subscription never sends another email or exposes membership',async()=>{
  let n=0; const r=await call('subscribe',{body:email,query:async()=>({rows:++n===1?[{attempts:1}]:[]})});
- assert.equal(r.statusCode,202);assert.equal(JSON.parse(r.body).confirmed,false);
+ assert.equal(r.statusCode,429);assert.equal(JSON.parse(r.body).confirmed,false);
 });
 test('persistent rate limit stops outgoing email',async()=>{
  const r=await call('subscribe',{body:email,query:async()=>({rows:[{attempts:6}]})});assert.equal(r.statusCode,429);
 });
 test('GET confirmation and unsubscribe never mutate the database',async()=>{
  for(const route of ['confirm','unsubscribe']){
-  const r=await call(route,{method:'GET',url:'/api/'+route+'?token='+'a'.repeat(64),query:()=>{throw Error('GET must not query');}});
+  const r=await call(route,{method:'GET',url:'/api/'+route+'?token='+'a'.repeat(64),query:async sql=>{assert.match(sql,/^SELECT language/);return {rows:[]};}});
   assert.equal(r.statusCode,200);assert.match(r.body,/<form method="post">/);assert.equal(r.headers['Referrer-Policy'],'no-referrer');
  }
 });
 test('confirmation requires an unexpired unused token and does not expose email',async()=>{
  let sqlText;
  const r=await call('confirm',{body:{token:'a'.repeat(64)},query:async(sql,args)=>{sqlText=sql;assert.equal(args[0],digest('a'.repeat(64)));return{rows:[{email:email.email}]};}});
- assert.equal(r.statusCode,200);assert.match(sqlText,/token_expires_at>now\(\)/);assert.match(sqlText,/token_hash=NULL/);assert.equal(r.body.includes(email.email),false);
+ assert.equal(r.statusCode,200);assert.match(sqlText,/expires_at>now\(\)/);assert.match(sqlText,/token_hash=NULL/);assert.equal(r.body.includes(email.email),false);
  const reused=await call('confirm',{body:{token:'a'.repeat(64)}});assert.equal(reused.statusCode,400);
 });
 test('invalid token cannot inject HTML or reach storage',async()=>{
@@ -68,5 +68,29 @@ test('database, provider and configuration failures return unavailable, never fa
   {query:async sql=>({rows:sql.includes('rate_limits')?[{attempts:1}]:[{}]}),send:async()=>({ok:false})}
  ]){
   const r=await call('subscribe',{body:email,...options});assert.equal(r.statusCode,503);assert.doesNotMatch(r.body,/secret-database-string/);
+ }
+});
+test('localized mail and stored-token language survive confirmation, expiry and unsubscribe',async()=>{
+ const {messages}=require('../lib/language');
+ for(const lang of ['en','ru','he']) {
+  let mail;
+  const sent=await call('subscribe',{body:{...email,lang},query:async sql=>({rows:sql.includes('rate_limits')?[{attempts:1}]:[{email:email.email}]}),send:async(url,options)=>{mail=JSON.parse(options.body);return{ok:true};}});
+  assert.equal(sent.statusCode,202);assert.equal(mail.subject,messages[lang].subject);assert.match(mail.text,new RegExp('lang='+lang));
+  for(const route of ['confirm','unsubscribe']) {
+   const page=await call(route,{method:'GET',url:'/api/'+route+'?token='+'a'.repeat(64)+'&lang=en',query:async()=>({rows:[{language:lang}]})});
+   assert.match(page.body,new RegExp('lang="'+lang+'"'));assert.match(page.body,new RegExp('dir="'+(lang==='he'?'rtl':'ltr')+'"'));assert.ok(page.body.includes(messages[lang][route]));
+   const expired=await call(route,{body:{token:'a'.repeat(64)},query:async sql=>({rows:sql.startsWith('SELECT')?[{language:lang}]:[]})});
+   assert.equal(expired.statusCode,400);assert.ok(expired.body.includes(messages[lang].invalid));
+  }
+ }
+});
+test('explicit provider rejection and ambiguous timeout are persisted differently without retrying',async()=>{
+ for(const [send,state,delay] of [[async()=>({ok:false,status:422}),'failed',60],[async()=>({ok:false,status:503}),'unknown',900],[async()=>{throw Error('timeout');},'unknown',900]]) {
+  const updates=[];
+  const r=await call('subscribe',{body:email,query:async(sql,args)=>{
+   if(sql.startsWith('UPDATE')) updates.push(args);
+   return {rows:sql.includes('rate_limits')?[{attempts:1}]:[{email:email.email}]};
+  },send});
+  assert.equal(r.statusCode,503);assert.equal(JSON.parse(r.body).retryAfterSeconds,delay);assert.equal(r.headers['Retry-After'],String(delay));assert.equal(updates.length,2);assert.equal(updates[0][1],state);assert.equal(updates[1][1],state);
  }
 });

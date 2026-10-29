@@ -1,0 +1,7 @@
+const messages = {
+ en: {subject:'Confirm your BTC2G subscription',intro:'You requested BTC2G product updates. Open the link and press Confirm subscription within 24 hours.',ignore:'If you did not request this, ignore this email.',confirm:'Confirm subscription',unsubscribe:'Unsubscribe',prompt:'Confirm your subscription to BTC2G product updates.',leave:'Unsubscribe from BTC2G product updates.',invalid:'This link is invalid, expired or already used.',confirmed:'Your BTC2G subscription is confirmed.',left:'You have unsubscribed.'},
+ ru: {subject:'Подтвердите подписку BTC2G',intro:'Вы запросили новости BTC2G. Откройте ссылку и нажмите «Подтвердить подписку» в течение 24 часов.',ignore:'Если вы не подавали заявку, проигнорируйте это письмо.',confirm:'Подтвердить подписку',unsubscribe:'Отписаться',prompt:'Подтвердите подписку на новости BTC2G.',leave:'Отписаться от новостей BTC2G.',invalid:'Ссылка недействительна, истекла или уже использована.',confirmed:'Ваша подписка BTC2G подтверждена.',left:'Вы отписались от рассылки.'},
+ he: {subject:'אישור הרשמה ל-BTC2G',intro:'ביקשתם עדכונים מ-BTC2G. פתחו את הקישור ולחצו על אישור הרשמה בתוך 24 שעות.',ignore:'אם לא ביקשתם להירשם, התעלמו מהודעה זו.',confirm:'אישור הרשמה',unsubscribe:'ביטול הרשמה',prompt:'אשרו הרשמה לעדכוני BTC2G.',leave:'ביטול הרשמה לעדכוני BTC2G.',invalid:'הקישור אינו תקין, פג תוקף או כבר נוצל.',confirmed:'ההרשמה ל-BTC2G אושרה.',left:'ההרשמה בוטלה.'}
+};
+const language = value => Object.hasOwn(messages,value) ? value : 'en';
+module.exports={messages,language};
