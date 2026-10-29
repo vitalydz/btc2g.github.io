@@ -18,13 +18,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
   <style>
     :root {
       color-scheme: dark;
@@ -312,7 +305,7 @@
           <a class="button" href="#early-access">Join early access</a>
           <a class="button secondary" href="index.html#forecast">View public dashboard</a>
         </div>
-        <p class="hero-note">No payment is collected. Early-access subscribers will be notified when previews and launch details are ready.</p>
+        <p class="hero-note">No payment is collected. Submit your email to register interest in previews and launch details.</p>
       </div>
 
       <aside class="preview-card" aria-label="Planned Premium research view">
@@ -321,7 +314,7 @@
           <span class="preview-badge">Preview</span>
         </div>
         <div class="research-stack">
-          <div class="research-row"><span class="research-icon" aria-hidden="true">01</span><div><strong>Relative-value snapshot</strong><span>BTC/Gold ratio, model direction, confidence, and data timestamp.</span></div></div>
+          <div class="research-row"><span class="research-icon" aria-hidden="true">01</span><div><strong>Relative-value snapshot</strong><span>BTC/Gold ratio, model direction, model score, and data timestamp. The score is not a probability of profit.</span></div></div>
           <div class="research-row"><span class="research-icon" aria-hidden="true">02</span><div><strong>Change log</strong><span>A timestamped record of model-state changes and the context around them.</span></div></div>
           <div class="research-row"><span class="research-icon" aria-hidden="true">03</span><div><strong>Research notes</strong><span>Plain-language explanations of methodology, limitations, and unusual data conditions.</span></div></div>
         </div>
@@ -335,7 +328,7 @@
         <p>The public dashboard keeps the latest model state simple. Premium is planned to add the history and explanations needed to evaluate that state without implying certainty.</p>
       </div>
       <div class="feature-grid">
-        <article class="feature-card"><span class="feature-number">1</span><h3>Understand the current state</h3><p>Review the ratio, comparison window, signal direction, confidence, source, and update time together.</p></article>
+        <article class="feature-card"><span class="feature-number">1</span><h3>Understand the current state</h3><p>Review the ratio, comparison window, signal direction, model score, source, and update time together.</p></article>
         <article class="feature-card"><span class="feature-number">2</span><h3>Trace what changed</h3><p>Compare the latest model state with earlier observations instead of treating each update as an isolated call.</p></article>
         <article class="feature-card"><span class="feature-number">3</span><h3>Read the limitations</h3><p>See concise notes about delayed markets, model assumptions, and conditions that can weaken a relative-value signal.</p></article>
       </div>
@@ -378,9 +371,9 @@
       <div class="section-heading"><p class="section-label">Questions, answered plainly</p><h2 id="faq-title">Before you join early access.</h2></div>
       <div class="faq-grid">
         <article class="faq-item"><h3>Is Premium live today?</h3><p>No. The product is in development. This page describes the planned research experience and collects interest for early access.</p></article>
-        <article class="faq-item"><h3>Will I be charged?</h3><p>No. There is no payment flow on this page. Joining early access only adds your email to the product-update list.</p></article>
+        <article class="faq-item"><h3>Will I be charged?</h3><p>No. There is no payment flow on this page. Submitting the form only records your request for product updates.</p></article>
         <article class="faq-item"><h3>Does Premium predict returns?</h3><p>No. BTC2G compares Bitcoin with gold through a model. It cannot guarantee prices, performance, or profitable decisions.</p></article>
-        <article class="faq-item"><h3>When will it launch?</h3><p>A launch date has not been announced. Early-access subscribers will receive material product updates when they are available.</p></article>
+        <article class="faq-item"><h3>When will it launch?</h3><p>A launch date has not been announced. Updates will be published when plans are ready; the form records interest in email updates.</p></article>
       </div>
     </section>
 
@@ -440,7 +433,7 @@
         const response = await fetch(SUBSCRIPTION_ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
         if (!response.ok) throw new Error(`Subscription request failed with status ${response.status}`);
         form.reset();
-        setFormStatus('You’re on the early-access list. Thank you.');
+        setFormStatus('Request received. Thank you for your interest in BTC2G.');
         if (typeof window.gtag === 'function') window.gtag('event', 'premium_early_access_signup');
       } catch (error) {
         console.log('Early-access signup failed.', error);
