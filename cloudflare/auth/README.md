@@ -8,6 +8,7 @@ This Cloudflare Worker hosts a same-origin account page and API backed by D1. Pu
 - Random, hashed, 30-day `HttpOnly; Secure; SameSite=Lax` sessions.
 - Same-origin checks on browser mutations.
 - Hourly registration limits keyed by an HMAC-like salted hash of the Cloudflare client IP. Raw IP addresses are never stored.
+- Failed sign-ins are rate-limited across hashed login/network pairs, hashed usernames and hashed networks. Five pair failures trigger a 15-minute lock; broader limits slow distributed password spraying without storing raw IP addresses or attempted usernames.
 - Reserved public names, including `Codex_admin`.
 - One-time administrator bootstrap protected by a Cloudflare secret and disabled after the first admin exists.
 - Mandatory account-email verification for new public registrations through Resend. Only token hashes are stored; links expire after 30 minutes. Pending accounts can sign in to request another message but are not counted as completed registrations. A verified account email is not marketing consent and does not activate Premium.

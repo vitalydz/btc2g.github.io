@@ -17,6 +17,11 @@ import {
 import { confirmedSubscriptions, registrationRatio, trafficMetrics } from './metrics.js';
 
 const encoder = new TextEncoder();
+const LOGIN_WINDOW_SECONDS = 15 * 60;
+const LOGIN_LOCK_SECONDS = 15 * 60;
+const LOGIN_PAIR_LIMIT = 5;
+const LOGIN_IDENTITY_LIMIT = 20;
+const LOGIN_IP_LIMIT = 30;
 
 function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -144,6 +149,70 @@ async function enforceRegistrationLimit(request, env) {
   return Number(result?.attempt_count || 1) <= limit;
 }
 
+async function loginScopes(request, env, usernameKey) {
+  if (!env.IP_HASH_SECRET) throw new Error('Sign-in protection is unavailable.');
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const [pair, identity, network] = await Promise.all([
+    sha256(`${env.IP_HASH_SECRET}:login:pair:${ip}:${usernameKey}`),
+    sha256(`${env.IP_HASH_SECRET}:login:identity:${usernameKey}`),
+    sha256(`${env.IP_HASH_SECRET}:login:network:${ip}`)
+  ]);
+  return [
+    { key: pair, limit: LOGIN_PAIR_LIMIT },
+    { key: identity, limit: LOGIN_IDENTITY_LIMIT },
+    { key: network, limit: LOGIN_IP_LIMIT }
+  ];
+}
+
+async function loginBlocked(env, scopes, now) {
+  const row = await env.DB.prepare(`
+    SELECT locked_until FROM login_rate_limits
+    WHERE scope_key IN (?, ?, ?) AND locked_until > ?
+    ORDER BY locked_until DESC LIMIT 1
+  `).bind(scopes[0].key, scopes[1].key, scopes[2].key, now).first();
+  return Number(row?.locked_until || 0);
+}
+
+async function recordLoginFailure(env, scopes, now) {
+  const cutoff = now - LOGIN_WINDOW_SECONDS;
+  const lockUntil = now + LOGIN_LOCK_SECONDS;
+  let blockedUntil = 0;
+  for (const scope of scopes) {
+    const row = await env.DB.prepare(`
+      INSERT INTO login_rate_limits
+        (scope_key, window_start, failure_count, locked_until, last_failed_at)
+      VALUES (?, ?, 1, 0, ?)
+      ON CONFLICT(scope_key) DO UPDATE SET
+        failure_count = CASE
+          WHEN login_rate_limits.window_start <= ? THEN 1
+          ELSE login_rate_limits.failure_count + 1
+        END,
+        window_start = CASE
+          WHEN login_rate_limits.window_start <= ? THEN ?
+          ELSE login_rate_limits.window_start
+        END,
+        locked_until = CASE
+          WHEN (CASE
+            WHEN login_rate_limits.window_start <= ? THEN 1
+            ELSE login_rate_limits.failure_count + 1
+          END) >= ? THEN ?
+          ELSE login_rate_limits.locked_until
+        END,
+        last_failed_at = ?
+      RETURNING locked_until
+    `).bind(scope.key, now, now, cutoff, cutoff, now, cutoff, scope.limit, lockUntil, now).first();
+    blockedUntil = Math.max(blockedUntil, Number(row?.locked_until || 0));
+  }
+  return blockedUntil;
+}
+
+async function clearLoginFailures(env, scopes) {
+  // A successful password clears the account-specific scopes. Network-wide
+  // failures remain so one valid login cannot reset a distributed spray attack.
+  await env.DB.prepare('DELETE FROM login_rate_limits WHERE scope_key IN (?, ?)')
+    .bind(scopes[0].key, scopes[1].key).run();
+}
+
 async function createSession(env, userId) {
   const token = randomToken();
   const tokenHash = await sha256(token);
@@ -239,14 +308,36 @@ async function bootstrapAdmin(request, env) {
 async function login(request, env) {
   let input;
   try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  const usernameKey = normalizeUsername(input?.username).slice(0, 64);
+  const suppliedPassword = String(input?.password || '');
+  const passwordCandidate = suppliedPassword.length <= 128 ? suppliedPassword : '[invalid-password-length]';
+  const now = Math.floor(Date.now() / 1000);
+  let scopes;
+  try {
+    scopes = await loginScopes(request, env, usernameKey);
+    if (await loginBlocked(env, scopes, now)) {
+      return json({ error: 'Too many sign-in attempts. Try again in 15 minutes.' }, 429, { 'retry-after': '900' });
+    }
+  } catch {
+    return json({ error: 'Sign in is temporarily unavailable.' }, 503);
+  }
   const user = await env.DB.prepare(`
     SELECT id, username, role, email, email_verified_at,
            password_hash, password_salt, password_iterations
     FROM users WHERE username_key = ? AND disabled_at IS NULL
-  `).bind(normalizeUsername(input?.username)).first();
-  if (!user) return json({ error: 'Invalid username or password.' }, 401);
-  const hash = await passwordHash(String(input?.password || ''), user.password_salt, user.password_iterations);
-  if (!constantTimeEqual(hash, user.password_hash)) return json({ error: 'Invalid username or password.' }, 401);
+  `).bind(usernameKey).first();
+  const hash = user
+    ? await passwordHash(passwordCandidate, user.password_salt, user.password_iterations)
+    : await passwordHash(passwordCandidate, 'btc2g-unknown-user', PASSWORD_ITERATIONS);
+  const valid = Boolean(user) && suppliedPassword.length <= 128 && constantTimeEqual(hash, user.password_hash);
+  if (!valid) {
+    const blockedUntil = await recordLoginFailure(env, scopes, now);
+    if (blockedUntil > now) {
+      return json({ error: 'Too many sign-in attempts. Try again in 15 minutes.' }, 429, { 'retry-after': '900' });
+    }
+    return json({ error: 'Invalid username or password.' }, 401);
+  }
+  await clearLoginFailures(env, scopes);
   const token = await createSession(env, user.id);
   return json({ user: userView(user) }, 200, { 'set-cookie': sessionCookie(token) });
 }
@@ -599,6 +690,7 @@ export default {
       env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(now),
       env.DB.prepare('DELETE FROM registration_attempts WHERE window_start < ?').bind(now - 86400),
       env.DB.prepare('DELETE FROM email_verification_tokens WHERE expires_at <= ?').bind(now),
+      env.DB.prepare('DELETE FROM login_rate_limits WHERE last_failed_at < ?').bind(now - 86400),
       env.DB.prepare("DELETE FROM daily_visitors WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays),
       env.DB.prepare("DELETE FROM daily_pageviews WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays)
     ]);

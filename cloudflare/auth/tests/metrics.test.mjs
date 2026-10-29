@@ -13,7 +13,7 @@ function database(t) {
   const db = new DatabaseSync(':memory:');
   t.after(() => db.close());
   for (const file of ['0001_initial.sql', '0002_traffic_metrics.sql', '0003_acquisition_attribution.sql',
-    '0004_email_verification.sql']) {
+    '0004_email_verification.sql', '0005_login_rate_limits.sql']) {
     db.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), 'utf8'));
   }
   return {
@@ -209,6 +209,47 @@ test('admin details stay protected and untrusted origins cannot record visits', 
     body: JSON.stringify({ path: '/' })
   }), env);
   assert.equal(blocked.status, 403);
+});
+
+test('repeated password failures trigger a temporary login lock without revealing usernames', async t => {
+  const { env, db } = database(t);
+  admin(db);
+  const attempt = (username, ip = '192.0.2.90') => worker.fetch(new Request('https://metrics.test/api/login', {
+    method: 'POST',
+    headers: { Origin: env.APP_ORIGIN, 'Content-Type': 'application/json', 'CF-Connecting-IP': ip },
+    body: JSON.stringify({ username, password: 'DefinitelyWrong9' })
+  }), env);
+
+  for (let count = 1; count < 5; count += 1) {
+    const response = await attempt('Admin');
+    assert.equal(response.status, 401);
+    assert.equal((await response.json()).error, 'Invalid username or password.');
+  }
+  const locked = await attempt('Admin');
+  assert.equal(locked.status, 429);
+  assert.equal(locked.headers.get('retry-after'), '900');
+  assert.match((await locked.json()).error, /15 minutes/);
+
+  const stillLocked = await attempt('Admin');
+  assert.equal(stillLocked.status, 429);
+  const distributedAttempt = await attempt('Admin', '192.0.2.91');
+  assert.equal(distributedAttempt.status, 401);
+
+  const unknown = await attempt('NotARealUser', '192.0.2.92');
+  assert.equal(unknown.status, 401);
+  assert.equal((await unknown.json()).error, 'Invalid username or password.');
+  assert.ok(db.prepare('SELECT COUNT(*) AS count FROM login_rate_limits').get().count >= 7);
+});
+
+test('login fails closed when the rate-limit secret is missing', async t => {
+  const { env, db } = database(t);
+  admin(db);
+  delete env.IP_HASH_SECRET;
+  const response = await worker.fetch(new Request('https://metrics.test/api/login', {
+    method: 'POST', headers: { Origin: env.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'Admin', password: 'anything' })
+  }), env);
+  assert.equal(response.status, 503);
 });
 
 test('signed-in users can verify an email without creating marketing consent', async t => {
