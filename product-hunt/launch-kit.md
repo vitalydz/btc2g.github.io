@@ -1,0 +1,68 @@
+# BTC2G Product Hunt launch kit
+
+## Asset order
+
+1. `btc2g-logo-512.png` — square product thumbnail. Product Hunt recommends 240×240; this 512×512 source can be uploaded directly.
+2. `01-home.jpg` — public dashboard, current BTC/Gold ratio, model signal, score, and market date.
+3. `02-forecast.jpg` — historical BTC and gold chart plus clearly labelled scenario extrapolations.
+4. `03-calculator.jpg` — BTC ↔ gold reference calculator, source/date note, and Key Insights.
+5. `04-premium.jpg` — planned Premium research layer and early-access positioning.
+
+Gallery images are 1270×760, the current Product Hunt recommended gallery size.
+
+## Short demo storyboard (35–45 seconds)
+
+Record the production site in a clean desktop browser at 1270×760 or 1920×1080. Do not show browser bookmarks, personal tabs, passwords, admin data, or developer tools.
+
+| Time | Screen/action | Voice-over or caption |
+| --- | --- | --- |
+| 0–5 s | Open `btc2g.com`; pause on the ratio and signal card. | “BTC2G compares Bitcoin with gold in one calm daily dashboard.” |
+| 5–14 s | Scroll to the forecast chart. | “See historical BTC and gold prices alongside clearly labelled model scenarios.” |
+| 14–24 s | Scroll to the calculator; enter `2.5`. | “Convert Bitcoin into estimated troy ounces of gold using the published daily ratio.” |
+| 24–31 s | Pause on Key Insights and the source/date line. | “Every output includes its source, market date, and limitations.” |
+| 31–40 s | Open Premium. | “Premium is an early-access research roadmap for history, notes, and weekly context—without trading promises.” |
+| 40–45 s | Return to the homepage or show the logo. | “BTC2G: Bitcoin versus gold, with the uncertainty left in.” |
+
+Product Hunt currently accepts a full public YouTube URL or an interactive demo link. Uploading or publishing the recording remains an owner action.
+
+## Ready-to-post answers
+
+### What data sources do you use?
+
+BTC2G currently uses daily market data retrieved through `yfinance`: `BTC-USD` for Bitcoin and `GC=F` as a gold-futures proxy. The dashboard shows the market date and links to the published signal and forecast metadata. These are reference data, not live executable prices; `GC=F` is not a physical bullion quote.
+
+### How is the Bitcoin-to-Gold ratio calculated?
+
+The published ratio is the daily BTC-USD reference price divided by the daily GC=F reference price per troy ounce. For example, a ratio of 20.058 means the reference value of one BTC is approximately 20.058 troy ounces of gold. The calculator uses the published rounded ratio, so it is an estimate and excludes fees, spreads, taxes, and local pricing differences.
+
+### What does the model signal mean?
+
+The signal is a model-based relative-value label derived from the latest BTC/Gold observation and its historical context. It is not an instruction to trade. The model score describes the strength of the model state; it is not a probability of profit.
+
+### Is the forecast a price target?
+
+No. The dashed chart lines are polynomial extrapolation scenarios that help visualize one possible continuation of historical patterns. They can diverge sharply from real markets and should not be treated as reliable targets, guaranteed outcomes, or financial advice.
+
+### How often is BTC2G updated?
+
+BTC2G is designed around daily reference data rather than live prices. The dashboard displays the market date and chart generation date so visitors can see exactly how current each output is.
+
+### What is BTC2G Premium?
+
+Premium is in development. The roadmap adds signal and ratio history, timestamped model notes, expanded methodology, and a weekly research digest. There is no payment flow today; the current form only records early-access interest. Plans may change based on data quality and user feedback.
+
+### Are you promising returns or financial outcomes?
+
+No. BTC2G is informational and educational research. It does not provide personalized financial advice, guaranteed signals, guaranteed returns, or an offer to buy or sell assets. Market data can be delayed or incomplete, assumptions can fail, and model outputs can be wrong.
+
+### What makes BTC2G different?
+
+BTC2G keeps the comparison focused on a simple question: how does Bitcoin’s reference value compare with gold over time? It combines the ratio, model context, source/date transparency, a reference calculator, and explicit limitations in a lightweight multilingual dashboard.
+
+### Can I buy Bitcoin through BTC2G?
+
+BTC2G does not process payments or custody funds. It links to independent providers where available, and users should review each provider’s fees, terms, eligibility, and local restrictions directly.
+
+## Launch-day response rule
+
+Answer questions directly, acknowledge uncertainty, and invite concrete product feedback. Do not ask for upvotes, promise financial performance, invent user numbers, or describe planned Premium features as already available.
