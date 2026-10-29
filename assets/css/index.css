@@ -597,6 +597,21 @@ body {
       color: #ffffff;
     }
 
+    .main-nav #nav-account {
+      padding: 7px 12px;
+      border: 1px solid #5f7cff;
+      border-radius: 8px;
+      background: #3454c8;
+      color: #ffffff;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .main-nav #nav-account:hover {
+      border-color: #89a0ff;
+      background: #4264dd;
+    }
+
     .language-control {
       position: static;
     }
@@ -1034,6 +1049,7 @@ body {
       .header-panel .language-control { display: flex; margin: 0; width: 100%; }
       .header-panel select { width: 100%; min-width: 0; min-height: 44px; }
       .main-nav a { display: flex; align-items: center; box-sizing: border-box; min-height: 44px; padding: 8px; }
+      .main-nav #nav-account { justify-content: center; margin-top: 4px; }
       .page-title { font-size: clamp(1.65rem, 7vw, 2.1rem); }
       p#subtitle { margin-bottom: 8px; font-size: .85rem; }
       .signal-card { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; padding: 14px; }
