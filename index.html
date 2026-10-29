@@ -121,7 +121,7 @@
 
     <section class="save-entry" aria-labelledby="save-entry-title">
       <div>
-        <span class="save-entry-tag">BTC2G SAVE · EN / RU / HE</span>
+        <span class="save-entry-tag">BTC2G SAVE</span>
         <h2 id="save-entry-title">Compare how much Bitcoin you receive</h2>
         <p id="save-entry-note">Manual comparison: enter final MoonPay and Topper quotes for the same total payment.</p>
       </div>
@@ -2106,7 +2106,7 @@
       setTextById('nav-premium', text.navPremium);
       setTextById('nav-buy', text.navBuy);
       setTextById('nav-account', text.navAccount);
-      document.getElementById('nav-save').href = 'save.html?lang=' + (['en', 'ru', 'he'].includes(lang) ? lang : 'en');
+      document.getElementById('nav-save').href = 'save.html?lang=' + encodeURIComponent(lang);
       document.getElementById('save-entry-link').href = document.getElementById('nav-save').href;
       setTextById('ratio-label', text.insightRatioTitle);
       updateMenuLabel();
@@ -2395,7 +2395,7 @@
       }
     });
 
-    const savedLang = localStorage.getItem('lang');
+    const savedLang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('lang');
     const browserLang = navigator.language.slice(0, 2).toLowerCase();
     const supportedLangs = Object.keys(texts);
 
