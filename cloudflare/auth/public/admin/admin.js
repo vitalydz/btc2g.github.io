@@ -11,6 +11,22 @@ function showAdmin(user) {
   dashboard.hidden = false;
   document.querySelector('#admin-name').textContent = user.username;
   document.querySelector('#logout').hidden = false;
+  void loadMarketHealth();
+}
+
+let marketHealthVersion = 0;
+async function loadMarketHealth() {
+  const version = ++marketHealthVersion;
+  const status = document.querySelector('#market-health-status');
+  status.textContent = 'Checking market updates…';
+  try {
+    const data = await request('/api/admin/market-health');
+    if (version !== marketHealthVersion) return;
+    const dates = `Market date: ${data.marketDate || 'unknown'} · Refreshed: ${data.updatedAt || 'unknown'}`;
+    status.textContent = `${dates}. ${data.issues.length ? data.issues.join(' ') : 'Update checks passed.'}`;
+  } catch {
+    if (version === marketHealthVersion) status.textContent = 'Market update diagnostics could not be loaded. Check the update workflow logs.';
+  }
 }
 
 function renderPasskeys(passkeys) {
@@ -182,6 +198,7 @@ document.querySelector('#login-form').addEventListener('submit', async event => 
 
 document.querySelector('#range').addEventListener('change', loadStats);
 document.querySelector('#refresh-stats').addEventListener('click', loadStats);
+document.querySelector('#refresh-market-health').addEventListener('click', loadMarketHealth);
 document.querySelector('#refresh-ideas').addEventListener('click', loadPrivateIdeas);
 document.querySelector('#add-passkey').addEventListener('click', async event => {
   const button = event.currentTarget;

@@ -41,18 +41,20 @@ for (const name of ['normalizeSignal', 'signalGuidance', 'renderFreshness', 'set
 const valid = {signal: 'HOLD', confidence: 0.56, ratio: 20.192, last_updated: '2000-01-01', note: ''};
 context.currentSignalData = valid;
 context.renderSignal();
-assert.match(element('data-freshness').textContent, /Data delayed/);
-assert.equal(element('data-freshness').hidden, false);
+assert.equal(element('data-freshness').textContent, '');
+assert.equal(element('data-freshness').hidden, true);
 assert.equal(element('signal-value').textContent, 'HOLD');
 context.currentSignalData = {...valid, last_updated: '2026-02-30'};
 context.renderSignal();
-assert.match(element('data-freshness').textContent, /freshness unavailable/);
+assert.equal(element('data-freshness').textContent, '');
+assert.equal(element('data-freshness').hidden, true);
 assert.equal(element('signal-updated').textContent, '--');
 for (const data of [null, {...valid, confidence: NaN}, {...valid, confidence: Infinity}, {...valid, confidence: -0.1}, {...valid, confidence: 1.1}, {...valid, ratio: 0}, {...valid, ratio: Infinity}, {...valid, ratio: '20'}]) {
   context.currentSignalData = data;
   context.renderSignal();
   assert.equal(element('signal-value').textContent, 'Unavailable');
-  assert.match(element('data-freshness').textContent, /Data unavailable/);
+  assert.equal(element('data-freshness').textContent, '');
+  assert.equal(element('data-freshness').hidden, true);
   assert.equal(element('ratio-value').textContent, 'Ratio temporarily unavailable');
 }
 console.log('PASS: delayed/unknown date rendering and invalid signal rejection.');

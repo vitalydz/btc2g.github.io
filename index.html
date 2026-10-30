@@ -526,14 +526,9 @@
     }
 
     function renderFreshness(status) {
-      const messages = {
-        en: {delayed: 'Data delayed — market quotes are more than 3 days old.', unknown: 'Data freshness unavailable — market date is missing or invalid.', unavailable: 'Data unavailable — the signal cannot be verified.'},
-        ru: {delayed: 'Данные задерживаются — котировки старше 3 дней.', unknown: 'Свежесть данных неизвестна — дата котировок отсутствует или некорректна.', unavailable: 'Данные недоступны — сигнал невозможно проверить.'},
-        he: {delayed: 'הנתונים מתעכבים — מחירי השוק ישנים מ־3 ימים.', unknown: 'עדכניות הנתונים אינה ידועה — תאריך השוק חסר או שגוי.', unavailable: 'הנתונים אינם זמינים — לא ניתן לאמת את האיתות.'},
-      };
       const element = document.getElementById('data-freshness');
-      element.hidden = status === 'fresh';
-      element.textContent = (messages[currentLang] || messages.en)[status] || '';
+      element.hidden = true;
+      element.textContent = '';
     }
 
     function renderSignal() {
@@ -616,7 +611,6 @@
         currentSignalData = await response.json();
         renderSignal();
       } catch (error) {
-        console.log('Signal loading failed.', error);
         currentSignalData = null;
         renderSignal();
       }
@@ -632,7 +626,6 @@
         currentMetaData = await response.json();
         renderMeta();
       } catch (error) {
-        console.log('Forecast metadata loading failed.', error);
         currentMetaData = null;
         renderMeta();
       }

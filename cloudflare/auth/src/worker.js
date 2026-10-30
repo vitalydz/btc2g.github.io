@@ -820,6 +820,13 @@ async function recordVisit(request, env) {
   return json({ ok: true, attribution }, 202, cors);
 }
 
+async function adminMarketHealth(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  const { marketHealth } = await import('./market-health.js');
+  return json(await marketHealth());
+}
+
 async function adminStats(request, env) {
   const user = await currentUser(request, env);
   if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
@@ -1062,6 +1069,7 @@ async function api(request, env) {
   const url = new URL(request.url);
   if (request.method === 'GET' && url.pathname === '/api/stats') return stats(env);
   if (request.method === 'GET' && url.pathname === '/api/admin/stats') return adminStats(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/admin/market-health') return adminMarketHealth(request, env);
   if (request.method === 'GET' && url.pathname === '/api/admin/ideas') return adminIdeas(request, env);
   if (request.method === 'GET' && url.pathname === '/api/ideas/mine') return privateIdeasForUser(request, env);
   if (request.method === 'GET' && url.pathname === '/api/passkeys') return listPasskeys(request, env);

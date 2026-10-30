@@ -71,6 +71,26 @@ function verifiedUser(db, id, username) {
   return { Cookie: `btc2g_session=${token}` };
 }
 
+test('market update diagnostics deny anonymous visitors and ordinary accounts', async t => {
+  const { env, db } = database(t);
+  for (const headers of [{}, verifiedUser(db, 'reader', 'Reader')]) {
+    const result = await worker.fetch(new Request('https://metrics.test/api/admin/market-health', { headers }), env);
+    assert.equal(result.status, 403);
+    assert.deepEqual(await result.json(), { error: 'Administrator access required.' });
+  }
+});
+
+test('market update diagnostics return source failures only to an authenticated admin', async t => {
+  const { env, db } = database(t);
+  t.mock.method(globalThis, 'fetch', async () => { throw new Error('source unavailable'); });
+  const result = await worker.fetch(new Request('https://metrics.test/api/admin/market-health', { headers: admin(db) }), env);
+  assert.equal(result.status, 200);
+  const data = await result.json();
+  assert.equal(data.status, 'attention');
+  assert.equal(data.issues.length, 2);
+  assert.match(result.headers.get('cache-control'), /no-store/);
+});
+
 test('unknown metrics and subscription source remain null, never zero', () => {
   assert.equal(trafficMetrics({ first_seen_at: null }).visitorsToday, null);
   assert.equal(trafficMetrics(null).status, 'unavailable');

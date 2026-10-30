@@ -52,6 +52,14 @@
       <p id="stats-status" role="status" aria-live="polite"></p>
       <button id="refresh-stats" type="button">Refresh statistics</button>
 
+      <section class="panel" aria-labelledby="market-health-title">
+        <p class="eyebrow">ADMIN ONLY</p>
+        <h2 id="market-health-title">Market data updates</h2>
+        <p id="market-health-status" role="status" aria-live="polite"></p>
+        <button id="refresh-market-health" type="button">Check market updates</button>
+        <a href="https://github.com/vitalydz/btc2g.github.io/actions/workflows/update-chart.yml" target="_blank" rel="noopener">Update workflow logs</a>
+      </section>
+
       <section class="panel" aria-labelledby="passkey-title">
         <h2 id="passkey-title">Administrator passkeys</h2>
         <p class="methodology passkey-copy">After the first passkey is added, every administrator sign-in requires both the password and Windows Hello, a phone, or a security key. Add a second passkey on another device as a backup.</p>
