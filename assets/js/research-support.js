@@ -24,6 +24,16 @@
     vi: { eyebrow:'NGHIÊN CỨU ĐỘC LẬP', title:'Loạt nghiên cứu TimeT', intro:'Ba bản thảo công khai của Vitaly Dziubov khám phá một khuôn khổ trường thời gian mang tính giả thuyết, tách biệt với nghiên cứu thị trường BTC2G.', publications:'Ấn phẩm trên Zenodo', figure:'Hình minh họa dựa trên Tài liệu 2. Mở bản ghi để xem toàn văn và siêu dữ liệu.', support:'Hỗ trợ thí nghiệm độc lập', supportIntro:'Đóng góp tự nguyện giúp tài trợ thí nghiệm và nghiên cứu tiếp theo.', network:'Tài sản và mạng', address:'Địa chỉ nhận', copy:'Sao chép địa chỉ', copied:'Đã sao chép địa chỉ', failed:'Không sao chép được. Hãy sao chép thủ công.', explorer:'Xem trên TRONSCAN ↗', warning:'Kiểm tra trước khi gửi: chỉ gửi USDT trên mạng TRON (TRC-20). Giao dịch tiền mã hóa không thể đảo ngược.', disclaimer:'Đây là đóng góp tự nguyện, không phải đầu tư hay mua hàng. Không có quyền sở hữu, lợi nhuận, ưu đãi thuế, ngày giao hoặc bảo đảm thành công. BTC2G không xử lý hay lưu ký giao dịch.' }
   };
 
+  const navigation = {
+    en:['Dashboard','Calculator','Premium'], ru:['Главная','Калькулятор','Премиум'], he:['לוח מחוונים','מחשבון','פרימיום'],
+    de:['Dashboard','Rechner','Premium'], fr:['Tableau de bord','Calculateur','Premium'], es:['Panel','Calculadora','Premium'],
+    zh:['仪表板','计算器','高级版'], it:['Dashboard','Calcolatore','Premium'], pt:['Painel','Calculadora','Premium'],
+    ar:['لوحة المعلومات','الحاسبة','بريميوم'], hi:['डैशबोर्ड','कैलकुलेटर','प्रीमियम'], ja:['ダッシュボード','計算機','プレミアム'],
+    ko:['대시보드','계산기','프리미엄'], tr:['Panel','Hesaplayıcı','Premium'], pl:['Panel','Kalkulator','Premium'],
+    nl:['Dashboard','Calculator','Premium'], uk:['Головна','Калькулятор','Преміум'], id:['Dasbor','Kalkulator','Premium'],
+    vi:['Bảng điều khiển','Máy tính','Premium']
+  };
+
   const ids = { eyebrow:'research-eyebrow', title:'research-title', intro:'research-intro', publications:'research-papers-title', figure:'research-figure-note', support:'research-support-title', supportIntro:'research-support-intro', network:'research-network-label', address:'research-address-label', copy:'research-copy-address', explorer:'research-explorer-link', warning:'research-network-warning', disclaimer:'research-support-disclaimer' };
   let language = 'en';
 
@@ -34,6 +44,13 @@
       const element = document.getElementById(id);
       if (element) element.textContent = text[key];
     });
+    const nav = navigation[language];
+    const dashboard = document.getElementById('research-nav-dashboard');
+    const calculator = document.getElementById('research-nav-calculator');
+    const premium = document.getElementById('research-nav-premium');
+    if (dashboard) { dashboard.textContent = nav[0]; dashboard.href = `index.html?lang=${encodeURIComponent(language)}`; }
+    if (calculator) { calculator.textContent = nav[1]; calculator.href = `index.html?lang=${encodeURIComponent(language)}#calculator`; }
+    if (premium) { premium.textContent = nav[2]; premium.href = `premium.html?lang=${encodeURIComponent(language)}`; }
     const status = document.getElementById('research-copy-status');
     if (status) status.textContent = '';
   }
@@ -63,5 +80,5 @@
     document.documentElement.lang = selector.value;
     document.documentElement.dir = ['he', 'ar'].includes(selector.value) ? 'rtl' : 'ltr';
   }
-  window.BTC2GResearch = { ADDRESS, translations, setLanguage, copyAddress };
+  window.BTC2GResearch = { ADDRESS, translations, navigation, setLanguage, copyAddress };
 })(window);

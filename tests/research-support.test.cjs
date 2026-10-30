@@ -68,3 +68,34 @@ test('copy control uses the exact address and has all 19 translations', async ()
   assert.equal(copied, address);
   assert.equal(nodes.get('research-copy-status').textContent, 'Address copied');
 });
+
+test('research navigation is translated and preserves the selected language', () => {
+  const nodes = new Map();
+  const document = {
+    documentElement: {},
+    getElementById(id) {
+      if (id === 'research-language') return null;
+      if (!nodes.has(id)) nodes.set(id, { textContent: '', href: '', addEventListener() {} });
+      return nodes.get(id);
+    },
+  };
+  const context = {
+    document,
+    navigator: { clipboard: { async writeText() {} } },
+    URLSearchParams,
+    window: { location: { search: '?lang=ru' }, localStorage: { getItem() { return null; }, setItem() {} } },
+  };
+  vm.createContext(context);
+  vm.runInContext(script, context);
+  assert.equal(Object.keys(context.window.BTC2GResearch.navigation).length, 19);
+  for (const labels of Object.values(context.window.BTC2GResearch.navigation)) {
+    assert.equal(labels.length, 3);
+    assert.ok(labels.every(label => label.trim()));
+  }
+  assert.equal(nodes.get('research-nav-dashboard').textContent, 'Главная');
+  assert.equal(nodes.get('research-nav-calculator').textContent, 'Калькулятор');
+  assert.equal(nodes.get('research-nav-premium').textContent, 'Премиум');
+  assert.equal(nodes.get('research-nav-dashboard').href, 'index.html?lang=ru');
+  assert.equal(nodes.get('research-nav-calculator').href, 'index.html?lang=ru#calculator');
+  assert.equal(nodes.get('research-nav-premium').href, 'premium.html?lang=ru');
+});
