@@ -47,4 +47,4 @@ Official references checked 2026-10-29:
 
 ## Sunday digest
 
-See [DIGEST.md](DIGEST.md) for the restored homepage flow, verification, storage, scheduling, opt-out, capacity and rollout checks. The homepage is wired to assets/js/digest-preferences.js; it never sends weekly choices to Formspree. Do not confuse source integration with a deployed service.
+See [DIGEST.md](DIGEST.md) for the restored homepage flow, verification, storage, scheduling, measured weekly-change and key-level calculations, opt-out, capacity and rollout checks. The homepage is wired to assets/js/digest-preferences.js; it never sends weekly choices to Formspree. Do not confuse source integration with a deployed service.

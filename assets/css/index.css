@@ -1224,6 +1224,22 @@ body {
     .regime-card[data-regime="gold"] .regime-swatch { background:#60a5fa; }
     .regime-method { margin:14px 0 8px; color:#94a3b8; font-size:.82rem; }
     .regime-premium-link { color:#d4af37; font-weight:800; }
+    .relative-strength { margin:18px 0 0; padding:18px; border:1px solid #2a3c55; border-radius:14px; background:linear-gradient(145deg,#0b1220,#101a2b); }
+    .relative-strength[hidden] { display:none; }
+    .relative-strength-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; }
+    .relative-strength-heading h2 { margin:0; font-size:1.35rem; }
+    .relative-strength-leader { max-width:410px; margin:0; padding:9px 12px; border:1px solid #d4af37; border-radius:10px; color:#f5d878; font-weight:800; text-align:center; }
+    .relative-strength-cards { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:16px; }
+    .strength-card { position:relative; min-width:0; padding:14px; border:1px solid #24344d; border-radius:11px; background:#0b0f19; }
+    .strength-card.is-leader { border-color:#d4af37; box-shadow:0 0 0 1px #d4af3740; }
+    .strength-card h3 { margin:0 0 10px; color:#fff; font-size:1rem; }
+    .strength-value { display:block; color:#f8fafc; font-size:clamp(1.25rem,2.5vw,1.8rem); font-weight:900; overflow-wrap:anywhere; }
+    .strength-changes { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+    .strength-changes span { display:block; color:#94a3b8; font-size:.72rem; }
+    .strength-changes strong { display:block; margin-top:2px; font-size:.92rem; }
+    .strength-positive { color:#10b981; }.strength-negative { color:#ef4444; }.strength-neutral { color:#cbd5e1; }
+    .relative-strength-source,.relative-strength-disclaimer { margin:12px 0 0; color:#94a3b8; font-size:.8rem; }
+    .relative-strength-disclaimer { margin-top:5px; }
     .forecast-static { margin-top:18px; border-top:1px solid #24344d; padding-top:14px; }
     .forecast-static summary { color:#9fc3f4; cursor:pointer; font-weight:700; }
     .forecast-static img { margin-top:14px; }
@@ -1250,5 +1266,6 @@ body {
     .research-page .research-section { margin-top:30px; }.research-page .research-heading h1{font-size:clamp(2rem,5vw,4rem);margin:0 0 14px;}.research-page .research-section h2{font-size:1.4rem;}
 
     @media(max-width:760px){
-      .market-hero{grid-template-columns:1fr;padding:22px 18px;gap:22px}.hero-actions>*{width:100%;box-sizing:border-box;text-align:center}.signal-card{grid-template-columns:1fr}.chart-heading,.regime-heading{align-items:flex-start;flex-direction:column}.chart-modes{width:100%;display:grid;grid-template-columns:1fr 1fr}.chart-mode{width:100%}.interactive-chart-wrap{min-height:350px;padding:8px 2px}#market-history-chart{height:320px}.regime-summary{grid-template-columns:1fr}.regime-current{width:100%;box-sizing:border-box}.subscribe-primary{grid-template-columns:1fr}.subscribe-primary>div:first-child{grid-row:auto}.subscribe-primary>label,.subscribe-primary>form,.subscribe-primary>.subscribe-trust,.subscribe-primary>.subscriber-proof,.subscribe-primary>.subscribe-message{grid-column:1}.research-layout{grid-template-columns:1fr}
+      .market-hero{grid-template-columns:1fr;padding:22px 18px;gap:22px}.hero-actions>*{width:100%;box-sizing:border-box;text-align:center}.signal-card{grid-template-columns:1fr}.chart-heading,.regime-heading,.relative-strength-heading{align-items:flex-start;flex-direction:column}.chart-modes{width:100%;display:grid;grid-template-columns:1fr 1fr}.chart-mode{width:100%}.interactive-chart-wrap{min-height:350px;padding:8px 2px}#market-history-chart{height:320px}.regime-summary{grid-template-columns:1fr}.regime-current,.relative-strength-leader{width:100%;max-width:none;box-sizing:border-box}.relative-strength-cards{grid-template-columns:1fr 1fr}.subscribe-primary{grid-template-columns:1fr}.subscribe-primary>div:first-child{grid-row:auto}.subscribe-primary>label,.subscribe-primary>form,.subscribe-primary>.subscribe-trust,.subscribe-primary>.subscriber-proof,.subscribe-primary>.subscribe-message{grid-column:1}.research-layout{grid-template-columns:1fr}
     }
+    @media(max-width:460px){.relative-strength-cards{grid-template-columns:1fr}}

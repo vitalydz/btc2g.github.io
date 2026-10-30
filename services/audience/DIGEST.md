@@ -16,7 +16,9 @@ No public API can change a preference by just knowing the address. Changes requi
 
 `vercel.json` calls `/api/digest-cron` Sundays at 06:00 UTC (08:00 Israel winter / 09:00 summer). It requires `Authorization: Bearer CRON_SECRET`, `DIGEST_ENABLED=true`, a working PostgreSQL database, verified MAIL_FROM and RESEND_API_KEY. Keep disabled in every preview/test deployment.
 
-The handler checks Sunday in Asia/Jerusalem. It reads the published BTC2G market artifact, validates actual dates, arithmetic consistency and freshness (maximum four days). The email reports the published market date and ratio/prices, links to the chart, and states research/financial limits; it does not invent weekly performance.
+The handler checks Sunday in Asia/Jerusalem. It reads both the published BTC2G signal artifact and the published BTC/Gold history, then validates dates, arithmetic consistency, ordering and freshness (maximum four days). The email reports the published market date, ratio/prices, model action and score. It calculates the measured seven-day ratio change from the last published observation at or before the calendar cutoff and reports the observed 30-day low/high as key-level context. If the two artifacts do not agree, the issue is rejected instead of sending a guessed or stale summary.
+
+The basic Sunday digest is free for confirmed, opted-in subscribers. Extended explanatory model notes remain a planned Premium feature; the email must describe them as planned and must not imply that Premium is live.
 
 Only confirmed, opted-in, non-unsubscribed addresses are selected. Atomic `(email,issue_day)` claims and stable provider idempotency keys suppress duplicates across concurrent runs. Consent is checked again before sending. An already in-flight message may arrive after opt-out.
 

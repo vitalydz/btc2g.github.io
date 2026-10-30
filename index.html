@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#071426" />
-  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.30.12">
+  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.30.13">
   <meta name="description" content="Track the published Bitcoin-to-gold ratio, daily market data, model direction, history chart, and BTC ↔ gold calculator." />
   <meta property="og:title" content="BTC2G - Bitcoin vs Gold Ratio" />
   <meta property="og:description" content="Published BTC/Gold ratio data, model context, interactive history, and a reference calculator." />
@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/index.css?v=20261030-2" />
+  <link rel="stylesheet" href="assets/css/index.css?v=20261030-3" />
   <link rel="canonical" href="https://btc2g.com/" />
 </head>
 <body>
@@ -108,6 +108,16 @@
         <div id="regime-summary" class="regime-summary" role="list"></div>
         <p id="regime-method" class="regime-method"></p>
         <a id="regime-premium-link" class="regime-premium-link" href="premium.html#early-access">Extended regime history in Premium →</a>
+      </section>
+      <section id="relative-strength" class="relative-strength" aria-labelledby="relative-strength-title" hidden>
+        <div class="relative-strength-heading">
+          <div><p class="chart-kicker">MULTI-ASSET RELATIVE STRENGTH</p><h2 id="relative-strength-title">Bitcoin across major reference assets</h2></div>
+          <p id="relative-strength-leader" class="relative-strength-leader"></p>
+        </div>
+        <p id="relative-strength-intro" class="plain-explanation">Compare published relative-price ratios on the same market date.</p>
+        <div id="relative-strength-cards" class="relative-strength-cards"></div>
+        <p id="relative-strength-source" class="relative-strength-source"></p>
+        <p id="relative-strength-disclaimer" class="relative-strength-disclaimer"></p>
       </section>
       <p id="chart-error" class="chart-error">The BTC vs Gold Forecast chart is unavailable right now. Please try refreshing it.</p>
       <p id="chart-method" class="plain-explanation">Solid lines show historical USD closes; dashed lines are polynomial scenarios, not reliable price targets. The model score is not a probability of profit.</p>
@@ -342,6 +352,7 @@
   <script src="assets/js/home-v2-text.js?v=20261029-2"></script>
   <script src="assets/js/scenario-entry.js?v=20261030-1"></script>
   <script src="assets/js/regime-detector.js?v=20261030-1"></script>
+  <script src="assets/js/multi-asset-dashboard.js?v=20261030-1"></script>
   <script src="assets/js/market-chart.js?v=20261030-2"></script>
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';
@@ -2284,6 +2295,7 @@
       window.BTC2GScenarioEntry?.setLanguage(lang);
       window.BTC2GDigest?.setLanguage(lang);
       window.BTC2GRegimes?.setLanguage(lang);
+      window.BTC2GMultiAsset?.setLanguage(lang);
       setTextById('subscribe-thanks-title', text.subscribeSuccess);
       setTextById('subscribe-thanks-text', window.BTC2GSubscription.text(lang).receiptNote);
       setTextById('thanks-share-label', text.shareTitle);
