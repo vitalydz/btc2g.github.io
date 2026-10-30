@@ -224,8 +224,9 @@ def mux_audio(music_path: Path) -> None:
         raise FileNotFoundError(f"Reference music not found: {music_path}")
     duration = TOTAL_DURATION
     audio_filter = (
-        f"[2:a]atrim=0:{duration},asetpts=PTS-STARTPTS,aformat=channel_layouts=stereo[music];"
-        f"[1:a]adelay={VOICE_DELAY_MS}|{VOICE_DELAY_MS},volume=1.55,highpass=f=95,"
+        f"[2:a]atrim=0:{duration},asetpts=PTS-STARTPTS,volume=0.333,"
+        "aformat=channel_layouts=stereo[music];"
+        f"[1:a]adelay={VOICE_DELAY_MS}|{VOICE_DELAY_MS},volume=3.10,highpass=f=95,"
         "acompressor=threshold=-18dB:ratio=2.5:attack=10:release=220,"
         "aformat=channel_layouts=stereo[voice];"
         "[music][voice]amix=inputs=2:duration=longest:dropout_transition=2:normalize=0,"
