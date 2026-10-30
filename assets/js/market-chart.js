@@ -12,6 +12,9 @@
   };
   let series = [];
   let mode = 'ratio';
+  let language = document.documentElement.lang || 'en', state = 'loading', historyMeta = null, currentPrices = null;
+  const ui = () => root.BTC2GLanguageText.text(language);
+  function modeLabel(selected = mode) { return root.BTC2GHomeV2Text.chartLabels(language)[['ratio','btc','gold','score'].indexOf(selected)]; }
 
   function validHistory(data) {
     return data?.source === 'yfinance' && data?.tickers?.Bitcoin === 'BTC-USD' && data?.tickers?.Gold === 'GC=F' &&
@@ -23,9 +26,9 @@
 
   function formatValue(value, selectedMode = mode) {
     if (!Number.isFinite(value)) return '—';
-    if (selectedMode === 'ratio') return `${value.toFixed(2)} oz t`;
+    if (selectedMode === 'ratio') return `${new Intl.NumberFormat(language, {maximumFractionDigits:2}).format(value)} oz t`;
     if (selectedMode === 'score') return `${Math.round(value)}/100`;
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: selectedMode === 'btc' ? 0 : 2 }).format(value);
+    return new Intl.NumberFormat(language, { style: 'currency', currency: 'USD', maximumFractionDigits: selectedMode === 'btc' ? 0 : 2 }).format(value);
   }
 
   function draw() {
@@ -42,6 +45,7 @@
     ctx.clearRect(0, 0, width, height);
 
     const config = modes[mode];
+    canvas.setAttribute('aria-label', modeLabel());
     const points = series.map(row => ({ date: row.date, value: row[config.key] })).filter(point => Number.isFinite(point.value));
     if (points.length < 2) return;
     const values = points.map(point => point.value);
@@ -85,7 +89,7 @@
     const last = points[points.length - 1];
     ctx.beginPath(); ctx.arc(x(points.length - 1), y(last.value), 4, 0, Math.PI * 2); ctx.fillStyle = config.color; ctx.fill();
     ctx.fillStyle = '#f8fafc'; ctx.font = '600 13px Inter, system-ui, sans-serif'; ctx.textAlign = 'left';
-    ctx.fillText(`${config.label}: ${formatValue(last.value)}`, left, 18);
+    ctx.fillText(`${modeLabel()}: ${formatValue(last.value)}`, left, 18);
   }
 
   function setMode(nextMode) {
@@ -99,9 +103,26 @@
     draw();
   }
 
+  function renderMetadata() {
+    const status = document.getElementById('market-history-status');
+    status.textContent = state === 'loading' ? ui().historyLoading : state === 'error' ? ui().historyError
+      : `${historyMeta.source} · BTC-USD / GC=F · ${ui().through} ${historyMeta.updated_for_market_date} (UTC) · ${series.length} ${ui().observations}`;
+    if (currentPrices && Number.isFinite(currentPrices.btc_price_usd) && Number.isFinite(currentPrices.gold_price_usd)) {
+      document.getElementById('market-price-strip').textContent = `BTC: ${formatValue(currentPrices.btc_price_usd, 'btc')} · ${ui().gold} (GC=F): ${formatValue(currentPrices.gold_price_usd, 'gold')} · ${ui().marketDate}: ${currentPrices.last_updated} UTC`;
+    } else {
+      document.getElementById('market-price-strip').textContent = state === 'loading' ? ui().historyLoading : ui().unavailable;
+    }
+  }
+  function setLanguage(value) {
+    language = value;
+    renderMetadata();
+    draw();
+  }
+
   async function load(version = Date.now()) {
     const status = document.getElementById('market-history-status');
-    status.textContent = 'Loading published history…';
+    state = 'loading';
+    renderMetadata();
     try {
       const [historyResponse, signalResponse] = await Promise.all([
         fetch(`${HISTORY_PATH}?v=${encodeURIComponent(version)}`, { cache: 'no-store' }),
@@ -112,19 +133,18 @@
       const signal = await signalResponse.json();
       if (!validHistory(history)) throw new Error('Published history could not be verified.');
       series = history.series;
-      status.textContent = `${history.source} · BTC-USD / GC=F · through ${history.updated_for_market_date} (UTC) · ${series.length} observations`;
-      if (Number.isFinite(signal.btc_price_usd) && Number.isFinite(signal.gold_price_usd)) {
-        document.getElementById('market-price-strip').textContent = `BTC: ${formatValue(signal.btc_price_usd, 'btc')} · Gold (GC=F): ${formatValue(signal.gold_price_usd, 'gold')} · Market date: ${signal.last_updated} UTC`;
-      }
+      historyMeta = history; currentPrices = signal; state = 'loaded';
+      renderMetadata();
       draw();
     } catch (error) {
       series = [];
-      status.textContent = 'Interactive history is temporarily unavailable. The published source files remain linked below.';
+      state = 'error'; currentPrices = null;
+      renderMetadata();
     }
   }
 
   document.querySelectorAll('[data-chart-mode]').forEach(button => button.addEventListener('click', () => setMode(button.dataset.chartMode)));
   root.addEventListener('resize', draw);
-  root.BTC2GMarketChart = { load, setMode, validHistory };
+  root.BTC2GMarketChart = { load, setMode, setLanguage, validHistory };
   load();
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BTC2G Premium Subscription Activated</title>
+  <title>BTC2G Payment Status</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -78,16 +78,20 @@
         width: 100%;
       }
     }
+    #status-language { max-width:100%; min-height:44px; padding:8px; font:inherit; background:#132b47; color:#fff; }
   </style>
 </head>
 <body>
   <main>
-    <h1>Premium subscription activated</h1>
-    <p>Thank you for subscribing to BTC2G Premium Signals.</p>
-    <p>Premium access will be enabled after payment confirmation.</p>
-    <p class="disclaimer">BTC2G signals are model-based and not financial advice.</p>
-    <a href="index.html">Back to BTC2G</a>
+    <select id="status-language" aria-label="Language"></select>
+    <h1 data-status="title">Payment confirmation pending</h1>
+    <p data-status="pending">Opening this page does not confirm payment or activate access. Access requires verified server-side payment confirmation.</p>
+    <p class="disclaimer" data-status="disclaimer">BTC2G signals are model-based and not financial advice.</p>
+    <a data-status="home" href="index.html">Back to BTC2G</a>
   </main>
+  <script src="assets/js/languages.js?v=20261030-6"></script>
+  <script src="assets/js/ui-text.js?v=20261030-6"></script>
+  <script src="assets/js/payment-status-locales.js?v=20261030-6"></script>
   <script src="assets/js/traffic.js" defer></script>
 </body>
 </html>

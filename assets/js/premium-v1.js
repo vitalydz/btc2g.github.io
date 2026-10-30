@@ -21,6 +21,6 @@
     vi:['PHIÊN BẢN ĐẦU','Nội dung dự kiến của phiên bản Premium đầu tiên.','Phạm vi ban đầu rõ ràng, tùy thuộc đánh giá chất lượng dữ liệu.',['12 tháng lịch sử tín hiệu và tỷ lệ','Bản tin nghiên cứu mỗi Chủ nhật','Ghi chú giải thích thay đổi điểm','Tải dữ liệu công bố dạng CSV'],'Tôi muốn nhận bản tin tuần miễn phí khi đang phát triển.','Giữ chỗ truy cập sớm']
   };
   Object.entries(simple).forEach(([key,v])=>{ simple[key]={label:v[0],title:v[1],intro:v[2],items:v[3],digest:v[4],button:v[5]}; });
-  const lang=new URLSearchParams(location.search).get('lang')||localStorage.getItem('lang')||'en';const t=lang==='ru'?ru:(simple[lang]||en);
+  const lang=window.BTC2GLanguages.requested();const t=lang==='ru'?ru:(simple[lang]||en);
   document.querySelector('.first-release .section-label').textContent=t.label;document.getElementById('first-release-title').textContent=t.title;document.getElementById('first-release-intro').textContent=t.intro;document.querySelectorAll('.first-release-list li').forEach((li,i)=>li.textContent=t.items[i]);document.getElementById('weekly-digest-label').textContent=t.digest;document.getElementById('early-access-button').textContent=t.button;
 })();

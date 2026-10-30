@@ -9,7 +9,7 @@ function page(lang,blocked=false){
  const links=[{href:'index.html',getAttribute(){return this.href},setAttribute(k,v){this[k]=v}},{href:'index.html#calculator',getAttribute(){return this.href},setAttribute(k,v){this[k]=v}}];
  let saved='en';const document={documentElement:{},getElementById:node,querySelector:()=>({content:''}),querySelectorAll(s){if(s==='[data-text]')return fields;if(s.startsWith('a['))return links;return []}};
  const c={window:{},document,location:{search:'?lang='+lang,href:'https://btc2g.com/save.html?lang='+lang},localStorage:{getItem(){if(blocked)throw Error();return saved},setItem(k,v){if(blocked)throw Error();saved=v}},navigator:{language:'en'},URL,URLSearchParams,Intl};vm.createContext(c);
- for(const p of ['quote-compare.js','save-text.js','save.js'])vm.runInContext(read('assets/js/'+p),c);
+ for(const p of ['languages.js','ui-text.js','quote-compare.js','save-text.js','save.js'])vm.runInContext(read('assets/js/'+p),c);
  return {c,node,fields,links,saved:()=>saved};
 }
 test('SAVE selector and dictionaries contain the same 19 languages and complete templates',()=>{
@@ -32,7 +32,7 @@ function premiumPage(lang){
  const document={documentElement:{},title:'',getElementById:node,querySelector:node,querySelectorAll(){return []},createElement(){return node('created-'+nodes.size)},createTextNode(text){return {textContent:text}}};
  let saved=null;const location={search:'?lang='+lang,href:'https://btc2g.com/premium.html?lang='+lang,assign(value){this.assigned=value}};
  const c={window:{},document,URL,URLSearchParams,location,localStorage:{getItem:()=>saved,setItem(k,v){saved=v}},navigator:{language:'en'}};
- vm.createContext(c);vm.runInContext(read('assets/js/subscription-request.js'),c);vm.runInContext(read('assets/js/premium-language.js'),c);return {c,nodes};
+ vm.createContext(c);vm.runInContext(read('assets/js/languages.js'),c);vm.runInContext(read('assets/js/ui-text.js'),c);vm.runInContext(read('assets/js/subscription-request.js'),c);vm.runInContext(read('assets/js/premium-language.js'),c);return {c,nodes};
 }
 test('Premium selector and dictionaries contain the same 19 complete languages',()=>{
  const {c}=premiumPage('en');const html=read('premium.html');const options=[...html.matchAll(/<option value="([a-z]{2})"/g)].map(match=>match[1]);

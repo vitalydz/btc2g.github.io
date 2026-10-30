@@ -35,7 +35,9 @@ Object.assign(context, {
   formatLocalizedDate: date => date,
   LOCALE_BY_LANGUAGE: {en: 'en-US'},
 });
-for (const name of ['normalizeSignal', 'signalGuidance', 'renderFreshness', 'setSignalUnavailable', 'renderRatio', 'renderSignal']) {
+context.window = {};
+vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'assets/js/ui-text.js'), 'utf8'), context);
+for (const name of ['getUIWords', 'normalizeSignal', 'signalGuidance', 'renderFreshness', 'setSignalUnavailable', 'renderRatio', 'renderSignal']) {
   vm.runInContext(html.match(new RegExp(`    function ${name}\\([^]*?\\n    \\}`))[0], context);
 }
 const valid = {signal: 'HOLD', confidence: 0.56, ratio: 20.192, last_updated: '2000-01-01', note: ''};

@@ -71,7 +71,7 @@
       text('calculator-result', `≈ ${amount} ${result.unit}`);
       const reciprocal = 1 / signal.ratio;
       const kilograms = signal.ratio * 0.0311034768;
-      text('calculator-equivalents', `1 BTC = ${signal.ratio.toFixed(3)} oz t = ${kilograms.toFixed(3)} kg gold · 1 oz t gold = ${reciprocal.toFixed(8)} BTC · BTC ${new Intl.NumberFormat(language, {style:'currency',currency:'USD',maximumFractionDigits:0}).format(signal.btc_price_usd)} · Gold ${new Intl.NumberFormat(language, {style:'currency',currency:'USD',maximumFractionDigits:2}).format(signal.gold_price_usd)}/oz`);
+      text('calculator-equivalents', `1 BTC = ${signal.ratio.toFixed(3)} oz t = ${kilograms.toFixed(3)} kg ${root.BTC2GLanguageText.text(language).gold} · 1 oz t ${root.BTC2GLanguageText.text(language).gold} = ${reciprocal.toFixed(8)} BTC · BTC ${new Intl.NumberFormat(language, {style:'currency',currency:'USD',maximumFractionDigits:0}).format(signal.btc_price_usd)} · ${root.BTC2GLanguageText.text(language).gold} ${new Intl.NumberFormat(language, {style:'currency',currency:'USD',maximumFractionDigits:2}).format(signal.gold_price_usd)}/oz`);
     } else {
       shareText = '';
       text('calculator-result', result.status === 'invalid' ? t.invalid : t.unavailable);
@@ -93,7 +93,7 @@
     if (!shareText) return;
     try {
       await navigator.clipboard.writeText(shareText);
-      text('calculator-action-status', language === 'ru' ? 'Результат скопирован.' : 'Result copied.');
+      text('calculator-action-status', root.BTC2GLanguageText.text(language).copied);
     } catch (error) {
       text('calculator-action-status', shareText);
     }
@@ -103,7 +103,7 @@
     if (navigator.share) {
       try { await navigator.share({title:'BTC2G calculator', text:shareText, url:location.href}); } catch (error) {}
     } else {
-      try { await navigator.clipboard.writeText(shareText); text('calculator-action-status', language === 'ru' ? 'Результат скопирован.' : 'Result copied.'); } catch (error) { text('calculator-action-status', shareText); }
+      try { await navigator.clipboard.writeText(shareText); text('calculator-action-status', root.BTC2GLanguageText.text(language).copied); } catch (error) { text('calculator-action-status', shareText); }
     }
   });
   // Recheck age on return to a long-lived page and at UTC date boundaries.

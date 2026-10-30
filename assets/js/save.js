@@ -19,7 +19,7 @@
     resetResult();
   }
   function renderComparison() {
-    const result = window.BTC2GQuotes.compare(...fields.map(id => byId(id).value));
+    const result = window.BTC2GQuotes.compare(...fields.map(id => window.BTC2GLanguages.decimal(byId(id).value)));
     if (result.status !== 'ready') {
       byId('save-result').textContent = t().invalid;
       return;
@@ -40,6 +40,7 @@
   function setLanguage(value) {
     value = String(value || '').toLowerCase().split(/[-_]/)[0];
     lang = Object.hasOwn(texts, value) ? value : 'en';
+    window.BTC2GLanguages.apply(lang);
     document.documentElement.lang = lang;
     document.documentElement.dir = ['he', 'ar'].includes(lang) ? 'rtl' : 'ltr';
     byId('save-language').value = lang;
@@ -75,7 +76,5 @@
   }));
   byId('save-compare').addEventListener('click', renderComparison);
   byId('save-clear').addEventListener('click', clearQuotes);
-  let saved;
-  try { saved = localStorage.getItem('lang'); } catch {}
-  setLanguage(new URLSearchParams(location.search).get('lang') || saved || navigator.language.slice(0, 2));
+  setLanguage(window.BTC2GLanguages.requested());
 })();

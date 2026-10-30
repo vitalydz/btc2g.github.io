@@ -28,12 +28,24 @@
   let language = 'en';
 
   function setLanguage(nextLanguage) {
-    language = translations[nextLanguage] ? nextLanguage : 'en';
+    nextLanguage = root.BTC2GLanguages.normalize(nextLanguage);
+    language = Object.hasOwn(translations, nextLanguage) ? nextLanguage : 'en';
+    root.BTC2GLanguages.apply(language);
     const text = translations[language];
     Object.entries(ids).forEach(([key, id]) => {
       const element = document.getElementById(id);
       if (element) element.textContent = text[key];
     });
+    const ui = root.BTC2GLanguageText.text(language);
+    document.title = text.title + ' · BTC2G';
+    document.querySelector?.('meta[name=description]')?.setAttribute('content', text.intro);
+    const image = document.getElementById('research-image');
+    image?.setAttribute?.('alt', text.figure);
+    const nav = document.querySelectorAll?.('.main-nav a') || [];
+    [ui.home, ui.calculator, 'Premium'].forEach((label, index) => { if (nav[index]) nav[index].textContent = label; });
+    document.querySelectorAll?.('footer a').forEach((link, index) => { link.textContent = [ui.home, ui.terms, ui.support][index]; });
+    const selector = document.getElementById('research-language');
+    selector?.setAttribute?.('aria-label', ui.language);
     const status = document.getElementById('research-copy-status');
     if (status) status.textContent = '';
   }
@@ -50,12 +62,12 @@
 
   document.getElementById('research-copy-address')?.addEventListener('click', copyAddress);
   const selector = document.getElementById('research-language');
-  const initialLanguage = new URLSearchParams(root.location?.search || '').get('lang') || root.localStorage?.getItem('lang') || 'en';
+  const initialLanguage = root.BTC2GLanguages.requested();
   setLanguage(initialLanguage);
   if (selector) {
-    selector.value = translations[initialLanguage] ? initialLanguage : 'en';
+    selector.value = Object.hasOwn(translations, initialLanguage) ? initialLanguage : 'en';
     selector.addEventListener('change', () => {
-      root.localStorage?.setItem('lang', selector.value);
+      root.BTC2GLanguages.remember(selector.value);
       document.documentElement.lang = selector.value;
       document.documentElement.dir = ['he', 'ar'].includes(selector.value) ? 'rtl' : 'ltr';
       setLanguage(selector.value);

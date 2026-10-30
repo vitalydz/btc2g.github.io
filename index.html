@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#071426" />
-  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.30.5">
+  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.30.6">
   <meta name="description" content="Track the published Bitcoin-to-gold ratio, daily market data, model direction, history chart, and BTC ↔ gold calculator." />
   <meta property="og:title" content="BTC2G - Bitcoin vs Gold Ratio" />
   <meta property="og:description" content="Published BTC/Gold ratio data, model context, interactive history, and a reference calculator." />
@@ -31,7 +31,7 @@
       <nav id="primary-navigation" class="main-nav" aria-label="Primary navigation">
         <a id="nav-home" href="index.html">Home</a>
         <a id="nav-forecast" href="#forecast">Forecast</a>
-        <a id="nav-premium" href="premium.html?v=20261029-21">Premium</a>
+        <a id="nav-premium" href="premium.html?v=20261030-6">Premium</a>
         <a id="nav-save" href="save.html">SAVE</a>
         <a id="nav-buy" href="buy.html">Buy BTC</a>
         <a id="nav-research" href="research.html">TimeT research</a>
@@ -239,7 +239,7 @@
       <h2 id="premium-title">Premium Signals</h2>
       <p id="premium-subtitle">Extended signal history, model notes, and weekly updates.</p>
       <div class="premium-actions">
-        <a id="premium-page-link" class="premium-page-link" href="premium.html?v=20261029-21">View Premium</a>
+        <a id="premium-page-link" class="premium-page-link" href="premium.html?v=20261030-6">View Premium</a>
         <button id="premium-unlock-btn" class="premium-button" type="button">Join early access</button>
       </div>
     </section>
@@ -325,14 +325,17 @@
     <p>© 2026 BTC2G</p>
   </footer>
 
+  <script src="assets/js/languages.js?v=20261030-6"></script>
+  <script src="assets/js/ui-text.js?v=20261030-6"></script>
+  <script src="assets/js/legacy-premium-text.js?v=20261030-6"></script>
   <script src="assets/js/contest-text.js?v=20261028-1"></script>
   <script src="assets/js/audience-text.js?v=20261028-2"></script>
-  <script src="assets/js/ratio-tools.js?v=20261028-2"></script>
+  <script src="assets/js/ratio-tools.js?v=20261030-6"></script>
   <script src="assets/js/digest-preferences.js?v=20261030-5"></script>
   <script src="assets/js/subscription-request.js?v=20261030-4"></script>
-  <script src="assets/js/home-v2-text.js?v=20261029-2"></script>
+  <script src="assets/js/home-v2-text.js?v=20261030-6"></script>
   <script src="assets/js/scenario-entry.js?v=20261030-1"></script>
-  <script src="assets/js/market-chart.js?v=20261029-1"></script>
+  <script src="assets/js/market-chart.js?v=20261030-6"></script>
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
@@ -477,10 +480,10 @@
       document.getElementById('signal-updated').textContent = currentLang === 'ru' ? 'Нет данных' : 'Unavailable';
       document.getElementById('signal-note').textContent = '';
       document.getElementById('insight-direction-value').textContent = '--';
-      const unavailable = currentLang === 'ru' ? 'Данные временно недоступны' : 'Ratio temporarily unavailable';
+      const unavailable = getUIWords().ratioUnavailable;
       setTextById('ratio-value', unavailable);
       setTextById('insight-ratio-value', unavailable);
-      setTextById('ratio-change', currentLang === 'ru' ? 'Изменение за 7 дней недоступно' : '7-day change unavailable');
+      setTextById('ratio-change', getUIWords().changeUnavailable);
       document.getElementById('ratio-value').classList.add?.('is-unavailable');
       renderFreshness('unavailable');
     }
@@ -489,7 +492,7 @@
       if (typeof window !== 'undefined' && window.BTC2GTools) window.BTC2GTools.update(currentSignalData, currentMetaData, currentLang);
       const ratio = currentSignalData?.ratio;
       const available = typeof ratio === 'number' && Number.isFinite(ratio) && ratio > 0;
-      const fallback = currentLang === 'ru' ? 'Данные временно недоступны' : 'Ratio temporarily unavailable';
+      const fallback = getUIWords().ratioUnavailable;
       const value = available
         ? `${new Intl.NumberFormat(LOCALE_BY_LANGUAGE[currentLang] || 'en-US', {
           minimumFractionDigits: 2,
@@ -506,7 +509,7 @@
         changeElement.textContent = `${sign}${new Intl.NumberFormat(LOCALE_BY_LANGUAGE[currentLang] || 'en-US', {maximumFractionDigits: 2}).format(change)}% · 7d`;
         changeElement.className = `ratio-change ${change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral'}`;
       } else if (changeElement) {
-        changeElement.textContent = currentLang === 'ru' ? 'Изменение за 7 дней недоступно' : '7-day change unavailable';
+        changeElement.textContent = getUIWords().changeUnavailable;
         changeElement.className = 'ratio-change neutral';
       }
       const freshness = typeof getSignalFreshness === 'function' ? getSignalFreshness(currentSignalData?.last_updated) : 'unknown';
@@ -525,15 +528,15 @@
       return days > 3 ? 'delayed' : 'fresh';
     }
 
+    function getUIWords() {
+      return window.BTC2GLanguageText.text(currentLang);
+    }
+
     function renderFreshness(status) {
-      const messages = {
-        en: {delayed: 'Data delayed — market quotes are more than 3 days old.', unknown: 'Data freshness unavailable — market date is missing or invalid.', unavailable: 'Data unavailable — the signal cannot be verified.'},
-        ru: {delayed: 'Данные задерживаются — котировки старше 3 дней.', unknown: 'Свежесть данных неизвестна — дата котировок отсутствует или некорректна.', unavailable: 'Данные недоступны — сигнал невозможно проверить.'},
-        he: {delayed: 'הנתונים מתעכבים — מחירי השוק ישנים מ־3 ימים.', unknown: 'עדכניות הנתונים אינה ידועה — תאריך השוק חסר או שגוי.', unavailable: 'הנתונים אינם זמינים — לא ניתן לאמת את האיתות.'},
-      };
+      const messages = getUIWords();
       const element = document.getElementById('data-freshness');
       element.hidden = status === 'fresh';
-      element.textContent = (messages[currentLang] || messages.en)[status] || '';
+      element.textContent = messages[status] || '';
     }
 
     function renderSignal() {
@@ -572,9 +575,9 @@
       const ratio = currentSignalData.ratio;
       const ratioChange = currentSignalData.ratio_change_7d_pct;
       document.getElementById('email-preview-subject').textContent = `Subject: BTC2G Signal Update — Ratio ${ratio.toFixed(2)} oz`;
-      document.getElementById('email-preview-ratio').textContent = `BTC/Gold ratio: ${ratio.toFixed(3)} oz t${Number.isFinite(ratioChange) ? ` (${ratioChange >= 0 ? '+' : ''}${ratioChange.toFixed(2)}% / 7d)` : ''}`;
-      document.getElementById('email-preview-score').textContent = `Model score: ${Math.round(confidence * 100)}/100 → ${text.signalLabels[signal]}`;
-      document.getElementById('email-preview-date').textContent = `Market date: ${localizedSignalDate}`;
+      document.getElementById('email-preview-ratio').textContent = `${text.insightRatioTitle}: ${ratio.toFixed(3)} oz t${Number.isFinite(ratioChange) ? ` (${ratioChange >= 0 ? '+' : ''}${ratioChange.toFixed(2)}% / 7d)` : ''}`;
+      document.getElementById('email-preview-score').textContent = `${getUIWords().score}: ${Math.round(confidence * 100)}/100 → ${text.signalLabels[signal]}`;
+      document.getElementById('email-preview-date').textContent = `${getUIWords().marketDate}: ${localizedSignalDate}`;
       document.getElementById('insight-direction-value').textContent = text.signalLabels[signal];
       renderRatio();
       if (!currentMetaData?.last_updated_utc) {
@@ -2183,6 +2186,12 @@
         ...base,
         ...selected,
         ...supplement,
+        ...window.BTC2GLegacyPremiumText[lang],
+        closeModal: window.BTC2GLanguageText.text(lang).close,
+        stripeNotConfigured: window.BTC2GLanguageText.text(lang).soon,
+        subscribeNotConfigured: window.BTC2GLanguageText.text(lang).soon,
+        premiumNextLocked: window.BTC2GLanguageText.text(lang).soon,
+        ...(STRIPE_CHECKOUT_URL.includes('YOUR-VERCEL-PROJECT') ? {premiumPrice: window.BTC2GLanguageText.text(lang).soon} : {}),
         signalLabels: {
           ...base.signalLabels,
           ...(selected.signalLabels || {}),
@@ -2197,7 +2206,7 @@
     }
 
     function setLang(lang) {
-      localStorage.setItem('lang', lang);
+      lang = window.BTC2GLanguages.apply(lang);
       const text = getTextForLanguage(lang);
       const localizedToday = formatLocalizedDate(todayStr, lang);
       currentLang = lang;
@@ -2212,7 +2221,7 @@
       setTextById('nav-home', text.navHome);
       setTextById('nav-forecast', text.navForecast);
       setTextById('nav-premium', text.navPremium);
-      document.getElementById('nav-premium').href = 'premium.html?v=20261029-21&lang=' + encodeURIComponent(lang);
+      document.getElementById('nav-premium').href = 'premium.html?v=20261030-6&lang=' + encodeURIComponent(lang);
       setTextById('nav-buy', text.navBuy);
       setTextById('nav-account', text.navAccount);
       document.getElementById('nav-save').href = 'save.html?lang=' + encodeURIComponent(lang);
@@ -2256,6 +2265,9 @@
       document.getElementById('premium-price').textContent = text.premiumPrice;
       document.getElementById('premium-email').placeholder = text.premiumEmailPlaceholder;
       document.getElementById('premium-submit-button').textContent = text.premiumSubmit;
+      const pendingCheckout = STRIPE_CHECKOUT_URL.includes('YOUR-VERCEL-PROJECT');
+      document.getElementById('premium-form').hidden = pendingCheckout;
+      document.getElementById('premium-submit-button').disabled = pendingCheckout;
       document.getElementById('premium-modal-close').setAttribute('aria-label', text.closeModal);
       document.getElementById('buy-title').textContent = text.buyTitle;
       setTextById('buy-text', text.buyText);
@@ -2277,6 +2289,13 @@
       document.getElementById('privacy-link').textContent = text.privacy;
       document.getElementById('terms-link').textContent = text.terms;
       document.getElementById('support-link').textContent = text.support;
+      const ui = window.BTC2GLanguageText.text(lang);
+      document.querySelectorAll('a[href^="research.html"]').forEach(link => { link.textContent = ui.research; });
+      setTextById('email-preview-subject', ui.emailSubject);
+      setTextById('email-preview-link', ui.viewChart);
+      document.getElementById('email-preview').setAttribute('aria-label', ui.emailSubject);
+      document.getElementById('forecastChart').alt = text.forecastTitle;
+      window.BTC2GMarketChart?.setLanguage(lang);
       window.BTC2GHomeV2Text?.setLanguage(lang);
       window.BTC2GScenarioEntry?.setLanguage(lang);
       window.BTC2GDigest?.setLanguage(lang);
@@ -2298,8 +2317,7 @@
     const mobileMenu = document.getElementById('menu-toggle');
     function updateMenuLabel() {
       const isOpen = mobileMenu.getAttribute('aria-expanded') === 'true';
-      const labels = {en: ['Open menu', 'Close menu'], ru: ['Открыть меню', 'Закрыть меню'], he: ['פתיחת תפריט', 'סגירת תפריט']};
-      mobileMenu.setAttribute('aria-label', (labels[currentLang] || labels.en)[Number(isOpen)]);
+      mobileMenu.setAttribute('aria-label', window.BTC2GLanguages.menu(currentLang, isOpen));
     }
     function closeMobileMenu(restoreFocus = false) {
       const wasOpen = mobileMenu.getAttribute('aria-expanded') === 'true';
@@ -2527,7 +2545,7 @@
 
       document.getElementById('premium-modal').hidden = false;
       setFormMessage('premium-message', '');
-      premiumEmail.focus();
+      (document.getElementById('premium-form').hidden ? document.getElementById('premium-modal-close') : premiumEmail).focus();
     }
 
     function closePremiumModal() {
@@ -2536,7 +2554,7 @@
 
     document.getElementById('premium-unlock-btn').addEventListener('click', () => {
       trackEvent('premium_click');
-      window.location.href = 'premium.html?v=20261029-21&lang=' + encodeURIComponent(currentLang) + '#early-access';
+      window.location.href = 'premium.html?v=20261030-6&lang=' + encodeURIComponent(currentLang) + '#early-access';
     });
     document.getElementById('premium-modal-close').addEventListener('click', closePremiumModal);
     document.getElementById('premium-modal').addEventListener('click', (event) => {
@@ -2550,7 +2568,7 @@
       }
     });
 
-    const savedLang = new URLSearchParams(location.search).get('lang') || localStorage.getItem('lang');
+    const savedLang = window.BTC2GLanguages.requested();
     const browserLang = navigator.language.slice(0, 2).toLowerCase();
     const supportedLangs = Object.keys(texts);
 

@@ -1759,7 +1759,7 @@
 
   let saved = '';
   try { saved = localStorage.getItem('lang') || ''; } catch {}
-  const requested = new URLSearchParams(location.search).get('lang') || saved || navigator.language;
+  const requested = window.BTC2GLanguages.requested();
   const lang = normalizeLanguage(requested);
   const t = translations[lang];
 
@@ -1772,7 +1772,7 @@
 
   const selector = document.getElementById('premium-language');
   selector.value = lang;
-  selector.setAttribute('aria-label', t.language || 'Language');
+  selector.setAttribute('aria-label', window.BTC2GLanguageText.text(lang).language);
   selector.addEventListener('change', event => {
     const next = normalizeLanguage(event.target.value);
     try { localStorage.setItem('lang', next); } catch {}
