@@ -12,6 +12,7 @@
   };
   let series = [];
   let mode = 'ratio';
+  let regimeAnalysis = null;
 
   function validHistory(data) {
     return data?.source === 'yfinance' && data?.tickers?.Bitcoin === 'BTC-USD' && data?.tickers?.Gold === 'GC=F' &&
@@ -55,6 +56,23 @@
     const plotHeight = height - top - bottom;
     const x = index => left + index / (points.length - 1) * plotWidth;
     const y = value => top + (max - value) / (max - min) * plotHeight;
+
+    if (mode === 'ratio' && regimeAnalysis?.assignments?.length === points.length) {
+      const bandColors = { btc: '#f7931a18', gold: '#60a5fa18', neutral: '#94a3b80d' };
+      let start = 0;
+      while (start < points.length) {
+        const regime = regimeAnalysis.assignments[start];
+        let end = start;
+        while (end + 1 < points.length && regimeAnalysis.assignments[end + 1] === regime) end += 1;
+        if (regime && bandColors[regime]) {
+          const from = start === 0 ? left : (x(start - 1) + x(start)) / 2;
+          const to = end === points.length - 1 ? width - right : (x(end) + x(end + 1)) / 2;
+          ctx.fillStyle = bandColors[regime];
+          ctx.fillRect(from, top, to - from, plotHeight);
+        }
+        start = end + 1;
+      }
+    }
 
     ctx.strokeStyle = '#24344d';
     ctx.fillStyle = '#94a3b8';
@@ -112,6 +130,8 @@
       const signal = await signalResponse.json();
       if (!validHistory(history)) throw new Error('Published history could not be verified.');
       series = history.series;
+      regimeAnalysis = root.BTC2GRegimes?.analyze(series) || null;
+      if (regimeAnalysis) root.BTC2GRegimes.render(regimeAnalysis, document.documentElement.lang || 'en');
       status.textContent = `${history.source} · BTC-USD / GC=F · through ${history.updated_for_market_date} (UTC) · ${series.length} observations`;
       if (Number.isFinite(signal.btc_price_usd) && Number.isFinite(signal.gold_price_usd)) {
         document.getElementById('market-price-strip').textContent = `BTC: ${formatValue(signal.btc_price_usd, 'btc')} · Gold (GC=F): ${formatValue(signal.gold_price_usd, 'gold')} · Market date: ${signal.last_updated} UTC`;
@@ -119,6 +139,9 @@
       draw();
     } catch (error) {
       series = [];
+      regimeAnalysis = null;
+      const detector = document.getElementById('regime-detector');
+      if (detector) detector.hidden = true;
       status.textContent = 'Interactive history is temporarily unavailable. The published source files remain linked below.';
     }
   }
