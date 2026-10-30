@@ -1,9 +1,27 @@
 # BTC2G Product Hunt launch kit
 
+## Ready-to-paste listing
+
+**Product name:** BTC2G
+
+**Tagline:** Track Bitcoin's value in gold, not just dollars
+
+**Description:** BTC2G tracks how many troy ounces of gold one Bitcoin represents. Explore the historical ratio, model context, relative-strength comparisons, a reference calculator, and clearly labelled scenarios—with sources, dates, and limitations.
+
+**Suggested topics:** Bitcoin, Fintech, Data Visualization
+
+### Maker comment
+
+Hi Product Hunt — I built BTC2G to answer a simple question that dollar-only charts miss: how much gold does one Bitcoin represent over time?
+
+The public dashboard combines the BTC/Gold ratio, daily market context, a model-based signal, historical regimes, relative-strength comparisons, and a reference calculator. Sources, market dates, and limitations are shown alongside the outputs. The forecast is a labelled scenario rather than a price promise, and the model score is not a probability of profit.
+
+BTC2G is still evolving. Premium is an early-access roadmap for deeper history, research notes, and weekly context; there is no payment flow today. I would especially value feedback on which comparisons and explanations make the dashboard more useful and easier to understand.
+
 ## Asset order
 
 1. `btc2g-logo-512.png` — square product thumbnail. Product Hunt recommends 240×240; this 512×512 source can be uploaded directly.
-2. `01-home.jpg` — public dashboard, current BTC/Gold ratio, model signal, score, and market date.
+2. `01-home.jpg` — public dashboard with the current BTC/Gold ratio, seven-day change, market date, and historical chart.
 3. `02-forecast.jpg` — historical BTC and gold chart plus clearly labelled scenario extrapolations.
 4. `03-calculator.jpg` — BTC ↔ gold reference calculator, source/date note, and Key Insights.
 5. `04-premium.jpg` — planned Premium research layer and early-access positioning.
