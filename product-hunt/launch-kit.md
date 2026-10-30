@@ -25,7 +25,7 @@ BTC2G is still evolving. Premium is an early-access roadmap for deeper history, 
 3. `02-forecast.jpg` — historical BTC and gold chart plus clearly labelled scenario extrapolations.
 4. `03-calculator.jpg` — BTC ↔ gold reference calculator, source/date note, and Key Insights.
 5. `04-premium.jpg` — planned Premium research layer and early-access positioning.
-6. `btc2g-demo-36s.mp4` — narrated 36-second gallery/demo video with continuous motion, four product scenes, an animated pointer, and concise captions.
+6. `btc2g-demo-36s-female.mp4` — narrated 36-second gallery/demo video with a warm female voice, a subtle music bed based on the supplied reference, continuous motion, enhanced scene transitions, an animated pointer, and concise captions.
 
 Gallery images are 1270×760, the current Product Hunt recommended gallery size.
 

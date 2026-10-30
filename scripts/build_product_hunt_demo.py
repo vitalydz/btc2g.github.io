@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import subprocess
 from pathlib import Path
 
@@ -11,12 +12,14 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 ASSET_DIR = ROOT / "product-hunt"
 SILENT_OUTPUT = ASSET_DIR / "btc2g-demo-motion-silent.mp4"
-VOICE_OUTPUT = ASSET_DIR / "btc2g-demo-voice.wav"
-OUTPUT = ASSET_DIR / "btc2g-demo-36s.mp4"
+VOICE_OUTPUT = ASSET_DIR / "btc2g-demo-voice.mp3"
+OUTPUT = ASSET_DIR / "btc2g-demo-36s-female.mp4"
+REFERENCE_MUSIC = ROOT.parent / "Voice" / "___Simona____.m4a"
 WIDTH, HEIGHT = 1270, 760
 FPS = 30
 SECONDS_PER_SCENE = 9
 FADE_FRAMES = 24
+VOICE_NAME = "en-US-AvaNeural"
 
 VOICEOVER = (
     "BTC2G answers one simple question: how much gold does one Bitcoin represent? "
@@ -107,6 +110,27 @@ def add_overlays(frame: np.ndarray, scene: dict, progress: float, overall: float
     return frame
 
 
+def transition_frame(previous: np.ndarray, current: np.ndarray, alpha: float) -> np.ndarray:
+    """Blend scenes with a soft zoom blur and a diagonal light sweep."""
+    eased = ease(alpha)
+    blur_strength = int(2 + 14 * np.sin(np.pi * eased))
+    if blur_strength % 2 == 0:
+        blur_strength += 1
+    outgoing = cv2.GaussianBlur(previous, (blur_strength, blur_strength), 0)
+    incoming = cv2.GaussianBlur(current, (blur_strength, blur_strength), 0)
+    blended = cv2.addWeighted(outgoing, 1.0 - eased, incoming, eased, 0)
+
+    sweep = np.zeros_like(blended)
+    center = int((-0.25 + 1.5 * eased) * WIDTH)
+    points = np.array(
+        [[center - 95, 0], [center + 5, 0], [center + 145, HEIGHT], [center + 45, HEIGHT]],
+        dtype=np.int32,
+    )
+    cv2.fillConvexPoly(sweep, points, (255, 238, 200))
+    glow = 0.16 * np.sin(np.pi * eased)
+    return cv2.addWeighted(blended, 1.0, sweep, glow, 0)
+
+
 def build_motion_video() -> None:
     writer = cv2.VideoWriter(str(SILENT_OUTPUT), cv2.VideoWriter_fourcc(*"mp4v"), FPS, (WIDTH, HEIGHT))
     if not writer.isOpened():
@@ -125,7 +149,7 @@ def build_motion_video() -> None:
                 frame = add_overlays(motion_frame(image, scene, progress), scene, progress, (written + 1) / total_frames)
                 if previous is not None and frame_number < FADE_FRAMES:
                     alpha = (frame_number + 1) / (FADE_FRAMES + 1)
-                    frame = cv2.addWeighted(previous, 1.0 - alpha, frame, alpha, 0)
+                    frame = transition_frame(previous, frame, alpha)
                 writer.write(frame)
                 previous = frame
                 written += 1
@@ -133,28 +157,38 @@ def build_motion_video() -> None:
         writer.release()
 
 
-def build_voiceover() -> None:
-    escaped_text = VOICEOVER.replace("'", "''")
-    escaped_path = str(VOICE_OUTPUT).replace("'", "''")
-    command = (
-        "Add-Type -AssemblyName System.Speech; "
-        "$voice = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
-        "$voice.SelectVoice('Microsoft David Desktop'); $voice.Rate = 2; $voice.Volume = 100; "
-        f"$voice.SetOutputToWaveFile('{escaped_path}'); $voice.Speak('{escaped_text}'); $voice.Dispose()"
-    )
-    subprocess.run(["powershell", "-NoProfile", "-Command", command], check=True)
+async def build_voiceover() -> None:
+    import edge_tts
+
+    speech = edge_tts.Communicate(VOICEOVER, VOICE_NAME, rate="+8%", pitch="+2Hz", volume="+0%")
+    await speech.save(str(VOICE_OUTPUT))
 
 
-def mux_audio() -> None:
+def mux_audio(music_path: Path) -> None:
     try:
         import imageio_ffmpeg
     except ImportError as error:
         raise RuntimeError("Install imageio-ffmpeg to create the narrated MP4") from error
+    if not music_path.exists():
+        raise FileNotFoundError(f"Reference music not found: {music_path}")
+    duration = SECONDS_PER_SCENE * len(SCENES)
+    audio_filter = (
+        f"[2:a]atrim=0:{duration},asetpts=PTS-STARTPTS,highpass=f=80,lowpass=f=1200,"
+        f"volume=0.10,afade=t=in:st=0:d=1.2,afade=t=out:st={duration - 2}:d=2,"
+        "aformat=channel_layouts=stereo[music];"
+        "[1:a]volume=1.12,highpass=f=95,acompressor=threshold=-18dB:ratio=2.5:attack=10:release=220,"
+        "aformat=channel_layouts=stereo[voice];"
+        "[music][voice]amix=inputs=2:duration=longest:dropout_transition=2,"
+        "loudnorm=I=-16:LRA=11:TP=-1.5,alimiter=limit=0.94[audio]"
+    )
     subprocess.run(
         [
             imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-i", str(SILENT_OUTPUT), "-i", str(VOICE_OUTPUT),
-            "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-c:a", "aac", "-b:a", "160k",
-            "-af", "apad", "-t", str(SECONDS_PER_SCENE * len(SCENES)), "-movflags", "+faststart", str(OUTPUT),
+            "-ss", "19.766", "-t", str(duration), "-i", str(music_path),
+            "-filter_complex", audio_filter, "-map", "0:v:0", "-map", "[audio]",
+            "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-c:a", "aac", "-b:a", "192k",
+            "-ar", "48000",
+            "-t", str(duration), "-movflags", "+faststart", str(OUTPUT),
         ],
         check=True,
     )
@@ -163,10 +197,11 @@ def mux_audio() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build the narrated BTC2G Product Hunt demo")
     parser.add_argument("--keep-intermediates", action="store_true")
+    parser.add_argument("--music", type=Path, default=REFERENCE_MUSIC)
     args = parser.parse_args()
     build_motion_video()
-    build_voiceover()
-    mux_audio()
+    asyncio.run(build_voiceover())
+    mux_audio(args.music)
     if not args.keep_intermediates:
         SILENT_OUTPUT.unlink(missing_ok=True)
         VOICE_OUTPUT.unlink(missing_ok=True)
