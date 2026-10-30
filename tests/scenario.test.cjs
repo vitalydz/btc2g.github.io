@@ -36,7 +36,7 @@ test('scenario page exposes accessible controls, safety disclosure, and share ac
   assert.match(page, /Scenario, not forecast/);
   assert.match(page, /not predictions, financial advice, or guarantees/);
   assert.match(page, /yfinance BTC-USD and GC=F/);
-  assert.match(page, /<script src="assets\/js\/traffic\.js" defer><\/script>/);
+  assert.match(page, /<script src="assets\/js\/traffic\.js\?v=\d{8}-\d+" defer><\/script>/);
   assert.match(homepage, /href="scenario\.html"/);
   assert.match(homepage, /BTC \/ Gold scenario/);
 });
