@@ -51,6 +51,7 @@ test('account statistics recover from failure and never leave stale figures visi
   let response = snapshot;
   const source = readFileSync(new URL('../public/account.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/gm, '');
   const context = vm.createContext({ document: ui.document, formatCount, measurementNote,
+    accountLanguage: 'en', applyAccountLanguage() {}, accountText: key => ({ show:'Show', hide:'Hide', passwordHint:'Use at least 12 characters.', loginPasswordHint:'Enter the password for this account.', create:'Create account', signIn:'Sign in', dataUnavailable:'Data unavailable', statsUnavailable:'Data unavailable. The statistics service could not be reached. Retry below.' })[key] || key,
     request: async path => {
       if (path === '/api/me') return { user: null };
       if (failure) throw new Error('Service unavailable');
@@ -142,6 +143,7 @@ test('idea form preserves text and key on failure, deduplicates retry, and repor
   message.classList = { remove() {}, add() {} };
   const source = readFileSync(new URL('../public/account.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/gm, '');
   const context = vm.createContext({ document: ui.document, formatCount, measurementNote,
+    accountLanguage: 'en', applyAccountLanguage() {}, accountText: key => ({ show:'Show', hide:'Hide', passwordHint:'Use at least 12 characters.', loginPasswordHint:'Enter the password for this account.', create:'Create account', signIn:'Sign in', dataUnavailable:'Data unavailable', statsUnavailable:'Data unavailable. The statistics service could not be reached. Retry below.' })[key] || key,
     crypto: { randomUUID: () => `local-key-${++keyCount}` },
     FormData: class { get(name) { return name === 'reviewConsent' ? 'on' : 'Preserved idea text'; } },
     request: async (path, options) => {

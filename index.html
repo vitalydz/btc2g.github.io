@@ -2232,6 +2232,8 @@
       setTextById('nav-buy', text.navBuy);
       setTextById('nav-account', text.navAccount);
       setTextById('hero-account-link', text.navAccount);
+      document.getElementById('nav-account').href = 'https://btc2g-accounts.btc2g.workers.dev/?lang=' + encodeURIComponent(lang);
+      document.getElementById('hero-account-link').href = document.getElementById('nav-account').href;
       document.getElementById('nav-save').href = 'save.html?lang=' + encodeURIComponent(lang);
       document.getElementById('save-entry-link').href = document.getElementById('nav-save').href;
       setTextById('ratio-label', text.insightRatioTitle);

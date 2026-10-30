@@ -1,5 +1,6 @@
 import { formatCount, measurementNote, request } from './metrics-view.js';
 import { authenticatePasskey } from './passkey-client.js';
+import { accountLanguage, applyAccountLanguage, accountText } from './account-language.js';
 
 const form = document.querySelector('#account-form');
 const message = document.querySelector('#message');
@@ -25,10 +26,12 @@ const ideaList = document.querySelector('#idea-list');
 let mode = 'register';
 let ideaSubmissionKey = '';
 
+applyAccountLanguage();
+
 togglePassword.addEventListener('click', () => {
   const visible = password.type === 'text';
   password.type = visible ? 'password' : 'text';
-  togglePassword.textContent = visible ? 'Show' : 'Hide';
+  togglePassword.textContent = visible ? accountText('show') : accountText('hide');
   togglePassword.setAttribute('aria-pressed', String(!visible));
   password.focus();
 });
@@ -51,11 +54,13 @@ async function refreshStats() {
       ? data.confirmedSubscribers.total : null;
     subscribersCard.hidden = !Number.isInteger(subscriberTotal) || subscriberTotal < 0;
     document.querySelector('#subscribers-count').textContent = subscribersCard.hidden ? '—' : formatCount(subscriberTotal);
-    document.querySelector('#stats-note').textContent = `${note} Visitors are daily browser/IP estimates, not verified people. Accounts are not email subscriptions.`;
+    document.querySelector('#stats-note').textContent = accountLanguage === 'ru'
+      ? `${data.source} · Отчётный день: ${data.day} (${data.timeZone}) · Обновлено: ${new Date(data.measuredAt).toLocaleString('ru-RU')}. Посетители — суточная оценка браузеров/IP, а не подтверждённые люди. Аккаунты не являются email-подписками.`
+      : `${note} Visitors are daily browser/IP estimates, not verified people. Accounts are not email subscriptions.`;
   } catch {
     subscribersCard.hidden = true;
-    document.querySelectorAll('.stats [data-count]').forEach(item => { item.textContent = 'Data unavailable'; });
-    document.querySelector('#stats-note').textContent = 'Data unavailable. The statistics service could not be reached. Retry below.';
+    document.querySelectorAll('.stats [data-count]').forEach(item => { item.textContent = accountText('dataUnavailable'); });
+    document.querySelector('#stats-note').textContent = accountText('statsUnavailable');
   }
 }
 
@@ -181,8 +186,8 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
   registrationEmailRow.hidden = mode === 'login';
   registrationEmail.required = mode === 'register';
   password.autocomplete = mode === 'register' ? 'new-password' : 'current-password';
-  passwordHint.textContent = mode === 'register' ? 'Use at least 12 characters.' : 'Enter the password for this account.';
-  submitButton.textContent = mode === 'register' ? 'Create account' : 'Sign in';
+  passwordHint.textContent = mode === 'register' ? accountText('passwordHint') : accountText('loginPasswordHint');
+  submitButton.textContent = mode === 'register' ? accountText('create') : accountText('signIn');
   setMessage('');
 }));
 

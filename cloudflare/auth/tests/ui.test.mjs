@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import vm from 'node:vm';
 
 const root = new URL('../public/', import.meta.url);
 test('preserves hidden authenticated state and offers useful public tools', async () => {
@@ -35,7 +36,32 @@ test('registration fields explain their accepted format before submission', asyn
   assert.match(html, /id="registration-email"[^>]+type="email"[^>]+required/);
   assert.match(html, /Registration is complete only after you verify this address/);
   assert.match(script, /email: mode === 'register'/);
-  assert.match(script, /Enter the password for this account/);
+  assert.match(script, /accountText\('loginPasswordHint'\)/);
+});
+
+test('account page localizes its primary UI in all 19 site languages', async () => {
+  const [html, languageScript, homepage] = await Promise.all([
+    readFile(new URL('index.html', root), 'utf8'),
+    readFile(new URL('account-language.js', root), 'utf8'),
+    readFile(new URL('../../../index.html', import.meta.url), 'utf8')
+  ]);
+  const options = [...html.matchAll(/<option value="([a-z]{2})"/g)].map(match => match[1]);
+  assert.equal(options.length, 19);
+  const executable = languageScript
+    .replaceAll('export let ', 'let ')
+    .replaceAll('export function ', 'function ')
+    .replace(/export \{[^}]+\};/, '') + '\nwindow.__i18n = { languages, dictionaries };';
+  const context = { window:{}, location:{search:'?lang=ru'}, localStorage:{getItem(){return'';}}, navigator:{language:'en'}, URLSearchParams };
+  vm.createContext(context);
+  vm.runInContext(executable, context);
+  assert.equal(context.window.__i18n.languages.length, 19);
+  for (const lang of options) {
+    const dictionary = context.window.__i18n.dictionaries[lang];
+    assert.ok(dictionary, lang);
+    assert.ok(Object.values(dictionary).every(value => typeof value === 'string' && value.trim()), lang);
+  }
+  assert.equal(context.window.__i18n.dictionaries.ru.title, 'Ваш аккаунт BTC2G');
+  assert.match(homepage, /btc2g-accounts\.btc2g\.workers\.dev\/\?lang=' \+ encodeURIComponent\(lang\)/);
 });
 
 test('password can be revealed without changing registration or sign-in submission', async () => {
