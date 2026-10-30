@@ -2284,6 +2284,9 @@
       document.getElementById('seo-bitcoin-gold-link').textContent = text.seoBitcoinGold;
       document.getElementById('seo-ratio-link').textContent = text.seoRatio;
       document.getElementById('seo-forecast-link').textContent = text.seoForecast;
+      document.getElementById('seo-bitcoin-gold-link').href = 'bitcoin-vs-gold.html?lang=' + encodeURIComponent(lang);
+      document.getElementById('seo-ratio-link').href = 'bitcoin-gold-ratio.html?lang=' + encodeURIComponent(lang);
+      document.getElementById('seo-forecast-link').href = 'bitcoin-vs-gold-forecast-2026.html?lang=' + encodeURIComponent(lang);
       document.getElementById('moonpay-text').textContent = text.moonpay;
       document.getElementById('topper-text').textContent = text.topper;
       setTextById('share-title', text.shareTitle);

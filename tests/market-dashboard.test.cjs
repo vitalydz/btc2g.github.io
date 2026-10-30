@@ -66,5 +66,14 @@ test('three existing insight articles end with a functional signup form', () => 
     assert.match(html, /class="article-signup-form"/);
     assert.match(html, /assets\/js\/article-signup\.js/);
     assert.match(html, /assets\/js\/subscription-request\.js/);
+    assert.match(html, /assets\/js\/insight-article-language\.js/);
   }
+});
+
+test('insight links preserve the selected language', () => {
+  const html = read('index.html');
+  assert.match(html, /bitcoin-vs-gold\.html\?lang=' \+ encodeURIComponent\(lang\)/);
+  assert.match(html, /bitcoin-gold-ratio\.html\?lang=' \+ encodeURIComponent\(lang\)/);
+  assert.match(html, /bitcoin-vs-gold-forecast-2026\.html\?lang=' \+ encodeURIComponent\(lang\)/);
+  assert.match(read('assets/js/insight-article-language.js'), /const russian/);
 });
