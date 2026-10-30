@@ -79,6 +79,7 @@
       <div class="hero-actions">
         <a id="hero-subscribe-link" class="hero-button hero-button-primary" href="#subscribe">Get model updates</a>
         <a id="hero-premium-link" class="hero-button" href="premium.html">View Premium</a>
+        <a id="hero-account-link" class="hero-button" href="https://btc2g-accounts.btc2g.workers.dev/">Account</a>
         <a id="calculator-jump" class="hero-text-link" href="#calculator">BTC ↔ gold calculator</a>
       </div>
     </section>
@@ -2230,6 +2231,7 @@
       document.getElementById('nav-premium').href = 'premium.html?v=20261029-21&lang=' + encodeURIComponent(lang);
       setTextById('nav-buy', text.navBuy);
       setTextById('nav-account', text.navAccount);
+      setTextById('hero-account-link', text.navAccount);
       document.getElementById('nav-save').href = 'save.html?lang=' + encodeURIComponent(lang);
       document.getElementById('save-entry-link').href = document.getElementById('nav-save').href;
       setTextById('ratio-label', text.insightRatioTitle);
