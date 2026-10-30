@@ -14,7 +14,7 @@ function database(t) {
   t.after(() => db.close());
   for (const file of ['0001_initial.sql', '0002_traffic_metrics.sql', '0003_acquisition_attribution.sql',
     '0004_email_verification.sql', '0005_login_rate_limits.sql', '0006_admin_passkeys.sql',
-    '0007_private_ideas.sql']) {
+    '0007_private_ideas.sql', '0008_admin_unlimited_ideas.sql']) {
     db.exec(readFileSync(new URL(`../migrations/${file}`, import.meta.url), 'utf8'));
   }
   return {
@@ -563,4 +563,33 @@ test('D1 insertion failures return generic errors and preserve the original exce
     assert.equal(logs.at(-1)[1], failure);
     assert.equal(db.prepare('SELECT COUNT(*) AS count FROM private_ideas').get().count, 0);
   }
+});
+
+test('administrators submit without account or attempt limits and review other users privately', async t => {
+  const { env, db } = database(t);
+  const adminHeaders = admin(db); // No verified email: administrator access is sufficient.
+  const userHeaders = verifiedUser(db, 'regular-author', 'RegularAuthor');
+  const userResponse = await ideaSubmission(env, userHeaders, 'regular-author-key-01');
+  assert.equal(userResponse.status, 201);
+  const userIdea = (await userResponse.json()).idea;
+  const responses = await Promise.all(Array.from({ length: 7 }, (_, index) =>
+    ideaSubmission(env, adminHeaders, `admin-unlimited-key-${index}`)));
+  assert.ok(responses.every(response => response.status === 201));
+  assert.equal(db.prepare("SELECT COUNT(*) AS count FROM private_ideas WHERE user_id = 'admin'").get().count, 7);
+  const retry = await ideaSubmission(env, adminHeaders, 'admin-unlimited-key-0');
+  assert.equal(retry.status, 200);
+  assert.equal((await retry.json()).duplicate, true);
+  const mine = await worker.fetch(new Request('https://metrics.test/api/ideas/mine', { headers: adminHeaders }), env);
+  const own = await mine.json();
+  assert.equal(mine.status, 200);
+  assert.equal(own.limit, null);
+  assert.equal(own.ideas.length, 7);
+  const queue = await worker.fetch(new Request('https://metrics.test/api/admin/ideas', { headers: adminHeaders }), env);
+  assert.equal(queue.status, 200);
+  const all = (await queue.json()).ideas;
+  assert.equal(all.length, 8);
+  assert.ok(all.some(idea => idea.id === userIdea.id && idea.username === 'RegularAuthor'));
+  assert.equal((await worker.fetch(new Request('https://metrics.test/api/admin/ideas', { headers: userHeaders }), env)).status, 403);
+  const userMine = await (await worker.fetch(new Request('https://metrics.test/api/ideas/mine', { headers: userHeaders }), env)).json();
+  assert.deepEqual(userMine.ideas.map(idea => idea.id), [userIdea.id]);
 });

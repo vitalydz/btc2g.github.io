@@ -169,4 +169,10 @@ test('idea form preserves text and key on failure, deduplicates retry, and repor
   await submit();
   assert.notEqual(keys.at(-1), keys[0]);
   assert.equal(resetCount, 2);
+  ui.nodes.set('.tabs', { hidden: false });
+  context.showUser({ username: 'Admin', role: 'admin', emailVerified: false });
+  assert.equal(ui.nodes.get('#idea-panel').hidden, false);
+  assert.equal(ui.nodes.get('#idea-form').hidden, false);
+  assert.equal(ui.nodes.get('#admin-link').hidden, false);
+  assert.match(ui.nodes.get('#idea-access').textContent, /unlimited ideas.*admin dashboard/);
 });

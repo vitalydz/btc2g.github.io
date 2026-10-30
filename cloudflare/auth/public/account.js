@@ -88,10 +88,13 @@ function showUser(user) {
     ? `Verified: ${user.email}`
     : displayedEmail ? `Verification pending for ${displayedEmail}.` : 'No verified email is attached.';
   if (displayedEmail) emailInput.value = displayedEmail;
-  ideaPanel.hidden = user.role !== 'user';
-  if (user.role === 'user') {
-    ideaForm.hidden = !user.emailVerified;
-    ideaAccess.textContent = user.emailVerified
+  const isAdmin = user.role === 'admin';
+  ideaPanel.hidden = false;
+  if (user.role === 'user' || isAdmin) {
+    ideaForm.hidden = !isAdmin && !user.emailVerified;
+    ideaAccess.textContent = isAdmin
+      ? 'Administrators can submit unlimited ideas. Open the admin dashboard above to review all users’ ideas.'
+      : user.emailVerified
       ? 'Your verified account can submit ideas privately.'
       : 'Verify your email above to unlock private idea submission.';
     loadMyIdeas().catch(error => { ideaMessage.textContent = error.message; });

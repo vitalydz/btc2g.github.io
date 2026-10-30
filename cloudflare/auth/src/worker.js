@@ -920,12 +920,11 @@ async function adminStats(request, env) {
 async function privateIdeasForUser(request, env) {
   const user = await currentUser(request, env);
   if (!user) return json({ error: 'Sign in required.' }, 401);
-  if (user.role !== 'user') return json({ error: 'Use the administrator review queue.' }, 403);
   const result = await env.DB.prepare(`
     SELECT id, title, audience, problem, solution, status, moderation_note, created_at, updated_at
     FROM private_ideas WHERE user_id = ? ORDER BY created_at DESC
   `).bind(user.id).all();
-  return json({ ideas: result.results.map(ideaView), limit: IDEA_LIMIT_PER_ACCOUNT });
+  return json({ ideas: result.results.map(ideaView), limit: user.role === 'admin' ? null : IDEA_LIMIT_PER_ACCOUNT });
 }
 
 async function enforceIdeaLimit(env, userId, now) {
@@ -943,8 +942,8 @@ async function enforceIdeaLimit(env, userId, now) {
 async function submitPrivateIdea(request, env) {
   const user = await currentUser(request, env);
   if (!user) return json({ error: 'Sign in required.' }, 401);
-  if (user.role !== 'user') return json({ error: 'Administrator accounts cannot submit ideas.' }, 403);
-  if (!user.email_verified_at) return json({ error: 'Verify your account email before submitting an idea.' }, 403);
+  const isAdmin = user.role === 'admin';
+  if (!isAdmin && !user.email_verified_at) return json({ error: 'Verify your account email before submitting an idea.' }, 403);
   const idempotencyKey = request.headers.get('Idempotency-Key') || '';
   if (!/^[A-Za-z0-9_-]{16,100}$/.test(idempotencyKey)) {
     return json({ error: 'A valid submission key is required.' }, 400);
@@ -955,7 +954,7 @@ async function submitPrivateIdea(request, env) {
   `).bind(user.id, idempotencyKey).first();
   if (existing) return json({ idea: ideaView(existing), duplicate: true });
   const now = Math.floor(Date.now() / 1000);
-  if (!await enforceIdeaLimit(env, user.id, now)) {
+  if (!isAdmin && !await enforceIdeaLimit(env, user.id, now)) {
     return json({ error: 'Too many submission attempts. Try again in one minute.' }, 429, { 'retry-after': '60' });
   }
   let input;
@@ -972,7 +971,7 @@ async function submitPrivateIdea(request, env) {
   }
   const count = await env.DB.prepare('SELECT COUNT(*) AS count FROM private_ideas WHERE user_id = ?')
     .bind(user.id).first();
-  if (Number(count?.count || 0) >= IDEA_LIMIT_PER_ACCOUNT) {
+  if (!isAdmin && Number(count?.count || 0) >= IDEA_LIMIT_PER_ACCOUNT) {
     return json({ error: `Each account may submit up to ${IDEA_LIMIT_PER_ACCOUNT} ideas.` }, 409);
   }
   const idea = {
@@ -1015,7 +1014,7 @@ async function adminIdeas(request, env) {
     FROM private_ideas JOIN users ON users.id = private_ideas.user_id
     ORDER BY CASE private_ideas.status
       WHEN 'submitted' THEN 0 WHEN 'reviewing' THEN 1 ELSE 2 END,
-      private_ideas.created_at DESC LIMIT 100
+      private_ideas.created_at DESC
   `).all();
   return json({
     ideas: result.results.map(idea => ({ ...ideaView(idea), username: idea.username })),
