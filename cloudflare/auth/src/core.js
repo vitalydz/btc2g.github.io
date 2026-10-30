@@ -116,3 +116,7 @@ export function acquisitionSource(referrer) {
 export function pageAcquisitionSource(path) {
   return normalizePagePath(path) === '/scenario.html' ? 'scenario' : null;
 }
+
+export function campaignAcquisitionSource(value) {
+  return String(value || '').trim().toLocaleLowerCase('en-US') === 'telegram' ? 'telegram' : null;
+}

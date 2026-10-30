@@ -142,13 +142,19 @@ async function loadStats() {
     document.querySelector('#scenario-visitors').textContent = formatCount(data.summary.scenarioVisitorsToday);
     document.querySelector('#scenario-registrations').textContent = formatCount(data.summary.scenarioRegisteredToday);
     document.querySelector('#scenario-conversion').textContent = percentage(data.summary.scenarioConversionToday);
+    document.querySelector('#telegram-visitors').textContent = formatCount(data.summary.telegramVisitorsToday);
+    document.querySelector('#telegram-registrations').textContent = formatCount(data.summary.telegramRegisteredToday);
+    document.querySelector('#telegram-conversion').textContent = percentage(data.summary.telegramConversionToday);
     document.querySelector('#daily-body').replaceChildren(...data.daily.map(row => {
       const tr = document.createElement('tr');
       const conversion = Number.isFinite(row.visitors) && row.visitors > 0 ? row.registrations / row.visitors : null;
       const productHuntConversion = Number.isFinite(row.producthunt_visitors) && row.producthunt_visitors > 0
         ? row.producthunt_registrations / row.producthunt_visitors : null;
+      const telegramConversion = Number.isFinite(row.telegram_visitors) && row.telegram_visitors > 0
+        ? row.telegram_registrations / row.telegram_visitors : null;
       [row.day, formatCount(row.visitors), formatCount(row.views), formatCount(row.registrations), percentage(conversion),
-        formatCount(row.producthunt_visitors), formatCount(row.producthunt_registrations), percentage(productHuntConversion)].forEach(value => {
+        formatCount(row.producthunt_visitors), formatCount(row.producthunt_registrations), percentage(productHuntConversion),
+        formatCount(row.telegram_visitors), formatCount(row.telegram_registrations), percentage(telegramConversion)].forEach(value => {
         const td = document.createElement('td'); td.textContent = value; tr.append(td);
       });
       return tr;

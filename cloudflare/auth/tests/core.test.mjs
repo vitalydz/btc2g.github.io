@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   clearSessionCookie,
   acquisitionSource,
+  campaignAcquisitionSource,
   jerusalemDay,
   normalizePagePath,
   pageAcquisitionSource,
@@ -101,4 +102,12 @@ test('recognizes only the trusted Scenario page path for internal attribution', 
   assert.equal(pageAcquisitionSource('/scenario.html?lang=ru'), 'scenario');
   assert.equal(pageAcquisitionSource('/scenario-copy.html'), null);
   assert.equal(pageAcquisitionSource('https://btc2g.com/scenario.html'), null);
+});
+
+test('normalizes only the exact Telegram campaign source', () => {
+  assert.equal(campaignAcquisitionSource('telegram'), 'telegram');
+  assert.equal(campaignAcquisitionSource(' Telegram '), 'telegram');
+  assert.equal(campaignAcquisitionSource('telegram-news'), null);
+  assert.equal(campaignAcquisitionSource('producthunt'), null);
+  assert.equal(campaignAcquisitionSource(null), null);
 });

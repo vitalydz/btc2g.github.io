@@ -41,7 +41,8 @@ const snapshot = {
   confirmedSubscribers: { total: null },
   summary: { visitorsToday: 4, viewsToday: 9, registeredToday: 2, registeredTotal: 3, verifiedEmailTotal: 3, pendingEmailTotal: 1, conversionToday: .5,
     productHuntVisitorsToday: 2, productHuntRegisteredToday: 1, productHuntConversionToday: .5,
-    scenarioVisitorsToday: 1, scenarioRegisteredToday: 1, scenarioConversionToday: 1 },
+    scenarioVisitorsToday: 1, scenarioRegisteredToday: 1, scenarioConversionToday: 1,
+    telegramVisitorsToday: 3, telegramRegisteredToday: 1, telegramConversionToday: 1 / 3 },
   daily: [], topPaths: [], recentRegistrations: [], methodology: 'Local test data'
 };
 
@@ -100,6 +101,9 @@ test('admin refresh clears stale totals and private lists on failure', async () 
   assert.equal(ui.nodes.get('#scenario-visitors').textContent, '1');
   assert.equal(ui.nodes.get('#scenario-registrations').textContent, '1');
   assert.equal(ui.nodes.get('#scenario-conversion').textContent, '100%');
+  assert.equal(ui.nodes.get('#telegram-visitors').textContent, '3');
+  assert.equal(ui.nodes.get('#telegram-registrations').textContent, '1');
+  assert.equal(ui.nodes.get('#telegram-conversion').textContent, '33.3%');
   assert.equal(ui.nodes.get('#pending-email-total').textContent, '1');
   assert.equal(ui.nodes.get('#app-version').textContent, '2026.10.29.1');
   ui.nodes.get('#recent-users').children = ['old private list'];

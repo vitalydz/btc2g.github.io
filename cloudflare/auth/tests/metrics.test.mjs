@@ -214,6 +214,59 @@ test('attributes a same-day Product Hunt registration with a signed browser-boun
   assert.equal(completedPublic.newToday, 1);
 });
 
+test('attributes a confirmed Telegram registration with an allowlisted UTM source and signed token', async t => {
+  const { env, db } = database(t);
+  let sent;
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    sent = JSON.parse(options.body);
+    return new Response(JSON.stringify({ id: 'local-email' }), { status: 200 });
+  });
+  const configured = {
+    ...env,
+    TERMS_VERSION: 'test',
+    RESEND_API_KEY: 'local-test-key',
+    EMAIL_FROM: 'BTC2G <accounts@btc2g.com>'
+  };
+  const commonHeaders = {
+    'CF-Connecting-IP': '192.0.2.46', 'User-Agent': 'telegram-local-test'
+  };
+  const visit = await worker.fetch(new Request('https://metrics.test/api/visit', {
+    method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: '/', campaignSource: 'telegram' })
+  }), configured);
+  const { attribution } = await visit.json();
+  assert.equal(visit.status, 202);
+  assert.match(attribution, /^\d{4}-\d{2}-\d{2}\.telegram\./);
+
+  const ignored = await worker.fetch(new Request('https://metrics.test/api/visit', {
+    method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: '/', campaignSource: 'telegram-news' })
+  }), configured);
+  assert.equal((await ignored.json()).attribution, null);
+
+  const registration = await worker.fetch(new Request('https://metrics.test/api/register', {
+    method: 'POST', headers: { ...commonHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'TelegramUser', email: 'telegram@example.com', password: 'LongEnoughPass9', acceptedTerms: true, attribution })
+  }), configured);
+  assert.equal(registration.status, 201);
+  assert.equal(db.prepare("SELECT acquisition_source FROM users WHERE username_key = 'telegramuser'").get().acquisition_source, 'telegram');
+
+  const token = new URL(sent.text.match(/https:\/\/\S+/)[0]).searchParams.get('token');
+  const confirmed = await worker.fetch(new Request('https://metrics.test/api/email-verification/confirm', {
+    method: 'POST',
+    headers: { Cookie: registration.headers.get('set-cookie'), Origin: configured.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  }), configured);
+  assert.equal(confirmed.status, 200);
+
+  const report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: admin(db) }), configured)).json();
+  assert.equal(report.summary.telegramVisitorsToday, 1);
+  assert.equal(report.summary.telegramRegisteredToday, 1);
+  assert.equal(report.summary.telegramConversionToday, 1);
+  assert.equal(report.daily[0].telegram_visitors, 1);
+  assert.equal(report.daily[0].telegram_registrations, 1);
+});
+
 test('attributes a completed registration from Scenario Simulator with a signed browser-bound token', async t => {
   const { env, db } = database(t);
   let sent;

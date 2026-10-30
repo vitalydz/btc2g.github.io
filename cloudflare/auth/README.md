@@ -16,10 +16,10 @@ The release version is stored in the repository-root `VERSION` file and mirrored
 - One-time administrator bootstrap protected by a Cloudflare secret and disabled after the first admin exists.
 - Mandatory account-email verification for new public registrations through Resend. Only token hashes are stored; links expire after 30 minutes. Pending accounts can sign in to request another message but are not counted as completed registrations. A verified account email is not marketing consent and does not activate Premium.
 - Explicit Terms and Privacy Policy acceptance recorded with a version and timestamp.
-- Daily traffic uses a salted hash of IP + user agent; raw IP addresses and user-agent strings are not stored. Product Hunt attribution uses a signed same-day token tied to that daily estimate and stores only the normalized source label.
+- Daily traffic uses a salted hash of IP + user agent; raw IP addresses and user-agent strings are not stored. Product Hunt and exact `utm_source=telegram` attribution use a signed same-day token tied to that daily estimate and store only the normalized source label. Arbitrary UTM values are discarded.
 - Email-verified ordinary users can privately submit up to three ideas. D1 stores the text, status and private moderation note. Only the author can read their own submissions; only an administrator can read the review queue. No public list or voting endpoint exists.
 
-The protected `/admin/` dashboard shows visitor estimates, page views, registrations, registration/visitor ratios, Product Hunt-attributed visits and accounts, daily history, top paths, and recent usernames. Only a live session for a D1 user with `role = 'admin'` can read `/api/admin/stats`.
+The protected `/admin/` dashboard shows visitor estimates, page views, registrations, registration/visitor ratios, Product Hunt- and Telegram-attributed visits and accounts, daily history, top paths, and recent usernames. Only a live session for a D1 user with `role = 'admin'` can read `/api/admin/stats`.
 
 ### Reading statistics correctly
 
