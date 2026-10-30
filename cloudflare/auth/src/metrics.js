@@ -9,6 +9,25 @@ export function confirmedSubscriptions() {
   };
 }
 
+export function confirmedSubscriptionsFromAudience(payload) {
+  const active = payload?.confirmedSubscribers?.active;
+  const confirmedToday = payload?.confirmedSubscribers?.confirmedToday;
+  const valid = payload?.source === 'BTC2G PostgreSQL audience v1'
+    && Number.isSafeInteger(active) && active >= 0
+    && Number.isSafeInteger(confirmedToday) && confirmedToday >= 0;
+  if (!valid) {
+    return {
+      status: 'unavailable', total: null, newToday: null,
+      reason: 'The confirmed subscriber source returned an invalid response.'
+    };
+  }
+  return {
+    status: 'available', total: active, active, newToday: confirmedToday,
+    source: payload.source,
+    measuredAt: payload.measuredAt || null
+  };
+}
+
 export function trafficMetrics(row) {
   const firstSeen = row?.first_seen_at;
   if (firstSeen === null || firstSeen === undefined) {

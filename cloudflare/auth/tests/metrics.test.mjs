@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import worker from '../src/worker.js';
 import { jerusalemDay } from '../src/core.js';
-import { confirmedSubscriptions, registrationRatio, trafficMetrics } from '../src/metrics.js';
+import { confirmedSubscriptions, confirmedSubscriptionsFromAudience, registrationRatio, trafficMetrics } from '../src/metrics.js';
 import { formatCount, measurementNote, percentage } from '../public/metrics-view.js';
 
 // Run the real Worker SQL against SQLite; all visits/accounts are local fixtures.
@@ -101,6 +101,41 @@ test('unknown metrics and subscription source remain null, never zero', () => {
   for (const value of [null, undefined, NaN, -1, '0']) assert.equal(formatCount(value), 'Data unavailable');
   assert.equal(formatCount(0), '0');
   assert.equal(percentage(null), 'Data unavailable');
+});
+
+test('accepts only authoritative non-negative confirmed subscriber metrics', () => {
+  const valid = confirmedSubscriptionsFromAudience({
+    source: 'BTC2G PostgreSQL audience v1', measuredAt: '2026-10-30T20:00:00Z',
+    confirmedSubscribers: { active: 4, confirmedToday: 1 }
+  });
+  assert.equal(valid.status, 'available');
+  assert.equal(valid.total, 4);
+  assert.equal(valid.active, 4);
+  assert.equal(valid.newToday, 1);
+  for (const payload of [null,
+    { source: 'other', confirmedSubscribers: { active: 4, confirmedToday: 1 } },
+    { source: 'BTC2G PostgreSQL audience v1', confirmedSubscribers: { active: -1, confirmedToday: 0 } },
+    { source: 'BTC2G PostgreSQL audience v1', confirmedSubscribers: { active: '4', confirmedToday: 0 } }
+  ]) assert.equal(confirmedSubscriptionsFromAudience(payload).status, 'unavailable');
+});
+
+test('server-side audience bridge exposes confirmed subscribers without exposing its token', async t => {
+  const { env } = database(t);
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    assert.equal(String(url), 'https://audience.example.com/api/stats');
+    assert.equal(options.headers.Authorization, 'Bearer private-stats-token');
+    return new Response(JSON.stringify({
+      source: 'BTC2G PostgreSQL audience v1', measuredAt: '2026-10-30T20:00:00Z',
+      confirmedSubscribers: { active: 3, confirmedToday: 1 }
+    }), { status: 200 });
+  });
+  const configured = { ...env, AUDIENCE_STATS_URL: 'https://audience.example.com/api/stats', AUDIENCE_STATS_TOKEN: 'private-stats-token' };
+  const response = await worker.fetch(new Request('https://metrics.test/api/stats'), configured);
+  const data = await response.json();
+  assert.equal(data.confirmedSubscribers.status, 'available');
+  assert.equal(data.confirmedSubscribers.active, 3);
+  assert.equal(data.confirmedSubscribers.newToday, 1);
+  assert.doesNotMatch(JSON.stringify(data), /private-stats-token/);
 });
 
 test('measurement notes require a timestamp and Jerusalem reporting day', () => {

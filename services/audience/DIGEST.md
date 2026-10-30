@@ -1,6 +1,6 @@
-# Sunday digest: real service implementation, deployment pending
+# Sunday digest: production service and controlled rollout
 
-The homepage choice is restored and wired to POST `/api/digest-request` in this Vercel project. `assets/audience-config.json` contains **apiOrigin:null** until an actual HTTPS deployment is verified. This is deliberately not an invented deployment address. Loading the form alone sends no email. Formspree is not used to save digest choices.
+The homepage choice is wired to POST `/api/digest-request` at the verified Vercel production origin in `assets/audience-config.json`. Loading the form alone sends no email. Formspree is not used to save digest choices. Production sending stays disabled until more than three confirmed subscribers have explicitly selected `weekly_digest=true` and the owner gives final approval immediately before enabling it.
 
 ## User flow
 

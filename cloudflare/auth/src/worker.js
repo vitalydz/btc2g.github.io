@@ -16,7 +16,7 @@ import {
   validateEmail,
   validateRegistration
 } from './core.js';
-import { confirmedSubscriptions, registrationRatio, trafficMetrics } from './metrics.js';
+import { confirmedSubscriptions, confirmedSubscriptionsFromAudience, registrationRatio, trafficMetrics } from './metrics.js';
 import {
   generateAuthenticationOptions,
   generateRegistrationOptions,
@@ -758,14 +758,37 @@ async function logout(request, env) {
   return json({ ok: true }, 200, { 'set-cookie': clearSessionCookie() });
 }
 
+async function audienceConfirmedSubscriptions(env) {
+  if (!env.AUDIENCE_STATS_URL || !env.AUDIENCE_STATS_TOKEN) return confirmedSubscriptions();
+  try {
+    const url = new URL(env.AUDIENCE_STATS_URL);
+    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash || url.pathname !== '/api/stats') {
+      return confirmedSubscriptions();
+    }
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${env.AUDIENCE_STATS_TOKEN}`, Accept: 'application/json' },
+      redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(5000)
+    });
+    if (!response.ok) throw new Error('Audience statistics request failed.');
+    const text = await response.text();
+    if (text.length > 16384) throw new Error('Audience statistics response is too large.');
+    return confirmedSubscriptionsFromAudience(JSON.parse(text));
+  } catch {
+    return {
+      status: 'unavailable', total: null, newToday: null,
+      reason: 'The confirmed subscriber source is temporarily unavailable.'
+    };
+  }
+}
+
 async function stats(env) {
   const day = jerusalemDay();
-  const row = await env.DB.prepare(`
+  const [row, subscriberStats] = await Promise.all([env.DB.prepare(`
     SELECT COUNT(*) AS total_accounts,
            SUM(CASE WHEN email_verified_day = ? THEN 1 ELSE 0 END) AS new_today
     FROM users
     WHERE disabled_at IS NULL AND role = 'user' AND email_verified_at IS NOT NULL
-  `).bind(day).first();
+  `).bind(day).first(), audienceConfirmedSubscriptions(env)]);
   let traffic;
   try {
     const trafficRow = await env.DB.prepare(`
@@ -782,7 +805,7 @@ async function stats(env) {
   return json({
     ...publicStats(row?.total_accounts, row?.new_today), day, timeZone: 'Asia/Jerusalem',
     measuredAt: new Date().toISOString(), source: 'Cloudflare D1',
-    traffic, confirmedSubscribers: confirmedSubscriptions()
+    traffic, confirmedSubscribers: subscriberStats
   });
 }
 
@@ -837,6 +860,7 @@ async function adminStats(request, env) {
   const requestedDays = Number.parseInt(url.searchParams.get('days') || '7', 10);
   const days = [7, 30, 90].includes(requestedDays) ? requestedDays : 7;
   const today = jerusalemDay();
+  const subscriberStatsPromise = audienceConfirmedSubscriptions(env);
 
   const [summary, dailyResult, pathsResult, recentResult] = await Promise.all([
     env.DB.prepare(`
@@ -903,6 +927,7 @@ async function adminStats(request, env) {
   ]);
 
   const traffic = trafficMetrics(summary);
+  const subscriberStats = await subscriberStatsPromise;
   const visitorsToday = traffic.visitorsToday;
   const registeredToday = Number(summary?.registered_today || 0);
   const productHuntVisitorsToday = traffic.status === 'available'
@@ -922,7 +947,7 @@ async function adminStats(request, env) {
     measuredAt: new Date().toISOString(),
     source: 'Cloudflare D1',
     traffic,
-    confirmedSubscribers: confirmedSubscriptions(),
+    confirmedSubscribers: subscriberStats,
     summary: {
       visitorsToday,
       viewsToday: traffic.viewsToday,
