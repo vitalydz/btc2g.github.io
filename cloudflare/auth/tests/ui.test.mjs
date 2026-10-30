@@ -86,6 +86,8 @@ test('signed-in account UI separates email verification from Premium and marketi
   ]);
   assert.match(html, /id="email-form"/);
   assert.match(html, /does not subscribe you to marketing or activate Premium/);
+  assert.match(html, /https:\/\/btc2g\.com\/#subscribe/);
+  assert.match(html, /Join the separate confirmed newsletter and choose the Sunday digest/);
   assert.match(script, /\/api\/email-verification\/request/);
   assert.match(verification, /id="confirm-email"/);
   assert.match(verification, /no-referrer/);

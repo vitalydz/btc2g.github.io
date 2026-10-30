@@ -46,6 +46,8 @@ textarea { resize:vertical; min-height:96px; }
 .email-panel { margin:20px 0; padding:18px; border:1px solid var(--line); border-radius:14px; background:#0b0f16; text-align:left; }
 .email-panel h2 { margin:0 0 6px; font-size:1.1rem; }
 .email-panel>p { color:var(--muted); }
+.email-panel .newsletter-cta { margin-bottom:0; }
+.newsletter-cta a { color:#a9cbff; font-weight:800; }
 .idea-panel { margin:20px 0; padding:18px; border:1px solid var(--line); border-radius:14px; background:#0b0f16; text-align:left; }
 .idea-panel h2 { margin:0 0 6px; font-size:1.25rem; }
 .idea-panel>p { color:var(--muted); }
