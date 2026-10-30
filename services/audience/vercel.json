@@ -1,0 +1,1 @@
+{"functions":{"api/*.js":{"maxDuration":300}},"crons":[{"path":"/api/digest-cron","schedule":"0 6 * * 0"}]}
