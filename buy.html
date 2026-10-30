@@ -181,6 +181,18 @@
         <option value="fr">Français</option>
         <option value="es">Español</option>
         <option value="zh">中文</option>
+        <option value="it">Italiano</option>
+        <option value="pt">Português</option>
+        <option value="ar">العربية</option>
+        <option value="hi">हिन्दी</option>
+        <option value="ja">日本語</option>
+        <option value="ko">한국어</option>
+        <option value="tr">Türkçe</option>
+        <option value="pl">Polski</option>
+        <option value="nl">Nederlands</option>
+        <option value="uk">Українська</option>
+        <option value="id">Bahasa Indonesia</option>
+        <option value="vi">Tiếng Việt</option>
       </select>
     </div>
 
@@ -340,6 +352,18 @@
         topperUnavailable: 'Topper 目前不可用。',
         moonpayLoading: 'MoonPay 仍在加载，请稍候。',
       },
+      it: { title:'Acquista Bitcoin', buyBtn:'Acquista Bitcoin con MoonPay 🚀', topperTitle:'Acquista Bitcoin con Topper', topperBtn:'Acquista Bitcoin con Topper ✨', languageLabel:'Lingua' },
+      pt: { title:'Comprar Bitcoin', buyBtn:'Comprar Bitcoin com MoonPay 🚀', topperTitle:'Comprar Bitcoin com Topper', topperBtn:'Comprar Bitcoin com Topper ✨', languageLabel:'Idioma' },
+      ar: { title:'شراء بيتكوين', buyBtn:'شراء بيتكوين عبر MoonPay 🚀', topperTitle:'شراء بيتكوين عبر Topper', topperBtn:'شراء بيتكوين عبر Topper ✨', languageLabel:'اللغة' },
+      hi: { title:'बिटकॉइन खरीदें', buyBtn:'MoonPay से बिटकॉइन खरीदें 🚀', topperTitle:'Topper से बिटकॉइन खरीदें', topperBtn:'Topper से बिटकॉइन खरीदें ✨', languageLabel:'भाषा' },
+      ja: { title:'ビットコインを購入', buyBtn:'MoonPayでビットコインを購入 🚀', topperTitle:'Topperでビットコインを購入', topperBtn:'Topperでビットコインを購入 ✨', languageLabel:'言語' },
+      ko: { title:'비트코인 구매', buyBtn:'MoonPay로 비트코인 구매 🚀', topperTitle:'Topper로 비트코인 구매', topperBtn:'Topper로 비트코인 구매 ✨', languageLabel:'언어' },
+      tr: { title:'Bitcoin satın al', buyBtn:'MoonPay ile Bitcoin satın al 🚀', topperTitle:'Topper ile Bitcoin satın al', topperBtn:'Topper ile Bitcoin satın al ✨', languageLabel:'Dil' },
+      pl: { title:'Kup Bitcoin', buyBtn:'Kup Bitcoin przez MoonPay 🚀', topperTitle:'Kup Bitcoin przez Topper', topperBtn:'Kup Bitcoin przez Topper ✨', languageLabel:'Język' },
+      nl: { title:'Bitcoin kopen', buyBtn:'Bitcoin kopen met MoonPay 🚀', topperTitle:'Bitcoin kopen met Topper', topperBtn:'Bitcoin kopen met Topper ✨', languageLabel:'Taal' },
+      uk: { title:'Купити Біткоїн', buyBtn:'Купити Біткоїн через MoonPay 🚀', topperTitle:'Купити Біткоїн через Topper', topperBtn:'Купити Біткоїн через Topper ✨', languageLabel:'Мова' },
+      id: { title:'Beli Bitcoin', buyBtn:'Beli Bitcoin dengan MoonPay 🚀', topperTitle:'Beli Bitcoin dengan Topper', topperBtn:'Beli Bitcoin dengan Topper ✨', languageLabel:'Bahasa' },
+      vi: { title:'Mua Bitcoin', buyBtn:'Mua Bitcoin bằng MoonPay 🚀', topperTitle:'Mua Bitcoin bằng Topper', topperBtn:'Mua Bitcoin bằng Topper ✨', languageLabel:'Ngôn ngữ' },
     };
 
     const availability = {
@@ -350,13 +374,25 @@
       fr: {soon: 'Ouvrir le site ↗', message: 'Les liens ouvrent les sites officiels dans un nouvel onglet. BTC2G ne traite aucun paiement.', home: 'Retour à BTC2G', footer: 'La disponibilité dépend du pays.'},
       es: {soon: 'Abrir sitio web ↗', message: 'Los enlaces abren los sitios oficiales en una pestaña nueva. BTC2G no procesa pagos.', home: 'Volver a BTC2G', footer: 'La disponibilidad depende del país.'},
       zh: {soon: '打开官网 ↗', message: '链接会在新标签页打开服务商官方网站。BTC2G 不处理付款。', home: '返回 BTC2G', footer: '服务是否可用取决于所在国家。'},
+      it: {soon:'Apri il sito ↗', message:'I link aprono i siti ufficiali dei provider in una nuova scheda. BTC2G non elabora pagamenti.', home:'Torna a BTC2G', footer:'La disponibilità del provider dipende dal Paese.'},
+      pt: {soon:'Abrir site ↗', message:'Os links abrem os sites oficiais dos provedores em uma nova aba. A BTC2G não processa pagamentos.', home:'Voltar ao BTC2G', footer:'A disponibilidade depende do país.'},
+      ar: {soon:'فتح الموقع ↗', message:'تفتح الروابط المواقع الرسمية لمزودي الخدمة في علامة تبويب جديدة. لا تعالج BTC2G المدفوعات.', home:'العودة إلى BTC2G', footer:'يعتمد توفر المزود على البلد.'},
+      hi: {soon:'वेबसाइट खोलें ↗', message:'लिंक आधिकारिक प्रदाता वेबसाइटों को नए टैब में खोलते हैं। BTC2G भुगतान संसाधित नहीं करता।', home:'BTC2G पर वापस जाएँ', footer:'प्रदाता की उपलब्धता देश पर निर्भर करती है।'},
+      ja: {soon:'サイトを開く ↗', message:'リンクは各プロバイダーの公式サイトを新しいタブで開きます。BTC2Gは決済を処理しません。', home:'BTC2Gに戻る', footer:'利用可否は国によって異なります。'},
+      ko: {soon:'웹사이트 열기 ↗', message:'링크는 공식 제공업체 사이트를 새 탭에서 엽니다. BTC2G는 결제를 처리하지 않습니다.', home:'BTC2G로 돌아가기', footer:'제공업체 이용 가능 여부는 국가에 따라 다릅니다.'},
+      tr: {soon:'Siteyi aç ↗', message:'Bağlantılar sağlayıcıların resmi sitelerini yeni sekmede açar. BTC2G ödeme işlemez.', home:'BTC2G’ye dön', footer:'Sağlayıcı kullanılabilirliği ülkeye bağlıdır.'},
+      pl: {soon:'Otwórz stronę ↗', message:'Linki otwierają oficjalne strony dostawców w nowej karcie. BTC2G nie przetwarza płatności.', home:'Wróć do BTC2G', footer:'Dostępność dostawcy zależy od kraju.'},
+      nl: {soon:'Website openen ↗', message:'De links openen de officiële websites van providers in een nieuw tabblad. BTC2G verwerkt geen betalingen.', home:'Terug naar BTC2G', footer:'Beschikbaarheid is afhankelijk van het land.'},
+      uk: {soon:'Відкрити сайт ↗', message:'Посилання відкривають офіційні сайти провайдерів у новій вкладці. BTC2G не обробляє платежі.', home:'Повернутися до BTC2G', footer:'Доступність провайдера залежить від країни.'},
+      id: {soon:'Buka situs ↗', message:'Tautan membuka situs resmi penyedia di tab baru. BTC2G tidak memproses pembayaran.', home:'Kembali ke BTC2G', footer:'Ketersediaan penyedia bergantung pada negara.'},
+      vi: {soon:'Mở trang web ↗', message:'Liên kết mở trang chính thức của nhà cung cấp trong thẻ mới. BTC2G không xử lý thanh toán.', home:'Quay lại BTC2G', footer:'Khả dụng của nhà cung cấp tùy thuộc vào quốc gia.'},
     };
 
     function setLang(lang) {
       localStorage.setItem('lang', lang);
       currentLang = lang;
       document.documentElement.lang = lang;
-      document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+      document.documentElement.dir = ['he', 'ar'].includes(lang) ? 'rtl' : 'ltr';
       document.getElementById('language-select').value = lang;
       document.getElementById('language-select').setAttribute('aria-label', texts[lang].languageLabel);
       document.getElementById('language-select').title = texts[lang].languageLabel;
@@ -369,10 +405,11 @@
       document.getElementById('buy-btn').textContent = `MoonPay — ${notice.soon}`;
       document.getElementById('topper-btn').textContent = `Topper — ${notice.soon}`;
       document.getElementById('back-home').textContent = notice.home;
+      document.getElementById('back-home').href = 'index.html?lang=' + encodeURIComponent(lang);
       document.getElementById('footer-text').textContent = notice.footer;
-      const saveLabels = { en: 'Compare final BTC quotes →', ru: 'Сравнить итоговые котировки BTC →', he: 'השוואת הצעות BTC סופיות ←', de: 'Endgültige BTC-Angebote vergleichen →', fr: 'Comparer les offres finales en BTC →', es: 'Comparar cotizaciones finales de BTC →', zh: '比较最终 BTC 报价 →' };
+      const saveLabels = { en:'Compare final BTC quotes →', ru:'Сравнить итоговые котировки BTC →', he:'השוואת הצעות BTC סופיות ←', de:'Endgültige BTC-Angebote vergleichen →', fr:'Comparer les offres finales en BTC →', es:'Comparar cotizaciones finales de BTC →', zh:'比较最终 BTC 报价 →', it:'Confronta le quotazioni BTC finali →', pt:'Comparar cotações finais de BTC →', ar:'مقارنة عروض BTC النهائية ←', hi:'अंतिम BTC कोटेशन की तुलना करें →', ja:'最終BTC見積もりを比較 →', ko:'최종 BTC 견적 비교 →', tr:'Nihai BTC tekliflerini karşılaştır →', pl:'Porównaj końcowe oferty BTC →', nl:'Vergelijk definitieve BTC-offertes →', uk:'Порівняти підсумкові котирування BTC →', id:'Bandingkan penawaran BTC akhir →', vi:'So sánh báo giá BTC cuối cùng →' };
       document.getElementById('save-link').textContent = saveLabels[lang] || saveLabels.en;
-      document.getElementById('save-link').href = 'save.html?lang=' + (['en', 'ru', 'he'].includes(lang) ? lang : 'en');
+      document.getElementById('save-link').href = 'save.html?lang=' + encodeURIComponent(lang);
     }
 
     window.setLang = setLang;
@@ -380,7 +417,8 @@
       setLang(event.target.value);
     });
 
-    const savedLang = localStorage.getItem('lang');
+    const requestedLang = new URLSearchParams(location.search).get('lang');
+    const savedLang = requestedLang || localStorage.getItem('lang');
     const browserLang = navigator.language.slice(0, 2).toLowerCase();
     const supportedLangs = Object.keys(texts);
 
