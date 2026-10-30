@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0f19">
+  <title>BTC2G Scenario Simulator</title>
+  <meta name="description" content="Explore how hypothetical Bitcoin and gold price changes affect the BTC/Gold ratio. Scenario tool, not a forecast.">
+  <link rel="canonical" href="https://btc2g.com/scenario.html">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="stylesheet" href="assets/css/scenario.css?v=20261030-1">
+</head>
+<body>
+  <main class="scenario-shell">
+    <header class="scenario-header">
+      <a class="brand" href="index.html" aria-label="BTC2G home">BTC2G</a>
+      <nav aria-label="Scenario navigation">
+        <a id="back-link" href="index.html">Dashboard</a>
+        <select id="scenario-language" aria-label="Language">
+          <option value="en">English</option><option value="ru">Русский</option><option value="he">עברית</option>
+          <option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option>
+          <option value="zh">中文</option><option value="it">Italiano</option><option value="pt">Português</option>
+          <option value="ar">العربية</option><option value="hi">हिन्दी</option><option value="ja">日本語</option>
+          <option value="ko">한국어</option><option value="tr">Türkçe</option><option value="pl">Polski</option>
+          <option value="nl">Nederlands</option><option value="uk">Українська</option><option value="id">Bahasa Indonesia</option>
+          <option value="vi">Tiếng Việt</option>
+        </select>
+      </nav>
+    </header>
+
+    <section class="scenario-hero" aria-labelledby="scenario-title">
+      <p id="scenario-eyebrow" class="eyebrow">INTERACTIVE RESEARCH TOOL</p>
+      <h1 id="scenario-title">BTC / Gold Scenario Simulator</h1>
+      <p id="scenario-intro">Explore how hypothetical changes in Bitcoin and gold prices affect the ratio. Nothing entered here is stored.</p>
+      <div id="data-status" class="data-status" role="status" aria-live="polite">Loading published market data…</div>
+    </section>
+
+    <section class="current-market" aria-labelledby="current-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">BTC2G PUBLISHED DATA</p><h2 id="current-title">Starting point</h2></div>
+        <p id="market-date">Market date: —</p>
+      </div>
+      <div class="market-grid">
+        <article><span id="btc-label">Bitcoin price</span><strong id="current-btc">—</strong></article>
+        <article><span id="gold-label">Gold price / oz t</span><strong id="current-gold">—</strong></article>
+        <article><span id="ratio-label">BTC / Gold ratio</span><strong id="current-ratio">—</strong></article>
+      </div>
+    </section>
+
+    <section class="simulator-card" aria-labelledby="controls-title">
+      <div class="section-heading">
+        <div><p id="scenario-whatif" class="eyebrow">WHAT-IF SCENARIO</p><h2 id="controls-title">Adjust hypothetical changes</h2></div>
+        <button id="reset-scenario" class="quiet-button" type="button">Reset</button>
+      </div>
+      <div class="control-grid">
+        <label for="btc-change"><span id="btc-change-label">Bitcoin change</span><output id="btc-change-output" for="btc-change">+0%</output>
+          <input id="btc-change" type="range" min="-80" max="300" step="1" value="0" disabled>
+        </label>
+        <label for="gold-change"><span id="gold-change-label">Gold change</span><output id="gold-change-output" for="gold-change">+0%</output>
+          <input id="gold-change" type="range" min="-50" max="100" step="1" value="0" disabled>
+        </label>
+      </div>
+
+      <div class="scenario-results" aria-live="polite">
+        <article><span id="future-btc-label">Scenario BTC price</span><strong id="future-btc">—</strong></article>
+        <article><span id="future-gold-label">Scenario gold price</span><strong id="future-gold">—</strong></article>
+        <article class="ratio-result"><span id="future-ratio-label">Scenario ratio</span><strong id="future-ratio">—</strong><small id="ratio-difference">—</small></article>
+      </div>
+    </section>
+
+    <section class="target-card" aria-labelledby="target-title">
+      <div>
+        <p id="scenario-reverse" class="eyebrow">REVERSE CALCULATION</p>
+        <h2 id="target-title">BTC price for a target ratio</h2>
+        <p id="target-intro">Choose a target ratio. The result uses the scenario gold price selected above.</p>
+      </div>
+      <div class="target-form">
+        <label for="target-ratio"><span id="target-ratio-label">Target ratio (oz t)</span>
+          <input id="target-ratio" type="number" min="0.01" max="10000" step="0.01" value="30" inputmode="decimal" disabled>
+        </label>
+        <div class="target-result"><span id="required-btc-label">Required BTC price</span><strong id="required-btc">—</strong></div>
+      </div>
+    </section>
+
+    <section class="scenario-actions" aria-label="Scenario actions">
+      <button id="copy-scenario" type="button" disabled>Copy result</button>
+      <button id="share-scenario" type="button" disabled>Share</button>
+      <p id="action-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <aside class="scenario-disclaimer">
+      <strong id="disclaimer-title">Scenario, not forecast</strong>
+      <p id="disclaimer-text">These are arithmetic what-if calculations, not predictions, financial advice, or guarantees. They exclude fees, spreads, taxes, and market liquidity.</p>
+      <p id="source-note">Source: yfinance BTC-USD and GC=F, via BTC2G published data.</p>
+    </aside>
+  </main>
+  <script src="assets/js/scenario-tools.js?v=20261030-1"></script>
+</body>
+</html>
