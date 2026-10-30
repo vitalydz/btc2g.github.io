@@ -39,6 +39,9 @@ test('Premium selector and dictionaries contain the same 19 complete languages',
  assert.deepEqual(options.sort(),[...expected].sort());assert.deepEqual(Object.keys(c.window.BTC2GPremiumTranslations).sort(),[...expected].sort());
  const keys=Object.keys(c.window.BTC2GPremiumTranslations.en).sort();for(const lang of expected){const t=c.window.BTC2GPremiumTranslations[lang];assert.deepEqual(Object.keys(t).sort(),keys);for(const key of keys)assert.ok(t[key]?.trim(),lang+':'+key);}
 });
+test('Premium Russian early-access heading uses research level terminology',()=>{
+ const {c}=premiumPage('ru');assert.equal(c.window.BTC2GPremiumTranslations.ru.earlyTitle,'Помогите сформировать более полезный исследовательский уровень.');
+});
 for(const lang of expected)test('Premium page renders in '+lang,()=>{
  const {c,nodes}=premiumPage(lang);const t=c.window.BTC2GPremiumTranslations[lang];
  assert.equal(c.document.documentElement.lang,lang);assert.equal(c.document.documentElement.dir,['he','ar'].includes(lang)?'rtl':'ltr');
