@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#071426" />
-  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.30.4">
+  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.30.5">
   <meta name="description" content="Track the published Bitcoin-to-gold ratio, daily market data, model direction, history chart, and BTC ↔ gold calculator." />
   <meta property="og:title" content="BTC2G - Bitcoin vs Gold Ratio" />
   <meta property="og:description" content="Published BTC/Gold ratio data, model context, interactive history, and a reference calculator." />
@@ -163,6 +163,12 @@
       <section id="subscribe-thanks" class="subscribe-thanks" aria-labelledby="subscribe-thanks-title" hidden>
         <h2 id="subscribe-thanks-title">Request received.</h2>
         <p id="subscribe-thanks-text">Receiving a request does not confirm an active email subscription.</p>
+        <form id="digest-preferences-form" class="digest-preferences-form">
+          <label><input id="weekly-digest-choice" type="checkbox" name="weekly_digest" aria-describedby="digest-preferences-help digest-preferences-status" /> <span id="weekly-digest-choice-label">Also send me the Sunday research digest in English.</span></label>
+          <p id="digest-preferences-help">An email will ask you to confirm this preference.</p>
+          <button id="save-digest-preferences" type="submit">Save digest preference</button>
+        </form>
+        <p id="digest-preferences-status" role="status" aria-live="polite"></p>
         <div class="thanks-share"><span id="thanks-share-label">Share BTC2G with friends</span><button id="thanks-share-button" type="button">Share</button><button id="thanks-copy-button" type="button">Copy link</button></div>
         <p id="thanks-share-status" role="status" aria-live="polite"></p>
       </section>
@@ -322,6 +328,7 @@
   <script src="assets/js/contest-text.js?v=20261028-1"></script>
   <script src="assets/js/audience-text.js?v=20261028-2"></script>
   <script src="assets/js/ratio-tools.js?v=20261028-2"></script>
+  <script src="assets/js/digest-preferences.js?v=20261030-5"></script>
   <script src="assets/js/subscription-request.js?v=20261030-4"></script>
   <script src="assets/js/home-v2-text.js?v=20261029-2"></script>
   <script src="assets/js/scenario-entry.js?v=20261030-1"></script>
@@ -2272,6 +2279,7 @@
       document.getElementById('support-link').textContent = text.support;
       window.BTC2GHomeV2Text?.setLanguage(lang);
       window.BTC2GScenarioEntry?.setLanguage(lang);
+      window.BTC2GDigest?.setLanguage(lang);
       setTextById('subscribe-thanks-title', text.subscribeSuccess);
       setTextById('subscribe-thanks-text', window.BTC2GSubscription.text(lang).receiptNote);
       setTextById('thanks-share-label', text.shareTitle);
@@ -2326,6 +2334,7 @@
     }
 
     function showSubscriptionThanks(email) {
+      window.BTC2GDigest?.setEmail(email);
       ['subscribe-intro', 'subscriber-email-label', 'subscribe-form', 'subscribe-trust', 'subscriber-proof', 'subscribe-message', 'email-preview'].forEach((id) => {
         document.getElementById(id).hidden = true;
       });
