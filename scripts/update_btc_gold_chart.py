@@ -67,6 +67,14 @@ def date_to_num(dates) -> np.ndarray:
     return np.array([date.to_pydatetime().date().toordinal() for date in dates])
 
 
+def validate_market_date(df: pd.DataFrame) -> None:
+    """Allow weekends/short holiday closures, but never silently publish stale data."""
+    market_date = df.index.max().date()
+    age = (utc_today().date() - market_date).days
+    if age < 0 or age > 4:
+        raise RuntimeError(f"Latest common market date {market_date} is invalid or stale ({age} days).")
+
+
 def forecast_polyfit(dates, prices, future_days: int, degree: int = 2):
     x = date_to_num(dates)
     y = prices.values.astype(float)
@@ -183,6 +191,7 @@ def build_chart() -> None:
     df.columns = ["Gold", "Bitcoin"]
     if df.empty:
         raise RuntimeError("Combined BTC/Gold dataset is empty.")
+    validate_market_date(df)
     signal = build_signal(df)
     history = build_history(df)
 
@@ -244,6 +253,8 @@ def build_chart() -> None:
             {
                 "last_updated_utc": utc_today().isoformat(),
                 "status": "ok",
+                "market_date": signal["last_updated"],
+                "price_basis": "Latest completed daily close shared by BTC and gold; no forward-filled quotes",
                 "source": "yfinance",
                 "tickers": TICKERS,
                 "chart": str(CHART_PATH.relative_to(REPO_ROOT)).replace("\\", "/"),
@@ -270,7 +281,6 @@ def main() -> int:
             print(f"Keeping existing chart: {CHART_PATH}", file=sys.stderr)
             if SIGNAL_PATH.exists():
                 print(f"Keeping existing signal: {SIGNAL_PATH}", file=sys.stderr)
-            return 0
         return 1
 
 
