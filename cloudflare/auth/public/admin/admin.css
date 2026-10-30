@@ -18,6 +18,8 @@ h2 { margin:0 0 14px; font-size:1.05rem; }
 .cards article { padding:18px; }
 .cards span { display:block; color:var(--gold); font-size:clamp(1rem,3vw,1.75rem); font-weight:900; overflow-wrap:anywhere; }
 .cards small { color:var(--muted); }
+.subscriber-note { margin:12px 0 0; color:var(--muted); font-size:.82rem; }
+.subscriber-note a { color:#a9cbff; }
 .panel { margin-top:18px; padding:20px; }
 .login { width:min(460px,100%); margin:90px auto 0; }
 .login h1 { margin-bottom:24px; font-size:2.35rem; }

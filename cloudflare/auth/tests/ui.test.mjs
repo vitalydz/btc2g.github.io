@@ -19,6 +19,13 @@ test('unavailable subscriber totals stay out of the public account summary', asy
   assert.match(css, /:has\(#subscribers-card\[hidden\]\)/);
 });
 
+test('administrator dashboard distinguishes accounts from confirmed newsletter subscribers', async () => {
+  const adminHtml = await readFile(new URL('admin/index.html', root), 'utf8');
+  assert.match(adminHtml, /Administrator accounts and verified account emails do not automatically join the newsletter/);
+  assert.match(adminHtml, /https:\/\/btc2g\.com\/#subscribe/);
+  assert.match(adminHtml, /confirm the email separately/);
+});
+
 test('registration fields explain their accepted format before submission', async () => {
   const [html, script] = await Promise.all(['index.html', 'account.js'].map(path => readFile(new URL(path, root), 'utf8')));
   assert.match(html, /aria-describedby="username-hint"/);
