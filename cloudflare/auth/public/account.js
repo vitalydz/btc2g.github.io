@@ -69,7 +69,7 @@ document.querySelector('#refresh-stats').addEventListener('click', refreshStats)
 function renderIdeas(ideas) {
   if (!ideas.length) {
     const empty = document.createElement('li');
-    empty.textContent = 'No ideas submitted yet.';
+    empty.textContent = accountLanguage === 'ru' ? 'Идей пока нет.' : 'No ideas submitted yet.';
     ideaList.replaceChildren(empty);
     return;
   }
@@ -84,7 +84,7 @@ function renderIdeas(ideas) {
     item.append(heading, status, date);
     if (idea.moderationNote) {
       const note = document.createElement('p');
-      note.textContent = `BTC2G note: ${idea.moderationNote}`;
+      note.textContent = `${accountLanguage === 'ru' ? 'Комментарий BTC2G' : 'BTC2G note'}: ${idea.moderationNote}`;
       item.append(note);
     }
     return item;
@@ -104,18 +104,20 @@ function showUser(user) {
   document.querySelector('#admin-link').hidden = user.role !== 'admin';
   const displayedEmail = user.email || user.pendingEmail;
   document.querySelector('#email-status').textContent = user.emailVerified && user.email
-    ? `Verified: ${user.email}`
-    : displayedEmail ? `Verification pending for ${displayedEmail}.` : 'No verified email is attached.';
+    ? `${accountLanguage === 'ru' ? 'Подтверждено' : 'Verified'}: ${user.email}`
+    : displayedEmail
+      ? `${accountLanguage === 'ru' ? 'Ожидается подтверждение адреса' : 'Verification pending for'} ${displayedEmail}.`
+      : accountLanguage === 'ru' ? 'Подтверждённый email не добавлен.' : 'No verified email is attached.';
   if (displayedEmail) emailInput.value = displayedEmail;
   const isAdmin = user.role === 'admin';
   ideaPanel.hidden = false;
   if (user.role === 'user' || isAdmin) {
     ideaForm.hidden = !isAdmin && !user.emailVerified;
     ideaAccess.textContent = isAdmin
-      ? 'Administrators can submit unlimited ideas. Open the admin dashboard above to review all users’ ideas.'
+      ? accountLanguage === 'ru' ? 'Администраторы могут отправлять идеи без ограничений. Откройте панель администратора выше, чтобы просмотреть идеи всех пользователей.' : 'Administrators can submit unlimited ideas. Open the admin dashboard above to review all users’ ideas.'
       : user.emailVerified
-      ? 'Your verified account can submit ideas privately.'
-      : 'Verify your email above to unlock private idea submission.';
+      ? accountLanguage === 'ru' ? 'Ваш подтверждённый аккаунт может отправлять идеи приватно.' : 'Your verified account can submit ideas privately.'
+      : accountLanguage === 'ru' ? 'Подтвердите email выше, чтобы открыть приватную отправку идей.' : 'Verify your email above to unlock private idea submission.';
     loadMyIdeas().catch(error => { ideaMessage.textContent = error.message; });
   }
 }
@@ -140,16 +142,16 @@ ideaForm.addEventListener('submit', async event => {
     });
     ideaSubmissionKey = crypto.randomUUID();
     ideaForm.reset();
-    ideaMessage.textContent = 'Idea submitted privately. It is not visible on the public site.';
+    ideaMessage.textContent = accountLanguage === 'ru' ? 'Идея отправлена приватно и не отображается на публичном сайте.' : 'Idea submitted privately. It is not visible on the public site.';
     ideaMessage.classList.add('success');
     try { await loadMyIdeas(); } catch {
-      ideaMessage.textContent += ' Your list could not be refreshed. Reload the page to view saved ideas.';
+      ideaMessage.textContent += accountLanguage === 'ru' ? ' Не удалось обновить список. Перезагрузите страницу, чтобы увидеть сохранённые идеи.' : ' Your list could not be refreshed. Reload the page to view saved ideas.';
     }
   } catch (error) {
     ideaMessage.textContent = error.status === 409
-      ? 'You have already submitted 3 ideas. View your submissions below.'
+      ? accountLanguage === 'ru' ? 'Вы уже отправили 3 идеи. Они показаны ниже.' : 'You have already submitted 3 ideas. View your submissions below.'
       : !error.status || error.status >= 500
-        ? 'Your idea could not be saved. Your text is preserved; please try again.'
+        ? accountLanguage === 'ru' ? 'Не удалось сохранить идею. Текст сохранён в форме; повторите попытку.' : 'Your idea could not be saved. Your text is preserved; please try again.'
         : error.message;
   } finally { ideaSubmit.disabled = false; }
 });
@@ -165,7 +167,7 @@ emailForm.addEventListener('submit', async event => {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ email: emailInput.value })
     });
-    emailMessage.textContent = 'Verification email sent. The link expires in 30 minutes.';
+    emailMessage.textContent = accountLanguage === 'ru' ? 'Письмо подтверждения отправлено. Ссылка действует 30 минут.' : 'Verification email sent. The link expires in 30 minutes.';
     emailMessage.classList.add('success');
   } catch (error) {
     emailMessage.textContent = error.message;
@@ -209,7 +211,7 @@ form.addEventListener('submit', async event => {
       body: JSON.stringify(payload)
     });
     if (data.passkeyRequired) {
-      setMessage('Confirm this administrator sign-in with your passkey.');
+      setMessage(accountLanguage === 'ru' ? 'Подтвердите вход администратора с помощью passkey.' : 'Confirm this administrator sign-in with your passkey.');
       const credential = await authenticatePasskey(data.options);
       data = await request('/api/passkeys/authenticate', {
         method: 'POST',
@@ -220,8 +222,8 @@ form.addEventListener('submit', async event => {
     showUser(data.user);
     if (mode === 'register') {
       emailMessage.textContent = data.verificationEmailSent
-        ? 'Verification email sent. Open the link within 30 minutes to complete registration.'
-        : 'Your account is pending. We could not send the verification email; use the button above to retry.';
+        ? accountLanguage === 'ru' ? 'Письмо подтверждения отправлено. Откройте ссылку в течение 30 минут, чтобы завершить регистрацию.' : 'Verification email sent. Open the link within 30 minutes to complete registration.'
+        : accountLanguage === 'ru' ? 'Аккаунт ожидает подтверждения. Не удалось отправить письмо; используйте кнопку выше, чтобы повторить попытку.' : 'Your account is pending. We could not send the verification email; use the button above to retry.';
       emailMessage.classList.toggle('success', data.verificationEmailSent);
     }
     await refreshStats();
