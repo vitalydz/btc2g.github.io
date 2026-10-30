@@ -13,6 +13,19 @@ This directory is a standalone Vercel project. No Cloudflare SDK, Worker, D1 or 
 
 Do not send test emails or submit production forms without separate permission. Verification before that permission uses the mock tests and a disposable PostgreSQL database only.
 
+### Local PostgreSQL verification
+
+Docker Desktop is sufficient; a host installation of PostgreSQL is not required. From `services/audience`, run:
+
+```powershell
+npm ci
+npm run test:postgres:local
+```
+
+The command starts PostgreSQL 16 on loopback port `55432`, runs the complete test suite under the same Node 22 major version required in production with `TEST_DATABASE_URL` so both real-PostgreSQL lifecycle tests execute, applies the production migrations to the local database, then stops the container. It does not call Resend: all mail transports in the tests are mocked. The named Docker volume is retained between runs; use `docker compose -f compose.local.yml down -v` only when you intentionally want to erase the local audience database.
+
+The compose credentials are fixed local-only values and must never be used in Vercel. Copy `.env.example` to an ignored `.env.local` only for manual local development, and keep real production secrets exclusively in Vercel's encrypted environment settings.
+
 ## API and semantics
 
 - POST `/api/visit`, JSON `{ "path": "/save.html" }`, Origin `https://btc2g.com`: one stored pageview per accepted request; deduplicates a daily visitor estimate using HMAC(day, platform IP, truncated user-agent). Raw IP, raw user-agent, email, path and query parameters are not stored in traffic rows. Recognizable bots are excluded, but unknown bots, NAT, VPN and browser changes remain limitations. Counts are **estimates**, not verified humans; sessions are not measured. `visitorDays` sums daily estimates and is not period-wide unique users. No geographic totals or campaign attribution yet.
