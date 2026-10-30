@@ -21,6 +21,8 @@
     vi: ['Địa chỉ email', 'Không thể xác nhận đã nhận yêu cầu. Yêu cầu có thể đã đến. Không tự động gửi lại.']
   };
 
+  const receiptNotes = {"en": "Receiving a request does not confirm an active email subscription.", "ru": "Получение заявки не подтверждает активную подписку по электронной почте.", "he": "קבלת הבקשה אינה מאשרת הרשמה פעילה לדואר אלקטרוני.", "de": "Der Eingang der Anfrage bestätigt kein aktives E-Mail-Abonnement.", "fr": "La réception de la demande ne confirme pas un abonnement e-mail actif.", "es": "Recibir la solicitud no confirma una suscripción de correo activa.", "zh": "收到申请并不代表电子邮件订阅已生效。", "it": "La ricezione della richiesta non conferma un abbonamento email attivo.", "pt": "A receção do pedido não confirma uma subscrição de email ativa.", "ar": "استلام الطلب لا يؤكد وجود اشتراك نشط بالبريد الإلكتروني.", "hi": "अनुरोध प्राप्त होना सक्रिय ईमेल सदस्यता की पुष्टि नहीं है।", "ja": "リクエストの受信は、メール購読が有効になったことを意味しません。", "ko": "요청 수신은 이메일 구독 활성화를 의미하지 않습니다.", "tr": "Talebin alınması etkin bir e-posta aboneliğini doğrulamaz.", "pl": "Otrzymanie zgłoszenia nie potwierdza aktywnej subskrypcji e-mail.", "nl": "Ontvangst van de aanvraag bevestigt geen actief e-mailabonnement.", "uk": "Отримання заявки не підтверджує активної підписки електронною поштою.", "id": "Penerimaan permintaan tidak mengonfirmasi langganan email aktif.", "vi": "Việc nhận yêu cầu không xác nhận đăng ký email đang hoạt động."};
+
   async function send(url, options) {
     const controller = new AbortController();
     let timer;
@@ -43,7 +45,7 @@
     send,
     text(language) {
       const [email, uncertain] = Object.hasOwn(messages, language) ? messages[language] : messages.en;
-      return { email, uncertain };
+      return { email, uncertain, receiptNote: Object.hasOwn(receiptNotes, language) ? receiptNotes[language] : receiptNotes.en };
     }
   };
 })();

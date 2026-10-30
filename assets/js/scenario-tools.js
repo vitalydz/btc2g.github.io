@@ -40,13 +40,16 @@
   }
   function calculateScenario(market, btcChange, goldChange, targetRatio) {
     if (!market || !finitePositive(market.btc) || !finitePositive(market.gold)) return null;
+    if ([btcChange,goldChange,targetRatio].some(value => value == null || typeof value === 'boolean' || String(value).trim() === '')) return null;
     const b = Number(btcChange), g = Number(goldChange), target = Number(targetRatio);
-    if (![b,g,target].every(Number.isFinite) || b < -99.99 || g < -99.99 || target <= 0) return null;
+    if (![b,g,target].every(Number.isFinite) || b < -80 || b > 300 || g < -50 || g > 100 || target < 0.01 || target > 10000) return null;
     const futureBtc = market.btc * (1 + b / 100);
     const futureGold = market.gold * (1 + g / 100);
     if (!finitePositive(futureBtc) || !finitePositive(futureGold)) return null;
     const futureRatio = futureBtc / futureGold;
-    return {futureBtc,futureGold,futureRatio,ratioChangePct:(futureRatio / (market.ratio || market.btc / market.gold) - 1) * 100,requiredBtc:target * futureGold};
+    const ratioChangePct=(futureRatio / (market.ratio || market.btc / market.gold) - 1) * 100, requiredBtc=target * futureGold;
+    if (!finitePositive(futureRatio) || !finitePositive(requiredBtc) || !Number.isFinite(ratioChangePct)) return null;
+    return {futureBtc,futureGold,futureRatio,ratioChangePct,requiredBtc};
   }
 
   const api = {KEYS,translations,validateMarketData,calculateScenario};
@@ -55,7 +58,7 @@
 
   const document = root.document;
   const byId = id => document.getElementById(id);
-  let market = null, result = null, lang = 'en';
+  let market = null, result = null, lang = 'en', dataState = 'loading';
   const textIds = {back:'back-link',account:'scenario-account-link',eyebrow:'scenario-eyebrow',title:'scenario-title',intro:'scenario-intro',starting:'current-title',btcPrice:'btc-label',goldPrice:'gold-label',ratio:'ratio-label',whatif:'scenario-whatif',adjust:'controls-title',reset:'reset-scenario',btcChange:'btc-change-label',goldChange:'gold-change-label',futureBtc:'future-btc-label',futureGold:'future-gold-label',futureRatio:'future-ratio-label',reverse:'scenario-reverse',targetTitle:'target-title',targetIntro:'target-intro',targetRatio:'target-ratio-label',requiredBtc:'required-btc-label',copy:'copy-scenario',share:'share-scenario',disclaimerTitle:'disclaimer-title',disclaimer:'disclaimer-text',source:'source-note'};
   function t(key) { return (translations[lang] || translations.en)[key]; }
   function money(value) { return new Intl.NumberFormat(locales[lang] || 'en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(value); }
@@ -66,7 +69,8 @@
     document.documentElement.lang = lang; document.documentElement.dir = ['he','ar'].includes(lang) ? 'rtl' : 'ltr';
     byId('scenario-language').value = lang; byId('scenario-language').setAttribute('aria-label', lang === 'ru' ? 'Язык' : 'Language');
     document.title = t('title');
-    if (!market) byId('data-status').textContent = t('loading');
+    byId('data-status').textContent = t(dataState);
+    byId('data-status').className = 'data-status' + (dataState === 'loaded' ? ' ready' : dataState === 'error' ? ' error' : '');
     render();
   }
   function render() {
@@ -74,7 +78,13 @@
     byId('market-date').textContent = `${t('marketDate')}: ${market.date}`;
     byId('current-btc').textContent = money(market.btc); byId('current-gold').textContent = money(market.gold); byId('current-ratio').textContent = `${number(market.ratio)} oz t`;
     result = calculateScenario(market, byId('btc-change').value, byId('gold-change').value, byId('target-ratio').value);
-    if (!result) return;
+    byId('action-status').textContent = '';
+    ['copy-scenario','share-scenario'].forEach(id=>byId(id).disabled=!result);
+    byId('target-ratio').setAttribute('aria-invalid', String(!result));
+    if (!result) {
+      ['future-btc','future-gold','future-ratio','ratio-difference','required-btc'].forEach(id=>byId(id).textContent='—');
+      return;
+    }
     byId('btc-change-output').textContent = signed(Number(byId('btc-change').value)); byId('gold-change-output').textContent = signed(Number(byId('gold-change').value));
     byId('future-btc').textContent = money(result.futureBtc); byId('future-gold').textContent = money(result.futureGold); byId('future-ratio').textContent = `${number(result.futureRatio)} oz t`;
     const change = result.ratioChangePct; byId('ratio-difference').textContent = Math.abs(change) < 0.005 ? t('unchanged') : `${signed(Math.abs(change))} ${change > 0 ? t('higher') : t('lower')}`;
@@ -87,20 +97,23 @@
   function shareUrl() {
     const url = new URL('scenario.html', root.location.href); url.searchParams.set('lang',lang); url.searchParams.set('btc',byId('btc-change').value); url.searchParams.set('gold',byId('gold-change').value); url.searchParams.set('target',byId('target-ratio').value); return url.toString();
   }
-  async function copyResult() { try { await root.navigator.clipboard.writeText(`${scenarioText()}\n${shareUrl()}`); byId('action-status').textContent=t('copied'); } catch { byId('action-status').textContent=''; } }
-  async function shareResult() { if (!root.navigator.share) return copyResult(); try { await root.navigator.share({title:t('title'),text:scenarioText(),url:shareUrl()}); byId('action-status').textContent=t('shared'); } catch (error) { if (error?.name !== 'AbortError') await copyResult(); } }
+  async function copyResult() { if (!result) return; try { await root.navigator.clipboard.writeText(`${scenarioText()}\n${shareUrl()}`); byId('action-status').textContent=t('copied'); } catch { byId('action-status').textContent=''; } }
+  async function shareResult() { if (!result) return; if (!root.navigator.share) return copyResult(); try { await root.navigator.share({title:t('title'),text:scenarioText(),url:shareUrl()}); byId('action-status').textContent=t('shared'); } catch (error) { if (error?.name !== 'AbortError') await copyResult(); } }
   function readInputs() {
     const params = new URLSearchParams(root.location.search); const bounded=(name,min,max,fallback)=>{const value=Number(params.get(name));return Number.isFinite(value)&&value>=min&&value<=max?value:fallback};
     byId('btc-change').value=bounded('btc',-80,300,0); byId('gold-change').value=bounded('gold',-50,100,0); byId('target-ratio').value=bounded('target',0.01,10000,30);
   }
   async function loadData() {
-    try { const response=await root.fetch(`assets/btc_signal.json?v=${Date.now()}`,{cache:'no-store'}); if(!response.ok)throw new Error('market'); market=validateMarketData(await response.json()); if(!market)throw new Error('market');
-      ['btc-change','gold-change','target-ratio','copy-scenario','share-scenario'].forEach(id=>byId(id).disabled=false); byId('data-status').textContent=t('loaded'); byId('data-status').className='data-status ready'; render();
-    } catch { byId('data-status').textContent=t('error'); byId('data-status').className='data-status error'; }
+    try { const response=await root.fetch(`assets/btc_signal.json?v=${Date.now()}`,{cache:'no-store',signal:AbortSignal.timeout(15000)}); if(!response.ok)throw new Error('market'); market=validateMarketData(await response.json()); if(!market)throw new Error('market');
+      ['btc-change','gold-change','target-ratio','copy-scenario','share-scenario'].forEach(id=>byId(id).disabled=false); dataState='loaded'; byId('data-status').textContent=t('loaded'); byId('data-status').className='data-status ready'; render();
+    } catch { dataState='error'; byId('data-status').textContent=t('error'); byId('data-status').className='data-status error'; }
   }
   document.addEventListener('DOMContentLoaded',()=>{
-    const params=new URLSearchParams(root.location.search); const saved=params.get('lang')||root.localStorage?.getItem('lang')||root.navigator.language.slice(0,2).toLowerCase(); lang=translations[saved]?saved:'en'; readInputs(); renderLanguage();
-    byId('scenario-language').addEventListener('change',event=>{lang=translations[event.target.value]?event.target.value:'en'; try{root.localStorage.setItem('lang',lang);}catch{} renderLanguage();});
+    const params=new URLSearchParams(root.location.search); let stored;
+    try { stored=root.localStorage.getItem('lang'); } catch {}
+    const saved=String(params.get('lang')||stored||root.navigator.language||'en').toLowerCase().split('-')[0];
+    lang=Object.hasOwn(translations,saved)?saved:'en'; readInputs(); renderLanguage();
+    byId('scenario-language').addEventListener('change',event=>{lang=Object.hasOwn(translations,event.target.value)?event.target.value:'en'; try{root.localStorage.setItem('lang',lang);}catch{} renderLanguage();});
     ['btc-change','gold-change','target-ratio'].forEach(id=>byId(id).addEventListener('input',render));
     byId('reset-scenario').addEventListener('click',()=>{byId('btc-change').value=0;byId('gold-change').value=0;byId('target-ratio').value=30;byId('action-status').textContent='';render();});
     byId('copy-scenario').addEventListener('click',copyResult); byId('share-scenario').addEventListener('click',shareResult); loadData();
