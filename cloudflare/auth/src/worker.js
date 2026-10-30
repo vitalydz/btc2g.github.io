@@ -458,6 +458,8 @@ async function currentUser(request, env) {
            sessions.passkey_verified_at
     FROM sessions JOIN users ON users.id = sessions.user_id
     WHERE sessions.token_hash = ? AND sessions.expires_at > ? AND users.disabled_at IS NULL
+      AND (users.role <> 'admin' OR sessions.passkey_verified_at IS NOT NULL
+           OR NOT EXISTS (SELECT 1 FROM passkeys WHERE user_id = users.id))
   `).bind(tokenHash, now).first();
 }
 
@@ -484,6 +486,10 @@ async function beginPasskeyRegistration(request, env) {
   let input;
   try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
   const config = passkeyConfiguration(env);
+  const scopes = await loginScopes(request, env, normalizeUsername(user.username));
+  if (await loginBlocked(env, scopes, Math.floor(Date.now() / 1000))) {
+    return json({ error: 'Too many password attempts. Try again in 15 minutes.' }, 429, { 'retry-after': '900' });
+  }
   const keys = await userPasskeys(env, user.id);
   if (keys.length && !user.passkey_verified_at) {
     return json({ error: 'Sign out and sign in with an existing passkey before adding another.' }, 403);
@@ -550,8 +556,10 @@ async function finishPasskeyRegistration(request, env) {
   const now = Math.floor(Date.now() / 1000);
   const displayName = String(input.name || `Passkey ${new Date().toISOString().slice(0, 10)}`)
     .trim().slice(0, 50) || 'Passkey';
+  const sessionToken = parseCookies(request.headers.get('Cookie')).btc2g_session;
+  const sessionHash = await sha256(sessionToken);
   try {
-    await env.DB.prepare(`
+    await env.DB.batch([env.DB.prepare(`
       INSERT INTO passkeys
         (credential_id, user_id, public_key, counter, transports, device_type,
          backed_up, display_name, created_at)
@@ -560,7 +568,14 @@ async function finishPasskeyRegistration(request, env) {
       credential.id, user.id, credential.publicKey, credential.counter,
       JSON.stringify(credential.transports || input.credential?.response?.transports || []),
       credentialDeviceType, credentialBackedUp ? 1 : 0, displayName, now
-    ).run();
+    ),
+    env.DB.prepare('UPDATE sessions SET passkey_verified_at = ? WHERE token_hash = ? AND user_id = ?')
+      .bind(now, sessionHash, user.id),
+    env.DB.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?')
+      .bind(user.id, sessionHash),
+    env.DB.prepare('DELETE FROM webauthn_challenges WHERE user_id = ?')
+      .bind(user.id)
+    ]);
   } catch (error) {
     const storageError = String(error).toLowerCase();
     if (storageError.includes('unique')) {
@@ -568,14 +583,6 @@ async function finishPasskeyRegistration(request, env) {
     }
     throw error;
   }
-  const sessionToken = parseCookies(request.headers.get('Cookie')).btc2g_session;
-  const sessionHash = await sha256(sessionToken);
-  await env.DB.batch([
-    env.DB.prepare('UPDATE sessions SET passkey_verified_at = ? WHERE token_hash = ? AND user_id = ?')
-      .bind(now, sessionHash, user.id),
-    env.DB.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?')
-      .bind(user.id, sessionHash)
-  ]);
   return json({ ok: true, passkeys: (await userPasskeys(env, user.id)).map(passkeyView) });
 }
 
@@ -1111,3 +1118,4 @@ export default {
     ]);
   }
 };
+
