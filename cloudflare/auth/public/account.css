@@ -30,6 +30,10 @@ label { display:grid; gap:7px; color:#d8dee8; font-size:.9rem; font-weight:700; 
 .field-hint { color:var(--muted); font-size:.78rem; font-weight:500; }
 input:not([type=checkbox]),textarea { width:100%; border:1px solid #343d4b; border-radius:10px; background:#090c12; color:var(--text); padding:13px 14px; font:inherit; outline:none; }
 input:focus,textarea:focus { border-color:var(--gold); box-shadow:0 0 0 3px #f4b94222; }
+.password-control { position:relative; display:block; }
+.password-control input { padding-inline-end:74px; }
+.password-control button { position:absolute; inset-inline-end:6px; top:50%; translate:0 -50%; min-width:58px; border:1px solid var(--line); border-radius:7px; background:#161c26; color:var(--muted); padding:7px 9px; font:inherit; font-size:.78rem; font-weight:800; cursor:pointer; }
+.password-control button:hover,.password-control button:focus-visible { border-color:var(--gold); color:var(--text); outline:none; }
 textarea { resize:vertical; min-height:96px; }
 .terms { grid-template-columns:auto 1fr; align-items:start; font-size:.82rem; font-weight:500; color:var(--muted); }
 .terms input { margin-top:4px; }

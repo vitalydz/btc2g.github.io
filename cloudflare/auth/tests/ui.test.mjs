@@ -23,6 +23,15 @@ test('registration fields explain their accepted format before submission', asyn
   assert.match(script, /Enter the password for this account/);
 });
 
+test('password can be revealed without changing registration or sign-in submission', async () => {
+  const [html, script, css] = await Promise.all(['index.html', 'account.js', 'account.css'].map(path => readFile(new URL(path, root), 'utf8')));
+  assert.match(html, /id="toggle-password"[^>]+aria-controls="password"[^>]+aria-pressed="false"/);
+  assert.match(script, /password\.type = visible \? 'password' : 'text'/);
+  assert.match(script, /togglePassword\.setAttribute\('aria-pressed', String\(!visible\)\)/);
+  assert.match(script, /password\.focus\(\)/);
+  assert.match(css, /\.password-control button\s*\{/);
+});
+
 test('registration flow explains that email verification completes the account', async () => {
   const [accountPage, accountCss] = await Promise.all(['index.html', 'account.css'].map(path => readFile(new URL(path, root), 'utf8')));
   assert.match(accountPage, /class="registration-steps" aria-label="Registration steps"/);

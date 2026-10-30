@@ -47,7 +47,10 @@
           <small class="field-hint" id="registration-email-hint">Required. Registration is complete only after you verify this address.</small>
         </label>
         <label>Password
-          <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" aria-describedby="password-hint" required>
+          <span class="password-control">
+            <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" aria-describedby="password-hint" required>
+            <button id="toggle-password" type="button" aria-controls="password" aria-pressed="false">Show</button>
+          </span>
           <small class="field-hint" id="password-hint">Use at least 12 characters.</small>
         </label>
         <label class="terms" id="terms-row">

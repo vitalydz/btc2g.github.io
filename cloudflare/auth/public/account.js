@@ -9,6 +9,7 @@ const termsCheckbox = document.querySelector('#accepted-terms');
 const registrationEmailRow = document.querySelector('#registration-email-row');
 const registrationEmail = document.querySelector('#registration-email');
 const password = document.querySelector('#password');
+const togglePassword = document.querySelector('#toggle-password');
 const passwordHint = document.querySelector('#password-hint');
 const signedIn = document.querySelector('#signed-in');
 const emailForm = document.querySelector('#email-form');
@@ -23,6 +24,14 @@ const ideaAccess = document.querySelector('#idea-access');
 const ideaList = document.querySelector('#idea-list');
 let mode = 'register';
 let ideaSubmissionKey = '';
+
+togglePassword.addEventListener('click', () => {
+  const visible = password.type === 'text';
+  password.type = visible ? 'password' : 'text';
+  togglePassword.textContent = visible ? 'Show' : 'Hide';
+  togglePassword.setAttribute('aria-pressed', String(!visible));
+  password.focus();
+});
 
 function setMessage(text, success = false) {
   message.textContent = text;
