@@ -1270,22 +1270,25 @@ body {
     }
     @media(max-width:460px){.relative-strength-cards{grid-template-columns:1fr}}
 
-    body.loading-promo-open { overflow:hidden; }
-    .loading-promo { position:fixed; inset:0; z-index:10000; display:grid; place-items:center; padding:18px; background:rgba(2,8,18,.92); backdrop-filter:blur(10px); }
-    .loading-promo-panel { position:relative; width:min(960px,100%); max-height:calc(100vh - 36px); overflow:auto; padding:18px; border:1px solid #334861; border-radius:18px; background:#071629; box-shadow:0 24px 80px #000b; box-sizing:border-box; }
-    .loading-promo-panel h2 { margin:0 52px 14px 0; color:#d4af37; font-size:clamp(1.1rem,2.5vw,1.55rem); }
-    .loading-promo-close { position:absolute; top:10px; right:12px; width:42px; height:42px; border:1px solid #4b607c; border-radius:50%; background:#101a2b; color:#fff; cursor:pointer; font:700 1.6rem/1 sans-serif; }
+    .loading-promo { position:fixed; right:18px; bottom:18px; z-index:10000; width:min(400px,calc(100vw - 36px)); pointer-events:none; }
+    .loading-promo-panel { position:relative; width:100%; max-height:calc(100vh - 36px); overflow:auto; padding:14px; border:1px solid #334861; border-radius:16px; background:#071629; box-shadow:0 18px 54px #000b; box-sizing:border-box; pointer-events:auto; }
+    .loading-promo-panel h2 { margin:0 46px 10px 0; color:#d4af37; font-size:1.05rem; }
+    .loading-promo-close { position:absolute; top:8px; right:10px; width:36px; height:36px; border:1px solid #4b607c; border-radius:50%; background:#101a2b; color:#fff; cursor:pointer; font:700 1.35rem/1 sans-serif; }
     .loading-promo-video { display:block; width:100%; aspect-ratio:127/76; border:1px solid #24344d; border-radius:12px; background:#020812; object-fit:contain; }
     .loading-promo-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:14px; }
-    .loading-promo-actions button { min-height:46px; padding:10px 18px; border:1px solid #d4af37; border-radius:10px; cursor:pointer; font:inherit; font-weight:800; }
+    .loading-promo-actions button { min-height:42px; padding:9px 14px; border:1px solid #d4af37; border-radius:10px; cursor:pointer; font:inherit; font-weight:800; }
     .loading-promo-sound { background:#d4af37; color:#111827; }
     .loading-promo-continue { background:#101a2b; color:#fff; }
     .loading-promo-vip { display:flex; gap:9px; align-items:center; margin-top:14px; color:#cbd5e1; font-weight:700; }
     .loading-promo-vip[hidden] { display:none; }
     .loading-promo-vip input { width:20px; height:20px; accent-color:#d4af37; }
     @media(max-width:600px) {
-      .loading-promo { padding:0; align-items:end; }
-      .loading-promo-panel { width:100%; max-height:100vh; padding:14px; border-radius:18px 18px 0 0; }
-      .loading-promo-actions { display:grid; grid-template-columns:1fr; }
-      .loading-promo-actions button { width:100%; }
+      .loading-promo { right:8px; bottom:8px; width:min(220px,calc(100vw - 16px)); }
+      .loading-promo-panel { max-height:none; padding:9px; border-radius:12px; }
+      .loading-promo-panel h2 { margin:0 38px 7px 0; font-size:.82rem; }
+      .loading-promo-close { top:5px; right:6px; width:30px; height:30px; font-size:1.1rem; }
+      .loading-promo-video { border-radius:8px; }
+      .loading-promo-actions { display:block; margin-top:7px; }
+      .loading-promo-actions button { width:100%; min-height:36px; padding:6px 8px; font-size:.75rem; }
+      .loading-promo-continue { display:none; }
     }

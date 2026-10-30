@@ -84,8 +84,9 @@
       const overlay = doc.createElement('section');
       overlay.id = 'btc2g-loading-promo';
       overlay.className = 'loading-promo';
-      overlay.setAttribute('role', 'dialog');
-      overlay.setAttribute('aria-modal', 'true');
+      // Keep the presentation visible without hiding the dashboard or trapping focus.
+      // Visitors should see the ratio and primary actions before choosing to watch.
+      overlay.setAttribute('role', 'region');
       overlay.setAttribute('aria-labelledby', 'btc2g-loading-promo-title');
       overlay.innerHTML = `
         <div class="loading-promo-panel">
@@ -103,7 +104,6 @@
           </label>
         </div>`;
       doc.body.appendChild(overlay);
-      doc.body.classList.add('loading-promo-open');
 
       const video = overlay.querySelector('video');
       const closeButton = overlay.querySelector('.loading-promo-close');
@@ -119,7 +119,6 @@
         win.clearTimeout(closingTimer);
         video.pause();
         overlay.remove();
-        doc.body.classList.remove('loading-promo-open');
       };
 
       closeButton.addEventListener('click', close);
@@ -137,7 +136,6 @@
         if (event.key === 'Escape' && overlay.isConnected) close();
       }, {once: true});
       video.play().catch(() => {});
-      closeButton.focus({preventScroll: true});
     };
 
     if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start, {once: true});

@@ -28,3 +28,15 @@ test('loading promo supports every homepage language and uses the approved video
   assert.match(source, /video\.muted = false/);
   assert.match(homepage, /assets\/js\/loading-promo\.js/);
 });
+
+test('loading promo does not block the dashboard or steal initial focus', () => {
+  const source = fs.readFileSync(path.join(root, 'assets/js/loading-promo.js'), 'utf8');
+  const styles = fs.readFileSync(path.join(root, 'assets/css/index.css'), 'utf8');
+  assert.doesNotMatch(source, /aria-modal/);
+  assert.doesNotMatch(source, /loading-promo-open/);
+  assert.doesNotMatch(source, /closeButton\.focus/);
+  assert.match(source, /setAttribute\('role', 'region'\)/);
+  assert.match(styles, /\.loading-promo \{ position:fixed; right:18px; bottom:18px;/);
+  assert.match(styles, /width:min\(220px,calc\(100vw - 16px\)\)/);
+  assert.doesNotMatch(styles, /body\.loading-promo-open/);
+});
