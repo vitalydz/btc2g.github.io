@@ -1,6 +1,8 @@
-# 2026.10.30.6 — language/runtime fixes
+# 2026.10.30.7 — language/runtime fixes
 
-Base: main `97ce23b4cb5cb70de58ff16d5766f11563272958` (2026.10.30.5).
+Initial base: main `97ce23b4cb5cb70de58ff16d5766f11563272958` (2026.10.30.5).
+Integrated concurrent main `daa641c5e507f7ec3d7d1db7a84007fa22a695b1` (.6),
+preserving scenario visit tracking and its regression. This candidate is .7.
 This is a small frontend release candidate; it does not assert full site-wide
 translation of legal documents or Account/admin.
 
@@ -49,8 +51,8 @@ translation of legal documents or Account/admin.
 Push on a feature branch, with only the changed paths layered on the recorded
 GitHub tree. Preserve concurrent Desktop commits. The local Desktop session owns
 main/Pages integration and browser verification under the existing coordination.
-The Worker APP_VERSION remains .5 because that separately deployed backend is not
-modified by this frontend release. Root VERSION and frontend cache keys are .6.
+The Worker APP_VERSION remains .6 because that separately deployed backend is not
+modified by this frontend release. Root VERSION and frontend cache keys are .7.
 
 Still pending: full translations of About, Terms, Privacy, Support, three articles,
 Account/admin/email verification, bot VIP UI, and their server-supplied error text.

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#071426" />
-  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.30.6">
+  <title>BTC2G - Bitcoin vs Gold Ratio</title><meta name="btc2g-release" content="2026.10.30.7">
   <meta name="description" content="Track the published Bitcoin-to-gold ratio, daily market data, model direction, history chart, and BTC ↔ gold calculator." />
   <meta property="og:title" content="BTC2G - Bitcoin vs Gold Ratio" />
   <meta property="og:description" content="Published BTC/Gold ratio data, model context, interactive history, and a reference calculator." />
@@ -31,7 +31,7 @@
       <nav id="primary-navigation" class="main-nav" aria-label="Primary navigation">
         <a id="nav-home" href="index.html">Home</a>
         <a id="nav-forecast" href="#forecast">Forecast</a>
-        <a id="nav-premium" href="premium.html?v=20261030-6">Premium</a>
+        <a id="nav-premium" href="premium.html?v=20261030-7">Premium</a>
         <a id="nav-save" href="save.html">SAVE</a>
         <a id="nav-buy" href="buy.html">Buy BTC</a>
         <a id="nav-research" href="research.html">TimeT research</a>
@@ -239,7 +239,7 @@
       <h2 id="premium-title">Premium Signals</h2>
       <p id="premium-subtitle">Extended signal history, model notes, and weekly updates.</p>
       <div class="premium-actions">
-        <a id="premium-page-link" class="premium-page-link" href="premium.html?v=20261030-6">View Premium</a>
+        <a id="premium-page-link" class="premium-page-link" href="premium.html?v=20261030-7">View Premium</a>
         <button id="premium-unlock-btn" class="premium-button" type="button">Join early access</button>
       </div>
     </section>
@@ -325,17 +325,17 @@
     <p>© 2026 BTC2G</p>
   </footer>
 
-  <script src="assets/js/languages.js?v=20261030-6"></script>
-  <script src="assets/js/ui-text.js?v=20261030-6"></script>
-  <script src="assets/js/legacy-premium-text.js?v=20261030-6"></script>
+  <script src="assets/js/languages.js?v=20261030-7"></script>
+  <script src="assets/js/ui-text.js?v=20261030-7"></script>
+  <script src="assets/js/legacy-premium-text.js?v=20261030-7"></script>
   <script src="assets/js/contest-text.js?v=20261028-1"></script>
   <script src="assets/js/audience-text.js?v=20261028-2"></script>
-  <script src="assets/js/ratio-tools.js?v=20261030-6"></script>
+  <script src="assets/js/ratio-tools.js?v=20261030-7"></script>
   <script src="assets/js/digest-preferences.js?v=20261030-5"></script>
   <script src="assets/js/subscription-request.js?v=20261030-4"></script>
-  <script src="assets/js/home-v2-text.js?v=20261030-6"></script>
+  <script src="assets/js/home-v2-text.js?v=20261030-7"></script>
   <script src="assets/js/scenario-entry.js?v=20261030-1"></script>
-  <script src="assets/js/market-chart.js?v=20261030-6"></script>
+  <script src="assets/js/market-chart.js?v=20261030-7"></script>
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
@@ -2221,7 +2221,7 @@
       setTextById('nav-home', text.navHome);
       setTextById('nav-forecast', text.navForecast);
       setTextById('nav-premium', text.navPremium);
-      document.getElementById('nav-premium').href = 'premium.html?v=20261030-6&lang=' + encodeURIComponent(lang);
+      document.getElementById('nav-premium').href = 'premium.html?v=20261030-7&lang=' + encodeURIComponent(lang);
       setTextById('nav-buy', text.navBuy);
       setTextById('nav-account', text.navAccount);
       document.getElementById('nav-save').href = 'save.html?lang=' + encodeURIComponent(lang);
@@ -2554,7 +2554,7 @@
 
     document.getElementById('premium-unlock-btn').addEventListener('click', () => {
       trackEvent('premium_click');
-      window.location.href = 'premium.html?v=20261030-6&lang=' + encodeURIComponent(currentLang) + '#early-access';
+      window.location.href = 'premium.html?v=20261030-7&lang=' + encodeURIComponent(currentLang) + '#early-access';
     });
     document.getElementById('premium-modal-close').addEventListener('click', closePremiumModal);
     document.getElementById('premium-modal').addEventListener('click', (event) => {
