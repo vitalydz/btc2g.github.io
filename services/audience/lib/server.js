@@ -75,7 +75,7 @@ function createHandler(route, {db = require('./db'), env = process.env, send = g
        UPDATE audience_tokens SET used_at=now() WHERE token_hash=$1 AND expires_at>now() AND used_at IS NULL RETURNING email,weekly_digest,created_at,language
       ) UPDATE audience_subscriptions s SET confirmed_at=CASE WHEN c.weekly_digest=false THEN s.confirmed_at ELSE coalesce(s.confirmed_at,now()) END,
        weekly_digest=coalesce(c.weekly_digest,s.weekly_digest),
-       digest_preferences_at=CASE WHEN c.weekly_digest IS NOT NULL THEN now() ELSE s.digest_preferences_at END,
+       digest_preferences_at=CASE WHEN c.weekly_digest IS NOT NULL THEN c.created_at ELSE s.digest_preferences_at END,
        digest_consent_at=CASE WHEN c.weekly_digest=true THEN now() ELSE s.digest_consent_at END,
        digest_unsubscribe_token=coalesce(s.digest_unsubscribe_token,$2),
        language=c.language,unsubscribed_at=CASE WHEN c.weekly_digest=false THEN s.unsubscribed_at ELSE NULL END,token_hash=NULL,token_expires_at=NULL

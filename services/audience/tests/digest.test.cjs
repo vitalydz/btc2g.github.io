@@ -64,5 +64,19 @@ test('real PostgreSQL digest lifecycle, ownership verification, duplicate cron a
   const disable=new URL(mail.text.match(/https:\/\/[^\s]+\/api\/confirm\?[^\s]+/)[0]).searchParams.get('token');
   assert.equal((await pool.query('SELECT weekly_digest FROM audience_subscriptions')).rows[0].weekly_digest,true);
   assert.equal((await call('confirm',{token:disable})).statusCode,200);assert.equal((await pool.query('SELECT weekly_digest FROM audience_subscriptions')).rows[0].weekly_digest,false);
+  await pool.query('DELETE FROM audience_rate_limits');
+  async function pendingChoice(value){
+   await pool.query("UPDATE audience_subscriptions SET requested_at=now()-interval '16 minutes'");
+   assert.equal((await call('digest-request',{...request,weeklyDigest:value})).statusCode,202);
+   return new URL(mail.text.match(/https:\/\/[^\s]+\/api\/confirm\?[^\s]+/)[0]).searchParams.get('token');
+  }
+  const older=await pendingChoice(false),newer=await pendingChoice(true);
+  assert.equal((await call('confirm',{token:older})).statusCode,200);
+  assert.equal((await call('confirm',{token:newer})).statusCode,200);
+  assert.equal((await pool.query('SELECT weekly_digest FROM audience_subscriptions')).rows[0].weekly_digest,true);
+  const obsolete=await pendingChoice(false),latest=await pendingChoice(true);
+  assert.equal((await call('confirm',{token:latest})).statusCode,200);
+  assert.equal((await call('confirm',{token:obsolete})).statusCode,400);
+
  }finally{if(pool)await pool.end();await admin.query('DROP SCHEMA IF EXISTS '+schema+' CASCADE');await admin.end();}
 });
