@@ -19,6 +19,8 @@ WIDTH, HEIGHT = 1270, 760
 FPS = 30
 FADE_FRAMES = 24
 INTRO_SECONDS = 3.6
+OUTRO_START_SECONDS = 37.0
+OUTRO_TRANSITION_SECONDS = 1.2
 VOICE_DELAY_MS = 2200
 VOICE_NAME = "en-US-AvaMultilingualNeural"
 
@@ -218,6 +220,18 @@ def build_motion_video() -> None:
                 if scene_index > 0 and previous is not None and frame_number < FADE_FRAMES:
                     alpha = (frame_number + 1) / (FADE_FRAMES + 1)
                     frame = transition_frame(previous, frame, alpha)
+                overall_elapsed = written / FPS
+                if overall_elapsed >= OUTRO_START_SECONDS:
+                    logo_card = logo_intro_frame(frame, logo, 1.2)
+                    outro_progress = min(
+                        1.0,
+                        (overall_elapsed - OUTRO_START_SECONDS) / OUTRO_TRANSITION_SECONDS,
+                    )
+                    frame = (
+                        logo_card
+                        if outro_progress >= 1.0
+                        else transition_frame(frame, logo_card, outro_progress)
+                    )
                 writer.write(frame)
                 previous = frame
                 written += 1
