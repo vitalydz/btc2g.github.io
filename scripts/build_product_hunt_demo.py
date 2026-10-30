@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import argparse
+import subprocess
 from pathlib import Path
 
 import cv2
@@ -6,78 +10,167 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSET_DIR = ROOT / "product-hunt"
-OUTPUT = ASSET_DIR / "btc2g-demo-28s.mp4"
+SILENT_OUTPUT = ASSET_DIR / "btc2g-demo-motion-silent.mp4"
+VOICE_OUTPUT = ASSET_DIR / "btc2g-demo-voice.wav"
+OUTPUT = ASSET_DIR / "btc2g-demo-36s.mp4"
 WIDTH, HEIGHT = 1270, 760
-FPS = 24
-SECONDS_PER_SCENE = 7
-FADE_FRAMES = 12
+FPS = 30
+SECONDS_PER_SCENE = 9
+FADE_FRAMES = 24
+
+VOICEOVER = (
+    "BTC2G answers one simple question: how much gold does one Bitcoin represent? "
+    "The dashboard shows the published ratio, the seven-day move, and market date at a glance. "
+    "Explore historical Bitcoin and gold data, plus clearly labelled long-term scenarios, not price promises. "
+    "Use the reference calculator to convert Bitcoin into estimated troy ounces, with sources and limitations beside the result. "
+    "Premium is an early-access research roadmap for deeper history, model notes, and weekly context. "
+    "BTC2G: Bitcoin versus gold, with the uncertainty left in."
+)
 
 SCENES = [
-    ("01-home.jpg", "Bitcoin versus gold in one calm daily dashboard"),
-    ("02-forecast.jpg", "Historical prices and clearly labelled model scenarios"),
-    ("03-calculator.jpg", "A reference calculator with source, date, and limitations"),
-    ("04-premium.jpg", "A Premium research roadmap without trading promises"),
+    {
+        "file": "01-home.jpg",
+        "label": "DAILY DASHBOARD",
+        "caption": "Published ratio, 7-day move, and market date",
+        "start": (0.50, 0.48, 1.00),
+        "end": (0.69, 0.37, 1.12),
+        "cursor": ((0.79, 0.36), (0.72, 0.48)),
+    },
+    {
+        "file": "02-forecast.jpg",
+        "label": "HISTORY + SCENARIOS",
+        "caption": "Historical prices with clearly labelled extrapolations",
+        "start": (0.50, 0.50, 1.02),
+        "end": (0.66, 0.42, 1.13),
+        "cursor": ((0.28, 0.66), (0.74, 0.35)),
+    },
+    {
+        "file": "03-calculator.jpg",
+        "label": "REFERENCE CALCULATOR",
+        "caption": "Convert BTC to gold with sources and limitations visible",
+        "start": (0.50, 0.43, 1.02),
+        "end": (0.52, 0.54, 1.12),
+        "cursor": ((0.47, 0.43), (0.63, 0.58)),
+    },
+    {
+        "file": "04-premium.jpg",
+        "label": "PREMIUM EARLY ACCESS",
+        "caption": "A research roadmap for deeper history and weekly context",
+        "start": (0.50, 0.50, 1.00),
+        "end": (0.36, 0.54, 1.10),
+        "cursor": ((0.82, 0.52), (0.20, 0.78)),
+    },
 ]
 
 
-def fitted_frame(image: np.ndarray, progress: float) -> np.ndarray:
-    image = cv2.resize(image, (WIDTH, HEIGHT), interpolation=cv2.INTER_AREA)
-    scale = 1.0 + 0.025 * progress
-    scaled = cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
-    x = (scaled.shape[1] - WIDTH) // 2
-    y = (scaled.shape[0] - HEIGHT) // 2
-    return scaled[y : y + HEIGHT, x : x + WIDTH].copy()
+def ease(value: float) -> float:
+    return value * value * (3.0 - 2.0 * value)
 
 
-def add_caption(frame: np.ndarray, caption: str) -> np.ndarray:
+def interpolate(start: float, end: float, progress: float) -> float:
+    return start + (end - start) * ease(progress)
+
+
+def motion_frame(image: np.ndarray, scene: dict, progress: float) -> np.ndarray:
+    source = cv2.resize(image, (WIDTH, HEIGHT), interpolation=cv2.INTER_AREA)
+    sx, sy, start_scale = scene["start"]
+    ex, ey, end_scale = scene["end"]
+    scale = interpolate(start_scale, end_scale, progress)
+    center_x = interpolate(sx, ex, progress) * WIDTH
+    center_y = interpolate(sy, ey, progress) * HEIGHT
+    crop_width = WIDTH / scale
+    crop_height = HEIGHT / scale
+    left = int(np.clip(center_x - crop_width / 2, 0, WIDTH - crop_width))
+    top = int(np.clip(center_y - crop_height / 2, 0, HEIGHT - crop_height))
+    right = min(WIDTH, int(left + crop_width))
+    bottom = min(HEIGHT, int(top + crop_height))
+    crop = source[top:bottom, left:right]
+    return cv2.resize(crop, (WIDTH, HEIGHT), interpolation=cv2.INTER_CUBIC)
+
+
+def add_overlays(frame: np.ndarray, scene: dict, progress: float, overall: float) -> np.ndarray:
     overlay = frame.copy()
-    cv2.rectangle(overlay, (0, HEIGHT - 92), (WIDTH, HEIGHT), (4, 15, 29), -1)
-    frame = cv2.addWeighted(overlay, 0.86, frame, 0.14, 0)
-    cv2.putText(
-        frame,
-        caption,
-        (48, HEIGHT - 38),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.82,
-        (245, 247, 250),
-        2,
-        cv2.LINE_AA,
-    )
+    cv2.rectangle(overlay, (0, 0), (WIDTH, 82), (4, 15, 29), -1)
+    cv2.rectangle(overlay, (0, HEIGHT - 98), (WIDTH, HEIGHT), (4, 15, 29), -1)
+    frame = cv2.addWeighted(overlay, 0.88, frame, 0.12, 0)
+    cv2.putText(frame, "BTC2G", (42, 51), cv2.FONT_HERSHEY_SIMPLEX, 0.86, (247, 147, 26), 2, cv2.LINE_AA)
+    cv2.putText(frame, scene["label"], (WIDTH - 365, 49), cv2.FONT_HERSHEY_SIMPLEX, 0.58, (212, 175, 55), 2, cv2.LINE_AA)
+    cv2.putText(frame, scene["caption"], (46, HEIGHT - 43), cv2.FONT_HERSHEY_SIMPLEX, 0.72, (245, 247, 250), 2, cv2.LINE_AA)
+    cv2.rectangle(frame, (0, HEIGHT - 6), (int(WIDTH * overall), HEIGHT), (247, 147, 26), -1)
+
+    (start_x, start_y), (end_x, end_y) = scene["cursor"]
+    cursor_x = int(interpolate(start_x, end_x, progress) * WIDTH)
+    cursor_y = int(interpolate(start_y, end_y, progress) * HEIGHT)
+    pulse = 8 + int(4 * abs(np.sin(progress * np.pi * 5)))
+    cv2.circle(frame, (cursor_x, cursor_y), pulse, (255, 255, 255), 2, cv2.LINE_AA)
+    cv2.circle(frame, (cursor_x, cursor_y), 3, (247, 147, 26), -1, cv2.LINE_AA)
     return frame
 
 
-def main() -> None:
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    writer = cv2.VideoWriter(str(OUTPUT), fourcc, FPS, (WIDTH, HEIGHT))
+def build_motion_video() -> None:
+    writer = cv2.VideoWriter(str(SILENT_OUTPUT), cv2.VideoWriter_fourcc(*"mp4v"), FPS, (WIDTH, HEIGHT))
     if not writer.isOpened():
         raise RuntimeError("OpenCV could not initialize the MP4 writer")
-
     previous = None
     frames_per_scene = FPS * SECONDS_PER_SCENE
+    total_frames = frames_per_scene * len(SCENES)
+    written = 0
     try:
-        for filename, caption in SCENES:
-            image = cv2.imread(str(ASSET_DIR / filename), cv2.IMREAD_COLOR)
+        for scene in SCENES:
+            image = cv2.imread(str(ASSET_DIR / scene["file"]), cv2.IMREAD_COLOR)
             if image is None:
-                raise FileNotFoundError(ASSET_DIR / filename)
-
+                raise FileNotFoundError(ASSET_DIR / scene["file"])
             for frame_number in range(frames_per_scene):
                 progress = frame_number / max(frames_per_scene - 1, 1)
-                frame = add_caption(fitted_frame(image, progress), caption)
+                frame = add_overlays(motion_frame(image, scene, progress), scene, progress, (written + 1) / total_frames)
                 if previous is not None and frame_number < FADE_FRAMES:
                     alpha = (frame_number + 1) / (FADE_FRAMES + 1)
                     frame = cv2.addWeighted(previous, 1.0 - alpha, frame, alpha, 0)
                 writer.write(frame)
                 previous = frame
+                written += 1
     finally:
         writer.release()
 
-    capture = cv2.VideoCapture(str(OUTPUT))
-    frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    duration = frame_count / FPS
-    capture.release()
-    if frame_count != FPS * SECONDS_PER_SCENE * len(SCENES):
-        raise RuntimeError(f"Unexpected frame count: {frame_count}")
-    print(f"Created {OUTPUT} ({duration:.1f}s, {WIDTH}x{HEIGHT}, {FPS}fps)")
+
+def build_voiceover() -> None:
+    escaped_text = VOICEOVER.replace("'", "''")
+    escaped_path = str(VOICE_OUTPUT).replace("'", "''")
+    command = (
+        "Add-Type -AssemblyName System.Speech; "
+        "$voice = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
+        "$voice.SelectVoice('Microsoft David Desktop'); $voice.Rate = 2; $voice.Volume = 100; "
+        f"$voice.SetOutputToWaveFile('{escaped_path}'); $voice.Speak('{escaped_text}'); $voice.Dispose()"
+    )
+    subprocess.run(["powershell", "-NoProfile", "-Command", command], check=True)
+
+
+def mux_audio() -> None:
+    try:
+        import imageio_ffmpeg
+    except ImportError as error:
+        raise RuntimeError("Install imageio-ffmpeg to create the narrated MP4") from error
+    subprocess.run(
+        [
+            imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-i", str(SILENT_OUTPUT), "-i", str(VOICE_OUTPUT),
+            "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-c:a", "aac", "-b:a", "160k",
+            "-af", "apad", "-t", str(SECONDS_PER_SCENE * len(SCENES)), "-movflags", "+faststart", str(OUTPUT),
+        ],
+        check=True,
+    )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Build the narrated BTC2G Product Hunt demo")
+    parser.add_argument("--keep-intermediates", action="store_true")
+    args = parser.parse_args()
+    build_motion_video()
+    build_voiceover()
+    mux_audio()
+    if not args.keep_intermediates:
+        SILENT_OUTPUT.unlink(missing_ok=True)
+        VOICE_OUTPUT.unlink(missing_ok=True)
+    print(f"Created {OUTPUT} ({SECONDS_PER_SCENE * len(SCENES)}s, {WIDTH}x{HEIGHT}, {FPS}fps, narrated)")
 
 
 if __name__ == "__main__":
