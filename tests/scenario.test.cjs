@@ -32,6 +32,7 @@ test('scenario calculation rejects missing, inconsistent, or unsafe market data'
 test('scenario page exposes accessible controls, safety disclosure, and share actions', () => {
   for (const id of ['btc-change','gold-change','target-ratio','future-ratio','required-btc','copy-scenario','share-scenario','data-status']) assert.match(page, new RegExp(`id="${id}"`));
   assert.match(page, /Nothing entered here is stored/);
+  assert.match(page, /id="scenario-account-link"[^>]+btc2g-accounts\.btc2g\.workers\.dev/);
   assert.match(page, /Scenario, not forecast/);
   assert.match(page, /not predictions, financial advice, or guarantees/);
   assert.match(page, /yfinance BTC-USD and GC=F/);
