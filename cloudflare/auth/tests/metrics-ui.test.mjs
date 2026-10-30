@@ -116,3 +116,57 @@ test('out-of-order admin responses cannot overwrite a newer reporting range', as
   await oldRequest;
   assert.equal(ui.nodes.get('#visitors-today').textContent, '4');
 });
+
+
+test('idea form preserves text and key on failure, deduplicates retry, and reports refresh separately', async () => {
+  const ui = page('../public/index.html');
+  let resetCount = 0;
+  let keyCount = 0;
+  let failure = Object.assign(new Error('internal database detail'), { status: 500 });
+  let refreshFailure = false;
+  const keys = [];
+  const ideaForm = ui.nodes.get('#idea-form');
+  ideaForm.reset = () => { resetCount += 1; };
+  const message = ui.nodes.get('#idea-message');
+  message.classList = { remove() {}, add() {} };
+  const source = readFileSync(new URL('../public/account.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/gm, '');
+  const context = vm.createContext({ document: ui.document, formatCount, measurementNote,
+    crypto: { randomUUID: () => `local-key-${++keyCount}` },
+    FormData: class { get(name) { return name === 'reviewConsent' ? 'on' : 'Preserved idea text'; } },
+    request: async (path, options) => {
+      if (path === '/api/me') return { user: null };
+      if (path === '/api/stats') return snapshot;
+      if (path === '/api/ideas') {
+        keys.push(options.headers['Idempotency-Key']);
+        if (failure) throw failure;
+        return { duplicate: true, idea: { id: 'saved-idea' } };
+      }
+      if (path === '/api/ideas/mine') {
+        if (refreshFailure) throw new Error('List unavailable');
+        return { ideas: [] };
+      }
+      throw new Error(`Unexpected path: ${path}`);
+    }
+  });
+  vm.runInContext(source, context);
+  const submit = () => ideaForm.listeners.submit({ preventDefault() {} });
+  for (const error of [failure, new TypeError('Failed to fetch'), Object.assign(new Error('limit'), { status: 409 })]) {
+    failure = error;
+    await submit();
+    assert.equal(resetCount, 0);
+    assert.equal(ui.nodes.get('#idea-submit').disabled, false);
+    assert.doesNotMatch(message.textContent, /internal database detail|Failed to fetch/);
+  }
+  assert.match(message.textContent, /already submitted 3 ideas.*below/);
+  assert.equal(new Set(keys).size, 1);
+  failure = null;
+  refreshFailure = true;
+  await submit();
+  assert.equal(new Set(keys).size, 1);
+  assert.equal(resetCount, 1);
+  assert.match(message.textContent, /Idea submitted privately.*list could not be refreshed/);
+  refreshFailure = false;
+  await submit();
+  assert.notEqual(keys.at(-1), keys[0]);
+  assert.equal(resetCount, 2);
+});

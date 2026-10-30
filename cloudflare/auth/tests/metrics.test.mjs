@@ -460,3 +460,107 @@ test('email verification fails closed when delivery is not configured', async t 
   assert.equal(response.status, 503);
   assert.equal(db.prepare('SELECT COUNT(*) AS count FROM email_verification_tokens').get().count, 0);
 });
+
+
+function ideaSubmission(env, headers, key) {
+  return worker.fetch(new Request('https://metrics.test/api/ideas', {
+    method: 'POST',
+    headers: { ...headers, Origin: env.APP_ORIGIN, 'Content-Type': 'application/json', 'Idempotency-Key': key },
+    body: JSON.stringify({ title: 'Local private idea', audience: 'Researchers',
+      problem: 'A sufficiently described problem.', solution: 'A sufficiently described solution.', reviewConsent: true })
+  }), env);
+}
+
+// Hold both count reads so neither insertion can happen before both requests
+// have passed the application check. Inserts still execute the real SQL trigger.
+function concurrentIdeaCounts(t, env) {
+  const prepare = env.DB.prepare.bind(env.DB);
+  let arrivals = 0;
+  let release;
+  const ready = new Promise(resolve => { release = resolve; });
+  t.mock.method(env.DB, 'prepare', sql => {
+    const statement = prepare(sql);
+    if (sql === 'SELECT COUNT(*) AS count FROM private_ideas WHERE user_id = ?') {
+      const first = statement.first.bind(statement);
+      statement.first = async () => {
+        const row = await first();
+        arrivals += 1;
+        if (arrivals === 2) release();
+        await ready;
+        return row;
+      };
+    }
+    return statement;
+  });
+  return () => assert.equal(arrivals, 2);
+}
+
+test('concurrent distinct ideas enforce the SQL account limit with HTTP 409', { timeout: 5000 }, async t => {
+  const { env, db } = database(t);
+  const headers = verifiedUser(db, 'race-limit', 'RaceLimit');
+  for (let index = 0; index < 2; index += 1) {
+    assert.equal((await ideaSubmission(env, headers, `race-seed-key-000${index}`)).status, 201);
+  }
+  const assertArrivals = concurrentIdeaCounts(t, env);
+  const responses = await Promise.all([
+    ideaSubmission(env, headers, 'race-distinct-key-01'),
+    ideaSubmission(env, headers, 'race-distinct-key-02')
+  ]);
+  assertArrivals();
+  assert.deepEqual(responses.map(r => r.status).sort(), [201, 409]);
+  const rejected = responses.find(r => r.status === 409);
+  assert.deepEqual(await rejected.json(), { error: 'Each account may submit up to 3 ideas.' });
+  assert.equal(db.prepare('SELECT COUNT(*) AS count FROM private_ideas').get().count, 3);
+});
+
+for (const initialCount of [0, 2]) {
+  test(`concurrent retries deduplicate with ${initialCount} existing ideas`, { timeout: 5000 }, async t => {
+    const { env, db } = database(t);
+    const headers = verifiedUser(db, 'race-retry', 'RaceRetry');
+    for (let index = 0; index < initialCount; index += 1) {
+      assert.equal((await ideaSubmission(env, headers, `retry-seed-key-00${index}`)).status, 201);
+    }
+    const assertArrivals = concurrentIdeaCounts(t, env);
+    const key = 'concurrent-retry-key-01';
+    const responses = await Promise.all([
+      ideaSubmission(env, headers, key), ideaSubmission(env, headers, key)
+    ]);
+    assertArrivals();
+    assert.deepEqual(responses.map(r => r.status).sort(), [200, 201]);
+    const data = await Promise.all(responses.map(r => r.json()));
+    assert.equal(data[0].idea.id, data[1].idea.id);
+    assert.equal(data.filter(item => item.duplicate === true).length, 1);
+    assert.equal(db.prepare('SELECT COUNT(*) AS count FROM private_ideas').get().count, initialCount + 1);
+    const retry = await ideaSubmission(env, headers, key);
+    assert.equal(retry.status, 200);
+    assert.equal((await retry.json()).idea.id, data[0].idea.id);
+    assert.equal(db.prepare('SELECT COUNT(*) AS count FROM private_ideas').get().count, initialCount + 1);
+  });
+}
+
+test('D1 insertion failures return generic errors and preserve the original exception', async t => {
+  const { env, db } = database(t);
+  const headers = verifiedUser(db, 'storage-failure', 'StorageFailure');
+  const prepare = env.DB.prepare.bind(env.DB);
+  const logs = [];
+  t.mock.method(console, 'error', (...args) => logs.push(args));
+  let failure;
+  t.mock.method(env.DB, 'prepare', sql => {
+    const statement = prepare(sql);
+    if (/INSERT INTO private_ideas\s/.test(sql)) {
+      statement.run = async () => { throw failure; };
+    }
+    return statement;
+  });
+  for (const message of [
+    'D1_ERROR: database unavailable; internal-host secret-detail',
+    'D1_ERROR: UNIQUE constraint failed: private_ideas.id; secret-detail'
+  ]) {
+    failure = new Error(message);
+    const response = await ideaSubmission(env, headers, 'storage-failure-key-01');
+    assert.equal(response.status, 500);
+    assert.deepEqual(await response.json(), { error: 'Unexpected server error.' });
+    assert.equal(logs.at(-1)[1], failure);
+    assert.equal(db.prepare('SELECT COUNT(*) AS count FROM private_ideas').get().count, 0);
+  }
+});

@@ -28,9 +28,14 @@ export async function request(path, options = {}) {
   try {
     const response = await fetch(path, { ...options, cache: 'no-store', signal: controller.signal });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || `Request failed (${response.status}).`);
+    if (!response.ok) {
+      const error = new Error(data.error || `Request failed (${response.status}).`);
+      error.status = response.status;
+      throw error;
+    }
     return data;
   } finally {
     clearTimeout(timer);
   }
 }
+

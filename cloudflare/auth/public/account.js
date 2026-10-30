@@ -100,6 +100,7 @@ function showUser(user) {
 
 ideaForm.addEventListener('submit', async event => {
   event.preventDefault();
+  if (ideaSubmit.disabled) return;
   ideaSubmit.disabled = true;
   ideaMessage.textContent = '';
   ideaMessage.classList.remove('success');
@@ -119,9 +120,15 @@ ideaForm.addEventListener('submit', async event => {
     ideaForm.reset();
     ideaMessage.textContent = 'Idea submitted privately. It is not visible on the public site.';
     ideaMessage.classList.add('success');
-    await loadMyIdeas();
+    try { await loadMyIdeas(); } catch {
+      ideaMessage.textContent += ' Your list could not be refreshed. Reload the page to view saved ideas.';
+    }
   } catch (error) {
-    ideaMessage.textContent = error.message;
+    ideaMessage.textContent = error.status === 409
+      ? 'You have already submitted 3 ideas. View your submissions below.'
+      : !error.status || error.status >= 500
+        ? 'Your idea could not be saved. Your text is preserved; please try again.'
+        : error.message;
   } finally { ideaSubmit.disabled = false; }
 });
 
@@ -210,3 +217,4 @@ document.querySelector('#logout-button').addEventListener('click', async () => {
 
 refreshStats();
 request('/api/me').then(data => data.user && showUser(data.user)).catch(() => {});
+

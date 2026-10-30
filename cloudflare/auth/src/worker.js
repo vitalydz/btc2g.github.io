@@ -988,7 +988,8 @@ async function submitPrivateIdea(request, env) {
     `).bind(idea.id, user.id, title, audience, problem, solution, idempotencyKey,
       env.TERMS_VERSION || 'unknown', now, now).run();
   } catch (error) {
-    if (String(error).toLowerCase().includes('unique')) {
+    const storageError = String(error).toLowerCase();
+    if (storageError.includes('unique') || storageError.includes('idea_limit_reached')) {
       const duplicate = await env.DB.prepare(`
         SELECT id, title, audience, problem, solution, status, moderation_note, created_at, updated_at
         FROM private_ideas WHERE user_id = ? AND idempotency_key = ?
@@ -1111,3 +1112,4 @@ export default {
     ]);
   }
 };
+
