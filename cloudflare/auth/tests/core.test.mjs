@@ -5,6 +5,7 @@ import {
   acquisitionSource,
   jerusalemDay,
   normalizePagePath,
+  pageAcquisitionSource,
   normalizeEmail,
   normalizeUsername,
   parseCookies,
@@ -93,4 +94,11 @@ test('normalizes only HTTPS Product Hunt referrers for attribution', () => {
   assert.equal(acquisitionSource('https://example.com/?next=producthunt.com'), null);
   assert.equal(acquisitionSource('http://producthunt.com/'), null);
   assert.equal(acquisitionSource('not a URL'), null);
+});
+
+test('recognizes only the trusted Scenario page path for internal attribution', () => {
+  assert.equal(pageAcquisitionSource('/scenario.html'), 'scenario');
+  assert.equal(pageAcquisitionSource('/scenario.html?lang=ru'), 'scenario');
+  assert.equal(pageAcquisitionSource('/scenario-copy.html'), null);
+  assert.equal(pageAcquisitionSource('https://btc2g.com/scenario.html'), null);
 });

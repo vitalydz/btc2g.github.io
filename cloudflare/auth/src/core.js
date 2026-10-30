@@ -112,3 +112,7 @@ export function acquisitionSource(referrer) {
     return null;
   }
 }
+
+export function pageAcquisitionSource(path) {
+  return normalizePagePath(path) === '/scenario.html' ? 'scenario' : null;
+}

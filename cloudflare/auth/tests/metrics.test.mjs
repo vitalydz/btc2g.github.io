@@ -194,6 +194,60 @@ test('attributes a same-day Product Hunt registration with a signed browser-boun
   assert.equal(completedPublic.newToday, 1);
 });
 
+test('attributes a completed registration from Scenario Simulator with a signed browser-bound token', async t => {
+  const { env, db } = database(t);
+  let sent;
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    sent = JSON.parse(options.body);
+    return new Response(JSON.stringify({ id: 'local-email' }), { status: 200 });
+  });
+  const configured = {
+    ...env,
+    TERMS_VERSION: 'test',
+    RESEND_API_KEY: 'local-test-key',
+    EMAIL_FROM: 'BTC2G <accounts@btc2g.com>'
+  };
+  const commonHeaders = {
+    'CF-Connecting-IP': '192.0.2.45', 'User-Agent': 'scenario-local-test'
+  };
+  const visit = await worker.fetch(new Request('https://metrics.test/api/visit', {
+    method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: '/scenario.html', referrer: 'https://btc2g.com/' })
+  }), configured);
+  const { attribution } = await visit.json();
+  assert.equal(visit.status, 202);
+  assert.match(attribution, /^\d{4}-\d{2}-\d{2}\.scenario\./);
+
+  const registration = await worker.fetch(new Request('https://metrics.test/api/register', {
+    method: 'POST', headers: { ...commonHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'ScenarioUser', email: 'scenario@example.com', password: 'LongEnoughPass9', acceptedTerms: true, attribution })
+  }), configured);
+  assert.equal(registration.status, 201);
+  assert.equal(db.prepare("SELECT acquisition_source FROM users WHERE username_key = 'scenariouser'").get().acquisition_source, 'scenario');
+
+  const adminHeaders = admin(db);
+  let report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: adminHeaders }), configured)).json();
+  assert.equal(report.summary.scenarioVisitorsToday, 1);
+  assert.equal(report.summary.scenarioRegisteredToday, 0);
+  assert.equal(report.summary.scenarioConversionToday, 0);
+
+  const token = new URL(sent.text.match(/https:\/\/\S+/)[0]).searchParams.get('token');
+  const confirmed = await worker.fetch(new Request('https://metrics.test/api/email-verification/confirm', {
+    method: 'POST',
+    headers: {
+      Cookie: registration.headers.get('set-cookie'),
+      Origin: configured.APP_ORIGIN,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ token })
+  }), configured);
+  assert.equal(confirmed.status, 200);
+
+  report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: adminHeaders }), configured)).json();
+  assert.equal(report.summary.scenarioRegisteredToday, 1);
+  assert.equal(report.summary.scenarioConversionToday, 1);
+});
+
 test('empty historical traffic and zero denominators are unavailable', async t => {
   const { env, db } = database(t);
   const headers = admin(db);
@@ -204,6 +258,8 @@ test('empty historical traffic and zero denominators are unavailable', async t =
   assert.equal(report.summary.visitorsToday, null);
   assert.equal(report.summary.productHuntVisitorsToday, null);
   assert.equal(report.summary.productHuntConversionToday, null);
+  assert.equal(report.summary.scenarioVisitorsToday, null);
+  assert.equal(report.summary.scenarioConversionToday, null);
   assert.ok(report.daily.every(row => row.visitors === null && row.views === null));
 });
 

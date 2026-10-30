@@ -7,6 +7,7 @@ import {
   jerusalemDay,
   normalizeEmail,
   normalizePagePath,
+  pageAcquisitionSource,
   normalizeUsername,
   parseCookies,
   publicStats,
@@ -116,7 +117,7 @@ async function createAttributionToken(env, day, visitorHash, source) {
 async function verifiedAttributionSource(request, env, token) {
   if (!env.IP_HASH_SECRET || typeof token !== 'string') return null;
   const [day, source, signature, extra] = token.split('.');
-  if (extra !== undefined || day !== jerusalemDay() || source !== 'producthunt' || !signature) return null;
+  if (extra !== undefined || day !== jerusalemDay() || !['producthunt', 'scenario'].includes(source) || !signature) return null;
   const visitorHash = await requestVisitorHash(request, env, day);
   const expected = await hmacSha256(env.IP_HASH_SECRET, `${day}:${visitorHash}:${source}`);
   return constantTimeEqual(signature, expected) ? source : null;
@@ -796,7 +797,7 @@ async function recordVisit(request, env) {
   if (!pagePath) return json({ error: 'Invalid page path.' }, 400, cors);
 
   const day = jerusalemDay();
-  const source = acquisitionSource(input?.referrer);
+  const source = acquisitionSource(input?.referrer) || pageAcquisitionSource(pagePath);
   const visitorHash = await requestVisitorHash(request, env, day);
   const now = Math.floor(Date.now() / 1000);
   await env.DB.batch([
@@ -834,12 +835,14 @@ async function adminStats(request, env) {
         (SELECT COUNT(*) FROM daily_visitors WHERE day = ?) AS visitors_today,
         (SELECT COALESCE(SUM(views), 0) FROM daily_pageviews WHERE day = ?) AS views_today,
         (SELECT COUNT(*) FROM daily_visitors WHERE day = ? AND acquisition_source = 'producthunt') AS producthunt_visitors_today,
+        (SELECT COUNT(*) FROM daily_visitors WHERE day = ? AND acquisition_source = 'scenario') AS scenario_visitors_today,
         (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NOT NULL) AS registered_total,
         (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_day = ?) AS registered_today,
         (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NOT NULL) AS verified_email_total,
         (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NULL) AS pending_email_total,
-        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_day = ? AND acquisition_source = 'producthunt') AS producthunt_registered_today
-    `).bind(today, today, today, today, today).first(),
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_day = ? AND acquisition_source = 'producthunt') AS producthunt_registered_today,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_day = ? AND acquisition_source = 'scenario') AS scenario_registered_today
+    `).bind(today, today, today, today, today, today, today).first(),
     env.DB.prepare(`
       WITH RECURSIVE dates(day) AS (
         SELECT date(?, '-' || ? || ' day')
@@ -889,6 +892,9 @@ async function adminStats(request, env) {
   const productHuntVisitorsToday = traffic.status === 'available'
     ? Number(summary?.producthunt_visitors_today || 0) : null;
   const productHuntRegisteredToday = Number(summary?.producthunt_registered_today || 0);
+  const scenarioVisitorsToday = traffic.status === 'available'
+    ? Number(summary?.scenario_visitors_today || 0) : null;
+  const scenarioRegisteredToday = Number(summary?.scenario_registered_today || 0);
   return json({
     appVersion: env.APP_VERSION || 'unknown',
     rangeDays: days,
@@ -908,12 +914,15 @@ async function adminStats(request, env) {
       conversionToday: registrationRatio(registeredToday, visitorsToday),
       productHuntVisitorsToday,
       productHuntRegisteredToday,
-      productHuntConversionToday: registrationRatio(productHuntRegisteredToday, productHuntVisitorsToday)
+      productHuntConversionToday: registrationRatio(productHuntRegisteredToday, productHuntVisitorsToday),
+      scenarioVisitorsToday,
+      scenarioRegisteredToday,
+      scenarioConversionToday: registrationRatio(scenarioRegisteredToday, scenarioVisitorsToday)
     },
     daily: dailyResult.results || [],
     topPaths: pathsResult.results || [],
     recentRegistrations: recentResult.results || [],
-    methodology: 'Visitors are daily IP + browser hash estimates, not verified people. Raw IP addresses are not stored. A registration is counted only after the account email is verified. Product Hunt is detected from the browser-reported referrer; a registration is attributed only when a signed same-day token matches the same browser/network estimate. Other registration/visitor ratios are not attributed conversion. Days before the earliest retained visit have no traffic data. Verified account emails are not marketing subscriptions.'
+    methodology: 'Visitors are daily IP + browser hash estimates, not verified people. Raw IP addresses are not stored. A registration is counted only after the account email is verified. Product Hunt is detected from the browser-reported referrer; Scenario is detected from the trusted BTC2G page path. A registration is attributed only when a signed same-day token matches the same browser/network estimate. Other registration/visitor ratios are not attributed conversion. Days before the earliest retained visit have no traffic data. Verified account emails are not marketing subscriptions.'
   });
 }
 

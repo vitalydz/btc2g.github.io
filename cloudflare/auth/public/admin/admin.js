@@ -123,6 +123,9 @@ async function loadStats() {
     document.querySelector('#producthunt-visitors').textContent = formatCount(data.summary.productHuntVisitorsToday);
     document.querySelector('#producthunt-registrations').textContent = formatCount(data.summary.productHuntRegisteredToday);
     document.querySelector('#producthunt-conversion').textContent = percentage(data.summary.productHuntConversionToday);
+    document.querySelector('#scenario-visitors').textContent = formatCount(data.summary.scenarioVisitorsToday);
+    document.querySelector('#scenario-registrations').textContent = formatCount(data.summary.scenarioRegisteredToday);
+    document.querySelector('#scenario-conversion').textContent = percentage(data.summary.scenarioConversionToday);
     document.querySelector('#daily-body').replaceChildren(...data.daily.map(row => {
       const tr = document.createElement('tr');
       const conversion = Number.isFinite(row.visitors) && row.visitors > 0 ? row.registrations / row.visitors : null;
