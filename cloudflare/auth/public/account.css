@@ -16,6 +16,12 @@ h1 { margin:.25rem 0 .65rem; font-size:clamp(2rem,8vw,3.7rem); line-height:1.02;
 .stats small { color:var(--muted); }
 .stats>p { grid-column:1/-1; margin:0; padding:10px 14px; background:#0d1118; color:var(--muted); font-size:.8rem; text-align:center; }
 .card { margin-top:22px; padding:24px; border:1px solid var(--line); border-radius:18px; background:rgba(17,21,29,.94); box-shadow:0 22px 70px #0008; }
+.registration-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:0 0 20px; padding:0; list-style:none; counter-reset:registration-step; }
+.registration-steps li { position:relative; min-width:0; padding:12px 10px 12px 42px; border:1px solid var(--line); border-radius:12px; background:#0b0f16; counter-increment:registration-step; }
+.registration-steps li::before { content:counter(registration-step); position:absolute; inset-inline-start:10px; top:11px; display:grid; place-items:center; width:24px; height:24px; border-radius:50%; background:#302713; color:var(--gold); font-size:.78rem; font-weight:900; }
+.registration-steps strong,.registration-steps span { display:block; overflow-wrap:anywhere; }
+.registration-steps strong { font-size:.8rem; }
+.registration-steps span { margin-top:3px; color:var(--muted); font-size:.7rem; line-height:1.35; }
 .tabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
 .tab,.secondary { border:1px solid var(--line); border-radius:10px; background:#0c1017; color:var(--muted); padding:11px 16px; font:inherit; font-weight:700; cursor:pointer; }
 .tab.active { border-color:#795d24; color:var(--gold); background:#1b170e; }
@@ -49,4 +55,4 @@ textarea { resize:vertical; min-height:96px; }
 #idea-list p { grid-column:1/-1; margin:6px 0 0; color:var(--muted); font-size:.85rem; }
 .admin-link { display:block; width:max-content; margin:0 auto 14px; font-weight:800; }
 .disclaimer { margin:24px auto 0; max-width:620px; color:#778294; font-size:.78rem; text-align:center; }
-@media (max-width:560px) { .shell{width:min(100% - 20px,720px);padding-top:18px}.hero{padding:40px 8px 24px}.stats{grid-template-columns:1fr}.stats>p{grid-column:auto}.card{padding:18px}.stats>div{padding:14px 10px} }
+@media (max-width:560px) { .shell{width:min(100% - 20px,720px);padding-top:18px}.hero{padding:40px 8px 24px}.stats{grid-template-columns:1fr}.stats>p{grid-column:auto}.card{padding:18px}.stats>div{padding:14px 10px}.registration-steps{grid-template-columns:1fr}.registration-steps li{min-height:54px} }

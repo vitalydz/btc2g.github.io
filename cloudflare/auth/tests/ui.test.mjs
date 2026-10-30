@@ -23,6 +23,18 @@ test('registration fields explain their accepted format before submission', asyn
   assert.match(script, /Enter the password for this account/);
 });
 
+test('registration flow explains that email verification completes the account', async () => {
+  const [accountPage, accountCss] = await Promise.all(['index.html', 'account.css'].map(path => readFile(new URL(path, root), 'utf8')));
+  assert.match(accountPage, /class="registration-steps" aria-label="Registration steps"/);
+  assert.match(accountPage, /<strong>Create account<\/strong>/);
+  assert.match(accountPage, /<strong>Check your inbox<\/strong>/);
+  assert.match(accountPage, /Open the verification link within 30 minutes/);
+  assert.match(accountPage, /<strong>Email verified<\/strong>/);
+  assert.match(accountPage, /Your registration is complete/);
+  assert.match(accountCss, /\.registration-steps\s*\{/);
+  assert.match(accountCss, /@media \(max-width:560px\)[^{]*\{[^}]*[\s\S]*\.registration-steps\{grid-template-columns:1fr\}/);
+});
+
 test('homepage form receipt does not claim confirmation and Premium CTA uses existing form', async () => {
   const source = await readFile(new URL('../../../index.html', import.meta.url), 'utf8');
   assert.equal((source.match(/subscribeSuccess:/g) || []).length, 19);
