@@ -66,9 +66,14 @@
   function signed(value) { return `${value > 0 ? '+' : ''}${number(value,2)}%`; }
   function renderLanguage() {
     Object.entries(textIds).forEach(([key,id]) => { if (byId(id)) byId(id).textContent = t(key); });
+    if (root.BTC2GLanguages) root.BTC2GLanguages.apply(lang);
     document.documentElement.lang = lang; document.documentElement.dir = ['he','ar'].includes(lang) ? 'rtl' : 'ltr';
-    byId('scenario-language').value = lang; byId('scenario-language').setAttribute('aria-label', lang === 'ru' ? 'Язык' : 'Language');
+    byId('scenario-language').value = lang; byId('scenario-language').setAttribute('aria-label', root.BTC2GLanguageText ? root.BTC2GLanguageText.text(lang).language : (lang === 'ru' ? 'Язык' : 'Language'));
     document.title = t('title');
+    document.querySelector?.('meta[name=description]')?.setAttribute('content', t('intro') + ' ' + t('disclaimer'));
+    document.querySelector?.('.brand')?.setAttribute('aria-label', t('back'));
+    document.querySelector?.('.scenario-header nav')?.setAttribute('aria-label', t('title'));
+    document.querySelector?.('.scenario-actions')?.setAttribute('aria-label', t('copy') + ' / ' + t('share'));
     byId('data-status').textContent = t(dataState);
     byId('data-status').className = 'data-status' + (dataState === 'loaded' ? ' ready' : dataState === 'error' ? ' error' : '');
     render();
@@ -111,7 +116,7 @@
   document.addEventListener('DOMContentLoaded',()=>{
     const params=new URLSearchParams(root.location.search); let stored;
     try { stored=root.localStorage.getItem('lang'); } catch {}
-    const saved=String(params.get('lang')||stored||root.navigator.language||'en').toLowerCase().split('-')[0];
+    const saved=root.BTC2GLanguages ? root.BTC2GLanguages.requested() : String(params.get('lang')||stored||root.navigator.language||'en').toLowerCase().split('-')[0];
     lang=Object.hasOwn(translations,saved)?saved:'en'; readInputs(); renderLanguage();
     byId('scenario-language').addEventListener('change',event=>{lang=Object.hasOwn(translations,event.target.value)?event.target.value:'en'; try{root.localStorage.setItem('lang',lang);}catch{} renderLanguage();});
     ['btc-change','gold-change','target-ratio'].forEach(id=>byId(id).addEventListener('input',render));

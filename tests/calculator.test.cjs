@@ -44,6 +44,7 @@ class Clock extends Date { constructor(...args) { super(...(args.length ? args :
 const window = { document: { getElementById: element, addEventListener() {} }, setInterval() {} };
 const context = vm.createContext({ window, Date: Clock, Intl });
 const root = path.join(__dirname, '..');
+vm.runInContext(fs.readFileSync(path.join(root, 'assets/js/ui-text.js'), 'utf8'), context);
 vm.runInContext(fs.readFileSync(path.join(root, 'assets/js/audience-text.js'), 'utf8'), context);
 vm.runInContext(fs.readFileSync(path.join(root, 'assets/js/ratio-tools.js'), 'utf8'), context);
 window.BTC2GTools.update(signal, meta, 'en');

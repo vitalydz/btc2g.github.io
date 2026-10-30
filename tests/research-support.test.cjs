@@ -40,7 +40,7 @@ test('support block states the exact asset, network, address, and safety boundar
 test('copy control uses the exact address and has all 19 translations', async () => {
   const nodes = new Map();
   const document = {
-    documentElement: {},
+    documentElement: {}, querySelectorAll() { return []; },
     getElementById(id) {
       if (id === 'research-language') return null;
       if (!nodes.has(id)) nodes.set(id, { textContent: '', addEventListener() {} });
@@ -51,10 +51,13 @@ test('copy control uses the exact address and has all 19 translations', async ()
   const context = {
     document,
     navigator: { clipboard: { async writeText(value) { copied = value; } } },
+    URL, location: {search: '', href:'https://btc2g.com/research.html', origin:'https://btc2g.com'},
     URLSearchParams,
     window: { location: {search: ''} },
   };
   vm.createContext(context);
+  vm.runInContext(fs.readFileSync(path.join(root, 'assets/js/languages.js'),'utf8'),context);
+  vm.runInContext(fs.readFileSync(path.join(root, 'assets/js/ui-text.js'),'utf8'),context);
   vm.runInContext(script, context);
   assert.equal(context.window.BTC2GResearch.ADDRESS, address);
   assert.equal(Object.keys(context.window.BTC2GResearch.translations).length, 19);

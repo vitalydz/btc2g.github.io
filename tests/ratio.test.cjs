@@ -22,6 +22,9 @@ const context = vm.createContext({
   LOCALE_BY_LANGUAGE: {en: 'en-US', ru: 'ru-RU'},
   setTextById: (id, value) => { output[id] = value; },
 });
+context.window = {};
+vm.runInContext(fs.readFileSync(path.join(root, 'assets/js/ui-text.js'), 'utf8'), context);
+vm.runInContext(html.match(/    function getUIWords\([^]*?\n    \}/)[0], context);
 vm.runInContext(renderRatio, context);
 for (const ratio of [undefined, null, 0, -1, NaN, Infinity, '40']) {
   context.currentSignalData = {ratio};

@@ -174,14 +174,26 @@
 
     <div class="language-control">
       <select id="language-select" aria-label="Language">
-        <option value="en">English</option>
-        <option value="ru">Русский</option>
-        <option value="he">עברית</option>
-        <option value="de">Deutsch</option>
-        <option value="fr">Français</option>
-        <option value="es">Español</option>
-        <option value="zh">中文</option>
-      </select>
+          <option value="en">English</option>
+          <option value="ru">Русский</option>
+          <option value="he">עברית</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+          <option value="es">Español</option>
+          <option value="zh">中文</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+          <option value="ar">العربية</option>
+          <option value="hi">हिन्दी</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="tr">Türkçe</option>
+          <option value="pl">Polski</option>
+          <option value="nl">Nederlands</option>
+          <option value="uk">Українська</option>
+          <option value="id">Bahasa Indonesia</option>
+          <option value="vi">Tiếng Việt</option>
+        </select>
     </div>
 
     <div id="moonpay" class="moonpay-section">
@@ -199,6 +211,8 @@
     <p class="footer-text" id="footer-text">Provider availability depends on country.</p>
   </div>
 
+  <script src="assets/js/languages.js?v=20261030-7"></script>
+  <script src="assets/js/ui-text.js?v=20261030-7"></script>
   <script>
     // Keep provider-specific links focused on the selected provider.
     function selectProvider() {
@@ -211,6 +225,7 @@
     window.addEventListener('hashchange', selectProvider);
   </script>
 
+  <script src="assets/js/buy-locales.js?v=20261030-7"></script>
   <script type="module">
     let currentLang = 'en';
 
@@ -352,18 +367,21 @@
       zh: {soon: '打开官网 ↗', message: '链接会在新标签页打开服务商官方网站。BTC2G 不处理付款。', home: '返回 BTC2G', footer: '服务是否可用取决于所在国家。'},
     };
 
+    Object.assign(texts, window.BTC2GBuyLocales.texts);
+    Object.assign(availability, window.BTC2GBuyLocales.availability);
+    window.BTC2GLanguages.options(document.getElementById('language-select'));
+
     function setLang(lang) {
-      localStorage.setItem('lang', lang);
+      lang = window.BTC2GLanguages.apply(lang);
       currentLang = lang;
+      document.title = 'BTC2G · ' + texts[lang].title;
       document.documentElement.lang = lang;
-      document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+      document.documentElement.dir = ['he','ar'].includes(lang) ? 'rtl' : 'ltr';
       document.getElementById('language-select').value = lang;
       document.getElementById('language-select').setAttribute('aria-label', texts[lang].languageLabel);
       document.getElementById('language-select').title = texts[lang].languageLabel;
       document.getElementById('title').textContent = texts[lang].title;
-      document.getElementById('buy-btn').textContent = texts[lang].buyBtn;
       document.getElementById('topper-title').textContent = texts[lang].topperTitle;
-      document.getElementById('topper-btn').textContent = texts[lang].topperBtn;
       const notice = availability[lang] || availability.en;
       document.getElementById('provider-notice').textContent = notice.message;
       document.getElementById('buy-btn').textContent = `MoonPay — ${notice.soon}`;
@@ -371,8 +389,9 @@
       document.getElementById('back-home').textContent = notice.home;
       document.getElementById('footer-text').textContent = notice.footer;
       const saveLabels = { en: 'Compare final BTC quotes →', ru: 'Сравнить итоговые котировки BTC →', he: 'השוואת הצעות BTC סופיות ←', de: 'Endgültige BTC-Angebote vergleichen →', fr: 'Comparer les offres finales en BTC →', es: 'Comparar cotizaciones finales de BTC →', zh: '比较最终 BTC 报价 →' };
+      Object.assign(saveLabels, window.BTC2GBuyLocales.saveLabels);
       document.getElementById('save-link').textContent = saveLabels[lang] || saveLabels.en;
-      document.getElementById('save-link').href = 'save.html?lang=' + (['en', 'ru', 'he'].includes(lang) ? lang : 'en');
+      document.getElementById('save-link').href = 'save.html?lang=' + lang;
     }
 
     window.setLang = setLang;
@@ -380,7 +399,7 @@
       setLang(event.target.value);
     });
 
-    const savedLang = localStorage.getItem('lang');
+    const savedLang = window.BTC2GLanguages.requested();
     const browserLang = navigator.language.slice(0, 2).toLowerCase();
     const supportedLangs = Object.keys(texts);
 

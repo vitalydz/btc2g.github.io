@@ -12,7 +12,7 @@
     runoff_closes: Date.parse('2027-03-02T00:00:00+02:00') / 1000
   });
   const pending=new Map();
-  try {lang=localStorage.getItem('lang')||navigator.language.split('-')[0];} catch (_) { /* Language storage is optional. */ }
+  lang=window.BTC2GLanguages.requested();
   if (!texts[lang]) lang='en';
   const t=key=>texts[lang][key];
   function node(tag,value,className) {const n=document.createElement(tag);if(value!==undefined)n.textContent=value;if(className)n.className=className;return n;}
@@ -29,7 +29,7 @@
     $('detail').showModal();
   }
   function render() {
-    document.documentElement.lang=lang;document.documentElement.dir=['he','ar'].includes(lang)?'rtl':'ltr';
+    window.BTC2GLanguages.apply(lang);
     document.querySelectorAll('[data-t]').forEach(n=>{n.textContent=t(n.dataset.t);});
     $('language').value=lang;$('language').setAttribute('aria-label',t('language'));
     $('availability').textContent=t('prep');$('mode-note').textContent=t(state?'demo':'blocked');
@@ -101,7 +101,7 @@
     finally{busy=false;render();}
   }
   $('language').replaceChildren(...Object.entries(names).map(([code,name])=>{const o=node('option',name);o.value=code;return o;}));
-  $('language').addEventListener('change',e=>{lang=e.target.value;try{localStorage.setItem('lang',lang);}catch(_){/* Keep preference in memory. */}message('');render();});
+  $('language').addEventListener('change',e=>{lang=e.target.value;window.BTC2GLanguages.apply(lang);message('');render();});
   $('login-form').addEventListener('submit',async e=>{e.preventDefault();if(busy)return;busy=true;try{await request('login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:$('code').value})});$('code').value='';await refresh();}catch(_){message(t('auth'));}finally{busy=false;render();}});
   $('logout').addEventListener('click',()=>mutate('logout',{},'prep'));
   $('retry').addEventListener('click',()=>refresh());
