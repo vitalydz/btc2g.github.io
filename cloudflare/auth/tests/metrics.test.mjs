@@ -460,3 +460,92 @@ test('email verification fails closed when delivery is not configured', async t 
   assert.equal(response.status, 503);
   assert.equal(db.prepare('SELECT COUNT(*) AS count FROM email_verification_tokens').get().count, 0);
 });
+
+
+// Full ceremonies use ES256 signatures and CBOR/COSE data, with the real verifier.
+import { authenticator } from './webauthn-fixture.mjs';
+async function passkeyAdmin(t) {
+  const {db,env}=database(t); const headers=admin(db);
+  const salt='test-salt';
+  const key=await crypto.subtle.importKey('raw',new TextEncoder().encode('CorrectPass9'),'PBKDF2',false,['deriveBits']);
+  const bits=await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:new TextEncoder().encode(`${salt}:0`),iterations:1},key,256);
+  db.prepare("UPDATE users SET password_hash=?, password_salt=? WHERE id='admin'").run(Buffer.from(bits).toString('base64url'),salt);
+  const post=(path,input,cookie=headers.Cookie)=>worker.fetch(new Request(`https://metrics.test/api/${path}`,{
+    method:'POST',headers:{Origin:env.APP_ORIGIN,'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})},body:JSON.stringify(input)
+  }),env);
+  const options=async()=>{const r=await post('passkeys/registration/options',{password:'CorrectPass9'});assert.equal(r.status,200);return r.json();};
+  const login=async()=>{const r=await post('login',{username:'Admin',password:'CorrectPass9'},null);assert.equal(r.status,200);assert.equal(r.headers.get('set-cookie'),null);return r.json();};
+  return {db,env,headers,post,options,login};
+}
+test('real WebAuthn enrollment, backup enrollment, login, replay and old-session revocation',async t=>{
+  const f=await passkeyAdmin(t), device=authenticator();
+  const token='another-old-session';
+  f.db.prepare("INSERT INTO sessions(token_hash,user_id,created_at,expires_at) VALUES(?,'admin',0,?)")
+    .run(createHash('sha256').update(token).digest('base64url'),Math.floor(Date.now()/1000)+3600);
+  const setup=await f.options(), registration={challengeId:setup.challengeId,credential:device.registration(setup.options)};
+  assert.equal((await f.post('passkeys/registration/verify',registration)).status,200);
+  assert.equal((await f.post('passkeys/registration/verify',registration)).status,400);
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM sessions').get().n,1);
+  assert.equal((await worker.fetch(new Request('https://metrics.test/api/admin/stats',{headers:{Cookie:`btc2g_session=${token}`}}),f.env)).status,403);
+  const backup=authenticator(), second=await f.options();
+  assert.equal((await f.post('passkeys/registration/verify',{challengeId:second.challengeId,credential:backup.registration(second.options),name:'Offline backup'})).status,200);
+  for(const [d,counter] of [[device,1],[backup,1]]) {
+    const login=await f.login(), input={challengeId:login.challengeId,credential:d.assertion(login.options,{counter})};
+    const verified=await f.post('passkeys/authenticate',input,null);
+    assert.equal(verified.status,200); assert.match(verified.headers.get('set-cookie'),/HttpOnly/);
+    assert.equal((await f.post('passkeys/authenticate',input,null)).status,400);
+    assert.equal((await worker.fetch(new Request('https://metrics.test/api/admin/stats',{headers:{Cookie:verified.headers.get('set-cookie')}}),f.env)).status,200);
+  }
+});
+test('real verifier rejects wrong origins, RP, missing UV, forged signatures, expired and replaced challenges',async t=>{
+  const f=await passkeyAdmin(t), d=authenticator();
+  let setup=await f.options();
+  assert.equal((await f.post('passkeys/registration/verify',{challengeId:setup.challengeId,credential:d.registration(setup.options,'https://evil.test')})).status,400);
+  setup=await f.options(); f.db.prepare('UPDATE webauthn_challenges SET expires_at=0').run();
+  assert.equal((await f.post('passkeys/registration/verify',{challengeId:setup.challengeId,credential:d.registration(setup.options)})).status,400);
+  setup=await f.options();
+  assert.equal((await f.post('passkeys/registration/verify',{challengeId:setup.challengeId,credential:d.registration(setup.options)})).status,200);
+  for(const mutation of [{origin:'https://evil.test'},{rp:'evil.test'},{flags:1},{badSignature:true}]) {
+    const login=await f.login(); const input={challengeId:login.challengeId,credential:d.assertion(login.options,mutation)};
+    const r=await f.post('passkeys/authenticate',input,null);assert.equal(r.status,401);assert.equal(r.headers.get('set-cookie'),null);
+    assert.equal((await f.post('passkeys/authenticate',input,null)).status,400);
+  }
+  let login=await f.login(); f.db.prepare('UPDATE webauthn_challenges SET expires_at=?').run(Math.floor(Date.now()/1000));
+  assert.equal((await f.post('passkeys/authenticate',{challengeId:login.challengeId,credential:d.assertion(login.options)},null)).status,400);
+  login=await f.login();await f.login();
+  assert.equal((await f.post('passkeys/authenticate',{challengeId:login.challengeId,credential:d.assertion(login.options)},null)).status,400);
+});
+test('enrollment password lock is enforced before checking a correct password',async t=>{
+  const f=await passkeyAdmin(t);
+  for(let i=0;i<5;i++) await f.post('passkeys/registration/options',{password:'wrong'});
+  assert.equal((await f.post('passkeys/registration/options',{password:'CorrectPass9'})).status,429);
+});
+test('unverified admin sessions fail closed even if an old row survives enrollment',async t=>{
+  const f=await passkeyAdmin(t),d=authenticator(),setup=await f.options();
+  await f.post('passkeys/registration/verify',{challengeId:setup.challengeId,credential:d.registration(setup.options)});
+  const token='surviving-unverified-session';
+  f.db.prepare("INSERT INTO sessions(token_hash,user_id,created_at,expires_at) VALUES(?,'admin',0,?)")
+    .run(createHash('sha256').update(token).digest('base64url'),Math.floor(Date.now()/1000)+3600);
+  const r=await worker.fetch(new Request('https://metrics.test/api/admin/stats',{headers:{Cookie:`btc2g_session=${token}`}}),f.env);
+  assert.equal(r.status,403);
+  assert.equal((await f.post('passkeys/registration/options',{password:'CorrectPass9'},`btc2g_session=${token}`)).status,403);
+});
+test('failed enrollment transaction rolls back credential and keeps old sessions unverified',async t=>{
+  const f=await passkeyAdmin(t),d=authenticator(),setup=await f.options();
+  f.db.exec("CREATE TRIGGER fail_session_update BEFORE UPDATE ON sessions BEGIN SELECT RAISE(ABORT, 'injected failure'); END;");
+  t.mock.method(console,'error',()=>{});
+  assert.equal((await f.post('passkeys/registration/verify',{challengeId:setup.challengeId,credential:d.registration(setup.options)})).status,500);
+  assert.equal(f.db.prepare('SELECT COUNT(*) n FROM passkeys').get().n,0);
+  assert.equal(f.db.prepare('SELECT passkey_verified_at FROM sessions').get().passkey_verified_at,null);
+});
+test('0006 upgrades populated pre-MFA schema without changing users or sessions',t=>{
+  const db=new DatabaseSync(':memory:');t.after(()=>db.close());db.exec('PRAGMA foreign_keys=ON');
+  for(const file of ['0001_initial.sql','0002_traffic_metrics.sql','0003_acquisition_attribution.sql','0004_email_verification.sql','0005_login_rate_limits.sql'])
+    db.exec(readFileSync(new URL(`../migrations/${file}`,import.meta.url),'utf8'));
+  db.exec("INSERT INTO users(id,username,username_key,password_hash,password_salt,password_iterations,role,created_at,created_day,accepted_terms_at,terms_version) VALUES('legacy','Legacy','legacy','hash','salt',210000,'admin',1,'2026-10-29',1,'test'); INSERT INTO sessions(token_hash,user_id,created_at,expires_at) VALUES('hash','legacy',1,2000000000);");
+  db.exec(readFileSync(new URL('../migrations/0006_admin_passkeys.sql',import.meta.url),'utf8'));
+  assert.equal(db.prepare('SELECT password_hash FROM users').get().password_hash,'hash');
+  assert.equal(db.prepare('SELECT passkey_verified_at FROM sessions').get().passkey_verified_at,null);
+  assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);
+  assert.throws(()=>db.exec(readFileSync(new URL('../migrations/0006_admin_passkeys.sql',import.meta.url),'utf8')),/duplicate column/);
+});
