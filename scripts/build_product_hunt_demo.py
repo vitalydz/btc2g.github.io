@@ -102,7 +102,7 @@ def add_overlays(frame: np.ndarray, scene: dict, progress: float, overall: float
     cv2.rectangle(overlay, (0, 0), (WIDTH, 82), (4, 15, 29), -1)
     cv2.rectangle(overlay, (0, HEIGHT - 98), (WIDTH, HEIGHT), (4, 15, 29), -1)
     frame = cv2.addWeighted(overlay, 0.88, frame, 0.12, 0)
-    cv2.putText(frame, "BTC2G", (42, 51), cv2.FONT_HERSHEY_SIMPLEX, 0.86, (247, 147, 26), 2, cv2.LINE_AA)
+    cv2.putText(frame, "BTC2G", (42, 58), cv2.FONT_HERSHEY_SIMPLEX, 1.075, (55, 175, 212), 3, cv2.LINE_AA)
     cv2.putText(frame, scene["label"], (WIDTH - 365, 49), cv2.FONT_HERSHEY_SIMPLEX, 0.58, (212, 175, 55), 2, cv2.LINE_AA)
     cv2.putText(frame, scene["caption"], (46, HEIGHT - 43), cv2.FONT_HERSHEY_SIMPLEX, 0.72, (245, 247, 250), 2, cv2.LINE_AA)
     cv2.rectangle(frame, (0, HEIGHT - 6), (int(WIDTH * overall), HEIGHT), (247, 147, 26), -1)
