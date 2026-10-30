@@ -48,20 +48,27 @@ const snapshot = {
 test('account statistics recover from failure and never leave stale figures visible', async () => {
   const ui = page('../public/index.html');
   let failure = false;
+  let response = snapshot;
   const source = readFileSync(new URL('../public/account.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/gm, '');
   const context = vm.createContext({ document: ui.document, formatCount, measurementNote,
     request: async path => {
       if (path === '/api/me') return { user: null };
       if (failure) throw new Error('Service unavailable');
-      return snapshot;
+      return response;
     }
   });
   vm.runInContext(source, context);
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(ui.nodes.get('#views-count').textContent, '9');
-  assert.equal(ui.nodes.get('#subscribers-count').textContent, 'Data unavailable');
+  assert.equal(ui.nodes.get('#subscribers-card').hidden, true);
+  assert.equal(ui.nodes.get('#subscribers-count').textContent, '—');
+  response = { ...snapshot, confirmedSubscribers: { status: 'available', total: 12 } };
+  await context.refreshStats();
+  assert.equal(ui.nodes.get('#subscribers-card').hidden, false);
+  assert.equal(ui.nodes.get('#subscribers-count').textContent, '12');
   failure = true;
   await context.refreshStats();
+  assert.equal(ui.nodes.get('#subscribers-card').hidden, true);
   for (const id of ['#today-count', '#total-count', '#visitors-count', '#views-count']) {
     assert.equal(ui.nodes.get(id).textContent, 'Data unavailable');
   }

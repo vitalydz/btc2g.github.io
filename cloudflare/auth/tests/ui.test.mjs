@@ -11,6 +11,14 @@ test('preserves hidden authenticated state and offers useful public tools', asyn
   assert.match(html, /https:\/\/btc2g.com\/index.html#calculator/);
 });
 
+test('unavailable subscriber totals stay out of the public account summary', async () => {
+  const [html, script, css] = await Promise.all(['index.html', 'account.js', 'account.css'].map(path => readFile(new URL(path, root), 'utf8')));
+  assert.match(html, /id="subscribers-card" hidden/);
+  assert.match(script, /confirmedSubscribers\?\.status === 'available'/);
+  assert.match(script, /subscribersCard\.hidden = !Number\.isInteger\(subscriberTotal\)/);
+  assert.match(css, /:has\(#subscribers-card\[hidden\]\)/);
+});
+
 test('registration fields explain their accepted format before submission', async () => {
   const [html, script] = await Promise.all(['index.html', 'account.js'].map(path => readFile(new URL(path, root), 'utf8')));
   assert.match(html, /aria-describedby="username-hint"/);

@@ -39,6 +39,7 @@ function setMessage(text, success = false) {
 }
 
 async function refreshStats() {
+  const subscribersCard = document.querySelector('#subscribers-card');
   try {
     const data = await request('/api/stats');
     const note = measurementNote(data);
@@ -46,9 +47,13 @@ async function refreshStats() {
     document.querySelector('#total-count').textContent = formatCount(data.totalAccounts);
     document.querySelector('#visitors-count').textContent = formatCount(data.traffic?.visitorsToday);
     document.querySelector('#views-count').textContent = formatCount(data.traffic?.viewsToday);
-    document.querySelector('#subscribers-count').textContent = formatCount(data.confirmedSubscribers?.total);
+    const subscriberTotal = data.confirmedSubscribers?.status === 'available'
+      ? data.confirmedSubscribers.total : null;
+    subscribersCard.hidden = !Number.isInteger(subscriberTotal) || subscriberTotal < 0;
+    document.querySelector('#subscribers-count').textContent = subscribersCard.hidden ? '—' : formatCount(subscriberTotal);
     document.querySelector('#stats-note').textContent = `${note} Visitors are daily browser/IP estimates, not verified people. Accounts are not email subscriptions.`;
   } catch {
+    subscribersCard.hidden = true;
     document.querySelectorAll('.stats [data-count]').forEach(item => { item.textContent = 'Data unavailable'; });
     document.querySelector('#stats-note').textContent = 'Data unavailable. The statistics service could not be reached. Retry below.';
   }
