@@ -766,14 +766,19 @@ async function audienceConfirmedSubscriptions(env) {
       return confirmedSubscriptions();
     }
     const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${env.AUDIENCE_STATS_TOKEN}`, Accept: 'application/json' },
-      redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(5000)
+      headers: {
+        Authorization: `Bearer ${env.AUDIENCE_STATS_TOKEN}`,
+        Accept: 'application/json',
+        'Cache-Control': 'no-cache'
+      },
+      redirect: 'manual', signal: AbortSignal.timeout(5000)
     });
-    if (!response.ok) throw new Error('Audience statistics request failed.');
+    if (!response.ok) throw new Error(`Audience statistics request failed with HTTP ${response.status}.`);
     const text = await response.text();
     if (text.length > 16384) throw new Error('Audience statistics response is too large.');
     return confirmedSubscriptionsFromAudience(JSON.parse(text));
-  } catch {
+  } catch (error) {
+    console.warn('Audience statistics bridge unavailable:', error?.name || 'Error', error?.message || 'Unknown error');
     return {
       status: 'unavailable', total: null, newToday: null,
       reason: 'The confirmed subscriber source is temporarily unavailable.'

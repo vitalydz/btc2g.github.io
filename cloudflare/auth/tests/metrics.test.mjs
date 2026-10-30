@@ -124,6 +124,9 @@ test('server-side audience bridge exposes confirmed subscribers without exposing
   t.mock.method(globalThis, 'fetch', async (url, options) => {
     assert.equal(String(url), 'https://audience.example.com/api/stats');
     assert.equal(options.headers.Authorization, 'Bearer private-stats-token');
+    assert.equal(options.headers['Cache-Control'], 'no-cache');
+    assert.equal(options.redirect, 'manual');
+    assert.equal('cache' in options, false);
     return new Response(JSON.stringify({
       source: 'BTC2G PostgreSQL audience v1', measuredAt: '2026-10-30T20:00:00Z',
       confirmedSubscribers: { active: 3, confirmedToday: 1 }
