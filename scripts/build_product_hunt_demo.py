@@ -145,23 +145,40 @@ def logo_intro_frame(home_frame: np.ndarray, logo: np.ndarray, elapsed: float) -
     background = np.repeat(((1 - y[..., None]) * top + y[..., None] * bottom), WIDTH, axis=1).astype(np.uint8)
     content = background.copy()
 
-    logo_size = 318
+    logo_size = 413
     logo_square = cv2.resize(logo, (logo_size, logo_size), interpolation=cv2.INTER_AREA)
     left = (WIDTH - logo_size) // 2
-    top_y = 125
+    top_y = 62
     opacity = min(1.0, elapsed / 0.8)
     if elapsed > 2.2:
         opacity = max(0.0, 1.0 - (elapsed - 2.2) / (INTRO_SECONDS - 2.2))
     content[top_y : top_y + logo_size, left : left + logo_size] = logo_square
-    cv2.putText(content, "BTC2G", (WIDTH // 2 - 102, 510), cv2.FONT_HERSHEY_SIMPLEX, 1.42, (247, 247, 250), 3, cv2.LINE_AA)
+    title = "BTC2G"
+    title_scale = 1.85
+    title_thickness = 4
+    title_width = cv2.getTextSize(title, cv2.FONT_HERSHEY_SIMPLEX, title_scale, title_thickness)[0][0]
     cv2.putText(
         content,
-        "BITCOIN VERSUS GOLD, WITH THE UNCERTAINTY LEFT IN",
-        (WIDTH // 2 - 390, 566),
+        title,
+        ((WIDTH - title_width) // 2, 550),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.62,
-        (212, 175, 55),
-        2,
+        title_scale,
+        (55, 175, 212),
+        title_thickness,
+        cv2.LINE_AA,
+    )
+    slogan = "From era of gold to era of crypto."
+    slogan_scale = 0.81
+    slogan_thickness = 2
+    slogan_width = cv2.getTextSize(slogan, cv2.FONT_HERSHEY_SIMPLEX, slogan_scale, slogan_thickness)[0][0]
+    cv2.putText(
+        content,
+        slogan,
+        ((WIDTH - slogan_width) // 2, 620),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        slogan_scale,
+        (247, 247, 250),
+        slogan_thickness,
         cv2.LINE_AA,
     )
     intro = cv2.addWeighted(background, 1.0 - opacity, content, opacity, 0)
