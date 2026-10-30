@@ -13,13 +13,14 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSET_DIR = ROOT / "product-hunt"
 SILENT_OUTPUT = ASSET_DIR / "btc2g-demo-motion-silent.mp4"
 VOICE_OUTPUT = ASSET_DIR / "btc2g-demo-voice.mp3"
-OUTPUT = ASSET_DIR / "btc2g-demo-36s-female.mp4"
+OUTPUT = ASSET_DIR / "btc2g-demo-42s-female.mp4"
 REFERENCE_MUSIC = ROOT.parent / "Voice" / "___Simona____.m4a"
 WIDTH, HEIGHT = 1270, 760
 FPS = 30
-SECONDS_PER_SCENE = 9
 FADE_FRAMES = 24
-VOICE_NAME = "en-US-AvaNeural"
+INTRO_SECONDS = 3.6
+VOICE_DELAY_MS = 2200
+VOICE_NAME = "en-US-AvaMultilingualNeural"
 
 VOICEOVER = (
     "BTC2G answers one simple question: how much gold does one Bitcoin represent? "
@@ -38,6 +39,7 @@ SCENES = [
         "start": (0.50, 0.48, 1.00),
         "end": (0.69, 0.37, 1.12),
         "cursor": ((0.79, 0.36), (0.72, 0.48)),
+        "seconds": 12,
     },
     {
         "file": "02-forecast.jpg",
@@ -46,6 +48,7 @@ SCENES = [
         "start": (0.50, 0.50, 1.02),
         "end": (0.66, 0.42, 1.13),
         "cursor": ((0.28, 0.66), (0.74, 0.35)),
+        "seconds": 10,
     },
     {
         "file": "03-calculator.jpg",
@@ -54,6 +57,7 @@ SCENES = [
         "start": (0.50, 0.43, 1.02),
         "end": (0.52, 0.54, 1.12),
         "cursor": ((0.47, 0.43), (0.63, 0.58)),
+        "seconds": 10,
     },
     {
         "file": "04-premium.jpg",
@@ -62,8 +66,10 @@ SCENES = [
         "start": (0.50, 0.50, 1.00),
         "end": (0.36, 0.54, 1.10),
         "cursor": ((0.82, 0.52), (0.20, 0.78)),
+        "seconds": 10,
     },
 ]
+TOTAL_DURATION = sum(scene["seconds"] for scene in SCENES)
 
 
 def ease(value: float) -> float:
@@ -131,23 +137,68 @@ def transition_frame(previous: np.ndarray, current: np.ndarray, alpha: float) ->
     return cv2.addWeighted(blended, 1.0, sweep, glow, 0)
 
 
+def logo_intro_frame(home_frame: np.ndarray, logo: np.ndarray, elapsed: float) -> np.ndarray:
+    """Show the BTC2G mark, then dissolve it into the live dashboard."""
+    y = np.linspace(0, 1, HEIGHT, dtype=np.float32)[:, None]
+    top = np.array([75, 44, 19], dtype=np.float32)
+    bottom = np.array([29, 15, 4], dtype=np.float32)
+    background = np.repeat(((1 - y[..., None]) * top + y[..., None] * bottom), WIDTH, axis=1).astype(np.uint8)
+    content = background.copy()
+
+    logo_size = 318
+    logo_square = cv2.resize(logo, (logo_size, logo_size), interpolation=cv2.INTER_AREA)
+    left = (WIDTH - logo_size) // 2
+    top_y = 125
+    opacity = min(1.0, elapsed / 0.8)
+    if elapsed > 2.2:
+        opacity = max(0.0, 1.0 - (elapsed - 2.2) / (INTRO_SECONDS - 2.2))
+    content[top_y : top_y + logo_size, left : left + logo_size] = logo_square
+    cv2.putText(content, "BTC2G", (WIDTH // 2 - 102, 510), cv2.FONT_HERSHEY_SIMPLEX, 1.42, (247, 247, 250), 3, cv2.LINE_AA)
+    cv2.putText(
+        content,
+        "BITCOIN VERSUS GOLD, WITH THE UNCERTAINTY LEFT IN",
+        (WIDTH // 2 - 390, 566),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.62,
+        (212, 175, 55),
+        2,
+        cv2.LINE_AA,
+    )
+    intro = cv2.addWeighted(background, 1.0 - opacity, content, opacity, 0)
+    if elapsed <= 2.2:
+        return intro
+    reveal = ease(min(1.0, (elapsed - 2.2) / (INTRO_SECONDS - 2.2)))
+    return cv2.addWeighted(intro, 1.0 - reveal, home_frame, reveal, 0)
+
+
 def build_motion_video() -> None:
     writer = cv2.VideoWriter(str(SILENT_OUTPUT), cv2.VideoWriter_fourcc(*"mp4v"), FPS, (WIDTH, HEIGHT))
     if not writer.isOpened():
         raise RuntimeError("OpenCV could not initialize the MP4 writer")
     previous = None
-    frames_per_scene = FPS * SECONDS_PER_SCENE
-    total_frames = frames_per_scene * len(SCENES)
+    total_frames = FPS * TOTAL_DURATION
+    logo = cv2.imread(str(ASSET_DIR / "btc2g-logo-512.png"), cv2.IMREAD_COLOR)
+    if logo is None:
+        raise FileNotFoundError(ASSET_DIR / "btc2g-logo-512.png")
     written = 0
     try:
-        for scene in SCENES:
+        for scene_index, scene in enumerate(SCENES):
+            frames_per_scene = FPS * scene["seconds"]
             image = cv2.imread(str(ASSET_DIR / scene["file"]), cv2.IMREAD_COLOR)
             if image is None:
                 raise FileNotFoundError(ASSET_DIR / scene["file"])
             for frame_number in range(frames_per_scene):
-                progress = frame_number / max(frames_per_scene - 1, 1)
+                elapsed = frame_number / FPS
+                if scene_index == 0:
+                    active_frame = max(0, frame_number - int(INTRO_SECONDS * FPS))
+                    active_total = max(1, frames_per_scene - int(INTRO_SECONDS * FPS) - 1)
+                    progress = min(1.0, active_frame / active_total)
+                else:
+                    progress = frame_number / max(frames_per_scene - 1, 1)
                 frame = add_overlays(motion_frame(image, scene, progress), scene, progress, (written + 1) / total_frames)
-                if previous is not None and frame_number < FADE_FRAMES:
+                if scene_index == 0 and elapsed < INTRO_SECONDS:
+                    frame = logo_intro_frame(frame, logo, elapsed)
+                if scene_index > 0 and previous is not None and frame_number < FADE_FRAMES:
                     alpha = (frame_number + 1) / (FADE_FRAMES + 1)
                     frame = transition_frame(previous, frame, alpha)
                 writer.write(frame)
@@ -160,7 +211,7 @@ def build_motion_video() -> None:
 async def build_voiceover() -> None:
     import edge_tts
 
-    speech = edge_tts.Communicate(VOICEOVER, VOICE_NAME, rate="+8%", pitch="+2Hz", volume="+0%")
+    speech = edge_tts.Communicate(VOICEOVER, VOICE_NAME, rate="+0%", pitch="+1Hz", volume="+0%")
     await speech.save(str(VOICE_OUTPUT))
 
 
@@ -171,20 +222,19 @@ def mux_audio(music_path: Path) -> None:
         raise RuntimeError("Install imageio-ffmpeg to create the narrated MP4") from error
     if not music_path.exists():
         raise FileNotFoundError(f"Reference music not found: {music_path}")
-    duration = SECONDS_PER_SCENE * len(SCENES)
+    duration = TOTAL_DURATION
     audio_filter = (
-        f"[2:a]atrim=0:{duration},asetpts=PTS-STARTPTS,highpass=f=80,lowpass=f=1200,"
-        f"volume=0.10,afade=t=in:st=0:d=1.2,afade=t=out:st={duration - 2}:d=2,"
-        "aformat=channel_layouts=stereo[music];"
-        "[1:a]volume=1.12,highpass=f=95,acompressor=threshold=-18dB:ratio=2.5:attack=10:release=220,"
+        f"[2:a]atrim=0:{duration},asetpts=PTS-STARTPTS,aformat=channel_layouts=stereo[music];"
+        f"[1:a]adelay={VOICE_DELAY_MS}|{VOICE_DELAY_MS},volume=1.55,highpass=f=95,"
+        "acompressor=threshold=-18dB:ratio=2.5:attack=10:release=220,"
         "aformat=channel_layouts=stereo[voice];"
-        "[music][voice]amix=inputs=2:duration=longest:dropout_transition=2,"
-        "loudnorm=I=-16:LRA=11:TP=-1.5,alimiter=limit=0.94[audio]"
+        "[music][voice]amix=inputs=2:duration=longest:dropout_transition=2:normalize=0,"
+        "alimiter=limit=0.95[audio]"
     )
     subprocess.run(
         [
             imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-i", str(SILENT_OUTPUT), "-i", str(VOICE_OUTPUT),
-            "-ss", "19.766", "-t", str(duration), "-i", str(music_path),
+            "-ss", "112", "-t", str(duration), "-i", str(music_path),
             "-filter_complex", audio_filter, "-map", "0:v:0", "-map", "[audio]",
             "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-c:a", "aac", "-b:a", "192k",
             "-ar", "48000",
@@ -205,7 +255,7 @@ def main() -> None:
     if not args.keep_intermediates:
         SILENT_OUTPUT.unlink(missing_ok=True)
         VOICE_OUTPUT.unlink(missing_ok=True)
-    print(f"Created {OUTPUT} ({SECONDS_PER_SCENE * len(SCENES)}s, {WIDTH}x{HEIGHT}, {FPS}fps, narrated)")
+    print(f"Created {OUTPUT} ({TOTAL_DURATION}s, {WIDTH}x{HEIGHT}, {FPS}fps, narrated)")
 
 
 if __name__ == "__main__":
