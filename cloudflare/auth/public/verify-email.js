@@ -55,6 +55,7 @@ button.addEventListener('click', async () => {
     });
     message.textContent = text[7];
     message.classList.add('success');
+    document.querySelector('#verify-return').focus();
   } catch (error) {
     message.textContent = error.status === 400 ? text[6] : error.status === 401 ? text[8] : error.message;
     button.disabled = false;
