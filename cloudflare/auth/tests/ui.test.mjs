@@ -129,6 +129,8 @@ test('signed-in account UI separates email verification from Premium and marketi
     assert.match(verificationScript, new RegExp(`\\b${language}:\\[`));
   }
   assert.match(verificationScript, /document\.documentElement\.dir = \['he','ar'\]/);
+  assert.match(verificationScript, /accountUrl = `\/\?lang=\$\{encodeURIComponent\(accountLanguage\)\}`/);
+  assert.match(verificationScript, /querySelector\('#verify-return'\)\.href = accountUrl/);
 });
 
 test('administrator UI supports passkey enrollment and second-factor sign-in', async () => {

@@ -29,7 +29,10 @@ document.documentElement.dir = ['he','ar'].includes(accountLanguage) ? 'rtl' : '
 document.title = `${text[1]} · BTC2G`;
 [['verify-eyebrow',0],['verify-title',1],['verify-intro',2],['confirm-email',3],['verify-return',4],['verify-disclaimer',5]]
   .forEach(([id,index]) => { document.getElementById(id).textContent = text[index]; });
+const accountUrl = `/?lang=${encodeURIComponent(accountLanguage)}`;
 document.querySelector('#verify-account-link').setAttribute('aria-label', text[4]);
+document.querySelector('#verify-account-link').href = accountUrl;
+document.querySelector('#verify-return').href = accountUrl;
 
 const button = document.querySelector('#confirm-email');
 const message = document.querySelector('#verify-message');
