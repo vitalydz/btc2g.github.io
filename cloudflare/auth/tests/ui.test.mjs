@@ -115,6 +115,9 @@ test('signed-in account UI separates email verification from Premium and marketi
     readFile(new URL('verify-email.js', root), 'utf8')
   ]);
   assert.match(html, /id="email-form"/);
+  assert.match(html, /id="username"[^>]+autocapitalize="none"[^>]+spellcheck="false"/);
+  assert.match(html, /id="registration-email"[^>]+inputmode="email"/);
+  assert.match(html, /id="password"[^>]+passwordrules="minlength: 12; maxlength: 128;"/);
   assert.match(html, /does not subscribe you to marketing or activate Premium/);
   assert.match(html, /https:\/\/btc2g\.com\/#subscribe/);
   assert.match(html, /Join the separate confirmed newsletter and choose the Sunday digest/);
