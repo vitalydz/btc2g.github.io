@@ -107,10 +107,11 @@ test('approved acquisition attribution is forwarded only through the account reg
 });
 
 test('signed-in account UI separates email verification from Premium and marketing', async () => {
-  const [html, script, verification] = await Promise.all([
+  const [html, script, verification, verificationScript] = await Promise.all([
     readFile(new URL('index.html', root), 'utf8'),
     readFile(new URL('account.js', root), 'utf8'),
-    readFile(new URL('verify-email.html', root), 'utf8')
+    readFile(new URL('verify-email.html', root), 'utf8'),
+    readFile(new URL('verify-email.js', root), 'utf8')
   ]);
   assert.match(html, /id="email-form"/);
   assert.match(html, /does not subscribe you to marketing or activate Premium/);
@@ -119,6 +120,11 @@ test('signed-in account UI separates email verification from Premium and marketi
   assert.match(script, /\/api\/email-verification\/request/);
   assert.match(verification, /id="confirm-email"/);
   assert.match(verification, /no-referrer/);
+  assert.match(verificationScript, /import \{ accountLanguage \}/);
+  for (const language of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
+    assert.match(verificationScript, new RegExp(`\\b${language}:\\[`));
+  }
+  assert.match(verificationScript, /document\.documentElement\.dir = \['he','ar'\]/);
 });
 
 test('administrator UI supports passkey enrollment and second-factor sign-in', async () => {

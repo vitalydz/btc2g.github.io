@@ -10,18 +10,18 @@
 </head>
 <body>
   <main class="shell">
-    <a class="brand" href="/" aria-label="Back to BTC2G account">₿<span>BTC2G</span></a>
+    <a class="brand" id="verify-account-link" href="/" aria-label="Back to BTC2G account">₿<span>BTC2G</span></a>
     <section class="hero">
-      <p class="eyebrow">ACCOUNT EMAIL</p>
-      <h1>Verify your email</h1>
-      <p>Confirm the address for the BTC2G account that is currently signed in.</p>
+      <p class="eyebrow" id="verify-eyebrow">ACCOUNT EMAIL</p>
+      <h1 id="verify-title">Verify your email</h1>
+      <p id="verify-intro">Confirm the address for the BTC2G account that is currently signed in.</p>
     </section>
     <section class="card">
       <button class="primary" id="confirm-email" type="button">Confirm email</button>
       <p class="message" id="verify-message" role="status" aria-live="polite"></p>
-      <p><a href="/">Return to account</a></p>
+      <p><a id="verify-return" href="/">Return to account</a></p>
     </section>
-    <p class="disclaimer">Email verification does not subscribe you to marketing or activate Premium.</p>
+    <p class="disclaimer" id="verify-disclaimer">Email verification does not subscribe you to marketing or activate Premium.</p>
   </main>
   <script type="module" src="/verify-email.js"></script>
 </body>
