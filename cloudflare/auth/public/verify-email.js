@@ -56,7 +56,7 @@ button.addEventListener('click', async () => {
     message.textContent = text[7];
     message.classList.add('success');
   } catch (error) {
-    message.textContent = error.message;
+    message.textContent = error.status === 400 ? text[6] : error.message;
     button.disabled = false;
   }
 });
