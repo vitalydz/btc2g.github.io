@@ -213,7 +213,7 @@ test('attributes a same-day Product Hunt registration with a signed browser-boun
 
   const registration = await worker.fetch(new Request('https://metrics.test/api/register', {
     method: 'POST', headers: { ...commonHeaders, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: 'ProductHunter', email: 'hunter@example.com', password: 'LongEnoughPass9', acceptedTerms: true, attribution })
+    body: JSON.stringify({ username: 'ProductHunter', email: 'hunter@example.com', password: 'LongEnoughPass9', acceptedTerms: true, attribution, language: 'ru' })
   }), configured);
   assert.equal(registration.status, 201);
   assert.equal(db.prepare("SELECT acquisition_source FROM users WHERE username_key = 'producthunter'").get().acquisition_source, 'producthunt');
@@ -231,7 +231,9 @@ test('attributes a same-day Product Hunt registration with a signed browser-boun
   const pendingPublic = await (await worker.fetch(new Request('https://metrics.test/api/stats'), configured)).json();
   assert.equal(pendingPublic.totalAccounts, 0);
 
-  const token = new URL(sent.text.match(/https:\/\/\S+/)[0]).searchParams.get('token');
+  const verificationUrl = new URL(sent.text.match(/https:\/\/\S+/)[0]);
+  assert.equal(verificationUrl.searchParams.get('lang'), 'ru');
+  const token = verificationUrl.searchParams.get('token');
   const confirmed = await worker.fetch(new Request('https://metrics.test/api/email-verification/confirm', {
     method: 'POST',
     headers: {

@@ -165,7 +165,7 @@ emailForm.addEventListener('submit', async event => {
     await request('/api/email-verification/request', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: emailInput.value })
+      body: JSON.stringify({ email: emailInput.value, language: accountLanguage })
     });
     emailMessage.textContent = accountLanguage === 'ru' ? 'Письмо подтверждения отправлено. Ссылка действует 30 минут.' : 'Verification email sent. The link expires in 30 minutes.';
     emailMessage.classList.add('success');
@@ -203,7 +203,8 @@ form.addEventListener('submit', async event => {
       email: mode === 'register' ? registrationEmail.value : undefined,
       password: form.password.value,
       acceptedTerms: mode === 'register' ? termsCheckbox.checked : undefined,
-      attribution: mode === 'register' ? new URLSearchParams(location.search).get('attribution') : undefined
+      attribution: mode === 'register' ? new URLSearchParams(location.search).get('attribution') : undefined,
+      language: accountLanguage
     };
     let data = await request(`/api/${mode}`, {
       method: 'POST',

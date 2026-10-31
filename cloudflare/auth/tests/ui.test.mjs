@@ -104,6 +104,7 @@ test('approved acquisition attribution is forwarded only through the account reg
   assert.match(traffic, /sessionStorage\.setItem\(storageKey, data\.attribution\)/);
   assert.match(traffic, /url\.searchParams\.set\('attribution'/);
   assert.match(account, /attribution: mode === 'register'/);
+  assert.match(account, /language: accountLanguage/);
 });
 
 test('signed-in account UI separates email verification from Premium and marketing', async () => {

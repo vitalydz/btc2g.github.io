@@ -34,6 +34,12 @@ const WEBAUTHN_CHALLENGE_SECONDS = 5 * 60;
 const WEBAUTHN_ALGORITHMS = [-7, -257];
 const IDEA_LIMIT_PER_ACCOUNT = 3;
 const IDEA_ATTEMPT_LIMIT_PER_MINUTE = 5;
+const ACCOUNT_LANGUAGES = new Set(['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']);
+
+function accountLanguage(value) {
+  const language = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return ACCOUNT_LANGUAGES.has(language) ? language : 'en';
+}
 
 function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -377,7 +383,7 @@ async function register(request, env, { admin = false } = {}) {
     try {
       await issueEmailVerification(env, { id, username: validation.username }, {
         ok: true, email: validation.email, emailKey: validation.emailKey
-      }, { checkDuplicate: false });
+      }, { checkDuplicate: false, language: accountLanguage(input?.language) });
       verificationEmailSent = true;
     } catch {
       // Keep the pending account accessible so the owner can sign in and retry delivery.
@@ -627,12 +633,13 @@ async function finishPasskeyAuthentication(request, env) {
   return json({ user: userView(key) }, 200, { 'set-cookie': sessionCookie(token) });
 }
 
-async function sendVerificationEmail(env, user, email, token) {
+async function sendVerificationEmail(env, user, email, token, language = 'en') {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM || !env.APP_ORIGIN) {
     throw new Error('Email delivery is not configured.');
   }
   const link = new URL('/verify-email.html', env.APP_ORIGIN);
   link.searchParams.set('token', token);
+  link.searchParams.set('lang', accountLanguage(language));
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -652,7 +659,7 @@ async function sendVerificationEmail(env, user, email, token) {
   if (!response.ok) throw new Error('Email delivery failed.');
 }
 
-async function issueEmailVerification(env, user, validation, { checkDuplicate = true } = {}) {
+async function issueEmailVerification(env, user, validation, { checkDuplicate = true, language = 'en' } = {}) {
   if (checkDuplicate) {
     const duplicate = await env.DB.prepare(`
       SELECT id FROM users WHERE email_key = ? AND id <> ? AND disabled_at IS NULL LIMIT 1
@@ -693,7 +700,7 @@ async function issueEmailVerification(env, user, validation, { checkDuplicate = 
   `).bind(tokenHash, user.id, validation.email, validation.emailKey, now,
     now + EMAIL_VERIFICATION_MAX_AGE_SECONDS).run();
   try {
-    await sendVerificationEmail(env, user, validation.email, token);
+    await sendVerificationEmail(env, user, validation.email, token, language);
   } catch {
     await env.DB.prepare('DELETE FROM email_verification_tokens WHERE token_hash = ?').bind(tokenHash).run();
     const error = new Error('Verification email could not be sent. Try again later.');
@@ -712,7 +719,7 @@ async function requestEmailVerification(request, env) {
   if (!validation.ok) return json({ error: 'Enter a valid email address.' }, 400);
 
   try {
-    const result = await issueEmailVerification(env, user, validation);
+    const result = await issueEmailVerification(env, user, validation, { language: accountLanguage(input?.language) });
     return json({ ok: true, ...result });
   } catch (error) {
     return json({ error: error.message }, error.status || 503);
