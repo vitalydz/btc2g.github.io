@@ -160,6 +160,11 @@ test('public stats exclude admin and distinguish no observations from measured z
   assert.equal(data.timeZone, 'Asia/Jerusalem');
   assert.ok(Number.isFinite(Date.parse(data.measuredAt)));
   assert.equal(result.headers.get('cache-control'), 'no-store');
+  assert.match(result.headers.get('content-security-policy'), /frame-ancestors 'none'/);
+  assert.equal(result.headers.get('permissions-policy'), 'camera=(), geolocation=(), microphone=(), payment=(), usb=()');
+  assert.equal(result.headers.get('referrer-policy'), 'no-referrer');
+  assert.equal(result.headers.get('x-content-type-options'), 'nosniff');
+  assert.equal(result.headers.get('x-frame-options'), 'DENY');
 });
 
 test('repeated page visits deduplicate daily visitor estimate but count each view', async t => {

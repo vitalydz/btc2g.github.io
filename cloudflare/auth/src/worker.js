@@ -48,6 +48,21 @@ function json(data, status = 200, headers = {}) {
   });
 }
 
+const SECURITY_HEADERS = {
+  'content-security-policy': "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests",
+  'permissions-policy': 'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
+  'referrer-policy': 'no-referrer',
+  'strict-transport-security': 'max-age=31536000; includeSubDomains',
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY'
+};
+
+function secured(response) {
+  const headers = new Headers(response.headers);
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value);
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
 function corsHeaders(origin, env) {
   if (!origin || origin !== env.PUBLIC_SITE_ORIGIN) return {};
   return {
@@ -1157,11 +1172,13 @@ export default {
   async fetch(request, env) {
     try {
       const url = new URL(request.url);
-      if (url.pathname.startsWith('/api/')) return await api(request, env);
-      return env.ASSETS.fetch(request);
+      const response = url.pathname.startsWith('/api/')
+        ? await api(request, env)
+        : await env.ASSETS.fetch(request);
+      return secured(response);
     } catch (error) {
       console.error('Unhandled request error', error);
-      return json({ error: 'Unexpected server error.' }, 500);
+      return secured(json({ error: 'Unexpected server error.' }, 500));
     }
   },
 
