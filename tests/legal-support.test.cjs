@@ -50,3 +50,11 @@ test('Public footers link safely to vitdart.com', () => {
   }
   assert.match(read('about.html'), /href="https:\/\/vitdart\.com\/"[^>]+target="_blank"[^>]+rel="noopener noreferrer"/);
 });
+
+test('About page describes market sources without claiming real-time data or guaranteed forecasts', () => {
+  const about = read('about.html');
+  assert.match(about, /daily market observations downloaded through yfinance for BTC-USD and the GC=F gold-futures reference/);
+  assert.match(about, /delayed, revised, or temporarily incomplete/);
+  assert.match(about, /not live prices or guaranteed predictions/);
+  assert.doesNotMatch(about, /real-time financial data/i);
+});
