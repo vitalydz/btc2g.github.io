@@ -1,0 +1,38 @@
+name: Notify search engines after publication
+
+on:
+  workflow_run:
+    workflows: ['pages build and deployment']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: search-discovery
+  cancel-in-progress: false
+
+jobs:
+  indexnow:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Notify participating search engines
+        env:
+          INITIAL_DISCOVERY: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [ "$INITIAL_DISCOVERY" = "true" ]; then
+            python scripts/submit_indexnow.py --all
+          else
+            python scripts/submit_indexnow.py
+          fi
