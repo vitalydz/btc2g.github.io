@@ -107,6 +107,7 @@ test('approved acquisition attribution is forwarded only through the account reg
   assert.match(account, /language: accountLanguage/);
   assert.match(account, /form\.setAttribute\('aria-busy', 'true'\)/);
   assert.match(account, /form\.removeAttribute\('aria-busy'\)/);
+  assert.match(account, /if \(submitButton\.disabled\) return/);
   assert.match(account, /emailForm\.setAttribute\('aria-busy', 'true'\)/);
   assert.match(account, /emailForm\.removeAttribute\('aria-busy'\)/);
 });

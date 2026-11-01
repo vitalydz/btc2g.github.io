@@ -204,6 +204,7 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
+  if (submitButton.disabled) return;
   submitButton.disabled = true;
   form.setAttribute('aria-busy', 'true');
   setMessage('');
