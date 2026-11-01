@@ -1,0 +1,20 @@
+{
+  "site":"https://btc2g.com",
+  "prepared":"2026-11-01",
+  "languages":["en","ru","he","de","fr","es","zh","it","pt","ar","hi","ja","ko","tr","pl","nl","uk","id","vi"],
+  "translated_public_pages":["/","/save.html","/scenario.html","/premium.html"],
+  "implementation":"Existing UI translations prerendered to static HTML at /{lang}/ routes. English uses root routes. Other public articles remain in their original language. Catalog gaps are not claimed as new translations.",
+  "providers":[
+    {"name":"Google Search Console","status":"account_access_pending","note":"Ownership and sitemap submission for BTC2G have not been verified. Browser use disabled in this task."},
+    {"name":"Bing Webmaster Tools","status":"account_access_pending","note":"Do not reuse VitdArt verification values."},
+    {"name":"IndexNow","status":"existing_integration","note":"Global submission used; HTTP 200/202 means receipt, not indexing. Expanded sitemap to be submitted after deployment."},
+    {"name":"Yandex","status":"account_access_pending","note":"IndexNow does not confirm webmaster ownership."},
+    {"name":"Naver","status":"account_access_pending","note":"VitdArt account/terms approval is not automatically authorization for new terms or challenges."},
+    {"name":"Baidu","status":"account_access_pending"},
+    {"name":"Sogou","status":"account_access_pending"},
+    {"name":"360","status":"not_submitted"},
+    {"name":"Coc Coc","status":"captcha_form_pending","note":"Sitemap is advertised in robots.txt; manual submission requires accessible browser and owner-operated challenge."},
+    {"name":"ChatGPT / Perplexity / Claude","status":"crawl_allowed","note":"Robots allows public crawling. User-Agent HTTP probes are reachability checks, not proof of actual crawler visits, citations or indexing."}
+  ],
+  "sources":["https://developers.google.com/search/docs/specialty/international/localized-versions","https://www.indexnow.org/faq","https://support.google.com/webmasters/answer/9008080","https://www.producthunt.com/launch","https://support.reddithelp.com/hc/en-us/articles/205926439-Reddiquette"]
+}

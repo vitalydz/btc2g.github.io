@@ -29,6 +29,13 @@ class IndexNowTests(unittest.TestCase):
             with self.subTest(url=url), self.assertRaises(ValueError):
                 submit([url], self.root, opener=lambda *a, **kw: self.fail('Network must not be called'))
 
+    def test_language_pages_follow_source_and_market_changes(self):
+        urls = ['https://btc2g.com/', 'https://btc2g.com/he/', 'https://btc2g.com/ru/scenario.html', 'https://btc2g.com/ru/premium.html']
+        self.assertEqual(changed_urls(urls, ['index.html']), urls[:2])
+        self.assertEqual(changed_urls(urls, ['assets/btc_signal.json']), urls[:3])
+        self.assertEqual(changed_urls(urls, ['ru/index.html']), [])
+        self.assertEqual(changed_urls(urls, ['he/index.html']), [urls[1]])
+
     def test_unpublished_key_blocks_notification(self):
         calls = []
         def opener(request, **kwargs):

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html data-static-language="zh" dir="ltr" lang="zh">
+<head><script src="/assets/js/static-language.js"></script><base href="https://btc2g.com/">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0f19">
+  <title>BTC / 黄金情景模拟器 | BTC2G</title>
+  <meta name="description" content="BTC / 黄金情景模拟器 — BTC2G.">
+  <link rel="canonical" href="https://btc2g.com/zh/scenario.html">
+  <link rel="icon" type="image/png" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/assets/css/scenario.css?v=20261030-1">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="https://btc2g.com/scenario.html" hreflang="en" rel="alternate"><link href="https://btc2g.com/ru/scenario.html" hreflang="ru" rel="alternate"><link href="https://btc2g.com/he/scenario.html" hreflang="he" rel="alternate"><link href="https://btc2g.com/de/scenario.html" hreflang="de" rel="alternate"><link href="https://btc2g.com/fr/scenario.html" hreflang="fr" rel="alternate"><link href="https://btc2g.com/es/scenario.html" hreflang="es" rel="alternate"><link href="https://btc2g.com/zh/scenario.html" hreflang="zh" rel="alternate"><link href="https://btc2g.com/it/scenario.html" hreflang="it" rel="alternate"><link href="https://btc2g.com/pt/scenario.html" hreflang="pt" rel="alternate"><link href="https://btc2g.com/ar/scenario.html" hreflang="ar" rel="alternate"><link href="https://btc2g.com/hi/scenario.html" hreflang="hi" rel="alternate"><link href="https://btc2g.com/ja/scenario.html" hreflang="ja" rel="alternate"><link href="https://btc2g.com/ko/scenario.html" hreflang="ko" rel="alternate"><link href="https://btc2g.com/tr/scenario.html" hreflang="tr" rel="alternate"><link href="https://btc2g.com/pl/scenario.html" hreflang="pl" rel="alternate"><link href="https://btc2g.com/nl/scenario.html" hreflang="nl" rel="alternate"><link href="https://btc2g.com/uk/scenario.html" hreflang="uk" rel="alternate"><link href="https://btc2g.com/id/scenario.html" hreflang="id" rel="alternate"><link href="https://btc2g.com/vi/scenario.html" hreflang="vi" rel="alternate"><link href="https://btc2g.com/scenario.html" hreflang="x-default" rel="alternate"></head>
+<body>
+  <main class="scenario-shell">
+    <header class="scenario-header">
+      <a class="brand" href="/zh/" aria-label="BTC2G home">BTC2G</a>
+      <nav aria-label="Scenario navigation">
+        <a id="back-link" href="/zh/">仪表板</a>
+        <a id="scenario-account-link" class="account-link" href="https://btc2g-accounts.btc2g.workers.dev/">创建账户</a>
+        <select id="scenario-language" aria-label="Language">
+          <option value="en">English</option><option value="ru">Русский</option><option value="he">עברית</option>
+          <option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option>
+          <option selected value="zh">中文</option><option value="it">Italiano</option><option value="pt">Português</option>
+          <option value="ar">العربية</option><option value="hi">हिन्दी</option><option value="ja">日本語</option>
+          <option value="ko">한국어</option><option value="tr">Türkçe</option><option value="pl">Polski</option>
+          <option value="nl">Nederlands</option><option value="uk">Українська</option><option value="id">Bahasa Indonesia</option>
+          <option value="vi">Tiếng Việt</option>
+        </select>
+      </nav>
+    </header>
+
+    <section class="scenario-hero" aria-labelledby="scenario-title">
+      <p id="scenario-eyebrow" class="eyebrow">交互式研究工具</p>
+      <h1 id="scenario-title">BTC / 黄金情景模拟器</h1>
+      <p id="scenario-intro">探索比特币和黄金价格的假设变化如何影响比率。输入内容不会被保存。</p>
+      <div id="data-status" class="data-status" role="status" aria-live="polite">正在加载已发布的市场数据…</div>
+    </section>
+
+    <section class="current-market" aria-labelledby="current-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">BTC2G PUBLISHED DATA</p><h2 id="current-title">起点</h2></div>
+        <p id="market-date">Market date: —</p>
+      </div>
+      <div class="market-grid">
+        <article><span id="btc-label">比特币价格</span><strong id="current-btc">—</strong></article>
+        <article><span id="gold-label">黄金价格 / 金衡盎司</span><strong id="current-gold">—</strong></article>
+        <article><span id="ratio-label">BTC / 黄金比率</span><strong id="current-ratio">—</strong></article>
+      </div>
+    </section>
+
+    <section class="simulator-card" aria-labelledby="controls-title">
+      <div class="section-heading">
+        <div><p id="scenario-whatif" class="eyebrow">假设情景</p><h2 id="controls-title">调整假设变化</h2></div>
+        <button id="reset-scenario" class="quiet-button" type="button">重置</button>
+      </div>
+      <div class="control-grid">
+        <label for="btc-change"><span id="btc-change-label">比特币变化</span><output id="btc-change-output" for="btc-change">+0%</output>
+          <input id="btc-change" type="range" min="-80" max="300" step="1" value="0" disabled>
+        </label>
+        <label for="gold-change"><span id="gold-change-label">黄金变化</span><output id="gold-change-output" for="gold-change">+0%</output>
+          <input id="gold-change" type="range" min="-50" max="100" step="1" value="0" disabled>
+        </label>
+      </div>
+
+      <div class="scenario-results" aria-live="polite">
+        <article><span id="future-btc-label">情景 BTC 价格</span><strong id="future-btc">—</strong></article>
+        <article><span id="future-gold-label">情景黄金价格</span><strong id="future-gold">—</strong></article>
+        <article class="ratio-result"><span id="future-ratio-label">情景比率</span><strong id="future-ratio">—</strong><small id="ratio-difference">—</small></article>
+      </div>
+    </section>
+
+    <section class="target-card" aria-labelledby="target-title">
+      <div>
+        <p id="scenario-reverse" class="eyebrow">反向计算</p>
+        <h2 id="target-title">目标比率对应的 BTC 价格</h2>
+        <p id="target-intro">选择目标比率。结果使用上方情景中的黄金价格。</p>
+      </div>
+      <div class="target-form">
+        <label for="target-ratio"><span id="target-ratio-label">目标比率（金衡盎司）</span>
+          <input id="target-ratio" type="number" min="0.01" max="10000" step="0.01" value="30" inputmode="decimal" disabled>
+        </label>
+        <div class="target-result"><span id="required-btc-label">所需 BTC 价格</span><strong id="required-btc">—</strong></div>
+      </div>
+    </section>
+
+    <section class="scenario-actions" aria-label="Scenario actions">
+      <button id="copy-scenario" type="button" disabled>复制结果</button>
+      <button id="share-scenario" type="button" disabled>分享</button>
+      <p id="action-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <aside class="scenario-disclaimer">
+      <strong id="disclaimer-title">情景而非预测</strong>
+      <p id="disclaimer-text">这是算术假设计算，不是预测、财务建议或保证。不含费用、价差、税费和流动性。</p>
+      <p id="source-note">来源：yfinance BTC-USD 和 GC=F，通过 BTC2G 已发布数据。</p>
+    </aside>
+  </main>
+  <script src="/assets/js/scenario-tools.js?v=20261030-4"></script>
+  <script src="/assets/js/traffic.js?v=20261030-1" defer></script>
+</body>
+</html>

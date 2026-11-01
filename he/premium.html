@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html data-static-language="he" dir="rtl" lang="he">
+<head><script src="/assets/js/static-language.js"></script><base href="https://btc2g.com/">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>הקשר נוסף מאחורי מודל BTC vs Gold. | BTC2G</title>
+  <link rel="canonical" href="https://btc2g.com/he/premium.html">
+  <meta name="description" content="הקשר נוסף מאחורי מודל BTC vs Gold. — BTC2G.">
+  <meta property="og:title" content="הקשר נוסף מאחורי מודל BTC vs Gold. | BTC2G">
+  <meta property="og:description" content="הקשר נוסף מאחורי מודל BTC vs Gold. — BTC2G.">
+  <meta property="og:url" content="https://btc2g.com/he/premium.html">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://btc2g.com/assets/btc_gold_forecast.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="הקשר נוסף מאחורי מודל BTC vs Gold. | BTC2G">
+  <meta name="twitter:description" content="הקשר נוסף מאחורי מודל BTC vs Gold. — BTC2G.">
+  <meta name="twitter:image" content="https://btc2g.com/assets/btc_gold_forecast.png">
+  <link rel="icon" type="image/png" href="/icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #071426;
+      --surface: #0c1b2f;
+      --surface-raised: #10233b;
+      --border: #1d3654;
+      --text: #f7f9fc;
+      --muted: #b4bfce;
+      --quiet: #8795a8;
+      --blue: #5f7cff;
+      --blue-dark: #3454c8;
+      --gold: #e3be57;
+      --green: #66d29a;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 82% 6%, rgba(95, 124, 255, 0.13), transparent 31rem),
+        radial-gradient(circle at 12% 24%, rgba(227, 190, 87, 0.08), transparent 25rem),
+        var(--page);
+      color: var(--text);
+      font-family: 'Roboto', sans-serif;
+      line-height: 1.65;
+    }
+    a { color: inherit; }
+    button, input { font: inherit; }
+    main, .site-footer { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 76px;
+      border-bottom: 1px solid rgba(86, 115, 151, 0.32);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-size: 1.12rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+    }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(227, 190, 87, 0.55);
+      border-radius: 50%;
+      background: rgba(227, 190, 87, 0.1);
+      color: var(--gold);
+      place-items: center;
+    }
+    .header-tools { display: flex; align-items: center; gap: 12px; }
+    nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    nav a {
+      padding: 9px 11px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    nav a:hover, nav a[aria-current="page"] { background: rgba(95, 124, 255, 0.1); color: var(--text); }
+    .language-select {
+      min-height: 40px;
+      padding: 0 34px 0 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%23b4bfce' d='m1 1 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 11px center;
+      color: var(--text);
+      cursor: pointer;
+      appearance: none;
+    }
+    [dir="rtl"] .language-select { padding: 0 11px 0 34px; background-position: left 11px center; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+      gap: 52px;
+      align-items: center;
+      padding: 84px 0 68px;
+    }
+    .eyebrow, .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      border: 1px solid rgba(102, 210, 154, 0.35);
+      border-radius: 999px;
+      background: rgba(102, 210, 154, 0.08);
+      color: #94e5ba;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 6px 10px;
+      text-transform: uppercase;
+    }
+    .eyebrow::before, .status-pill::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      content: '';
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 760px;
+      margin: 18px 0 20px;
+      font-size: clamp(2.6rem, 6vw, 4.7rem);
+      letter-spacing: -0.045em;
+      line-height: 1.02;
+    }
+    h1 span { color: var(--gold); }
+    .hero-copy > p {
+      max-width: 690px;
+      margin-bottom: 26px;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2vw, 1.22rem);
+    }
+    .hero-actions, .share-buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border: 1px solid var(--blue-dark);
+      border-radius: 9px;
+      background: var(--blue-dark);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      line-height: 1;
+      text-decoration: none;
+    }
+    .button:hover { border-color: var(--blue); background: var(--blue); }
+    .button.secondary { border-color: var(--border); background: rgba(12, 27, 47, 0.75); color: var(--muted); }
+    .button.secondary:hover { border-color: #345477; background: var(--surface-raised); color: var(--text); }
+    .hero-note { margin-top: 14px; color: var(--quiet); font-size: 0.9rem; }
+
+    .preview-card {
+      position: relative;
+      overflow: hidden;
+      padding: 24px;
+      border: 1px solid #294667;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(16, 35, 59, 0.98), rgba(8, 23, 41, 0.98));
+      box-shadow: var(--shadow);
+    }
+    .preview-card::after {
+      position: absolute;
+      top: -80px;
+      right: -70px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(95, 124, 255, 0.12);
+      content: '';
+    }
+    .preview-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+    .preview-label, .section-label {
+      margin-bottom: 5px;
+      color: var(--gold);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .preview-header h2 { margin-bottom: 0; font-size: 1.3rem; }
+    .preview-badge { padding: 5px 8px; border: 1px solid var(--border); border-radius: 7px; color: var(--quiet); font-size: 0.75rem; white-space: nowrap; }
+    .research-stack { display: grid; gap: 12px; }
+    .research-row {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid rgba(65, 93, 127, 0.6);
+      border-radius: 11px;
+      background: rgba(7, 20, 38, 0.58);
+    }
+    .research-icon { display: grid; width: 36px; height: 36px; border-radius: 9px; background: rgba(95, 124, 255, 0.12); color: #aebcff; font-weight: 700; place-items: center; }
+    .research-row strong { display: block; margin-bottom: 2px; color: var(--text); font-size: 0.94rem; }
+    .research-row span { color: var(--quiet); font-size: 0.86rem; }
+
+    .section { padding: 72px 0; border-top: 1px solid rgba(86, 115, 151, 0.24); }
+    .section-heading { max-width: 720px; margin-bottom: 32px; }
+    .section-heading h2 { margin-bottom: 12px; font-size: clamp(1.8rem, 4vw, 2.7rem); letter-spacing: -0.025em; line-height: 1.13; }
+    .section-heading p, .feature-card p, .method-card p, .faq-item p, .early-access-copy p, .share-section p { color: var(--muted); }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feature-card, .method-card, .faq-item, .share-section {
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(12, 27, 47, 0.78);
+    }
+    .feature-number { display: grid; width: 36px; height: 36px; margin-bottom: 18px; border: 1px solid rgba(227, 190, 87, 0.3); border-radius: 10px; background: rgba(227, 190, 87, 0.08); color: var(--gold); font-weight: 700; place-items: center; }
+    .feature-card h3, .method-card h3, .faq-item h3 { margin-bottom: 8px; font-size: 1.08rem; }
+    .feature-card p, .method-card p, .faq-item p { margin-bottom: 0; font-size: 0.95rem; }
+
+    .comparison-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: rgba(12, 27, 47, 0.78); }
+    .comparison-table { width: 100%; min-width: 660px; border-collapse: collapse; }
+    .comparison-table th, .comparison-table td { padding: 16px 18px; border-bottom: 1px solid var(--border); text-align: left; }
+    .comparison-table th { color: var(--quiet); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; }
+    .comparison-table td { color: var(--muted); }
+    .comparison-table td:first-child { color: var(--text); font-weight: 700; }
+    .comparison-table tr:last-child td { border-bottom: 0; }
+    .first-release-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:0; padding:0; list-style:none; }
+    .first-release-list li { padding:18px; border:1px solid var(--border); border-radius:12px; background:rgba(12,27,47,.78); color:var(--text); }
+    .first-release-list li::before { content:'✓'; margin-inline-end:10px; color:var(--green); font-weight:900; }
+    .available { color: var(--green); font-weight: 700; }
+    .planned { color: #aebcff; font-weight: 700; }
+
+    .method-grid, .faq-grid { display: grid; gap: 16px; }
+    .method-grid { grid-template-columns: repeat(2, 1fr); }
+    .faq-grid { grid-template-columns: repeat(3, 1fr); }
+    .method-card ul { margin: 14px 0 0; padding-left: 20px; color: var(--muted); }
+    .method-card li + li { margin-top: 8px; }
+
+    .early-access {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(340px, 1.1fr);
+      gap: 42px;
+      align-items: center;
+      padding: 36px;
+      border: 1px solid #2a4a70;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(16, 35, 59, 0.98), rgba(11, 31, 53, 0.98));
+      box-shadow: var(--shadow);
+    }
+    .early-access-copy h2 { margin: 10px 0 12px; font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.13; }
+    .signup-form { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    .signup-form input { min-width: 0; min-height: 50px; padding: 0 15px; border: 1px solid #345477; border-radius: 9px; outline: none; background: #07182b; color: var(--text); }
+    .signup-form input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(95, 124, 255, 0.16); }
+    .digest-choice { grid-column:1/-1; display:flex; align-items:flex-start; gap:10px; color:var(--muted); font-size:.9rem; line-height:1.45; }
+    .digest-choice input { width:20px; height:20px; min-height:20px; margin-top:1px; flex:0 0 auto; }
+    .form-help, .form-status { grid-column: 1 / -1; margin: 0; color: var(--quiet); font-size: 0.86rem; }
+    .form-help a { color: var(--muted); }
+    .form-status { min-height: 22px; color: var(--green); font-weight: 700; }
+    .form-status.error { color: #ff9f9f; }
+
+    .share-section { display: flex; align-items: center; justify-content: space-between; gap: 28px; margin-top: 24px; }
+    .share-section h2 { margin-bottom: 5px; font-size: 1.25rem; }
+    .share-section p, .share-status { margin-bottom: 0; }
+    .share-status { min-height: 20px; color: var(--green); font-size: 0.88rem; }
+    [hidden] { display: none !important; }
+    .disclaimer { margin-top: 18px; padding: 18px; border-left: 3px solid var(--gold); border-radius: 0 10px 10px 0; background: rgba(227, 190, 87, 0.06); color: var(--muted); font-size: 0.92rem; }
+
+    .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 30px 0 40px; color: var(--quiet); font-size: 0.9rem; }
+    .site-footer p { margin: 0; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 16px; }
+    .footer-links a:hover { color: var(--text); }
+
+    @media (max-width: 900px) {
+      .hero, .early-access { grid-template-columns: 1fr; }
+      .hero { gap: 34px; padding-top: 58px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .faq-grid { grid-template-columns: 1fr; }
+      .early-access { gap: 24px; }
+    }
+    @media (max-width: 640px) {
+      main, .site-footer { width: min(100% - 28px, 1120px); }
+      .site-header { align-items: flex-start; flex-direction: column; gap: 12px; padding: 16px 0; }
+      .header-tools { width: 100%; align-items: stretch; flex-direction: column; }
+      nav { width: 100%; }
+      nav a { padding: 7px 8px; }
+      .language-select { width: 100%; }
+      .hero { padding: 48px 0 54px; }
+      h1 { font-size: clamp(2.35rem, 13vw, 3.3rem); }
+      .hero-actions, .share-buttons, .share-section, .site-footer { align-items: stretch; flex-direction: column; }
+      .hero-actions .button, .share-buttons .button { width: 100%; }
+      .section { padding: 54px 0; }
+      .method-grid, .faq-grid { grid-template-columns: 1fr; }
+      .first-release-list { grid-template-columns:1fr; }
+      .early-access { padding: 24px 18px; }
+      .signup-form { grid-template-columns: 1fr; }
+      .signup-form .button { width: 100%; }
+    }
+  </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="https://btc2g.com/premium.html" hreflang="en" rel="alternate"><link href="https://btc2g.com/ru/premium.html" hreflang="ru" rel="alternate"><link href="https://btc2g.com/he/premium.html" hreflang="he" rel="alternate"><link href="https://btc2g.com/de/premium.html" hreflang="de" rel="alternate"><link href="https://btc2g.com/fr/premium.html" hreflang="fr" rel="alternate"><link href="https://btc2g.com/es/premium.html" hreflang="es" rel="alternate"><link href="https://btc2g.com/zh/premium.html" hreflang="zh" rel="alternate"><link href="https://btc2g.com/it/premium.html" hreflang="it" rel="alternate"><link href="https://btc2g.com/pt/premium.html" hreflang="pt" rel="alternate"><link href="https://btc2g.com/ar/premium.html" hreflang="ar" rel="alternate"><link href="https://btc2g.com/hi/premium.html" hreflang="hi" rel="alternate"><link href="https://btc2g.com/ja/premium.html" hreflang="ja" rel="alternate"><link href="https://btc2g.com/ko/premium.html" hreflang="ko" rel="alternate"><link href="https://btc2g.com/tr/premium.html" hreflang="tr" rel="alternate"><link href="https://btc2g.com/pl/premium.html" hreflang="pl" rel="alternate"><link href="https://btc2g.com/nl/premium.html" hreflang="nl" rel="alternate"><link href="https://btc2g.com/uk/premium.html" hreflang="uk" rel="alternate"><link href="https://btc2g.com/id/premium.html" hreflang="id" rel="alternate"><link href="https://btc2g.com/vi/premium.html" hreflang="vi" rel="alternate"><link href="https://btc2g.com/premium.html" hreflang="x-default" rel="alternate"></head>
+<body>
+  <main>
+    <header class="site-header">
+      <a class="brand" href="/he/" aria-label="BTC2G home"><span class="brand-mark" aria-hidden="true">₿</span>BTC2G</a>
+      <div class="header-tools">
+        <nav aria-label="ניווט דפי פרימיום">
+          <a href="/he/">בית</a>
+          <a href="/he/#forecast">תחזית</a>
+          <a href="/he/premium.html" aria-current="page">פרימיום</a>
+          <a href="/buy.html?lang=he">קנה BTC</a>
+        </nav>
+        <select id="premium-language" class="language-select" aria-label="Language">
+          <option value="en">English</option><option value="ru">Русский</option><option selected value="he">עברית</option>
+          <option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option>
+          <option value="zh">中文</option><option value="it">Italiano</option><option value="pt">Português</option>
+          <option value="ar">العربية</option><option value="hi">हिन्दी</option><option value="ja">日本語</option>
+          <option value="ko">한국어</option><option value="tr">Türkçe</option><option value="pl">Polski</option>
+          <option value="nl">Nederlands</option><option value="uk">Українська</option><option value="id">Bahasa Indonesia</option>
+          <option value="vi">Tiếng Việt</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">בפיתוח · גישה מוקדמת</span>
+        <h1>הקשר נוסף מאחורי מודל BTC vs Gold.</h1>
+        <p>BTC2G Premium מתוכנן כשכבת מחקר ממוקדת: ראה מה השתנה, הבן את כניסות המודל וסקור אותות בהקשר במקום לפעול על תווית אחת.</p>
+        <div class="hero-actions">
+          <a class="button" href="/he/premium.html#early-access">הצטרף לגישה מוקדמת</a>
+          <a class="button secondary" href="/he/#forecast">הצג את לוח המחוונים הציבורי</a>
+        </div>
+        <p class="hero-note">לא נגבה תשלום. שלח את האימייל שלך כדי לרשום עניין בתצוגות מקדימות ופרטי השקה.</p>
+      </div>
+
+      <aside class="preview-card" aria-label="תצוגת מחקר פרימיום מתוכננת">
+        <div class="preview-header">
+          <div><p class="preview-label">תצוגת מחקר מתוכננת</p><h2>הקשר דגם במבט חטוף</h2></div>
+          <span class="preview-badge">תצוגה מקדימה</span>
+        </div>
+        <div class="research-stack">
+          <div class="research-row"><span class="research-icon" aria-hidden="true">01</span><div><strong>תמונת מצב בעל ערך יחסי</strong><span>יחס BTC/Gold, כיוון הדגם, ציון הדגם וחותמת הזמן של הנתונים. הציון אינו הסתברות לרווח.</span></div></div>
+          <div class="research-row"><span class="research-icon" aria-hidden="true">02</span><div><strong>יומן שינוי</strong><span>תיעוד עם חותמת זמן של שינויים במצב מודל וההקשר סביבם.</span></div></div>
+          <div class="research-row"><span class="research-icon" aria-hidden="true">03</span><div><strong>הערות מחקר</strong><span>הסברים בשפה פשוטה של מתודולוגיה, מגבלות ותנאי נתונים חריגים.</span></div></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" aria-labelledby="why-premium-title">
+      <div class="section-heading">
+        <p class="section-label">תהליך מחקר רגוע יותר</p>
+        <h2 id="why-premium-title">מעבר מאות לביקורת מושכלת.</h2>
+        <p>לוח המחוונים הציבורי שומר על מצב הדגם העדכני ביותר פשוט. Premium מתוכננת להוסיף את ההיסטוריה וההסברים הדרושים להערכת מצב זה מבלי לרמוז על וודאות.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card"><span class="feature-number">1</span><h3>להבין את המצב הנוכחי</h3><p>סקור את היחס, חלון ההשוואה, כיוון האות, ציון הדגם, המקור וזמן העדכון ביחד.</p></article>
+        <article class="feature-card"><span class="feature-number">2</span><h3>עקבו אחר מה השתנה</h3><p>השווה את מצב הדגם האחרון עם תצפיות קודמות במקום להתייחס לכל עדכון כאל קריאה מבודדת.</p></article>
+        <article class="feature-card"><span class="feature-number">3</span><h3>קרא את המגבלות</h3><p>ראה הערות תמציתיות לגבי שווקים מושהים, הנחות מודל ותנאים שיכולים להחליש אות ערך יחסי.</p></article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="included-title">
+      <div class="section-heading">
+        <p class="section-label">מפת הדרכים של המוצר</p>
+        <h2 id="included-title">מה פומבי עכשיו - ומה פרימיום מתוכננת להוסיף.</h2>
+        <p>זוהי תצוגה מקדימה שקופה לגישה מוקדמת, לא הבטחה של מנוי חי. פריטים מתוכננים עשויים להתפתח על סמך איכות הנתונים ומשוב הקוראים.</p>
+      </div>
+      <div class="comparison-wrap">
+        <table class="comparison-table">
+          <thead><tr><th scope="col">יכולת מחקר</th><th scope="col">לוח מחוונים ציבורי</th><th scope="col">מפת דרכים פרימיום</th></tr></thead>
+          <tbody>
+            <tr><td>מצב הדגם האחרון של BTC לעומת זהב</td><td>זמין</td><td>כלול בתוספת הקשר</td></tr>
+            <tr><td>היסטוריית אותות ויחס</td><td>המדינה האחרונה בלבד</td><td>מתוכנן</td></tr>
+            <tr><td>הערות דגם עם חותמת זמן</td><td>סיכום קצר</td><td>מתוכנן</td></tr>
+            <tr><td>תקציר מחקר שבועי</td><td>—</td><td>מתוכנן</td></tr>
+            <tr><td>מתודולוגיה ופרטי מקור</td><td>הסבר ליבה</td><td>הערות מורחבות</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section first-release" aria-labelledby="first-release-title">
+      <div class="section-heading"><p class="section-label">גרסה ראשונה</p><h2 id="first-release-title">מה מתוכנן לגרסת Premium הראשונה.</h2><p id="first-release-intro">היקף פתיחה מוגדר, בכפוף לבדיקת איכות הנתונים.</p></div>
+      <ul class="first-release-list"><li>12 חודשי היסטוריית אותות ויחס</li><li>סקירת מחקר שבועית בימי ראשון</li><li>הערות המסבירות שינוי בציון</li><li>הורדת נתונים בפורמט CSV</li></ul>
+    </section>
+
+    <section class="section" aria-labelledby="method-title">
+      <div class="section-heading">
+        <p class="section-label">נבנה לשקיפות</p>
+        <h2 id="method-title">הקשר שימושי ללא הבטחות מסחר.</h2>
+        <p>כיוון המוצר נשאר מעוגן באותם עקרונות זהירים כמו דגם ה-BTC2G הציבורי.</p>
+      </div>
+      <div class="method-grid">
+        <article class="method-card"><h3>מה הדגם נועד להראות</h3><ul><li>הערכת השווי היחסית של ביטקוין מול זהב באמצעות נתוני מחיר ממקור השוק.</li><li>איך היחס האחרון משתווה לחלון היסטורי מתגלגל.</li><li>מתי עודכנו לאחרונה הנתונים הבסיסיים ופלט המודל.</li></ul></article>
+        <article class="method-card"><h3>מה שהדגם לא מראה</h3><ul><li>נקודת כניסה או יציאה מובטחת.</li><li>תחזית תשואה לטווח קצר של ביטקוין, זהב או תיק.</li><li>ייעוץ המותאם לכספים, למטרות או לסובלנות של הקורא.</li></ul></article>
+      </div>
+      <p class="disclaimer"><strong>כתב ויתור: </strong>התוכן והאותות של BTC2G Premium מבוססים על דגמים ומסופקים למטרות מידע וחינוכיות בלבד. הם אינם ייעוץ פיננסי, הצעה לקנות או למכור נכס, או הבטחה לרווח. נתוני שוק יכולים להתעכב או לא שלמים, הנחות עלולות להיכשל, ואותות המודל יכולים להיות שגויים. בצע תמיד מחקר עצמאי ושקול ייעוץ מקצועי במידת הצורך.</p>
+    </section>
+
+    <section class="section" aria-labelledby="faq-title">
+      <div class="section-heading"><p class="section-label">שאלות, ענה בצורה ברורה</p><h2 id="faq-title">לפני שתצטרף לגישה מוקדמת.</h2></div>
+      <div class="faq-grid">
+        <article class="faq-item"><h3>האם Premium בשידור חי היום?</h3><p>לא. המוצר נמצא בפיתוח. דף זה מתאר את חווית המחקר המתוכננת ואוסף עניין לגישה מוקדמת.</p></article>
+        <article class="faq-item"><h3>האם יחויב?</h3><p>לא. אין זרימת תשלום בדף זה. שליחת הטופס מתעדת רק את בקשתך לעדכוני מוצר.</p></article>
+        <article class="faq-item"><h3>האם פרימיום חוזה תשואות?</h3><p>לא. BTC2G משווה ביטקוין לזהב באמצעות מודל. זה לא יכול להבטיח מחירים, ביצועים או החלטות רווחיות.</p></article>
+      </div>
+    </section>
+
+    <section dir="rtl" lang="he" id="early-access" class="section" aria-labelledby="early-access-title">
+      <div class="early-access">
+        <div class="early-access-copy">
+          <span class="status-pill">רשימת גישה מוקדמת</span>
+          <h2 id="early-access-title">עזרו לעצב שכבת מחקר שימושית יותר.</h2>
+          <p>הצטרף לעדכונים מדי פעם על תצוגות מקדימות, שיפורים במתודולוגיה ותוכניות השקה. ללא התראות פיננסיות, תשלום או תאריך גישה מובטח.</p>
+        </div>
+        <form id="early-access-form" class="signup-form" novalidate>
+          <input id="early-access-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" aria-label="כתובת אימייל" aria-describedby="form-help form-status" required>
+          <label class="digest-choice"><input id="weekly-digest" name="weekly_digest" type="checkbox" value="yes"><span id="weekly-digest-label">אני רוצה תקציר שבועי חינם בזמן הפיתוח.</span></label>
+          <input type="hidden" name="source" value="btc2g-premium-early-access">
+          <button id="early-access-button" class="button" type="submit">שמירת מקום בגישה מוקדמת</button>
+          <p id="form-help" class="form-help"><a href="/privacy.html?lang=he">קבל עדכוני מוצר BTC2G. מדיניות פרטיות</a></p>
+          <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <section class="share-section" aria-labelledby="share-title">
+        <div><h2 id="share-title">מכירים מישהו שמשווה ביטקוין לזהב?</h2><p>שתף איתם את התצוגה המקדימה הזו עם גישה מוקדמת.</p><p id="share-status" class="share-status" role="status" aria-live="polite"></p></div>
+        <div class="share-buttons"><button id="native-share-btn" class="button secondary" type="button" hidden>שתף</button><button id="copy-link-btn" class="button secondary" type="button">העתק קישור</button></div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 BTC2G</p>
+    <div class="footer-links"><a href="/about.html?lang=he">בערך</a><a href="/privacy.html?lang=he">פרטיות</a><a href="/terms.html?lang=he">תנאים</a><a href="https://vitdart.com/" target="_blank" rel="noopener noreferrer">vitdart.com</a></div>
+  </footer>
+
+  <script src="/assets/js/subscription-request.js?v=20261030-4"></script>
+  <script src="/assets/js/premium-language.js?v=20261029-21"></script>
+  <script src="/assets/js/premium-v1.js?v=20261029-1"></script>
+  <script>
+    const SUBSCRIPTION_ENDPOINT = 'https://formspree.io/f/mkoyjwkr';
+
+    function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+    function setFormStatus(message, isError = false) {
+      const status = document.getElementById('form-status');
+      status.textContent = message;
+      status.classList.toggle('error', isError);
+    }
+    async function submitEarlyAccess(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const emailInput = document.getElementById('early-access-email');
+      const button = document.getElementById('early-access-button');
+      if (button.disabled) return;
+      const email = emailInput.value.trim();
+      if (!isValidEmail(email)) {
+        emailInput.setAttribute('aria-invalid', 'true');
+        setFormStatus(window.BTC2GPremiumText.invalid, true);
+        emailInput.focus();
+        return;
+      }
+
+      button.disabled = true;
+      emailInput.removeAttribute('aria-invalid');
+      button.textContent = window.BTC2GPremiumText.sending;
+      setFormStatus('');
+      try {
+        const response = await window.BTC2GSubscription.send(SUBSCRIPTION_ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error(`Subscription request failed with status ${response.status}`);
+        form.reset();
+        setFormStatus(window.BTC2GPremiumText.received);
+        if (typeof window.gtag === 'function') window.gtag('event', 'premium_early_access_signup');
+      } catch (error) {
+        console.log('Early-access signup failed.', error);
+        setFormStatus(error.name === 'TimeoutError' ? window.BTC2GSubscription.text(document.getElementById('early-access').lang).uncertain : window.BTC2GPremiumText.error, true);
+      } finally {
+        button.disabled = false;
+        button.textContent = window.BTC2GPremiumText.button;
+      }
+    }
+
+    function getSharePayload() {
+      return { title: window.BTC2GPremiumText.documentTitle, text: window.BTC2GPremiumText.shareIntro, url: window.location.href };
+    }
+    async function copyCurrentLink() {
+      const status = document.getElementById('share-status');
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        status.textContent = window.BTC2GPremiumText.copied;
+      } catch (error) {
+        console.log('Copy link failed.', error);
+        status.textContent = window.BTC2GPremiumText.copyFailed;
+      }
+    }
+    async function shareWithNativeApi() {
+      if (!navigator.share) { await copyCurrentLink(); return; }
+      try { await navigator.share(getSharePayload()); } catch (error) { console.log('Native share was not completed.', error); }
+    }
+
+    document.getElementById('native-share-btn').hidden = !navigator.share;
+    document.getElementById('early-access-form').addEventListener('submit', submitEarlyAccess);
+    document.getElementById('native-share-btn').addEventListener('click', shareWithNativeApi);
+    document.getElementById('copy-link-btn').addEventListener('click', copyCurrentLink);
+  </script>
+  <script src="/assets/js/traffic.js?v=20261030-1" defer></script>
+</body>
+</html>

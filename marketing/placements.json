@@ -1,0 +1,13 @@
+{
+  "site":"https://btc2g.com",
+  "checked":"2026-11-01",
+  "published":[],
+  "scope":"Prepare social promotion; no posts sent in this task.",
+  "candidates":[
+    {"platform":"Reddit","status":"draft_ready","draft_id":"btc2g-reddit-en","blocker":"Choose a relevant open thread and verify its current self-promotion rules; browser access unavailable in this task."},
+    {"platform":"Telegram","status":"draft_ready","draft_id":"btc2g-telegram-ru","blocker":"Owner channel or an explicitly permitted group not identified."},
+    {"platform":"Facebook","status":"draft_ready","draft_id":"btc2g-facebook-he","blocker":"Owner page/account and group-specific rules not verified."},
+    {"platform":"Product Hunt","status":"draft_ready","draft_id":"btc2g-producthunt-en","blocker":"Verify whether a BTC2G listing already exists before submitting; existing launch kit retained."},
+    {"platform":"LinkedIn","status":"draft_ready","draft_id":"btc2g-linkedin-en","blocker":"Owner profile not verified in this task."}
+  ]
+}

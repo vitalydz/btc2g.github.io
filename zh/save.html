@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html data-static-language="zh" dir="ltr" lang="zh">
+<head><script src="/assets/js/static-language.js"></script><base href="https://btc2g.com/">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071426">
+  <title>比较实际到账的 BTC | BTC2G</title>
+  <meta name="description" content="比较实际到账的 BTC — BTC2G.">
+  <link rel="canonical" href="https://btc2g.com/zh/save.html">
+  <link rel="stylesheet" href="/assets/css/save.css?v=20261028-1">
+  <script defer src="/assets/js/quote-compare.js?v=20261028-1"></script>
+  <script defer src="/assets/js/save-text.js?v=20261029-19"></script>
+  <script defer src="/assets/js/save.js?v=20261029-19"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="https://btc2g.com/save.html" hreflang="en" rel="alternate"><link href="https://btc2g.com/ru/save.html" hreflang="ru" rel="alternate"><link href="https://btc2g.com/he/save.html" hreflang="he" rel="alternate"><link href="https://btc2g.com/de/save.html" hreflang="de" rel="alternate"><link href="https://btc2g.com/fr/save.html" hreflang="fr" rel="alternate"><link href="https://btc2g.com/es/save.html" hreflang="es" rel="alternate"><link href="https://btc2g.com/zh/save.html" hreflang="zh" rel="alternate"><link href="https://btc2g.com/it/save.html" hreflang="it" rel="alternate"><link href="https://btc2g.com/pt/save.html" hreflang="pt" rel="alternate"><link href="https://btc2g.com/ar/save.html" hreflang="ar" rel="alternate"><link href="https://btc2g.com/hi/save.html" hreflang="hi" rel="alternate"><link href="https://btc2g.com/ja/save.html" hreflang="ja" rel="alternate"><link href="https://btc2g.com/ko/save.html" hreflang="ko" rel="alternate"><link href="https://btc2g.com/tr/save.html" hreflang="tr" rel="alternate"><link href="https://btc2g.com/pl/save.html" hreflang="pl" rel="alternate"><link href="https://btc2g.com/nl/save.html" hreflang="nl" rel="alternate"><link href="https://btc2g.com/uk/save.html" hreflang="uk" rel="alternate"><link href="https://btc2g.com/id/save.html" hreflang="id" rel="alternate"><link href="https://btc2g.com/vi/save.html" hreflang="vi" rel="alternate"><link href="https://btc2g.com/save.html" hreflang="x-default" rel="alternate"></head>
+<body>
+  <main class="save-shell">
+    <header class="save-header">
+      <a class="brand" href="/zh/">BTC2G <span>SAVE</span></a>
+      <select id="save-language" aria-label="语言">
+        <option value="en">English</option><option value="ru">Русский</option><option value="he">עברית</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option selected value="zh">中文</option><option value="it">Italiano</option><option value="pt">Português</option><option value="ar">العربية</option><option value="hi">हिन्दी</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="tr">Türkçe</option><option value="pl">Polski</option><option value="nl">Nederlands</option><option value="uk">Українська</option><option value="id">Bahasa Indonesia</option><option value="vi">Tiếng Việt</option>
+      </select>
+    </header>
+    <p class="eyebrow" data-text="eyebrow">购买前看得更清楚</p>
+    <h1 data-text="title">比较实际到账的 BTC</h1>
+    <p class="intro" data-text="intro">输入两份报价在相同总付款下的最终 BTC 数量。不假设手续费或汇率。</p>
+    <section class="budget-panel" aria-labelledby="budget-title">
+      <h2 id="budget-title" data-text="budget">1. 设置总付款</h2>
+      <div class="budget-fields">
+        <label><span data-text="amount">含手续费的总付款</span><input id="save-amount" inputmode="decimal" value="50" maxlength="16" autocomplete="off"></label>
+        <label><span data-text="currency">货币</span><select id="save-currency"><option>USD</option><option>EUR</option><option>GBP</option><option>ILS</option></select></label>
+      </div>
+      <div class="presets" aria-label="含手续费的总付款"><button type="button" data-amount="50">50</button><button type="button" data-amount="100">100</button><button type="button" data-amount="200">200</button></div>
+      <p class="small" data-text="resetNote">更改金额或货币将清除两份报价。请重新获取报价。</p>
+    </section>
+    <section aria-labelledby="quotes-title">
+      <h2 id="quotes-title" data-text="quotes">2. 输入可比报价</h2>
+      <p data-text="instructions">使用相同国家、付款方式和 Bitcoin 网络。输入扣费后的最终 BTC，不要重复扣除网络费。报价可能变化。</p>
+      <div class="quote-grid">
+        <article class="quote-card">
+          <h3>MoonPay</h3>
+          <a href="https://www.moonpay.com/buy/btc" target="_blank" rel="noopener noreferrer" data-text="open">获取报价 ↗</a>
+          <label for="save-moonpay" data-text="received">最终到账 BTC</label><input id="save-moonpay" inputmode="decimal" maxlength="22" autocomplete="off" placeholder="0.00000000">
+          <p class="quote-rate" id="moonpay-rate">需要报价</p>
+        </article>
+        <article class="quote-card">
+          <h3>Topper</h3>
+          <a href="https://www.topperpay.com/" target="_blank" rel="noopener noreferrer" data-text="open">获取报价 ↗</a>
+          <label for="save-topper" data-text="received">最终到账 BTC</label><input id="save-topper" inputmode="decimal" maxlength="22" autocomplete="off" placeholder="0.00000000">
+          <p class="quote-rate" id="topper-rate">需要报价</p>
+        </article>
+      </div>
+      <label class="confirmation"><input id="save-confirm" type="checkbox"><span data-text="confirm">两份报价均有效，且总付款、货币、付款方式和网络相同。</span></label>
+      <button id="save-compare" class="primary" type="button" data-text="compare">比较报价</button>
+      <div id="save-result" class="result" role="status" aria-live="polite">请输入两份报价。</div>
+      <button id="save-clear" class="secondary" type="button" data-text="clear">清除报价</button>
+    </section>
+    <details class="method">
+      <summary data-text="method">计算方法</summary>
+      <p data-text="formula">每 BTC 实际成本 = 总付款 ÷ 到账 BTC。1 BTC = 100,000,000 聪。相同付款获得更多 BTC，表示该报价的实际成本更低。</p>
+      <p data-text="limits">不核实报价、不拆分费用、不预测节省金额。不包含报价以外的银行费用。购买前核对最终条件。</p>
+      <p><a href="https://support.topperpay.com/hc/en-us/articles/8926549324444-Topper-costs-and-fees" data-text="topperFees">Topper 费用</a> · <a href="https://support.moonpay.com/en/articles/380500-how-do-i-buy-cryptocurrency-with-moonpay" data-text="moonpayHelp">MoonPay 帮助</a></p>
+    </details>
+    <footer><p data-text="privacy">在本页面计算。报价不会保存或发送给 BTC2G。购买由外部服务商处理。</p><a href="/zh/#calculator" data-text="home">BTC ↔ 黄金计算器</a></footer>
+    <noscript>This calculator requires JavaScript. Provider links remain available.</noscript>
+  </main>
+  <script src="/assets/js/traffic.js?v=20261030-1" defer></script>
+</body>
+</html>

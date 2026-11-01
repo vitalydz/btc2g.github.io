@@ -15,6 +15,7 @@ ORIGIN = 'https://btc2g.com'
 KEY_FILE = 'indexnow-key.txt'
 MARKET_PAGES = {'', 'scenario.html', 'bitcoin-gold-ratio.html',
                 'bitcoin-vs-gold.html', 'bitcoin-vs-gold-forecast-2026.html'}
+LANGUAGES = {'ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi'}
 
 
 def wait_for_publication(revision, opener=urlopen, sleep=time.sleep):
@@ -55,8 +56,11 @@ def changed_urls(urls, files):
     selected = []
     for url in urls:
         page = urlsplit(url).path.lstrip('/')
-        local = page or 'index.html'
-        if local in files or shared_changed or (market_changed and page in MARKET_PAGES):
+        local = page + 'index.html' if page.endswith('/') else page or 'index.html'
+        parts = page.split('/', 1)
+        base_page = parts[1] if len(parts) == 2 and parts[0] in LANGUAGES else page
+        base_local = base_page or 'index.html'
+        if local in files or base_local in files or shared_changed or (market_changed and base_page in MARKET_PAGES):
             selected.append(url)
     return selected
 
