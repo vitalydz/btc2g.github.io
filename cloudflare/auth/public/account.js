@@ -7,6 +7,7 @@ const message = document.querySelector('#message');
 const submitButton = document.querySelector('#submit-button');
 const termsRow = document.querySelector('#terms-row');
 const termsCheckbox = document.querySelector('#accepted-terms');
+const usernameInput = document.querySelector('#username');
 const registrationEmailRow = document.querySelector('#registration-email-row');
 const registrationEmail = document.querySelector('#registration-email');
 const password = document.querySelector('#password');
@@ -201,6 +202,7 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
   passwordHint.textContent = mode === 'register' ? accountText('passwordHint') : accountText('loginPasswordHint');
   submitButton.textContent = mode === 'register' ? accountText('create') : accountText('signIn');
   setMessage('');
+  usernameInput.focus();
 }));
 
 form.addEventListener('submit', async event => {

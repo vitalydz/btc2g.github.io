@@ -73,6 +73,12 @@ test('password can be revealed without changing registration or sign-in submissi
   assert.match(css, /\.password-control button\s*\{/);
 });
 
+test('switching registration mode moves focus to the first account field', async () => {
+  const account = await readFile(new URL('account.js', root), 'utf8');
+  assert.match(account, /const usernameInput = document\.querySelector\('#username'\)/);
+  assert.match(account, /usernameInput\.focus\(\)/);
+});
+
 test('registration flow explains that email verification completes the account', async () => {
   const [accountPage, accountCss] = await Promise.all(['index.html', 'account.css'].map(path => readFile(new URL(path, root), 'utf8')));
   assert.match(accountPage, /class="registration-steps" aria-label="Registration steps"/);
