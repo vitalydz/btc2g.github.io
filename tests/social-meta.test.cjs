@@ -19,3 +19,14 @@ test('homepage social preview declares all supported locale variants', () => {
   const alternateLocales = [...homepage.matchAll(/property="og:locale:alternate" content="([^"]+)"/g)].map(match => match[1]);
   assert.deepEqual(alternateLocales, ['ru_RU','he_IL','de_DE','fr_FR','es_ES','zh_CN','it_IT','pt_PT','ar_SA','hi_IN','ja_JP','ko_KR','tr_TR','pl_PL','nl_NL','uk_UA','id_ID','vi_VN']);
 });
+
+test('homepage publishes valid multilingual WebSite structured data', () => {
+  const match = homepage.match(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/);
+  assert.ok(match);
+  const data = JSON.parse(match[1]);
+  assert.equal(data['@context'], 'https://schema.org');
+  assert.equal(data['@type'], 'WebSite');
+  assert.equal(data.name, 'BTC2G');
+  assert.equal(data.url, 'https://btc2g.com/');
+  assert.equal(data.inLanguage.length, 19);
+});
