@@ -48,4 +48,5 @@ test('Public footers link safely to vitdart.com', () => {
     const page = read(file);
     assert.match(page, /href="https:\/\/vitdart\.com\/"[^>]+target="_blank"[^>]+rel="noopener noreferrer"/);
   }
+  assert.match(read('about.html'), /href="https:\/\/vitdart\.com\/"[^>]+target="_blank"[^>]+rel="noopener noreferrer"/);
 });
