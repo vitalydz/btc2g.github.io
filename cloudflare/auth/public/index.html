@@ -79,12 +79,12 @@
           <p id="email-status">No verified email is attached.</p>
           <form id="email-form">
             <label>Email address
-              <input id="account-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" maxlength="254" required>
+              <input id="account-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" maxlength="254" aria-describedby="account-email-hint" required>
             </label>
             <button class="primary" id="email-submit" type="submit">Send verification email</button>
             <p class="message" id="email-message" role="status" aria-live="polite"></p>
           </form>
-          <p class="field-hint">Verification identifies your account email only. It does not subscribe you to marketing or activate Premium.</p>
+          <p class="field-hint" id="account-email-hint">Verification identifies your account email only. It does not subscribe you to marketing or activate Premium.</p>
           <p class="newsletter-cta">Want model signal emails? <a href="https://btc2g.com/#subscribe">Join the separate confirmed newsletter and choose the Sunday digest.</a></p>
           <p class="telegram-cta"><a href="https://t.me/BTC2GNews" target="_blank" rel="noopener">Telegram: @BTC2GNews</a></p>
         </section>

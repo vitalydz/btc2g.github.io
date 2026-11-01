@@ -121,6 +121,8 @@ test('signed-in account UI separates email verification from Premium and marketi
   assert.match(html, /id="email-form"/);
   assert.match(html, /id="username"[^>]+autocapitalize="none"[^>]+spellcheck="false"/);
   assert.match(html, /id="registration-email"[^>]+inputmode="email"/);
+  assert.match(html, /id="account-email"[^>]+aria-describedby="account-email-hint"/);
+  assert.match(html, /id="account-email-hint"/);
   assert.match(html, /id="password"[^>]+passwordrules="minlength: 12; maxlength: 128;"/);
   assert.match(html, /id="password"[^>]+enterkeyhint="go"/);
   assert.match(html, /does not subscribe you to marketing or activate Premium/);
