@@ -30,3 +30,7 @@ test('homepage publishes valid multilingual WebSite structured data', () => {
   assert.equal(data.url, 'https://btc2g.com/');
   assert.equal(data.inLanguage.length, 19);
 });
+
+test('homepage allows large search-result image previews', () => {
+  assert.match(homepage, /name="robots" content="index,follow,max-image-preview:large"/);
+});
