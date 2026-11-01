@@ -110,6 +110,7 @@ test('approved acquisition attribution is forwarded only through the account reg
   assert.match(account, /if \(submitButton\.disabled\) return/);
   assert.match(account, /emailForm\.setAttribute\('aria-busy', 'true'\)/);
   assert.match(account, /emailForm\.removeAttribute\('aria-busy'\)/);
+  assert.match(account, /if \(emailSubmit\.disabled\) return/);
 });
 
 test('signed-in account UI separates email verification from Premium and marketing', async () => {

@@ -165,6 +165,7 @@ ideaForm.addEventListener('submit', async event => {
 
 emailForm.addEventListener('submit', async event => {
   event.preventDefault();
+  if (emailSubmit.disabled) return;
   emailSubmit.disabled = true;
   emailForm.setAttribute('aria-busy', 'true');
   emailMessage.textContent = '';
