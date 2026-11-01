@@ -159,6 +159,7 @@ ideaForm.addEventListener('submit', async event => {
 emailForm.addEventListener('submit', async event => {
   event.preventDefault();
   emailSubmit.disabled = true;
+  emailForm.setAttribute('aria-busy', 'true');
   emailMessage.textContent = '';
   emailMessage.classList.remove('success');
   try {
@@ -173,6 +174,7 @@ emailForm.addEventListener('submit', async event => {
     emailMessage.textContent = error.message;
   } finally {
     emailSubmit.disabled = false;
+    emailForm.removeAttribute('aria-busy');
   }
 });
 
