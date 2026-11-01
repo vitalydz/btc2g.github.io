@@ -13,3 +13,9 @@ test('homepage social preview names BTC2G and describes its image', () => {
   assert.match(homepage, /property="og:image:alt" content="[^"]*Bitcoin-to-gold ratio[^"]*"/);
   assert.match(homepage, /name="twitter:image:alt" content="[^"]*Bitcoin-to-gold ratio[^"]*"/);
 });
+
+test('homepage social preview declares all supported locale variants', () => {
+  assert.match(homepage, /property="og:locale" content="en_US"/);
+  const alternateLocales = [...homepage.matchAll(/property="og:locale:alternate" content="([^"]+)"/g)].map(match => match[1]);
+  assert.deepEqual(alternateLocales, ['ru_RU','he_IL','de_DE','fr_FR','es_ES','zh_CN','it_IT','pt_PT','ar_SA','hi_IN','ja_JP','ko_KR','tr_TR','pl_PL','nl_NL','uk_UA','id_ID','vi_VN']);
+});
