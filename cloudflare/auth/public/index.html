@@ -50,11 +50,11 @@
       </div>
       <form id="account-form">
         <label><span id="username-label">Username</span>
-          <input id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="32" pattern="[A-Za-z][A-Za-z0-9_]{2,31}" aria-describedby="username-hint" required>
+          <input id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" enterkeyhint="next" minlength="3" maxlength="32" pattern="[A-Za-z][A-Za-z0-9_]{2,31}" aria-describedby="username-hint" required>
           <small class="field-hint" id="username-hint">3–32 characters. Start with a letter; use letters, numbers, or underscores.</small>
         </label>
         <label id="registration-email-row"><span id="registration-email-label">Email address</span>
-          <input id="registration-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" maxlength="254" aria-describedby="registration-email-hint" required>
+          <input id="registration-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" enterkeyhint="next" maxlength="254" aria-describedby="registration-email-hint" required>
           <small class="field-hint" id="registration-email-hint">Required. Registration is complete only after you verify this address.</small>
         </label>
         <label><span id="password-label">Password</span>
@@ -79,7 +79,7 @@
           <p id="email-status">No verified email is attached.</p>
           <form id="email-form">
             <label>Email address
-              <input id="account-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" maxlength="254" aria-describedby="account-email-hint" required>
+              <input id="account-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" enterkeyhint="send" maxlength="254" aria-describedby="account-email-hint" required>
             </label>
             <button class="primary" id="email-submit" type="submit">Send verification email</button>
             <p class="message" id="email-message" role="status" aria-live="polite"></p>
