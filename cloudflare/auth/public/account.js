@@ -23,6 +23,7 @@ const ideaSubmit = document.querySelector('#idea-submit');
 const ideaMessage = document.querySelector('#idea-message');
 const ideaAccess = document.querySelector('#idea-access');
 const ideaList = document.querySelector('#idea-list');
+const refreshStatsButton = document.querySelector('#refresh-stats');
 let mode = 'register';
 let ideaSubmissionKey = '';
 
@@ -42,6 +43,9 @@ function setMessage(text, success = false) {
 }
 
 async function refreshStats() {
+  if (refreshStatsButton.disabled) return;
+  refreshStatsButton.disabled = true;
+  refreshStatsButton.setAttribute('aria-busy', 'true');
   const subscribersCard = document.querySelector('#subscribers-card');
   try {
     const data = await request('/api/stats');
@@ -61,10 +65,13 @@ async function refreshStats() {
     subscribersCard.hidden = true;
     document.querySelectorAll('.stats [data-count]').forEach(item => { item.textContent = accountText('dataUnavailable'); });
     document.querySelector('#stats-note').textContent = accountText('statsUnavailable');
+  } finally {
+    refreshStatsButton.disabled = false;
+    refreshStatsButton.removeAttribute('aria-busy');
   }
 }
 
-document.querySelector('#refresh-stats').addEventListener('click', refreshStats);
+refreshStatsButton.addEventListener('click', refreshStats);
 
 function renderIdeas(ideas) {
   if (!ideas.length) {

@@ -190,3 +190,10 @@ test('administrator UI shows the configured application version', async () => {
   assert.match(config, new RegExp(`"APP_VERSION": "${expected.replaceAll('.', '\\.') }"`));
   assert.match(config, /"run_worker_first": true/);
 });
+
+test('account statistics refresh prevents duplicate requests and announces loading', async () => {
+  const account = await readFile(new URL('../public/account.js', import.meta.url), 'utf8');
+  assert.match(account, /if \(refreshStatsButton\.disabled\) return/);
+  assert.match(account, /refreshStatsButton\.setAttribute\('aria-busy', 'true'\)/);
+  assert.match(account, /refreshStatsButton\.removeAttribute\('aria-busy'\)/);
+});

@@ -8,8 +8,10 @@ function page(htmlPath) {
   const html = readFileSync(new URL(htmlPath, import.meta.url), 'utf8');
   const nodes = new Map();
   function node() {
-    return { textContent: '', value: '7', hidden: false, children: [], listeners: {},
+    return { textContent: '', value: '7', hidden: false, disabled: false, children: [], listeners: {}, attributes: {},
       addEventListener(name, handler) { this.listeners[name] = handler; },
+      setAttribute(name, value) { this.attributes[name] = value; },
+      removeAttribute(name) { delete this.attributes[name]; },
       replaceChildren(...children) { this.children = children; },
       append(child) { this.children.push(child); } };
   }
