@@ -42,3 +42,10 @@ test('Support is discoverable and new account acceptance uses the current Terms 
   assert.match(sitemap, /https:\/\/btc2g\.com\/bitcoin-vs-gold-forecast-2026\.html/);
   assert.match(workerConfig, /"TERMS_VERSION": "2026-10-29\.3"/);
 });
+
+test('Public footers link safely to vitdart.com', () => {
+  for (const file of ['index.html', 'premium.html', 'research.html']) {
+    const page = read(file);
+    assert.match(page, /href="https:\/\/vitdart\.com\/"[^>]+target="_blank"[^>]+rel="noopener noreferrer"/);
+  }
+});
