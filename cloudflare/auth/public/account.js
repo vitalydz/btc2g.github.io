@@ -196,6 +196,7 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
 form.addEventListener('submit', async event => {
   event.preventDefault();
   submitButton.disabled = true;
+  form.setAttribute('aria-busy', 'true');
   setMessage('');
   try {
     const payload = {
@@ -232,6 +233,7 @@ form.addEventListener('submit', async event => {
     setMessage(error.message);
   } finally {
     submitButton.disabled = false;
+    form.removeAttribute('aria-busy');
   }
 });
 
