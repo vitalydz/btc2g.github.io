@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from scripts.submit_indexnow import changed_urls, sitemap_urls, submit
+from scripts.submit_indexnow import changed_urls, sitemap_urls, submit, wait_for_publication
 
 
 class Response(io.BytesIO):
@@ -55,6 +55,16 @@ class IndexNowTests(unittest.TestCase):
             return response
         with self.assertRaisesRegex(RuntimeError, '429'):
             submit(sitemap_urls(self.root), self.root, opener)
+
+    def test_notifications_wait_for_successful_pages_publication(self):
+        for conclusion in ['success', 'failure']:
+            def opener(request, **kwargs):
+                return Response(json.dumps({'workflow_runs': [{'name': 'pages build and deployment', 'status': 'completed', 'conclusion': conclusion}]}).encode())
+            if conclusion == 'success':
+                wait_for_publication('a' * 40, opener, lambda seconds: None)
+            else:
+                with self.assertRaisesRegex(RuntimeError, 'no URLs submitted'):
+                    wait_for_publication('a' * 40, opener, lambda seconds: None)
 
 
 if __name__ == '__main__':

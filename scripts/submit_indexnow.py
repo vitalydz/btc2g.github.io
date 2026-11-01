@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
@@ -14,6 +15,20 @@ ORIGIN = 'https://btc2g.com'
 KEY_FILE = 'indexnow-key.txt'
 MARKET_PAGES = {'', 'scenario.html', 'bitcoin-gold-ratio.html',
                 'bitcoin-vs-gold.html', 'bitcoin-vs-gold-forecast-2026.html'}
+
+
+def wait_for_publication(revision, opener=urlopen, sleep=time.sleep):
+    url = f'https://api.github.com/repos/vitalydz/btc2g.github.io/actions/runs?head_sha={revision}&per_page=20'
+    for _ in range(30):
+        with opener(Request(url, headers={'User-Agent': 'BTC2G-IndexNow'}), timeout=20) as response:
+            runs = json.load(response)['workflow_runs']
+        pages = [run for run in runs if run['name'] == 'pages build and deployment']
+        if pages and pages[0]['status'] == 'completed':
+            if pages[0]['conclusion'] != 'success':
+                raise RuntimeError('Pages publication did not succeed; no URLs submitted')
+            return
+        sleep(10)
+    raise RuntimeError('Timed out waiting for Pages publication; no URLs submitted')
 
 
 def sitemap_urls(root=ROOT):
@@ -77,15 +92,18 @@ def main():
     parser.add_argument('--all', action='store_true', help='Initial discovery of all sitemap URLs')
     parser.add_argument('--revision', default='HEAD', help='Deployed commit to inspect')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--wait-for-publication', action='store_true')
     args = parser.parse_args()
+    revision = subprocess.check_output(['git', 'rev-parse', '--verify', args.revision + '^{commit}'], cwd=ROOT, text=True).strip()
     urls = sitemap_urls()
     if not args.all:
-        revision = subprocess.check_output(['git', 'rev-parse', '--verify', args.revision + '^{commit}'], cwd=ROOT, text=True).strip()
         files = subprocess.check_output(['git', 'diff-tree', '--root', '--no-commit-id', '--name-only', '-r', revision], cwd=ROOT, text=True).splitlines()
         urls = changed_urls(urls, files)
     if args.dry_run:
         print(json.dumps(urls, indent=2))
     else:
+        if args.wait_for_publication:
+            wait_for_publication(revision)
         submit(urls)
 
 
