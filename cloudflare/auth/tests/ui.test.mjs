@@ -182,4 +182,5 @@ test('administrator UI shows the configured application version', async () => {
   assert.match(adminScript, /data\.appVersion/);
   assert.match(worker, /appVersion: env\.APP_VERSION/);
   assert.match(config, new RegExp(`"APP_VERSION": "${expected.replaceAll('.', '\\.') }"`));
+  assert.match(config, /"run_worker_first": true/);
 });
