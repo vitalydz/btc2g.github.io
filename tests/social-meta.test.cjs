@@ -34,3 +34,20 @@ test('homepage publishes valid multilingual WebSite structured data', () => {
 test('homepage allows large search-result image previews', () => {
   assert.match(homepage, /name="robots" content="index,follow,max-image-preview:large"/);
 });
+
+test('research articles publish complete large-image social previews', () => {
+  const root = path.join(__dirname, '..');
+  for (const file of ['bitcoin-vs-gold.html', 'bitcoin-gold-ratio.html', 'bitcoin-vs-gold-forecast-2026.html']) {
+    const html = fs.readFileSync(path.join(root, file), 'utf8');
+    assert.match(html, /<meta property="og:type" content="article"\s*\/>/);
+    assert.match(html, /<meta property="og:site_name" content="BTC2G"\s*\/>/);
+    assert.match(html, /<meta property="og:title" content="[^"]+"\s*\/>/);
+    assert.match(html, /<meta property="og:description" content="[^"]+"\s*\/>/);
+    assert.match(html, /<meta property="og:url" content="https:\/\/btc2g\.com\/[^"]+"\s*\/>/);
+    assert.match(html, /<meta property="og:image" content="https:\/\/btc2g\.com\/assets\/btc_gold_forecast\.png"\s*\/>/);
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image"\s*\/>/);
+    assert.match(html, /<meta name="twitter:title" content="[^"]+"\s*\/>/);
+    assert.match(html, /<meta name="twitter:description" content="[^"]+"\s*\/>/);
+    assert.match(html, /<meta name="twitter:image" content="https:\/\/btc2g\.com\/assets\/btc_gold_forecast\.png"\s*\/>/);
+  }
+});
