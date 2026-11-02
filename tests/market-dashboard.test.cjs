@@ -35,7 +35,7 @@ test('homepage is data-first without fabricated audience totals', () => {
   assert.match(html, /id="ratio-change"/);
   assert.match(html, /id="subscribe"/);
   assert.match(html, /id="hero-account-link"[^>]+https:\/\/btc2g-accounts\.btc2g\.workers\.dev\//);
-  assert.match(html, /setTextById\('hero-account-link', text\.navAccount\)/);
+  assert.match(html, /setTextById\('hero-account-link', createAccountLabels\[lang\] \|\| createAccountLabels\.en\)/);
   assert.match(html, /<details class="forecast-static" open>/);
   assert.match(html, /id="forecastChart"[^>]+assets\/btc_gold_forecast\.png/);
   assert.ok(html.indexOf('id="forecastChart"') < html.indexOf('class="signal-card"'));

@@ -6,21 +6,57 @@
   <meta name="theme-color" content="#071426">
   <title>Ratio Bitcoin / Oro | BTC2G</title><meta name="btc2g-release" content="2026.10.30.13">
   <meta name="description" content="Ratio Bitcoin / Oro — BTC2G.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
   <meta property="og:title" content="Ratio Bitcoin / Oro | BTC2G">
   <meta property="og:description" content="Ratio Bitcoin / Oro — BTC2G.">
   <meta property="og:url" content="https://btc2g.com/es/">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="BTC2G">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="ru_RU">
+  <meta property="og:locale:alternate" content="he_IL">
+  <meta property="og:locale:alternate" content="de_DE">
+  <meta property="og:locale:alternate" content="fr_FR">
+  <meta property="og:locale:alternate" content="es_ES">
+  <meta property="og:locale:alternate" content="zh_CN">
+  <meta property="og:locale:alternate" content="it_IT">
+  <meta property="og:locale:alternate" content="pt_PT">
+  <meta property="og:locale:alternate" content="ar_SA">
+  <meta property="og:locale:alternate" content="hi_IN">
+  <meta property="og:locale:alternate" content="ja_JP">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta property="og:locale:alternate" content="tr_TR">
+  <meta property="og:locale:alternate" content="pl_PL">
+  <meta property="og:locale:alternate" content="nl_NL">
+  <meta property="og:locale:alternate" content="uk_UA">
+  <meta property="og:locale:alternate" content="id_ID">
+  <meta property="og:locale:alternate" content="vi_VN">
   <meta property="og:image" content="https://btc2g.com/assets/btc_gold_forecast.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="2800">
+  <meta property="og:image:height" content="1400">
+  <meta property="og:image:alt" content="BTC2G Bitcoin-to-gold ratio research dashboard">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Ratio Bitcoin / Oro | BTC2G">
   <meta name="twitter:description" content="Ratio Bitcoin / Oro — BTC2G.">
   <meta name="twitter:image" content="https://btc2g.com/assets/btc_gold_forecast.png">
+  <meta name="twitter:image:alt" content="BTC2G Bitcoin-to-gold ratio research dashboard">
   <link rel="icon" type="image/png" href="/icons/icon-192.png">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="manifest" href="/manifest.json">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/index.css?v=20261030-4">
   <link rel="canonical" href="https://btc2g.com/es/">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "BTC2G",
+      "url": "https://btc2g.com/",
+      "description": "Track the published Bitcoin-to-gold ratio, daily market data, model direction, history chart, and BTC to gold calculator.",
+      "inLanguage": ["en","ru","he","de","fr","es","zh","it","pt","ar","hi","ja","ko","tr","pl","nl","uk","id","vi"]
+    }
+  </script>
 
 
 
@@ -101,7 +137,7 @@
       <div class="hero-actions">
         <a id="hero-subscribe-link" class="hero-button hero-button-primary" href="/es/#subscribe">Recibir actualizaciones</a>
         <a id="hero-premium-link" class="hero-button" href="/es/premium.html">Ver Premium</a>
-        <a id="hero-account-link" class="hero-button" href="https://btc2g-accounts.btc2g.workers.dev/?lang=es">Cuenta</a>
+        <a id="hero-account-link" class="hero-button" href="https://btc2g-accounts.btc2g.workers.dev/?lang=es">Crear cuenta</a>
         <a id="calculator-jump" class="hero-text-link" href="/es/#calculator">Calculadora de referencia BTC ↔ oro</a>
       </div>
     </section>
@@ -157,7 +193,7 @@
       </button>
       <details class="forecast-static" open>
         <summary>Ver escenario a largo plazo</summary>
-        <img style="display:block" id="forecastChart" src="/assets/btc_gold_forecast.png?v=1793491623801" alt="BTC vs Gold long-term scenario chart">
+        <img style="display:block" id="forecastChart" src="/assets/btc_gold_forecast.png?v=1793580250464" alt="BTC vs Gold long-term scenario chart">
         <section class="signal-card" aria-labelledby="signal-title">
           <div class="signal-main">
             <h2 id="signal-title">Señal del modelo BTC</h2>
@@ -2236,7 +2272,8 @@
       document.getElementById('nav-premium').href = 'premium.html?v=20261029-21&lang=' + encodeURIComponent(lang);
       setTextById('nav-buy', text.navBuy);
       setTextById('nav-account', text.navAccount);
-      setTextById('hero-account-link', text.navAccount);
+      const createAccountLabels = {en:'Create account',ru:'Создать аккаунт',he:'יצירת חשבון',de:'Konto erstellen',fr:'Créer un compte',es:'Crear cuenta',zh:'创建账户',it:'Crea account',pt:'Criar conta',ar:'إنشاء حساب',hi:'खाता बनाएँ',ja:'アカウント作成',ko:'계정 만들기',tr:'Hesap oluştur',pl:'Utwórz konto',nl:'Account maken',uk:'Створити акаунт',id:'Buat akun',vi:'Tạo tài khoản'};
+      setTextById('hero-account-link', createAccountLabels[lang] || createAccountLabels.en);
       document.getElementById('nav-account').href = 'https://btc2g-accounts.btc2g.workers.dev/?lang=' + encodeURIComponent(lang);
       document.getElementById('hero-account-link').href = document.getElementById('nav-account').href;
       document.getElementById('nav-save').href = 'save.html?lang=' + encodeURIComponent(lang);

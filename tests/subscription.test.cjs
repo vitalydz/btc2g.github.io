@@ -111,3 +111,14 @@ test('homepage email label and timeout message cover every offered language', ()
     if (language !== 'en') assert.notEqual(text.email, 'Email address');
   }
 });
+
+test('homepage hero uses a localized account-creation call to action', () => {
+  assert.match(homepage, /id="hero-account-link"[^>]*>Create account<\/a>/);
+  const labelsMatch = homepage.match(/const createAccountLabels = (\{[^;]+\});/);
+  assert.ok(labelsMatch, 'localized create-account labels must be present');
+  const labels = vm.runInNewContext(`(${labelsMatch[1]})`);
+  const offeredLanguages = [...homepage.matchAll(/<option value="([a-z]{2})">/g)].map((match) => match[1]);
+  assert.deepEqual(Object.keys(labels).sort(), offeredLanguages.sort());
+  for (const language of offeredLanguages) assert.ok(labels[language], `missing create-account label for ${language}`);
+  assert.match(homepage, /setTextById\('hero-account-link', createAccountLabels\[lang\] \|\| createAccountLabels\.en\)/);
+});
