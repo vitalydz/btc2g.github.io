@@ -84,9 +84,11 @@ test('switching registration mode moves focus to the first account field', async
 });
 
 test('registration flow explains that email verification completes the account', async () => {
-  const [accountPage, accountCss] = await Promise.all(['index.html', 'account.css'].map(path => readFile(new URL(path, root), 'utf8')));
+  const [accountPage, accountCss, accountLanguage] = await Promise.all(['index.html', 'account.css', 'account-language.js'].map(path => readFile(new URL(path, root), 'utf8')));
   assert.match(accountPage, /class="registration-steps" aria-label="Registration steps"/);
   assert.match(accountPage, /<strong>Create account<\/strong>/);
+  assert.match(accountPage, /id="submit-button"[^>]*>Create free account<\/button>/);
+  assert.match(accountLanguage, /const freeAccountRows = \{en:'Create free account',ru:'Создать бесплатный аккаунт'/);
   assert.match(accountPage, /<strong>Check your inbox<\/strong>/);
   assert.match(accountPage, /Open the verification link within 30 minutes/);
   assert.match(accountPage, /<strong>Email verified<\/strong>/);

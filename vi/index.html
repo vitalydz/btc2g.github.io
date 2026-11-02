@@ -137,7 +137,7 @@
       <div class="hero-actions">
         <a id="hero-subscribe-link" class="hero-button" href="/vi/#subscribe">Nhận cập nhật mô hình</a>
         <a id="hero-premium-link" class="hero-button" href="/vi/premium.html">Xem Premium</a>
-        <a id="hero-account-link" class="hero-button hero-button-primary" href="https://btc2g-accounts.btc2g.workers.dev/?lang=vi">Tạo tài khoản</a>
+        <a id="hero-account-link" class="hero-button hero-button-primary" href="https://btc2g-accounts.btc2g.workers.dev/?lang=vi">Tạo tài khoản miễn phí</a>
         <a id="calculator-jump" class="hero-text-link" href="/vi/#calculator">Máy tính tham khảo BTC ↔ vàng</a>
       </div>
     </section>
@@ -2272,7 +2272,7 @@
       document.getElementById('nav-premium').href = 'premium.html?v=20261029-21&lang=' + encodeURIComponent(lang);
       setTextById('nav-buy', text.navBuy);
       setTextById('nav-account', text.navAccount);
-      const createAccountLabels = {en:'Create account',ru:'Создать аккаунт',he:'יצירת חשבון',de:'Konto erstellen',fr:'Créer un compte',es:'Crear cuenta',zh:'创建账户',it:'Crea account',pt:'Criar conta',ar:'إنشاء حساب',hi:'खाता बनाएँ',ja:'アカウント作成',ko:'계정 만들기',tr:'Hesap oluştur',pl:'Utwórz konto',nl:'Account maken',uk:'Створити акаунт',id:'Buat akun',vi:'Tạo tài khoản'};
+      const createAccountLabels = {en:'Create free account',ru:'Создать бесплатный аккаунт',he:'יצירת חשבון חינם',de:'Kostenloses Konto erstellen',fr:'Créer un compte gratuit',es:'Crear cuenta gratis',zh:'创建免费账户',it:'Crea account gratuito',pt:'Criar conta grátis',ar:'إنشاء حساب مجاني',hi:'मुफ़्त खाता बनाएँ',ja:'無料アカウントを作成',ko:'무료 계정 만들기',tr:'Ücretsiz hesap oluştur',pl:'Utwórz bezpłatne konto',nl:'Gratis account maken',uk:'Створити безкоштовний акаунт',id:'Buat akun gratis',vi:'Tạo tài khoản miễn phí'};
       setTextById('hero-account-link', createAccountLabels[lang] || createAccountLabels.en);
       document.getElementById('nav-account').href = 'https://btc2g-accounts.btc2g.workers.dev/?lang=' + encodeURIComponent(lang);
       document.getElementById('hero-account-link').href = document.getElementById('nav-account').href;

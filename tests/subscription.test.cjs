@@ -113,7 +113,7 @@ test('homepage email label and timeout message cover every offered language', ()
 });
 
 test('homepage hero uses a localized account-creation call to action', () => {
-  assert.match(homepage, /id="hero-account-link"[^>]*>Create account<\/a>/);
+  assert.match(homepage, /id="hero-account-link"[^>]*>Create free account<\/a>/);
   const labelsMatch = homepage.match(/const createAccountLabels = (\{[^;]+\});/);
   assert.ok(labelsMatch, 'localized create-account labels must be present');
   const labels = vm.runInNewContext(`(${labelsMatch[1]})`);

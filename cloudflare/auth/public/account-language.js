@@ -25,6 +25,7 @@ const keys = ['title','intro','today','total','subscribers','visitors','views','
 const trustRows = {
   en:'Email verification does not subscribe you to marketing.',ru:'Подтверждение email не подписывает вас на рекламную рассылку.',he:'אימות האימייל אינו רושם אתכם לדיוור שיווקי.',de:'Die E-Mail-Bestätigung meldet Sie nicht für Marketing an.',fr:'La vérification de l’e-mail ne vous inscrit pas aux communications marketing.',es:'Verificar el correo no te suscribe a comunicaciones de marketing.',zh:'验证邮箱不会订阅营销邮件。',it:'La verifica dell’email non ti iscrive alle comunicazioni di marketing.',pt:'A verificação do email não o inscreve em comunicações de marketing.',ar:'لا يؤدي توثيق البريد الإلكتروني إلى الاشتراك في رسائل تسويقية.',hi:'ईमेल सत्यापन आपको मार्केटिंग संदेशों की सदस्यता नहीं देता।',ja:'メール確認によってマーケティング配信に登録されることはありません。',ko:'이메일 인증은 마케팅 메시지 구독으로 이어지지 않습니다.',tr:'E-posta doğrulaması sizi pazarlama iletilerine abone yapmaz.',pl:'Weryfikacja e-maila nie zapisuje Cię na wiadomości marketingowe.',nl:'E-mailverificatie schrijft u niet in voor marketingberichten.',uk:'Підтвердження email не підписує вас на маркетингові повідомлення.',id:'Verifikasi email tidak mendaftarkan Anda ke pesan pemasaran.',vi:'Xác minh email không đăng ký bạn nhận nội dung tiếp thị.'
 };
+const freeAccountRows = {en:'Create free account',ru:'Создать бесплатный аккаунт',he:'יצירת חשבון חינם',de:'Kostenloses Konto erstellen',fr:'Créer un compte gratuit',es:'Crear cuenta gratis',zh:'创建免费账户',it:'Crea account gratuito',pt:'Criar conta grátis',ar:'إنشاء حساب مجاني',hi:'मुफ़्त खाता बनाएँ',ja:'無料アカウントを作成',ko:'무료 계정 만들기',tr:'Ücretsiz hesap oluştur',pl:'Utwórz bezpłatne konto',nl:'Gratis account maken',uk:'Створити безкоштовний акаунт',id:'Buat akun gratis',vi:'Tạo tài khoản miễn phí'};
 const dictionaries = Object.fromEntries(Object.entries(rows).map(([lang, values]) => [lang, {...Object.fromEntries(keys.map((key, index) => [key, values[index]])), trust:trustRows[lang]}]));
 const extras = {
   en: { dataUnavailable:'Data unavailable', statsUnavailable:'Data unavailable. The statistics service could not be reached. Retry below.' },
@@ -36,7 +37,7 @@ try { saved = localStorage.getItem('lang') || ''; } catch {}
 const browser = (navigator.language || 'en').slice(0, 2).toLowerCase();
 export let accountLanguage = languages.includes(requested) ? requested : (languages.includes(saved) ? saved : (languages.includes(browser) ? browser : 'en'));
 
-export function accountText(key) { return dictionaries[accountLanguage]?.[key] || extras[accountLanguage]?.[key] || dictionaries.en[key] || extras.en[key] || key; }
+export function accountText(key) { return (key === 'create' ? freeAccountRows[accountLanguage] : null) || dictionaries[accountLanguage]?.[key] || extras[accountLanguage]?.[key] || dictionaries.en[key] || extras.en[key] || key; }
 
 export function applyAccountLanguage() {
   document.documentElement.lang = accountLanguage;
