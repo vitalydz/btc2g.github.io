@@ -59,8 +59,12 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     const dictionary = context.window.__i18n.dictionaries[lang];
     assert.ok(dictionary, lang);
     assert.ok(Object.values(dictionary).every(value => typeof value === 'string' && value.trim()), lang);
+    assert.ok(dictionary.trust, lang);
   }
   assert.equal(context.window.__i18n.dictionaries.ru.title, 'Ваш аккаунт BTC2G');
+  assert.match(context.window.__i18n.dictionaries.ru.trust, /не подписывает/);
+  assert.match(html, /id="account-trust">Email verification does not subscribe you to marketing/);
+  assert.match(languageScript, /trust:'account-trust'/);
   assert.match(homepage, /btc2g-accounts\.btc2g\.workers\.dev\/\?lang=' \+ encodeURIComponent\(lang\)/);
 });
 

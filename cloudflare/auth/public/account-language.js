@@ -22,7 +22,10 @@ const rows = {
 };
 
 const keys = ['title','intro','today','total','subscribers','visitors','views','refresh','create','signIn','username','email','password','show','hide','passwordHint','loginPasswordHint'];
-const dictionaries = Object.fromEntries(Object.entries(rows).map(([lang, values]) => [lang, Object.fromEntries(keys.map((key, index) => [key, values[index]]))]));
+const trustRows = {
+  en:'Email verification does not subscribe you to marketing.',ru:'Подтверждение email не подписывает вас на рекламную рассылку.',he:'אימות האימייל אינו רושם אתכם לדיוור שיווקי.',de:'Die E-Mail-Bestätigung meldet Sie nicht für Marketing an.',fr:'La vérification de l’e-mail ne vous inscrit pas aux communications marketing.',es:'Verificar el correo no te suscribe a comunicaciones de marketing.',zh:'验证邮箱不会订阅营销邮件。',it:'La verifica dell’email non ti iscrive alle comunicazioni di marketing.',pt:'A verificação do email não o inscreve em comunicações de marketing.',ar:'لا يؤدي توثيق البريد الإلكتروني إلى الاشتراك في رسائل تسويقية.',hi:'ईमेल सत्यापन आपको मार्केटिंग संदेशों की सदस्यता नहीं देता।',ja:'メール確認によってマーケティング配信に登録されることはありません。',ko:'이메일 인증은 마케팅 메시지 구독으로 이어지지 않습니다.',tr:'E-posta doğrulaması sizi pazarlama iletilerine abone yapmaz.',pl:'Weryfikacja e-maila nie zapisuje Cię na wiadomości marketingowe.',nl:'E-mailverificatie schrijft u niet in voor marketingberichten.',uk:'Підтвердження email не підписує вас на маркетингові повідомлення.',id:'Verifikasi email tidak mendaftarkan Anda ke pesan pemasaran.',vi:'Xác minh email không đăng ký bạn nhận nội dung tiếp thị.'
+};
+const dictionaries = Object.fromEntries(Object.entries(rows).map(([lang, values]) => [lang, {...Object.fromEntries(keys.map((key, index) => [key, values[index]])), trust:trustRows[lang]}]));
 const extras = {
   en: { dataUnavailable:'Data unavailable', statsUnavailable:'Data unavailable. The statistics service could not be reached. Retry below.' },
   ru: { dataUnavailable:'Данные недоступны', statsUnavailable:'Данные недоступны. Не удалось связаться со службой статистики. Повторите попытку ниже.' }
@@ -41,7 +44,7 @@ export function applyAccountLanguage() {
   try { localStorage.setItem('lang', accountLanguage); } catch {}
   const selector = document.querySelector('#account-language');
   selector.value = accountLanguage;
-  const targets = { title:'account-title', intro:'account-intro', today:'stats-title', total:'total-label', subscribers:'subscribers-label', visitors:'visitors-label', views:'views-label', refresh:'refresh-stats', create:'register-tab', signIn:'login-tab', username:'username-label', email:'registration-email-label', password:'password-label', show:'toggle-password' };
+  const targets = { title:'account-title', intro:'account-intro', trust:'account-trust', today:'stats-title', total:'total-label', subscribers:'subscribers-label', visitors:'visitors-label', views:'views-label', refresh:'refresh-stats', create:'register-tab', signIn:'login-tab', username:'username-label', email:'registration-email-label', password:'password-label', show:'toggle-password' };
   Object.entries(targets).forEach(([key,id]) => { const node = document.getElementById(id); if (node) node.textContent = accountText(key); });
   document.querySelector('#account-home-link').href = `https://btc2g.com/?lang=${encodeURIComponent(accountLanguage)}`;
   if (accountLanguage === 'ru') {

@@ -11,7 +11,8 @@ a { color:var(--gold); }
 .hero { padding:58px 0 30px; text-align:center; }
 .eyebrow { color:var(--gold); font-size:.78rem; font-weight:800; letter-spacing:.18em; }
 h1 { margin:.25rem 0 .65rem; font-size:clamp(2rem,8vw,3.7rem); line-height:1.02; }
-.hero p:last-child { max-width:560px; margin:0 auto; color:var(--muted); }
+.hero #account-intro { max-width:560px; margin:0 auto; color:var(--muted); }
+.hero .account-trust { max-width:560px; margin:10px auto 0; color:#c7d8ee; font-size:.86rem; font-weight:700; }
 .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; overflow:hidden; margin-top:22px; border:1px solid var(--line); border-radius:18px; background:var(--line); }
 .stats:has(#subscribers-card[hidden]) { grid-template-columns:repeat(2,1fr); }
 .stats>div { padding:20px 12px; background:#0d1118; text-align:center; }
