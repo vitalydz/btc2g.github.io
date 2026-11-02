@@ -64,10 +64,14 @@ test('three existing insight articles end with a functional signup form', () => 
   for (const file of ['bitcoin-vs-gold.html', 'bitcoin-gold-ratio.html', 'bitcoin-vs-gold-forecast-2026.html']) {
     const html = read(file);
     assert.match(html, /class="article-signup-form"/);
+    assert.match(html, /data-article-account[^>]+btc2g-accounts\.btc2g\.workers\.dev/);
     assert.match(html, /assets\/js\/article-signup\.js/);
     assert.match(html, /assets\/js\/subscription-request\.js/);
     assert.match(html, /assets\/js\/insight-article-language\.js/);
   }
+  const language = read('assets/js/insight-article-language.js');
+  assert.match(language, /url\.searchParams\.set\('lang', lang\)/);
+  assert.match(language, /'Create a BTC2G account': 'Создать аккаунт BTC2G'/);
 });
 
 test('insight links preserve the selected language', () => {

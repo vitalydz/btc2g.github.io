@@ -12,6 +12,12 @@
   root.document.documentElement.dir = (lang === 'he' || lang === 'ar') ? 'rtl' : 'ltr';
   try { root.localStorage.setItem('lang', lang); } catch (_) { /* Storage is optional. */ }
 
+  root.document.querySelectorAll('[data-article-account]').forEach((link) => {
+    const url = new URL(link.href);
+    url.searchParams.set('lang', lang);
+    link.href = url.toString();
+  });
+
   root.document.querySelectorAll('a[href]').forEach((link) => {
     const raw = link.getAttribute('href');
     if (!raw || /^(?:https?:|mailto:|tel:|#)/i.test(raw)) return;
@@ -70,7 +76,8 @@
     'Get BTC2G model updates': 'Получать обновления модели BTC2G',
     'A short email when the published model direction changes or the ratio moves significantly. No daily spam.': 'Короткое письмо при изменении направления модели или значительном движении соотношения. Без ежедневного спама.',
     'Subscribe free': 'Подписаться бесплатно',
-    'Email address': 'Адрес электронной почты'
+    'Email address': 'Адрес электронной почты',
+    'Create a BTC2G account': 'Создать аккаунт BTC2G'
   };
 
   const walker = root.document.createTreeWalker(root.document.body, NodeFilter.SHOW_TEXT);
