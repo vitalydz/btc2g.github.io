@@ -51,3 +51,22 @@ test('research articles publish complete large-image social previews', () => {
     assert.match(html, /<meta name="twitter:image" content="https:\/\/btc2g\.com\/assets\/btc_gold_forecast\.png"\s*\/>/);
   }
 });
+
+test('research articles publish valid Article structured data without invented dates', () => {
+  const root = path.join(__dirname, '..');
+  for (const file of ['bitcoin-vs-gold.html', 'bitcoin-gold-ratio.html', 'bitcoin-vs-gold-forecast-2026.html']) {
+    const html = fs.readFileSync(path.join(root, file), 'utf8');
+    const scripts = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+    assert.equal(scripts.length, 1, file);
+    const article = JSON.parse(scripts[0][1]);
+    assert.equal(article['@context'], 'https://schema.org');
+    assert.equal(article['@type'], 'Article');
+    assert.match(article.headline, /Bitcoin|BTC/);
+    assert.match(article.mainEntityOfPage, /^https:\/\/btc2g\.com\//);
+    assert.equal(article.image, 'https://btc2g.com/assets/btc_gold_forecast.png');
+    assert.equal(article.author.name, 'BTC2G');
+    assert.equal(article.publisher.logo.url, 'https://btc2g.com/icons/icon-512.png');
+    assert.equal('datePublished' in article, false);
+    assert.equal('dateModified' in article, false);
+  }
+});
