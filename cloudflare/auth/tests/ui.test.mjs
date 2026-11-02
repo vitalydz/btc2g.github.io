@@ -30,7 +30,7 @@ test('administrator dashboard distinguishes accounts from confirmed newsletter s
 test('registration fields explain their accepted format before submission', async () => {
   const [html, script] = await Promise.all(['index.html', 'account.js'].map(path => readFile(new URL(path, root), 'utf8')));
   assert.match(html, /aria-describedby="username-hint username-privacy"/);
-  assert.match(html, /id="username-hint">3–32 characters/);
+  assert.match(html, /id="username-hint">3–32 characters\. Start with a Latin letter/);
   assert.match(html, /id="username-privacy">Your username is used only for sign-in and is not displayed publicly/);
   assert.match(html, /aria-describedby="password-hint"/);
   assert.match(html, /id="password-hint">Use at least 12 characters/);
@@ -63,6 +63,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(Object.values(dictionary).every(value => typeof value === 'string' && value.trim()), lang);
     assert.ok(dictionary.trust, lang);
     assert.ok(dictionary.usernamePrivacy, lang);
+    assert.ok(dictionary.usernameHint, lang);
     assert.ok(dictionary.emailHint, lang);
     assert.ok(dictionary.verificationSent, lang);
     assert.ok(dictionary.verificationFailed, lang);
@@ -72,6 +73,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
   assert.match(html, /id="account-trust">Email verification does not subscribe you to marketing/);
   assert.match(languageScript, /trust:'account-trust'/);
   assert.match(languageScript, /usernamePrivacy:'username-privacy'/);
+  assert.match(languageScript, /usernameHint:'username-hint'/);
   assert.match(languageScript, /emailHint:'registration-email-hint'/);
   assert.match(languageScript, /verificationSent:verificationSentRows\[lang\]/);
   assert.match(languageScript, /verificationFailed:verificationFailedRows\[lang\]/);
