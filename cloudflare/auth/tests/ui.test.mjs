@@ -91,6 +91,12 @@ test('registration flow explains that email verification completes the account',
   assert.match(accountCss, /@media \(max-width:560px\)[^{]*\{[^}]*[\s\S]*\.registration-steps\{grid-template-columns:1fr\}/);
 });
 
+test('registration form appears before public progress metrics', async () => {
+  const accountPage = await readFile(new URL('index.html', root), 'utf8');
+  assert.ok(accountPage.indexOf('id="account-card"') < accountPage.indexOf('class="stats"'));
+  assert.ok(accountPage.indexOf('id="account-form"') < accountPage.indexOf('id="today-count"'));
+});
+
 test('homepage form receipt does not claim confirmation and Premium CTA uses existing form', async () => {
   const source = await readFile(new URL('../../../index.html', import.meta.url), 'utf8');
   assert.equal((source.match(/subscribeSuccess:/g) || []).length, 19);
