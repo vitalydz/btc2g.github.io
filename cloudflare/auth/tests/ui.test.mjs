@@ -63,6 +63,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(Object.values(dictionary).every(value => typeof value === 'string' && value.trim()), lang);
     assert.ok(dictionary.trust, lang);
     assert.ok(dictionary.usernamePrivacy, lang);
+    assert.ok(dictionary.emailHint, lang);
     assert.ok(dictionary.verificationSent, lang);
     assert.ok(dictionary.verificationFailed, lang);
   }
@@ -71,6 +72,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
   assert.match(html, /id="account-trust">Email verification does not subscribe you to marketing/);
   assert.match(languageScript, /trust:'account-trust'/);
   assert.match(languageScript, /usernamePrivacy:'username-privacy'/);
+  assert.match(languageScript, /emailHint:'registration-email-hint'/);
   assert.match(languageScript, /verificationSent:verificationSentRows\[lang\]/);
   assert.match(languageScript, /verificationFailed:verificationFailedRows\[lang\]/);
   assert.match(homepage, /btc2g-accounts\.btc2g\.workers\.dev\/\?lang=' \+ encodeURIComponent\(lang\)/);
