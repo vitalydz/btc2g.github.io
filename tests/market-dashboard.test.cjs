@@ -65,6 +65,8 @@ test('three existing insight articles end with a functional signup form', () => 
     const html = read(file);
     assert.match(html, /class="article-signup-form"/);
     assert.match(html, /data-article-account[^>]+btc2g-accounts\.btc2g\.workers\.dev/);
+    assert.match(html, /class="related-guides"/);
+    assert.equal((html.match(/class="related-guides"[\s\S]*?<\/nav>/) || [''])[0].match(/<a /g)?.length, 2);
     assert.match(html, /assets\/js\/article-signup\.js/);
     assert.match(html, /assets\/js\/subscription-request\.js/);
     assert.match(html, /assets\/js\/insight-article-language\.js/);
@@ -72,6 +74,7 @@ test('three existing insight articles end with a functional signup form', () => 
   const language = read('assets/js/insight-article-language.js');
   assert.match(language, /url\.searchParams\.set\('lang', lang\)/);
   assert.match(language, /'Create a BTC2G account': 'Создать аккаунт BTC2G'/);
+  assert.match(language, /'Related BTC2G guides': 'Связанные материалы BTC2G'/);
 });
 
 test('insight links preserve the selected language', () => {
