@@ -1,6 +1,7 @@
 (function () {
   'use strict';
   const texts = window.BTC2GSaveText;
+  const accountLabels = {en:'Create account',ru:'Создать аккаунт',he:'יצירת חשבון',de:'Konto erstellen',fr:'Créer un compte',es:'Crear cuenta',zh:'创建账户',it:'Crea account',pt:'Criar conta',ar:'إنشاء حساب',hi:'खाता बनाएँ',ja:'アカウント作成',ko:'계정 만들기',tr:'Hesap oluştur',pl:'Utwórz konto',nl:'Account maken',uk:'Створити акаунт',id:'Buat akun',vi:'Tạo tài khoản'};
 
   const byId = id => document.getElementById(id);
   let lang = 'en';
@@ -48,6 +49,8 @@
     try { localStorage.setItem('lang', lang); } catch {}
     document.title = t().title + ' | BTC2G SAVE';
     document.querySelector('meta[name=description]').content = t().intro;
+    byId('save-account-link').textContent = accountLabels[lang];
+    byId('save-account-link').href = 'https://btc2g-accounts.btc2g.workers.dev/?lang=' + encodeURIComponent(lang);
     document.querySelectorAll('a[href^="index.html"]').forEach(a => {
       const u = new URL(a.getAttribute('href'), location.href); u.searchParams.set('lang', lang); a.setAttribute('href', 'index.html' + u.search + u.hash);
     });
