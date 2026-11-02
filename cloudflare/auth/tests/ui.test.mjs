@@ -89,6 +89,8 @@ test('registration flow explains that email verification completes the account',
   assert.match(accountPage, /<strong>Create account<\/strong>/);
   assert.match(accountPage, /id="submit-button"[^>]*>Create free account<\/button>/);
   assert.match(accountLanguage, /const freeAccountRows = \{en:'Create free account',ru:'Создать бесплатный аккаунт'/);
+  assert.match(accountPage, /id="account-title">Create your free BTC2G account<\/h1>/);
+  assert.match(accountLanguage, /const freeTitleRows = \{en:'Create your free BTC2G account',ru:'Создайте бесплатный аккаунт BTC2G'/);
   assert.match(accountPage, /<strong>Check your inbox<\/strong>/);
   assert.match(accountPage, /Open the verification link within 30 minutes/);
   assert.match(accountPage, /<strong>Email verified<\/strong>/);
