@@ -38,6 +38,7 @@ test('registration fields explain their accepted format before submission', asyn
   assert.match(html, /Registration is complete only after you verify this address/);
   assert.match(script, /email: mode === 'register'/);
   assert.match(script, /accountText\('loginPasswordHint'\)/);
+  assert.match(script, /accountText\(data\.verificationEmailSent \? 'verificationSent' : 'verificationFailed'\)/);
 });
 
 test('account page localizes its primary UI in all 19 site languages', async () => {
@@ -62,12 +63,16 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(Object.values(dictionary).every(value => typeof value === 'string' && value.trim()), lang);
     assert.ok(dictionary.trust, lang);
     assert.ok(dictionary.usernamePrivacy, lang);
+    assert.ok(dictionary.verificationSent, lang);
+    assert.ok(dictionary.verificationFailed, lang);
   }
   assert.equal(context.window.__i18n.dictionaries.ru.title, 'Ваш аккаунт BTC2G');
   assert.match(context.window.__i18n.dictionaries.ru.trust, /не подписывает/);
   assert.match(html, /id="account-trust">Email verification does not subscribe you to marketing/);
   assert.match(languageScript, /trust:'account-trust'/);
   assert.match(languageScript, /usernamePrivacy:'username-privacy'/);
+  assert.match(languageScript, /verificationSent:verificationSentRows\[lang\]/);
+  assert.match(languageScript, /verificationFailed:verificationFailedRows\[lang\]/);
   assert.match(homepage, /btc2g-accounts\.btc2g\.workers\.dev\/\?lang=' \+ encodeURIComponent\(lang\)/);
 });
 

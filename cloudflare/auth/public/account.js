@@ -236,9 +236,7 @@ form.addEventListener('submit', async event => {
     }
     showUser(data.user);
     if (mode === 'register') {
-      emailMessage.textContent = data.verificationEmailSent
-        ? accountLanguage === 'ru' ? 'Письмо подтверждения отправлено. Откройте ссылку в течение 30 минут, чтобы завершить регистрацию.' : 'Verification email sent. Open the link within 30 minutes to complete registration.'
-        : accountLanguage === 'ru' ? 'Аккаунт ожидает подтверждения. Не удалось отправить письмо; используйте кнопку выше, чтобы повторить попытку.' : 'Your account is pending. We could not send the verification email; use the button above to retry.';
+      emailMessage.textContent = accountText(data.verificationEmailSent ? 'verificationSent' : 'verificationFailed');
       emailMessage.classList.toggle('success', data.verificationEmailSent);
     }
     await refreshStats();
