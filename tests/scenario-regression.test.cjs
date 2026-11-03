@@ -13,8 +13,9 @@ async function setup({blocked=false,failed=false,search=''}={}){
 }
 test('invalid target clears previous values and blocks copying; correction recovers',async()=>{
  const h=await setup();assert.equal(h.el('required-btc').textContent,'$120,000.00');
+ assert.equal(h.el('ratio-formula').textContent,'Calculation: $80,000.00 ÷ $4,000.00 = 20 oz t');
  h.el('target-ratio').value='';h.el('target-ratio').listeners.input();
- for(const id of ['required-btc','future-btc','future-gold','future-ratio','ratio-difference'])assert.equal(h.el(id).textContent,'—');
+ for(const id of ['required-btc','future-btc','future-gold','future-ratio','ratio-difference','ratio-formula'])assert.equal(h.el(id).textContent,'—');
  assert.equal(h.el('target-ratio').attributes['aria-invalid'],'true');
  assert.equal(h.el('copy-scenario').disabled,true);assert.equal(h.el('share-scenario').disabled,true);
  await h.el('copy-scenario').listeners.click();assert.equal(h.copied(),'');
