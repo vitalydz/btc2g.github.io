@@ -46,10 +46,22 @@ export async function render(page, lang) {
   const title=document.querySelector('h1')?.textContent.trim();
   if(!title) throw new Error(`Missing heading: ${page}/${lang}`);
   document.title=`${title} | BTC2G`;
-  const description=`${title} — BTC2G.`;
+  const scenarioIntro=document.querySelector('#scenario-intro')?.textContent.trim();
+  const scenarioDisclosure=document.querySelector('#disclaimer-title')?.textContent.trim();
+  const description=page==='scenario.html' && scenarioIntro && scenarioDisclosure
+    ? `${scenarioIntro} ${scenarioDisclosure}`
+    : `${title} — BTC2G.`;
   for(const meta of document.querySelectorAll('meta[name="description"],meta[property="og:description"],meta[name="twitter:description"]')) meta.content=description;
   for(const meta of document.querySelectorAll('meta[property="og:title"],meta[name="twitter:title"]')) meta.content=document.title;
   for(const meta of document.querySelectorAll('meta[property="og:url"]')) meta.content=pageURL(page,lang);
+  const structuredData=document.querySelector('script[type="application/ld+json"]');
+  if(structuredData) {
+    const data=JSON.parse(structuredData.textContent);
+    if(data['@type']==='WebApplication') {
+      data.name=document.title;data.url=pageURL(page,lang);data.description=description;data.inLanguage=lang;
+      structuredData.textContent=`\n${JSON.stringify(data,null,2)}\n  `;
+    }
+  }
   const canonical=document.querySelector('link[rel="canonical"]');
   if(!canonical) throw new Error(`Missing canonical: ${page}`);
   canonical.href=pageURL(page,lang);
