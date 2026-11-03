@@ -74,6 +74,27 @@ const termsRows = {
   id:['Saya menerima','Ketentuan','dan','Kebijakan Privasi'],
   vi:['Tôi chấp nhận','Điều khoản','và','Chính sách quyền riêng tư']
 };
+const disclaimerRows = {
+  en:'BTC2G provides informational research, not financial advice. Account totals include email-verified registrations, not verified investors or customers.',
+  ru:'BTC2G предоставляет исследовательскую информацию, а не финансовые рекомендации. В статистику входят регистрации с подтверждённым email, а не проверенные инвесторы или клиенты.',
+  he:'BTC2G מספק מידע מחקרי ולא ייעוץ פיננסי. סך החשבונות כולל הרשמות עם אימייל מאומת, ולא משקיעים או לקוחות מאומתים.',
+  de:'BTC2G bietet informative Forschung, keine Finanzberatung. Die Kontosumme umfasst Registrierungen mit bestätigter E-Mail, nicht geprüfte Anleger oder Kunden.',
+  fr:'BTC2G fournit des informations de recherche, pas des conseils financiers. Le total des comptes inclut les inscriptions avec e-mail vérifié, pas des investisseurs ou clients vérifiés.',
+  es:'BTC2G ofrece información de investigación, no asesoramiento financiero. El total incluye registros con correo verificado, no inversores ni clientes verificados.',
+  zh:'BTC2G 提供研究信息，不构成财务建议。账户总数仅包含邮箱已验证的注册，不代表经过验证的投资者或客户。',
+  it:'BTC2G fornisce informazioni di ricerca, non consulenza finanziaria. Il totale include registrazioni con email verificata, non investitori o clienti verificati.',
+  pt:'A BTC2G fornece informações de pesquisa, não aconselhamento financeiro. O total inclui cadastros com email verificado, não investidores ou clientes verificados.',
+  ar:'تقدم BTC2G معلومات بحثية وليست نصيحة مالية. يشمل إجمالي الحسابات التسجيلات ذات البريد الموثق، ولا يعني مستثمرين أو عملاء تم التحقق منهم.',
+  hi:'BTC2G शोध संबंधी जानकारी देता है, वित्तीय सलाह नहीं। खाते की कुल संख्या में सत्यापित ईमेल वाले पंजीकरण शामिल हैं, सत्यापित निवेशक या ग्राहक नहीं।',
+  ja:'BTC2Gは調査情報を提供するもので、金融助言ではありません。アカウント総数はメール確認済みの登録数であり、確認済みの投資家や顧客数ではありません。',
+  ko:'BTC2G는 연구 정보를 제공하며 금융 조언이 아닙니다. 계정 합계는 이메일 인증 가입 수이며, 검증된 투자자나 고객 수가 아닙니다.',
+  tr:'BTC2G araştırma amaçlı bilgi sunar, finansal tavsiye vermez. Hesap toplamı, doğrulanmış yatırımcı veya müşteri sayısını değil, e-postası doğrulanmış kayıtları gösterir.',
+  pl:'BTC2G udostępnia informacje badawcze, a nie porady finansowe. Łączna liczba kont obejmuje rejestracje ze zweryfikowanym e-mailem, nie zweryfikowanych inwestorów ani klientów.',
+  nl:'BTC2G biedt onderzoeksinformatie, geen financieel advies. Het accounttotaal omvat registraties met bevestigde e-mail, niet geverifieerde beleggers of klanten.',
+  uk:'BTC2G надає дослідницьку інформацію, а не фінансові поради. Загальна кількість облікових записів включає реєстрації з підтвердженим email, а не перевірених інвесторів чи клієнтів.',
+  id:'BTC2G menyediakan informasi riset, bukan nasihat keuangan. Total akun mencakup pendaftaran dengan email terverifikasi, bukan investor atau pelanggan terverifikasi.',
+  vi:'BTC2G cung cấp thông tin nghiên cứu, không phải tư vấn tài chính. Tổng số tài khoản gồm các đăng ký có email đã xác minh, không phải nhà đầu tư hay khách hàng đã được kiểm chứng.'
+};
 const dictionaries = Object.fromEntries(Object.entries(rows).map(([lang, values]) => [lang, {...Object.fromEntries(keys.map((key, index) => [key, values[index]])), trust:trustRows[lang], usernamePrivacy:usernamePrivacyRows[lang], usernameHint:usernameHintRows[lang], emailHint:emailHintRows[lang], verificationSent:verificationSentRows[lang], verificationFailed:verificationFailedRows[lang]}]));
 const extras = {
   en: { dataUnavailable:'Data unavailable', statsUnavailable:'Data unavailable. The statistics service could not be reached. Retry below.' },
@@ -123,6 +144,7 @@ export function applyAccountLanguage() {
     const node = document.getElementById(id);
     if (node) node.textContent = terms[index];
   });
+  document.querySelector('#account-disclaimer').textContent = disclaimerRows[accountLanguage] || disclaimerRows.en;
   document.querySelector('#account-home-link').href = `https://btc2g.com/?lang=${encodeURIComponent(accountLanguage)}`;
   if (accountLanguage === 'ru') {
     const map = new Map([

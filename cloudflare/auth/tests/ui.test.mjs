@@ -52,7 +52,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
   const executable = languageScript
     .replaceAll('export let ', 'let ')
     .replaceAll('export function ', 'function ')
-    .replace(/export \{[^}]+\};/, '') + '\nwindow.__i18n = { languages, dictionaries, registrationStepRows, termsRows, extras };';
+    .replace(/export \{[^}]+\};/, '') + '\nwindow.__i18n = { languages, dictionaries, registrationStepRows, termsRows, disclaimerRows, extras };';
   const context = { window:{}, location:{search:'?lang=ru'}, localStorage:{getItem(){return'';}}, navigator:{language:'en'}, URLSearchParams };
   vm.createContext(context);
   vm.runInContext(executable, context);
@@ -73,6 +73,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(context.window.__i18n.termsRows[lang].every(value => typeof value === 'string' && value.trim()), lang);
     assert.ok(context.window.__i18n.extras[lang].dataUnavailable.trim(), lang);
     assert.ok(context.window.__i18n.extras[lang].statsUnavailable.trim(), lang);
+    assert.ok(context.window.__i18n.disclaimerRows[lang].trim(), lang);
   }
   assert.equal(context.window.__i18n.dictionaries.ru.title, 'Ваш аккаунт BTC2G');
   assert.match(context.window.__i18n.dictionaries.ru.trust, /не подписывает/);
@@ -119,6 +120,9 @@ test('registration flow explains that email verification completes the account',
   assert.match(accountPage, /id="terms-prefix">I accept the<\/span>/);
   assert.match(accountLanguage, /const termsRows = \{/);
   assert.match(accountLanguage, /termsRows\[accountLanguage\] \|\| termsRows\.en/);
+  assert.match(accountPage, /id="account-disclaimer">BTC2G provides informational research/);
+  assert.match(accountLanguage, /const disclaimerRows = \{/);
+  assert.match(accountLanguage, /disclaimerRows\[accountLanguage\] \|\| disclaimerRows\.en/);
   assert.match(accountCss, /\.registration-steps\s*\{/);
   assert.match(accountCss, /@media \(max-width:560px\)[^{]*\{[^}]*[\s\S]*\.registration-steps\{grid-template-columns:1fr\}/);
 });
