@@ -52,7 +52,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
   const executable = languageScript
     .replaceAll('export let ', 'let ')
     .replaceAll('export function ', 'function ')
-    .replace(/export \{[^}]+\};/, '') + '\nwindow.__i18n = { languages, dictionaries };';
+    .replace(/export \{[^}]+\};/, '') + '\nwindow.__i18n = { languages, dictionaries, registrationStepRows };';
   const context = { window:{}, location:{search:'?lang=ru'}, localStorage:{getItem(){return'';}}, navigator:{language:'en'}, URLSearchParams };
   vm.createContext(context);
   vm.runInContext(executable, context);
@@ -67,6 +67,8 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(dictionary.emailHint, lang);
     assert.ok(dictionary.verificationSent, lang);
     assert.ok(dictionary.verificationFailed, lang);
+    assert.equal(context.window.__i18n.registrationStepRows[lang].length, 7, lang);
+    assert.ok(context.window.__i18n.registrationStepRows[lang].every(value => typeof value === 'string' && value.trim()), lang);
   }
   assert.equal(context.window.__i18n.dictionaries.ru.title, 'Ваш аккаунт BTC2G');
   assert.match(context.window.__i18n.dictionaries.ru.trust, /не подписывает/);
@@ -98,15 +100,18 @@ test('switching registration mode moves focus to the first account field', async
 test('registration flow explains that email verification completes the account', async () => {
   const [accountPage, accountCss, accountLanguage] = await Promise.all(['index.html', 'account.css', 'account-language.js'].map(path => readFile(new URL(path, root), 'utf8')));
   assert.match(accountPage, /class="registration-steps" aria-label="Registration steps"/);
-  assert.match(accountPage, /<strong>Create account<\/strong>/);
+  assert.match(accountPage, /id="step-create-title">Create account<\/strong>/);
   assert.match(accountPage, /id="submit-button"[^>]*>Create free account<\/button>/);
   assert.match(accountLanguage, /const freeAccountRows = \{en:'Create free account',ru:'Создать бесплатный аккаунт'/);
   assert.match(accountPage, /id="account-title">Create your free BTC2G account<\/h1>/);
   assert.match(accountLanguage, /const freeTitleRows = \{en:'Create your free BTC2G account',ru:'Создайте бесплатный аккаунт BTC2G'/);
-  assert.match(accountPage, /<strong>Check your inbox<\/strong>/);
+  assert.match(accountPage, /id="step-inbox-title">Check your inbox<\/strong>/);
   assert.match(accountPage, /Open the verification link within 30 minutes/);
-  assert.match(accountPage, /<strong>Email verified<\/strong>/);
+  assert.match(accountPage, /id="step-verified-title">Email verified<\/strong>/);
   assert.match(accountPage, /Your registration is complete/);
+  assert.match(accountLanguage, /const registrationStepRows = \{/);
+  assert.match(accountLanguage, /he:\['שלבי ההרשמה'/);
+  assert.match(accountLanguage, /registrationStepRows\[accountLanguage\] \|\| registrationStepRows\.en/);
   assert.match(accountCss, /\.registration-steps\s*\{/);
   assert.match(accountCss, /@media \(max-width:560px\)[^{]*\{[^}]*[\s\S]*\.registration-steps\{grid-template-columns:1fr\}/);
 });
