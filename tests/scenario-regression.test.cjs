@@ -13,6 +13,7 @@ async function setup({blocked=false,failed=false,search=''}={}){
 }
 test('invalid target clears previous values and blocks copying; correction recovers',async()=>{
  const h=await setup();assert.equal(h.el('required-btc').textContent,'$120,000.00');
+ assert.equal(h.el('scenario-market-date').textContent,'Market date: 2026-10-29');
  assert.equal(h.el('ratio-formula').textContent,'Calculation: $80,000.00 ÷ $4,000.00 = 20 oz t');
  h.el('target-ratio').value='';h.el('target-ratio').listeners.input();
  for(const id of ['required-btc','future-btc','future-gold','future-ratio','ratio-difference','ratio-formula'])assert.equal(h.el(id).textContent,'—');

@@ -30,14 +30,14 @@ test('scenario calculation rejects missing, inconsistent, or unsafe market data'
 });
 
 test('scenario page exposes accessible controls, safety disclosure, and share actions', () => {
-  for (const id of ['btc-change','gold-change','target-ratio','future-ratio','hypothetical-label','ratio-formula','required-btc','copy-scenario','share-scenario','data-status']) assert.match(page, new RegExp(`id="${id}"`));
+  for (const id of ['btc-change','gold-change','target-ratio','future-ratio','hypothetical-label','scenario-market-date','ratio-formula','required-btc','copy-scenario','share-scenario','data-status']) assert.match(page, new RegExp(`id="${id}"`));
   assert.match(page, /Nothing entered here is stored/);
   assert.match(page, /id="scenario-account-link"[^>]+btc2g-accounts\.btc2g\.workers\.dev/);
   assert.match(page, /Scenario, not forecast/);
   assert.match(page, /not predictions, financial advice, or guarantees/);
   assert.match(page, /yfinance BTC-USD and GC=F/);
   assert.match(page, /scenario\.css\?v=20261103-2/);
-  assert.match(page, /scenario-tools\.js\?v=20261103-3/);
+  assert.match(page, /scenario-tools\.js\?v=20261103-4/);
   assert.match(fs.readFileSync(path.join(root, 'assets/css/scenario.css'), 'utf8'), /border:2px dashed #8a6f24/);
   assert.match(page, /<script src="assets\/js\/traffic\.js\?v=\d{8}-\d+" defer><\/script>/);
   assert.match(homepage, /href="scenario\.html"/);

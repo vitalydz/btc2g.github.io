@@ -73,11 +73,13 @@
     document.title = t('title');
     byId('data-status').textContent = t(dataState);
     byId('data-status').className = 'data-status' + (dataState === 'loaded' ? ' ready' : dataState === 'error' ? ' error' : '');
+    byId('scenario-market-date').textContent = `${t('marketDate')}: ${market ? market.date : '—'}`;
     render();
   }
   function render() {
     if (!market) return;
     byId('market-date').textContent = `${t('marketDate')}: ${market.date}`;
+    byId('scenario-market-date').textContent = `${t('marketDate')}: ${market.date}`;
     byId('current-btc').textContent = money(market.btc); byId('current-gold').textContent = money(market.gold); byId('current-ratio').textContent = `${number(market.ratio)} oz t`;
     result = calculateScenario(market, byId('btc-change').value, byId('gold-change').value, byId('target-ratio').value);
     byId('action-status').textContent = '';
