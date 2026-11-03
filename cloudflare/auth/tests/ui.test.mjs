@@ -52,7 +52,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
   const executable = languageScript
     .replaceAll('export let ', 'let ')
     .replaceAll('export function ', 'function ')
-    .replace(/export \{[^}]+\};/, '') + '\nwindow.__i18n = { languages, dictionaries, registrationStepRows };';
+    .replace(/export \{[^}]+\};/, '') + '\nwindow.__i18n = { languages, dictionaries, registrationStepRows, termsRows };';
   const context = { window:{}, location:{search:'?lang=ru'}, localStorage:{getItem(){return'';}}, navigator:{language:'en'}, URLSearchParams };
   vm.createContext(context);
   vm.runInContext(executable, context);
@@ -69,6 +69,8 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(dictionary.verificationFailed, lang);
     assert.equal(context.window.__i18n.registrationStepRows[lang].length, 7, lang);
     assert.ok(context.window.__i18n.registrationStepRows[lang].every(value => typeof value === 'string' && value.trim()), lang);
+    assert.equal(context.window.__i18n.termsRows[lang].length, 4, lang);
+    assert.ok(context.window.__i18n.termsRows[lang].every(value => typeof value === 'string' && value.trim()), lang);
   }
   assert.equal(context.window.__i18n.dictionaries.ru.title, 'Ваш аккаунт BTC2G');
   assert.match(context.window.__i18n.dictionaries.ru.trust, /не подписывает/);
@@ -112,6 +114,9 @@ test('registration flow explains that email verification completes the account',
   assert.match(accountLanguage, /const registrationStepRows = \{/);
   assert.match(accountLanguage, /he:\['שלבי ההרשמה'/);
   assert.match(accountLanguage, /registrationStepRows\[accountLanguage\] \|\| registrationStepRows\.en/);
+  assert.match(accountPage, /id="terms-prefix">I accept the<\/span>/);
+  assert.match(accountLanguage, /const termsRows = \{/);
+  assert.match(accountLanguage, /termsRows\[accountLanguage\] \|\| termsRows\.en/);
   assert.match(accountCss, /\.registration-steps\s*\{/);
   assert.match(accountCss, /@media \(max-width:560px\)[^{]*\{[^}]*[\s\S]*\.registration-steps\{grid-template-columns:1fr\}/);
 });

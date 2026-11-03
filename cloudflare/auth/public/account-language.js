@@ -53,6 +53,27 @@ const registrationStepRows = {
   id:['Langkah pendaftaran','Buat akun','Pilih nama pengguna dan kata sandi yang aman.','Periksa kotak masuk','Buka tautan verifikasi dalam 30 menit.','Email terverifikasi','Pendaftaran Anda selesai.'],
   vi:['Các bước đăng ký','Tạo tài khoản','Chọn tên người dùng và mật khẩu an toàn.','Kiểm tra hộp thư','Mở liên kết xác minh trong vòng 30 phút.','Email đã xác minh','Đăng ký đã hoàn tất.']
 };
+const termsRows = {
+  en:['I accept the','Terms','and','Privacy Policy'],
+  ru:['Я принимаю','Условия','и','Политику конфиденциальности'],
+  he:['אני מאשר/ת את','התנאים','ואת','מדיניות הפרטיות'],
+  de:['Ich akzeptiere die','Nutzungsbedingungen','und die','Datenschutzerklärung'],
+  fr:['J’accepte les','Conditions','et la','Politique de confidentialité'],
+  es:['Acepto los','Términos','y la','Política de privacidad'],
+  zh:['我接受','条款','和','隐私政策'],
+  it:['Accetto i','Termini','e l’','Informativa sulla privacy'],
+  pt:['Aceito os','Termos','e a','Política de Privacidade'],
+  ar:['أوافق على','الشروط','و','سياسة الخصوصية'],
+  hi:['मैं','शर्तें','और','गोपनीयता नीति स्वीकार करता/करती हूँ'],
+  ja:['私は','利用規約','と','プライバシーポリシーに同意します'],
+  ko:['다음에 동의합니다:','이용약관','및','개인정보 처리방침'],
+  tr:['Şunları kabul ediyorum:','Koşullar','ve','Gizlilik Politikası'],
+  pl:['Akceptuję','Warunki','oraz','Politykę prywatności'],
+  nl:['Ik accepteer de','Voorwaarden','en het','Privacybeleid'],
+  uk:['Я приймаю','Умови','та','Політику конфіденційності'],
+  id:['Saya menerima','Ketentuan','dan','Kebijakan Privasi'],
+  vi:['Tôi chấp nhận','Điều khoản','và','Chính sách quyền riêng tư']
+};
 const dictionaries = Object.fromEntries(Object.entries(rows).map(([lang, values]) => [lang, {...Object.fromEntries(keys.map((key, index) => [key, values[index]])), trust:trustRows[lang], usernamePrivacy:usernamePrivacyRows[lang], usernameHint:usernameHintRows[lang], emailHint:emailHintRows[lang], verificationSent:verificationSentRows[lang], verificationFailed:verificationFailedRows[lang]}]));
 const extras = {
   en: { dataUnavailable:'Data unavailable', statsUnavailable:'Data unavailable. The statistics service could not be reached. Retry below.' },
@@ -79,6 +100,11 @@ export function applyAccountLanguage() {
   ['step-create-title','step-create-detail','step-inbox-title','step-inbox-detail','step-verified-title','step-verified-detail'].forEach((id, index) => {
     const node = document.getElementById(id);
     if (node) node.textContent = steps[index + 1];
+  });
+  const terms = termsRows[accountLanguage] || termsRows.en;
+  ['terms-prefix','terms-link','terms-and','privacy-link'].forEach((id, index) => {
+    const node = document.getElementById(id);
+    if (node) node.textContent = terms[index];
   });
   document.querySelector('#account-home-link').href = `https://btc2g.com/?lang=${encodeURIComponent(accountLanguage)}`;
   if (accountLanguage === 'ru') {
