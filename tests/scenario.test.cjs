@@ -64,3 +64,12 @@ test('scenario and homepage entry provide complete text for all 19 languages', (
   context.BTC2GScenarioEntry.setLanguage('ru');
   assert.equal(nodes.get('scenario-entry-link').href,'scenario.html?lang=ru');
 });
+
+test('scenario account links preserve all 19 selected languages', () => {
+  for (const lang of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
+    const file = lang === 'en' ? path.join(root, 'scenario.html') : path.join(root, lang, 'scenario.html');
+    const html = fs.readFileSync(file, 'utf8');
+    const accountLanguages = [...html.matchAll(/href="https:\/\/btc2g-accounts\.btc2g\.workers\.dev\/\?lang=([a-z]{2})"/g)].map(match => match[1]);
+    assert.deepEqual(accountLanguages, [lang, lang], lang);
+  }
+});
