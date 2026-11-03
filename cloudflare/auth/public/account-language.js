@@ -77,7 +77,24 @@ const termsRows = {
 const dictionaries = Object.fromEntries(Object.entries(rows).map(([lang, values]) => [lang, {...Object.fromEntries(keys.map((key, index) => [key, values[index]])), trust:trustRows[lang], usernamePrivacy:usernamePrivacyRows[lang], usernameHint:usernameHintRows[lang], emailHint:emailHintRows[lang], verificationSent:verificationSentRows[lang], verificationFailed:verificationFailedRows[lang]}]));
 const extras = {
   en: { dataUnavailable:'Data unavailable', statsUnavailable:'Data unavailable. The statistics service could not be reached. Retry below.' },
-  ru: { dataUnavailable:'Данные недоступны', statsUnavailable:'Данные недоступны. Не удалось связаться со службой статистики. Повторите попытку ниже.' }
+  ru: { dataUnavailable:'Данные недоступны', statsUnavailable:'Данные недоступны. Не удалось связаться со службой статистики. Повторите попытку ниже.' },
+  he: { dataUnavailable:'הנתונים אינם זמינים', statsUnavailable:'הנתונים אינם זמינים. לא ניתן להתחבר לשירות הסטטיסטיקה. נסו שוב למטה.' },
+  de: { dataUnavailable:'Daten nicht verfügbar', statsUnavailable:'Daten nicht verfügbar. Der Statistikdienst konnte nicht erreicht werden. Versuchen Sie es unten erneut.' },
+  fr: { dataUnavailable:'Données indisponibles', statsUnavailable:'Données indisponibles. Le service de statistiques est inaccessible. Réessayez ci-dessous.' },
+  es: { dataUnavailable:'Datos no disponibles', statsUnavailable:'Datos no disponibles. No se pudo conectar con el servicio de estadísticas. Reinténtalo abajo.' },
+  zh: { dataUnavailable:'数据不可用', statsUnavailable:'数据不可用。无法连接统计服务。请在下方重试。' },
+  it: { dataUnavailable:'Dati non disponibili', statsUnavailable:'Dati non disponibili. Impossibile raggiungere il servizio statistiche. Riprova qui sotto.' },
+  pt: { dataUnavailable:'Dados indisponíveis', statsUnavailable:'Dados indisponíveis. Não foi possível acessar o serviço de estatísticas. Tente novamente abaixo.' },
+  ar: { dataUnavailable:'البيانات غير متاحة', statsUnavailable:'البيانات غير متاحة. تعذر الاتصال بخدمة الإحصاءات. أعد المحاولة أدناه.' },
+  hi: { dataUnavailable:'डेटा उपलब्ध नहीं है', statsUnavailable:'डेटा उपलब्ध नहीं है। आँकड़ा सेवा से संपर्क नहीं हो सका। नीचे फिर प्रयास करें।' },
+  ja: { dataUnavailable:'データを利用できません', statsUnavailable:'データを利用できません。統計サービスに接続できませんでした。下でもう一度お試しください。' },
+  ko: { dataUnavailable:'데이터를 사용할 수 없습니다', statsUnavailable:'데이터를 사용할 수 없습니다. 통계 서비스에 연결하지 못했습니다. 아래에서 다시 시도하세요.' },
+  tr: { dataUnavailable:'Veriler kullanılamıyor', statsUnavailable:'Veriler kullanılamıyor. İstatistik hizmetine ulaşılamadı. Aşağıdan tekrar deneyin.' },
+  pl: { dataUnavailable:'Dane niedostępne', statsUnavailable:'Dane niedostępne. Nie można połączyć się z usługą statystyk. Spróbuj ponownie poniżej.' },
+  nl: { dataUnavailable:'Gegevens niet beschikbaar', statsUnavailable:'Gegevens niet beschikbaar. De statistiekdienst kon niet worden bereikt. Probeer het hieronder opnieuw.' },
+  uk: { dataUnavailable:'Дані недоступні', statsUnavailable:'Дані недоступні. Не вдалося зв’язатися зі службою статистики. Спробуйте ще раз нижче.' },
+  id: { dataUnavailable:'Data tidak tersedia', statsUnavailable:'Data tidak tersedia. Layanan statistik tidak dapat dihubungi. Coba lagi di bawah.' },
+  vi: { dataUnavailable:'Dữ liệu không khả dụng', statsUnavailable:'Dữ liệu không khả dụng. Không thể kết nối dịch vụ thống kê. Hãy thử lại bên dưới.' }
 };
 const requested = new URLSearchParams(location.search).get('lang');
 let saved = '';
