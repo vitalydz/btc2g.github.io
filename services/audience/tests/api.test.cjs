@@ -33,8 +33,24 @@ test('persistent rate limit stops outgoing email',async()=>{
 test('GET confirmation and unsubscribe never mutate the database',async()=>{
  for(const route of ['confirm','unsubscribe']){
   const r=await call(route,{method:'GET',url:'/api/'+route+'?token='+'a'.repeat(64),query:async sql=>{assert.match(sql,/^SELECT language/);return {rows:[]};}});
-  assert.equal(r.statusCode,200);assert.match(r.body,/<form method="post">/);assert.equal(r.headers['Referrer-Policy'],'no-referrer');
+  assert.equal(r.statusCode,200);assert.match(r.body,/<form method="post">/);assert.equal(r.headers['Referrer-Policy'],'strict-origin');
  }
+});
+
+test('email action pages preserve native form Origin without accepting opaque or foreign origins',async()=>{
+ for(const route of ['confirm','unsubscribe','digest-unsubscribe']) {
+  const page=await call(route,{method:'GET',origin:undefined,url:'/api/'+route+'?token='+'a'.repeat(64)});
+  assert.equal(page.statusCode,200);
+  assert.equal(page.headers['Referrer-Policy'],'strict-origin');
+  assert.match(page.headers['Content-Security-Policy'],/form-action 'self'/);
+  for(const origin of ['null','https://evil.example']) {
+   const rejected=await call(route,{origin,body:{token:'a'.repeat(64)},query:()=>{throw Error('Must not query');}});
+   assert.equal(rejected.statusCode,403);
+   assert.equal(JSON.parse(rejected.body).error,'origin_rejected');
+  }
+ }
+ const json=await call('subscribe',{body:{consent:false}});
+ assert.equal(json.headers['Referrer-Policy'],'no-referrer');
 });
 test('confirmation requires an unexpired unused token and does not expose email',async()=>{
  let sqlText;

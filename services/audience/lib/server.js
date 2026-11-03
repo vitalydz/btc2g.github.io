@@ -15,6 +15,9 @@ function createHandler(route, {db = require('./db'), env = process.env, send = g
   const html = (status, body) => {
    res.statusCode=status;
    res.setHeader('Content-Type','text/html; charset=utf-8');
+   // no-referrer turns native form POST Origin into "null". Send only the
+   // origin (never the token-bearing URL), preserving the strict origin check.
+   res.setHeader('Referrer-Policy','strict-origin');
    res.setHeader('Content-Security-Policy',"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
    res.end('<!doctype html><html lang="'+lang+'" dir="'+(lang==='he'?'rtl':'ltr')+'"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>BTC2G subscription</title><body>'+body+'</body></html>');
   };
