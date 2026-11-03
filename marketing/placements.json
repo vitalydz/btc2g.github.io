@@ -30,10 +30,12 @@
     "title":"I built a free Bitcoin vs gold dashboard with a what-if simulator",
     "rules_checked":"2026-11-03: community description explicitly invites sharing projects and constructive feedback; no additional community rules displayed on rules page or composer. Search showed no existing BTC2G placement. Creator affiliation disclosed; one useful demo, no subscription or return promises.",
     "evidence_path":"C:/Users/vitly/OneDrive/Documents/Playground/btc2g-reddit-sideproject-published.png",
-    "verification":"Reddit displayed Posted; permalink opened with full post by u/vitdart and no moderation/removal warning. This does not establish audience reach or conversions."
+    "verification":"Reddit displayed Posted; permalink opened with full post by u/vitdart and no moderation/removal warning. This does not establish audience reach or conversions.",
+    "followup_2026_11_03":{"displayed_views":79,"displayed_score":2,"comment_counter":1,"comment_text":"Not displayed in the accessible comment region; no content or sentiment inferred.","interpretation":"Early post visibility, not site visits or attributed subscriptions. Owner test excluded."}
   }],
   "scope":"Owner authorized one free useful demonstration; one Reddit post published. Other platforms remain drafts.",
   "candidates":[
+    {"platform":"Reddit r/sideprojects","status":"draft_ready","draft_id":"next-placement-2026-11-03.json","rules_checked":"2026-11-03","rules_url":"https://www.reddit.com/r/sideprojects/about/rules/","blocker":"Not submitted: next platform selected and a distinct educational draft prepared. Check duplicate history and exact AI-assisted showcase flair before publication."},
     {"platform":"Reddit","status":"published","draft_id":"btc2g-reddit-en","blocker":null},
     {"platform":"Telegram","status":"draft_ready","draft_id":"btc2g-telegram-ru","blocker":"Owner channel or an explicitly permitted group not identified."},
     {"platform":"Facebook","status":"draft_ready","draft_id":"btc2g-facebook-he","blocker":"Owner page/account and group-specific rules not verified."},

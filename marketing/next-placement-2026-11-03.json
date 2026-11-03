@@ -1,0 +1,22 @@
+{
+  "site":"https://btc2g.com/",
+  "status":"draft_ready",
+  "platform":"Reddit r/sideprojects",
+  "community":"https://www.reddit.com/r/sideprojects/",
+  "rules_url":"https://www.reddit.com/r/sideprojects/about/rules/",
+  "checked":"2026-11-03",
+  "selection_reason":"Initial r/SideProject placement has 79 displayed views, score 2 and a comment counter of 1. This is preliminary visibility, not proof of conversions. Another maker community permits detailed project demonstrations and uses the existing account; it is a practical next experiment before a larger launch.",
+  "rules_summary":[
+    "Explain the problem, implementation and reusable lessons in the post itself.",
+    "No repetitive project posts, affiliate links or excessive promotion.",
+    "No DM funnel or astroturfing; disclose creator affiliation.",
+    "Select the appropriate showcase flair; AI-assisted projects must use the vibecoded showcase flair."
+  ],
+  "draft":{
+    "language":"en",
+    "title":"I made a Bitcoin/gold scenario calculator to explain a common percentage mistake",
+    "body":"If Bitcoin rises 10% and gold rises 5%, how much does Bitcoin's value in gold change? The answer is about 4.76%, because the ratio changes by 1.10 / 1.05 - 1. Subtracting the two percentages only approximates the result.\n\nI'm building BTC2G with AI coding assistance to make comparisons like this easier to inspect. It combines historical BTC/gold ratios, a reference calculator, and a what-if simulator. The interface uses JavaScript and static HTML, including crawlable pages in 19 languages. Sources and market dates are shown.\n\nYou can change the two hypothetical price moves at https://btc2g.com/scenario.html without creating an account. The inputs describe an arithmetic scenario; they do not predict returns. The history uses published BTC-USD and gold-futures reference data rather than an executable trade quote.\n\nI'd appreciate feedback on whether the formula and inputs are understandable on a phone. What explanation would help someone avoid mixing up dollar returns with changes in the BTC/gold ratio?",
+    "image":"Optional fresh screenshot of the scenario tool; verify the shown inputs and market date before use."
+  },
+  "publication":"Not submitted. User asked to choose the next platform, not to publish a second post. Recheck duplicates, exact current flair and community rules before submitting. No paid promotion."
+}
