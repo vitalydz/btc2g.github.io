@@ -55,6 +55,29 @@ test('scenario simulator publishes localized large-image social previews', () =>
   }
 });
 
+test('scenario simulator publishes localized WebApplication structured data', () => {
+  const root = path.join(__dirname, '..');
+  for (const lang of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
+    const file = lang === 'en' ? path.join(root, 'scenario.html') : path.join(root, lang, 'scenario.html');
+    const html = fs.readFileSync(file, 'utf8');
+    const title = html.match(/<title>([^<]+)<\/title>/)?.[1];
+    const description = html.match(/<meta name="description" content="([^"]+)">/)?.[1];
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)?.[1];
+    const scripts = [...html.matchAll(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/g)];
+    assert.equal(scripts.length, 1, lang);
+    const data = JSON.parse(scripts[0][1]);
+    assert.equal(data['@context'], 'https://schema.org', lang);
+    assert.equal(data['@type'], 'WebApplication', lang);
+    assert.equal(data.name, title, lang);
+    assert.equal(data.url, canonical, lang);
+    assert.equal(data.description, description, lang);
+    assert.equal(data.applicationCategory, 'FinanceApplication', lang);
+    assert.equal(data.operatingSystem, 'Any', lang);
+    assert.equal(data.inLanguage, lang, lang);
+    assert.equal('offers' in data, false, lang);
+  }
+});
+
 test('research articles publish complete large-image social previews', () => {
   const root = path.join(__dirname, '..');
   for (const file of ['bitcoin-vs-gold.html', 'bitcoin-gold-ratio.html', 'bitcoin-vs-gold-forecast-2026.html']) {
