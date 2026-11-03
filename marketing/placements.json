@@ -1,10 +1,23 @@
 {
   "site":"https://btc2g.com",
-  "checked":"2026-11-01",
-  "published":[],
-  "scope":"Prepare social promotion; no posts sent in this task.",
+  "checked":"2026-11-03",
+  "published":[{
+    "platform":"Reddit",
+    "community":"https://www.reddit.com/r/SideProject/",
+    "account":"u/vitdart",
+    "draft_id":"btc2g-reddit-en",
+    "language":"en",
+    "status":"published",
+    "published_url":"https://www.reddit.com/r/SideProject/comments/1xmix05/i_built_a_free_bitcoin_vs_gold_dashboard_with_a/",
+    "published_at":"2026-11-03",
+    "title":"I built a free Bitcoin vs gold dashboard with a what-if simulator",
+    "rules_checked":"2026-11-03: community description explicitly invites sharing projects and constructive feedback; no additional community rules displayed on rules page or composer. Search showed no existing BTC2G placement. Creator affiliation disclosed; one useful demo, no subscription or return promises.",
+    "evidence_path":"C:/Users/vitly/OneDrive/Documents/Playground/btc2g-reddit-sideproject-published.png",
+    "verification":"Reddit displayed Posted; permalink opened with full post by u/vitdart and no moderation/removal warning. This does not establish audience reach or conversions."
+  }],
+  "scope":"Owner authorized one free useful demonstration; one Reddit post published. Other platforms remain drafts.",
   "candidates":[
-    {"platform":"Reddit","status":"draft_ready","draft_id":"btc2g-reddit-en","blocker":"Choose a relevant open thread and verify its current self-promotion rules; browser access unavailable in this task."},
+    {"platform":"Reddit","status":"published","draft_id":"btc2g-reddit-en","blocker":null},
     {"platform":"Telegram","status":"draft_ready","draft_id":"btc2g-telegram-ru","blocker":"Owner channel or an explicitly permitted group not identified."},
     {"platform":"Facebook","status":"draft_ready","draft_id":"btc2g-facebook-he","blocker":"Owner page/account and group-specific rules not verified."},
     {"platform":"Product Hunt","status":"draft_ready","draft_id":"btc2g-producthunt-en","blocker":"Verify whether a BTC2G listing already exists before submitting; existing launch kit retained."},
