@@ -35,6 +35,26 @@ test('homepage allows large search-result image previews', () => {
   assert.match(homepage, /name="robots" content="index,follow,max-image-preview:large"/);
 });
 
+test('scenario simulator publishes localized large-image social previews', () => {
+  const root = path.join(__dirname, '..');
+  for (const lang of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
+    const file = lang === 'en' ? path.join(root, 'scenario.html') : path.join(root, lang, 'scenario.html');
+    const html = fs.readFileSync(file, 'utf8');
+    const title = html.match(/<title>([^<]+)<\/title>/)?.[1];
+    const description = html.match(/<meta name="description" content="([^"]+)">/)?.[1];
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)?.[1];
+    assert.ok(title && description && canonical, lang);
+    assert.match(html, /name="robots" content="index,follow,max-image-preview:large"/);
+    assert.ok(html.includes(`<meta property="og:title" content="${title}" />`), lang);
+    assert.ok(html.includes(`<meta property="og:description" content="${description}" />`), lang);
+    assert.ok(html.includes(`<meta property="og:url" content="${canonical}" />`), lang);
+    assert.match(html, /property="og:image" content="https:\/\/btc2g\.com\/assets\/btc_gold_forecast\.png"/);
+    assert.match(html, /name="twitter:card" content="summary_large_image"/);
+    assert.ok(html.includes(`<meta name="twitter:title" content="${title}" />`), lang);
+    assert.ok(html.includes(`<meta name="twitter:description" content="${description}" />`), lang);
+  }
+});
+
 test('research articles publish complete large-image social previews', () => {
   const root = path.join(__dirname, '..');
   for (const file of ['bitcoin-vs-gold.html', 'bitcoin-gold-ratio.html', 'bitcoin-vs-gold-forecast-2026.html']) {
