@@ -1,11 +1,11 @@
 {
   "signal": "HOLD",
-  "confidence": 0.56,
-  "ratio": 19.8,
-  "ratio_7d_ago": 20.229,
-  "ratio_change_7d_pct": -2.12,
-  "btc_price_usd": 77198.21,
-  "gold_price_usd": 3898.9,
-  "last_updated": "2026-10-30",
+  "confidence": 0.57,
+  "ratio": 19.316,
+  "ratio_7d_ago": 19.811,
+  "ratio_change_7d_pct": -2.5,
+  "btc_price_usd": 76677.3,
+  "gold_price_usd": 3969.6,
+  "last_updated": "2026-11-02",
   "note": "BTC appears neutral compared to gold based on the model"
 }
