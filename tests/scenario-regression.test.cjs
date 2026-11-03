@@ -32,6 +32,8 @@ test('changing language preserves failed/loaded states instead of inventing a ne
   const h=await setup({failed});h.el('scenario-language').listeners.change({target:{value:'ru'}});
   assert.match(h.el('data-status').textContent,failed?/недоступны/:/загружены/);assert.equal(h.requests(),1);
   assert.equal(h.el('scenario-result-account-link').textContent,'Создать аккаунт');
+  assert.equal(h.el('scenario-account-link').href,'https://btc2g-accounts.btc2g.workers.dev/?lang=ru');
+  assert.equal(h.el('scenario-result-account-link').href,'https://btc2g-accounts.btc2g.workers.dev/?lang=ru');
  }
 });
 test('invalid input, out-of-range target and overflowing derived results are rejected',()=>{
