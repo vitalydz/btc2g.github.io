@@ -109,7 +109,7 @@ function createHandler(route, {db = require('./db'), env = process.env, send = g
    if (!origin) return json(403,{error:'origin_required'});
    if (!env.RESEND_API_KEY || !env.MAIL_FROM || !env.API_ORIGIN || new URL(env.API_ORIGIN).protocol!=='https:') return json(503,{error:'mail_not_configured'});
    const email=typeof body.email==='string'?body.email.trim().toLowerCase():'';
-   if (email.length>254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email) || body.consent!==true || body.consentVersion!=='2026-10-29') return json(400,{error:'email_and_explicit_consent_required'});
+   if (email.length>254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email) || body.consent!==true || !['2026-10-29','2026-11-03'].includes(body.consentVersion)) return json(400,{error:'email_and_explicit_consent_required'});
    const isDigest=route==='digest-request';
    if(isDigest && typeof body.weeklyDigest!=='boolean') return json(400,{error:'explicit_digest_choice_required'});
    if(isDigest && body.weeklyDigest && env.DIGEST_ENABLED!=='true') return json(503,{error:'digest_not_enabled'});

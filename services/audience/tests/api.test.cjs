@@ -27,6 +27,13 @@ test('repeat or already active subscription never sends another email or exposes
  let n=0; const r=await call('subscribe',{body:email,query:async()=>({rows:++n===1?[{attempts:1}]:[]})});
  assert.equal(r.statusCode,429);assert.equal(JSON.parse(r.body).confirmed,false);
 });
+
+test('current homepage consent version is accepted and unknown versions never reach storage',async()=>{
+ const r=await call('subscribe',{body:{...email,consentVersion:'2026-11-03'},query:async sql=>({rows:sql.includes('rate_limits')?[{attempts:1}]:[{email:email.email}]}),send:async()=>({ok:true})});
+ assert.equal(r.statusCode,202);
+ const rejected=await call('subscribe',{body:{...email,consentVersion:'unknown'},query:()=>{throw Error('Must not query');}});
+ assert.equal(rejected.statusCode,400);
+});
 test('persistent rate limit stops outgoing email',async()=>{
  const r=await call('subscribe',{body:email,query:async()=>({rows:[{attempts:6}]})});assert.equal(r.statusCode,429);
 });
