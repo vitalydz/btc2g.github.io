@@ -43,9 +43,28 @@
 
   window.BTC2GSubscription = {
     send,
+    async subscribe(email, consent, lang) {
+      if (consent !== true) throw new Error('Explicit consent required');
+      const configResponse = await send('/assets/audience-config.json', {cache:'no-store', credentials:'omit'});
+      if (!configResponse.ok) throw new Error('Subscription configuration unavailable');
+      const config = await configResponse.json();
+      const base = new URL(config.apiOrigin);
+      if (base.protocol !== 'https:' || base.username || base.password || base.pathname !== '/' || base.search || base.hash) throw new Error('Invalid subscription service origin');
+      const response = await send(new URL('/api/subscribe',base).href, {
+        method:'POST', credentials:'omit', headers:{'Content-Type':'application/json',Accept:'application/json'},
+        body:JSON.stringify({email,consent,consentVersion:'2026-11-03',lang})
+      });
+      if (!response.ok) throw new Error('Subscription receipt unavailable');
+      const receipt = await response.json();
+      if (receipt.status !== 'request_received' || receipt.confirmed !== false) throw new Error('Unexpected subscription receipt');
+      return receipt;
+    },
     text(language) {
       const [email, uncertain] = Object.hasOwn(messages, language) ? messages[language] : messages.en;
-      return { email, uncertain, receiptNote: Object.hasOwn(receiptNotes, language) ? receiptNotes[language] : receiptNotes.en };
+      const copy = window.BTC2GSubscriptionCopy;
+      const row = copy?.[language] || copy?.en;
+      return { email, uncertain, receiptNote: row?.[6] || receiptNotes[language] || receiptNotes.en,
+        title:row?.[0],subtitle:row?.[1],button:row?.[2],consent:row?.[3],privacy:row?.[4],consentRequired:row?.[5] };
     }
   };
 })();

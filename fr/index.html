@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html data-static-language="fr" dir="ltr" lang="fr">
 <head><script src="/assets/js/static-language.js"></script><base href="https://btc2g.com/">
+  <meta name="msvalidate.01" content="0A4171F7CAE51334B9D490FE0B4BF77B">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071426">
@@ -45,7 +46,7 @@
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="manifest" href="/manifest.json">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/index.css?v=20261030-4">
+  <link rel="stylesheet" href="/assets/css/index.css?v=20261103-1">
   <link rel="canonical" href="https://btc2g.com/fr/">
   <script type="application/ld+json">
     {
@@ -135,7 +136,7 @@
       </div>
       <p id="data-freshness" class="data-freshness hero-data-warning" role="status" hidden></p>
       <div class="hero-actions">
-        <a id="hero-subscribe-link" class="hero-button" href="/fr/#subscribe">Recevoir les mises à jour</a>
+        <a id="hero-subscribe-link" class="hero-button" href="/fr/#subscribe">Actualités BTC2G</a>
         <a id="hero-premium-link" class="hero-button" href="/fr/premium.html">Voir Premium</a>
         <a id="hero-account-link" class="hero-button hero-button-primary" href="https://btc2g-accounts.btc2g.workers.dev/?lang=fr">Créer un compte gratuit</a>
         <a id="calculator-jump" class="hero-text-link" href="/fr/#calculator">Calculateur indicatif BTC ↔ or</a>
@@ -193,7 +194,7 @@
       </button>
       <details class="forecast-static" open>
         <summary>Voir le scénario à long terme</summary>
-        <img style="display:block" id="forecastChart" src="/assets/btc_gold_forecast.png?v=1793580250464" alt="BTC vs Gold long-term scenario chart">
+        <img style="display:block" id="forecastChart" src="/assets/btc_gold_forecast.png?v=1793660839246" alt="BTC vs Gold long-term scenario chart">
         <section class="signal-card" aria-labelledby="signal-title">
           <div class="signal-main">
             <h2 id="signal-title">Signal du modèle BTC</h2>
@@ -221,18 +222,19 @@
 
     <section id="subscribe" class="subscribe-section subscribe-primary" aria-labelledby="subscribe-title">
       <div id="subscribe-intro">
-        <h2 id="subscribe-title">Recevez le signal lorsqu’il change</h2>
-        <p id="subscribe-subtitle">Un e-mail court seulement lors d’un changement de direction ou d’un fort mouvement. Aucun spam quotidien.</p>
+        <h2 id="subscribe-title">Actualités BTC2G</h2>
+        <p id="subscribe-subtitle">Des nouvelles des outils BTC2G. Confirmez votre adresse par e-mail.</p>
       </div>
       <label id="subscriber-email-label" for="subscriber-email">Adresse e-mail</label>
       <form id="subscribe-form" class="subscribe-form" novalidate>
         <input id="subscriber-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="subscribe-message subscribe-trust">
-        <button id="subscribe-button" type="submit">S’abonner gratuitement</button>
+        <button id="subscribe-button" type="submit">S’abonner</button>
+        <label class="subscription-consent"><input id="subscription-consent" name="consent" type="checkbox" required aria-describedby="subscribe-message"><span id="subscription-consent-text">J’accepte de recevoir les actualités BTC2G par e-mail.</span> <a id="subscription-privacy" href="/privacy.html">Confidentialité</a></label>
       </form>
-      <p id="subscribe-trust" class="subscribe-trust">Désabonnement en un clic. Nombre affiché uniquement depuis une source vérifiée.</p>
+      <p id="subscribe-trust" class="subscribe-trust" hidden>Désabonnement en un clic. Nombre affiché uniquement depuis une source vérifiée.</p>
       <p id="subscriber-proof" class="subscriber-proof" hidden></p>
       <p id="subscribe-message" class="subscribe-message" role="status" aria-live="polite"></p>
-      <aside aria-description="Changements du ratio et du score, date, sources et lien vers le graphique." id="email-preview" class="email-preview" aria-label="Example BTC2G update email">
+      <aside aria-description="Changements du ratio et du score, date, sources et lien vers le graphique." id="email-preview" class="email-preview" aria-label="Example BTC2G update email" hidden>
         <span id="email-preview-label">EXEMPLE D’E-MAIL</span>
         <strong id="email-preview-subject">Subject: BTC2G Signal Update</strong>
         <p><span id="email-preview-ratio">BTC/Gold ratio: unavailable</span><br><span id="email-preview-score">Model score: unavailable</span><br><span id="email-preview-date">Market date: unavailable</span></p>
@@ -240,8 +242,8 @@
       </aside>
       <section id="subscribe-thanks" class="subscribe-thanks" aria-labelledby="subscribe-thanks-title" hidden>
         <h2 id="subscribe-thanks-title">Demande reçue. Merci de votre intérêt pour BTC2G.</h2>
-        <p id="subscribe-thanks-text">La réception de la demande ne confirme pas un abonnement e-mail actif.</p>
-        <form id="digest-preferences-form" class="digest-preferences-form">
+        <p id="subscribe-thanks-text">Consultez votre messagerie et confirmez via le lien. L’abonnement commence après confirmation.</p>
+        <form id="digest-preferences-form" class="digest-preferences-form" hidden>
           <label><input id="weekly-digest-choice" type="checkbox" name="weekly_digest" aria-describedby="digest-preferences-help digest-preferences-status"> <span id="weekly-digest-choice-label">Recevoir aussi le résumé de recherche du dimanche en anglais.</span></label>
           <p id="digest-preferences-help">Le choix sera appliqué après confirmation par e-mail.</p>
           <button id="save-digest-preferences" type="submit">Enregistrer le choix</button>
@@ -390,7 +392,8 @@
   <script src="/assets/js/audience-text.js?v=20261028-2"></script>
   <script src="/assets/js/ratio-tools.js?v=20261028-2"></script>
   <script src="/assets/js/digest-preferences.js?v=20261030-5"></script>
-  <script src="/assets/js/subscription-request.js?v=20261030-4"></script>
+  <script src="/assets/js/subscription-copy.js?v=20261103-1"></script>
+  <script src="/assets/js/subscription-request.js?v=20261103-1"></script>
   <script src="/assets/js/home-v2-text.js?v=20261029-2"></script>
   <script src="/assets/js/scenario-entry.js?v=20261030-1"></script>
   <script src="/assets/js/regime-detector.js?v=20261030-1"></script>
@@ -401,7 +404,6 @@
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
     const META_PATH = 'assets/btc_gold_forecast_meta.json';
-    const SUBSCRIPTION_ENDPOINT = "https://formspree.io/f/mkoyjwkr";
     const STRIPE_CHECKOUT_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/stripe/create-checkout-session";
     const isPremiumUser = false;
     let currentLang = 'en';
@@ -2348,6 +2350,9 @@
       window.BTC2GMultiAsset?.setLanguage(lang);
       setTextById('subscribe-thanks-title', text.subscribeSuccess);
       setTextById('subscribe-thanks-text', window.BTC2GSubscription.text(lang).receiptNote);
+      const subscriptionText = window.BTC2GSubscription.text(lang);
+      setTextById('hero-subscribe-link', subscriptionText.title);
+      for (const [id, key] of [['subscribe-title','title'],['subscribe-subtitle','subtitle'],['subscribe-button','button'],['subscription-consent-text','consent'],['subscription-privacy','privacy']]) setTextById(id, subscriptionText[key]);
       setTextById('thanks-share-label', text.shareTitle);
       setTextById('thanks-share-button', text.nativeShare);
       setTextById('thanks-copy-button', text.copyLink);
@@ -2434,35 +2439,24 @@
         return;
       }
 
-      if (SUBSCRIPTION_ENDPOINT.includes('YOUR_ID')) {
-        console.log('Subscription failed: Formspree endpoint is not configured.');
-        setFormMessage(config.messageId, text.subscribeNotConfigured, true);
+      const consent = document.getElementById('subscription-consent');
+      if (!consent.checked) {
+        consent.setAttribute('aria-invalid', 'true');
+        consent.focus();
+        setFormMessage(config.messageId, window.BTC2GSubscription.text(currentLang).consentRequired, true);
         return;
       }
 
       submitButton.disabled = true;
+      consent.disabled = true;
+      consent.removeAttribute('aria-invalid');
       emailInput.removeAttribute('aria-invalid');
       submitButton.textContent = text.subscribeSending;
       setFormMessage(config.messageId, '');
 
       try {
-        const response = await window.BTC2GSubscription.send(SUBSCRIPTION_ENDPOINT, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            source: typeof config.source === 'function' ? config.source(text) : config.source,
-          }),
-        });
+        await window.BTC2GSubscription.subscribe(email, consent.checked, currentLang);
 
-        if (!response.ok) {
-          throw new Error(`Subscription request failed with status ${response.status}`);
-        }
-
-        console.log('Subscription succeeded.');
         emailInput.value = '';
         if (config.successEventName) {
           trackEvent(config.successEventName);
@@ -2470,11 +2464,11 @@
         setFormMessage(config.messageId, text[config.successTextKey]);
         if (config.showThankYou) showSubscriptionThanks(email);
       } catch (error) {
-        console.log('Subscription failed.', error);
         setFormMessage(config.messageId, error.name === 'TimeoutError' ? window.BTC2GSubscription.text(currentLang).uncertain : text.subscribeError, true);
       } finally {
         submitButton.disabled = false;
-        submitButton.textContent = getCurrentText()[config.buttonTextKey];
+        consent.disabled = false;
+        submitButton.textContent = window.BTC2GSubscription.text(currentLang).button;
       }
     }
 
@@ -2517,7 +2511,7 @@
         const data = response.ok ? await response.json() : null;
         const total = data?.confirmedSubscribers?.status === 'available' ? data.confirmedSubscribers.total : null;
         proof.hidden = !(Number.isInteger(total) && total > 0);
-        if (!proof.hidden) proof.textContent = currentLang === 'ru' ? `${total} читателей уже получают обновления.` : `${total} readers already receive updates.`;
+        if (!proof.hidden) proof.textContent = currentLang === 'ru' ? `Подтверждённых подписок: ${total}.` : `Confirmed email subscriptions: ${total}.`;
       } catch (error) {
         proof.hidden = true;
       }

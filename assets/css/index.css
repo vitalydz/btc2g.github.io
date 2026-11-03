@@ -388,6 +388,12 @@ body {
       font: inherit;
     }
 
+    #subscribe [hidden] { display:none !important; }
+    #subscribe-form { flex-wrap: wrap; }
+    #subscribe-form .subscription-consent { flex: 1 0 100%; display:flex; align-items:flex-start; gap:8px; font-size:14px; line-height:1.5; }
+    #subscribe-form .subscription-consent input { flex:0 0 auto; width:18px; height:18px; min-width:18px; min-height:18px; margin:2px 0; padding:0; }
+    .subscription-consent a { color:#87cefa; }
+
     .subscribe-form input::placeholder {
       color: #9a9a9a;
     }

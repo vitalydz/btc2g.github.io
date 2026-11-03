@@ -46,7 +46,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/index.css?v=20261030-4" />
+  <link rel="stylesheet" href="assets/css/index.css?v=20261103-1" />
   <link rel="canonical" href="https://btc2g.com/" />
   <script type="application/ld+json">
     {
@@ -222,18 +222,19 @@
 
     <section id="subscribe" class="subscribe-section subscribe-primary" aria-labelledby="subscribe-title">
       <div id="subscribe-intro">
-        <h2 id="subscribe-title">Get the model signal when it changes</h2>
-        <p id="subscribe-subtitle">A short email only when direction changes or the ratio moves significantly. No daily spam.</p>
+        <h2 id="subscribe-title">BTC2G product updates</h2>
+        <p id="subscribe-subtitle">News about BTC2G tools. Confirm your address by email.</p>
       </div>
       <label id="subscriber-email-label" for="subscriber-email">Email address</label>
       <form id="subscribe-form" class="subscribe-form" novalidate>
         <input id="subscriber-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" aria-describedby="subscribe-message subscribe-trust" />
-        <button id="subscribe-button" type="submit">Get free signal updates</button>
+        <button id="subscribe-button" type="submit">Subscribe</button>
+        <label class="subscription-consent"><input id="subscription-consent" name="consent" type="checkbox" required aria-describedby="subscribe-message" /><span id="subscription-consent-text">I agree to receive BTC2G product updates by email.</span> <a id="subscription-privacy" href="privacy.html">Privacy Policy</a></label>
       </form>
-      <p id="subscribe-trust" class="subscribe-trust">One-click unsubscribe.</p>
+      <p id="subscribe-trust" class="subscribe-trust" hidden></p>
       <p id="subscriber-proof" class="subscriber-proof" hidden></p>
       <p id="subscribe-message" class="subscribe-message" role="status" aria-live="polite"></p>
-      <aside id="email-preview" class="email-preview" aria-label="Example BTC2G update email">
+      <aside id="email-preview" class="email-preview" aria-label="Example BTC2G update email" hidden>
         <span id="email-preview-label">EXAMPLE EMAIL</span>
         <strong id="email-preview-subject">Subject: BTC2G Signal Update</strong>
         <p><span id="email-preview-ratio">BTC/Gold ratio: unavailable</span><br><span id="email-preview-score">Model score: unavailable</span><br><span id="email-preview-date">Market date: unavailable</span></p>
@@ -241,8 +242,8 @@
       </aside>
       <section id="subscribe-thanks" class="subscribe-thanks" aria-labelledby="subscribe-thanks-title" hidden>
         <h2 id="subscribe-thanks-title">Request received.</h2>
-        <p id="subscribe-thanks-text">Receiving a request does not confirm an active email subscription.</p>
-        <form id="digest-preferences-form" class="digest-preferences-form">
+        <p id="subscribe-thanks-text">Check your email and confirm using the link. Your subscription starts only after confirmation.</p>
+        <form id="digest-preferences-form" class="digest-preferences-form" hidden>
           <label><input id="weekly-digest-choice" type="checkbox" name="weekly_digest" aria-describedby="digest-preferences-help digest-preferences-status" /> <span id="weekly-digest-choice-label">Also send me the Sunday research digest in English.</span></label>
           <p id="digest-preferences-help">An email will ask you to confirm this preference.</p>
           <button id="save-digest-preferences" type="submit">Save digest preference</button>
@@ -410,7 +411,8 @@
   <script src="assets/js/audience-text.js?v=20261028-2"></script>
   <script src="assets/js/ratio-tools.js?v=20261028-2"></script>
   <script src="assets/js/digest-preferences.js?v=20261030-5"></script>
-  <script src="assets/js/subscription-request.js?v=20261030-4"></script>
+  <script src="assets/js/subscription-copy.js?v=20261103-1"></script>
+  <script src="assets/js/subscription-request.js?v=20261103-1"></script>
   <script src="assets/js/home-v2-text.js?v=20261029-2"></script>
   <script src="assets/js/scenario-entry.js?v=20261030-1"></script>
   <script src="assets/js/regime-detector.js?v=20261030-1"></script>
@@ -421,7 +423,6 @@
     const CHART_PATH = 'assets/btc_gold_forecast.png';
     const SIGNAL_PATH = 'assets/btc_signal.json';
     const META_PATH = 'assets/btc_gold_forecast_meta.json';
-    const SUBSCRIPTION_ENDPOINT = "https://formspree.io/f/mkoyjwkr";
     const STRIPE_CHECKOUT_URL = "https://YOUR-VERCEL-PROJECT.vercel.app/api/stripe/create-checkout-session";
     const isPremiumUser = false;
     let currentLang = 'en';
@@ -2368,6 +2369,9 @@
       window.BTC2GMultiAsset?.setLanguage(lang);
       setTextById('subscribe-thanks-title', text.subscribeSuccess);
       setTextById('subscribe-thanks-text', window.BTC2GSubscription.text(lang).receiptNote);
+      const subscriptionText = window.BTC2GSubscription.text(lang);
+      setTextById('hero-subscribe-link', subscriptionText.title);
+      for (const [id, key] of [['subscribe-title','title'],['subscribe-subtitle','subtitle'],['subscribe-button','button'],['subscription-consent-text','consent'],['subscription-privacy','privacy']]) setTextById(id, subscriptionText[key]);
       setTextById('thanks-share-label', text.shareTitle);
       setTextById('thanks-share-button', text.nativeShare);
       setTextById('thanks-copy-button', text.copyLink);
@@ -2454,35 +2458,24 @@
         return;
       }
 
-      if (SUBSCRIPTION_ENDPOINT.includes('YOUR_ID')) {
-        console.log('Subscription failed: Formspree endpoint is not configured.');
-        setFormMessage(config.messageId, text.subscribeNotConfigured, true);
+      const consent = document.getElementById('subscription-consent');
+      if (!consent.checked) {
+        consent.setAttribute('aria-invalid', 'true');
+        consent.focus();
+        setFormMessage(config.messageId, window.BTC2GSubscription.text(currentLang).consentRequired, true);
         return;
       }
 
       submitButton.disabled = true;
+      consent.disabled = true;
+      consent.removeAttribute('aria-invalid');
       emailInput.removeAttribute('aria-invalid');
       submitButton.textContent = text.subscribeSending;
       setFormMessage(config.messageId, '');
 
       try {
-        const response = await window.BTC2GSubscription.send(SUBSCRIPTION_ENDPOINT, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            source: typeof config.source === 'function' ? config.source(text) : config.source,
-          }),
-        });
+        await window.BTC2GSubscription.subscribe(email, consent.checked, currentLang);
 
-        if (!response.ok) {
-          throw new Error(`Subscription request failed with status ${response.status}`);
-        }
-
-        console.log('Subscription succeeded.');
         emailInput.value = '';
         if (config.successEventName) {
           trackEvent(config.successEventName);
@@ -2490,11 +2483,11 @@
         setFormMessage(config.messageId, text[config.successTextKey]);
         if (config.showThankYou) showSubscriptionThanks(email);
       } catch (error) {
-        console.log('Subscription failed.', error);
         setFormMessage(config.messageId, error.name === 'TimeoutError' ? window.BTC2GSubscription.text(currentLang).uncertain : text.subscribeError, true);
       } finally {
         submitButton.disabled = false;
-        submitButton.textContent = getCurrentText()[config.buttonTextKey];
+        consent.disabled = false;
+        submitButton.textContent = window.BTC2GSubscription.text(currentLang).button;
       }
     }
 
@@ -2537,7 +2530,7 @@
         const data = response.ok ? await response.json() : null;
         const total = data?.confirmedSubscribers?.status === 'available' ? data.confirmedSubscribers.total : null;
         proof.hidden = !(Number.isInteger(total) && total > 0);
-        if (!proof.hidden) proof.textContent = currentLang === 'ru' ? `${total} читателей уже получают обновления.` : `${total} readers already receive updates.`;
+        if (!proof.hidden) proof.textContent = currentLang === 'ru' ? `Подтверждённых подписок: ${total}.` : `Confirmed email subscriptions: ${total}.`;
       } catch (error) {
         proof.hidden = true;
       }

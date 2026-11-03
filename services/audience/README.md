@@ -38,6 +38,8 @@ Vercel supplies the trusted `x-forwarded-for` used here. Do not deploy this hand
 
 ## Frontend cutover after deployment
 
+Production homepage cutover completed 2026-11-03: the main form uses `/api/subscribe` at the public origin in `assets/audience-config.json`, with a separate unchecked consent control, localized confirmation instructions, and strict receipt validation. PostgreSQL stores confirmations and the existing statistics proxy reports active subscribers. The homepage no longer submits subscription requests to Formspree. Premium early access remains separate. The Sunday preference form is hidden while the digest is disabled; this cutover does not enable weekly mail. The privacy notice lists Vercel, PostgreSQL and Resend. The checklist below remains guidance for future deployments.
+
 `client/audience-client.js` is an inactive adapter example, not loaded by the public site. After API validation:
 
 1. Copy the adapter into site assets; configure only the public API origin. Never put database, email or stats secrets in JavaScript.
