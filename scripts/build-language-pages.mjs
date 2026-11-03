@@ -46,9 +46,12 @@ export async function render(page, lang) {
   const title=document.querySelector('h1')?.textContent.trim();
   if(!title) throw new Error(`Missing heading: ${page}/${lang}`);
   document.title=`${title} | BTC2G`;
+  const homePurpose=document.querySelector('#site-purpose')?.textContent.trim();
   const scenarioIntro=document.querySelector('#scenario-intro')?.textContent.trim();
   const scenarioDisclosure=document.querySelector('#disclaimer-title')?.textContent.trim();
-  const description=page==='scenario.html' && scenarioIntro && scenarioDisclosure
+  const description=page==='index.html' && homePurpose
+    ? homePurpose
+    : page==='scenario.html' && scenarioIntro && scenarioDisclosure
     ? `${scenarioIntro} ${scenarioDisclosure}`
     : `${title} — BTC2G.`;
   for(const meta of document.querySelectorAll('meta[name="description"],meta[property="og:description"],meta[name="twitter:description"]')) meta.content=description;
@@ -59,6 +62,9 @@ export async function render(page, lang) {
     const data=JSON.parse(structuredData.textContent);
     if(data['@type']==='WebApplication') {
       data.name=document.title;data.url=pageURL(page,lang);data.description=description;data.inLanguage=lang;
+      structuredData.textContent=`\n${JSON.stringify(data,null,2)}\n  `;
+    } else if(data['@type']==='WebSite') {
+      data.description=description;
       structuredData.textContent=`\n${JSON.stringify(data,null,2)}\n  `;
     }
   }

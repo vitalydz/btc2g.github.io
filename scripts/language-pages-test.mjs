@@ -22,6 +22,13 @@ test('published language HTML has real translated headings, reciprocal alternate
       for(const input of d.querySelectorAll('input[type="email"],input[type="password"]')) assert.ok(!input.getAttribute('value'));
       for(const script of d.querySelectorAll('script[src]'))assert.ok(script.src.startsWith('/')||script.src.startsWith('https://'));
       assert.equal(d.querySelectorAll('script[src="/assets/js/static-language.js"]').length,1);
+      if(page==='index.html') {
+        const expected=d.querySelector('#site-purpose').textContent.trim();
+        assert.equal(d.querySelector('meta[name="description"]').content,expected);
+        assert.equal(d.querySelector('meta[property="og:description"]').content,expected);
+        assert.equal(d.querySelector('meta[name="twitter:description"]').content,expected);
+        assert.equal(JSON.parse(d.querySelector('script[type="application/ld+json"]').textContent).description,expected);
+      }
       if(page==='scenario.html') {
         const expected=`${d.querySelector('#scenario-intro').textContent.trim()} ${d.querySelector('#disclaimer-title').textContent.trim()}`;
         assert.equal(d.querySelector('meta[name="description"]').content,expected);
