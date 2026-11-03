@@ -68,6 +68,7 @@
   function signed(value) { return `${value > 0 ? '+' : ''}${number(value,2)}%`; }
   function renderLanguage() {
     Object.entries(textIds).forEach(([key,id]) => { if (byId(id)) byId(id).textContent = t(key); });
+    byId('scenario-result-account-link').textContent = t('account');
     document.documentElement.lang = lang; document.documentElement.dir = ['he','ar'].includes(lang) ? 'rtl' : 'ltr';
     byId('scenario-language').value = lang; byId('scenario-language').setAttribute('aria-label', lang === 'ru' ? 'Язык' : 'Language');
     document.title = t('title');

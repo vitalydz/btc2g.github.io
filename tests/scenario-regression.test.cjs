@@ -31,6 +31,7 @@ test('changing language preserves failed/loaded states instead of inventing a ne
  for(const failed of [true,false]){
   const h=await setup({failed});h.el('scenario-language').listeners.change({target:{value:'ru'}});
   assert.match(h.el('data-status').textContent,failed?/недоступны/:/загружены/);assert.equal(h.requests(),1);
+  assert.equal(h.el('scenario-result-account-link').textContent,'Создать аккаунт');
  }
 });
 test('invalid input, out-of-range target and overflowing derived results are rejected',()=>{
