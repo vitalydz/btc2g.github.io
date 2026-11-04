@@ -9,13 +9,13 @@
   "latest_metrics":{
     "day":"2026-11-04",
     "time_zone":"Asia/Jerusalem",
-    "measured_at":"2026-11-04T14:24:37.141Z",
+    "measured_at":"2026-11-04T15:20:52.573Z",
     "source":"https://btc2g-accounts.btc2g.workers.dev/api/stats (Cloudflare D1)",
     "confirmed_accounts_total":0,
     "confirmed_accounts_today":0,
     "remaining_to_100":100,
-    "estimated_visitors_today_not_counted_as_users":7,
-    "page_views_today_not_counted_as_users":13,
+    "estimated_visitors_today_not_counted_as_users":8,
+    "page_views_today_not_counted_as_users":14,
     "confirmed_newsletter_subscribers_not_counted_as_accounts":0
   },
   "published":[{
