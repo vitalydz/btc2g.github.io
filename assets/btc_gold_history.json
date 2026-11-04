@@ -10,15 +10,8 @@
     "gold_usd": "USD per troy ounce",
     "model_score": "0-100 model score"
   },
-  "updated_for_market_date": "2026-11-02",
+  "updated_for_market_date": "2026-11-03",
   "series": [
-    {
-      "date": "2023-12-07",
-      "ratio": 21.1555,
-      "btc_usd": 43292.66,
-      "gold_usd": 2046.4,
-      "model_score": 90
-    },
     {
       "date": "2023-12-08",
       "ratio": 21.9243,
@@ -5121,6 +5114,13 @@
       "btc_usd": 76677.3,
       "gold_usd": 3969.6,
       "model_score": 57
+    },
+    {
+      "date": "2026-11-03",
+      "ratio": 19.6287,
+      "btc_usd": 77345.05,
+      "gold_usd": 3940.4,
+      "model_score": 56
     }
   ]
 }
