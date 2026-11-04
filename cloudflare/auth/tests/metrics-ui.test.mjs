@@ -10,6 +10,7 @@ function page(htmlPath) {
   function node() {
     return { textContent: '', value: '7', hidden: false, disabled: false, children: [], listeners: {}, attributes: {},
       addEventListener(name, handler) { this.listeners[name] = handler; },
+      getAttribute(name) { return this.attributes[name] ?? null; },
       setAttribute(name, value) { this.attributes[name] = value; },
       removeAttribute(name) { delete this.attributes[name]; },
       replaceChildren(...children) { this.children = children; },

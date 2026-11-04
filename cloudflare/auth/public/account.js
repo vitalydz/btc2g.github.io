@@ -11,6 +11,8 @@ const usernameInput = document.querySelector('#username');
 const registrationEmailRow = document.querySelector('#registration-email-row');
 const registrationEmail = document.querySelector('#registration-email');
 const password = document.querySelector('#password');
+const registrationPasswordPattern = password.getAttribute('pattern');
+const registrationPasswordRules = password.getAttribute('passwordrules');
 const togglePassword = document.querySelector('#toggle-password');
 const passwordHint = document.querySelector('#password-hint');
 const signedIn = document.querySelector('#signed-in');
@@ -199,6 +201,13 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
   registrationEmailRow.hidden = mode === 'login';
   registrationEmail.required = mode === 'register';
   password.autocomplete = mode === 'register' ? 'new-password' : 'current-password';
+  if (mode === 'register') {
+    password.setAttribute('pattern', registrationPasswordPattern);
+    password.setAttribute('passwordrules', registrationPasswordRules);
+  } else {
+    password.removeAttribute('pattern');
+    password.removeAttribute('passwordrules');
+  }
   passwordHint.textContent = mode === 'register' ? accountText('passwordHint') : accountText('loginPasswordHint');
   submitButton.textContent = mode === 'register' ? accountText('create') : accountText('signIn');
   setMessage('');

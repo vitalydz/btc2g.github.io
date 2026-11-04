@@ -111,6 +111,16 @@ test('switching registration mode moves focus to the first account field', async
   assert.match(account, /usernameInput\.focus\(\)/);
 });
 
+test('password strength constraints apply only while creating an account', async () => {
+  const account = await readFile(new URL('account.js', root), 'utf8');
+  assert.match(account, /const registrationPasswordPattern = password\.getAttribute\('pattern'\)/);
+  assert.match(account, /const registrationPasswordRules = password\.getAttribute\('passwordrules'\)/);
+  assert.match(account, /password\.setAttribute\('pattern', registrationPasswordPattern\)/);
+  assert.match(account, /password\.setAttribute\('passwordrules', registrationPasswordRules\)/);
+  assert.match(account, /password\.removeAttribute\('pattern'\)/);
+  assert.match(account, /password\.removeAttribute\('passwordrules'\)/);
+});
+
 test('registration flow explains that email verification completes the account', async () => {
   const [accountPage, accountCss, accountLanguage] = await Promise.all(['index.html', 'account.css', 'account-language.js'].map(path => readFile(new URL(path, root), 'utf8')));
   assert.match(accountPage, /class="registration-steps" aria-label="Registration steps"/);
