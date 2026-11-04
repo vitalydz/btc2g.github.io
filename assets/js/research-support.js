@@ -25,13 +25,13 @@
   };
 
   const navigation = {
-    en:['Dashboard','Calculator','Premium'], ru:['Главная','Калькулятор','Премиум'], he:['לוח מחוונים','מחשבון','פרימיום'],
-    de:['Dashboard','Rechner','Premium'], fr:['Tableau de bord','Calculateur','Premium'], es:['Panel','Calculadora','Premium'],
-    zh:['仪表板','计算器','高级版'], it:['Dashboard','Calcolatore','Premium'], pt:['Painel','Calculadora','Premium'],
-    ar:['لوحة المعلومات','الحاسبة','بريميوم'], hi:['डैशबोर्ड','कैलकुलेटर','प्रीमियम'], ja:['ダッシュボード','計算機','プレミアム'],
-    ko:['대시보드','계산기','프리미엄'], tr:['Panel','Hesaplayıcı','Premium'], pl:['Panel','Kalkulator','Premium'],
-    nl:['Dashboard','Calculator','Premium'], uk:['Головна','Калькулятор','Преміум'], id:['Dasbor','Kalkulator','Premium'],
-    vi:['Bảng điều khiển','Máy tính','Premium']
+    en:['Dashboard','Calculator','Premium','Account'], ru:['Главная','Калькулятор','Премиум','Аккаунт'], he:['לוח מחוונים','מחשבון','פרימיום','חשבון'],
+    de:['Dashboard','Rechner','Premium','Konto'], fr:['Tableau de bord','Calculateur','Premium','Compte'], es:['Panel','Calculadora','Premium','Cuenta'],
+    zh:['仪表板','计算器','高级版','账户'], it:['Dashboard','Calcolatore','Premium','Account'], pt:['Painel','Calculadora','Premium','Conta'],
+    ar:['لوحة المعلومات','الحاسبة','بريميوم','الحساب'], hi:['डैशबोर्ड','कैलकुलेटर','प्रीमियम','खाता'], ja:['ダッシュボード','計算機','プレミアム','アカウント'],
+    ko:['대시보드','계산기','프리미엄','계정'], tr:['Panel','Hesaplayıcı','Premium','Hesap'], pl:['Panel','Kalkulator','Premium','Konto'],
+    nl:['Dashboard','Calculator','Premium','Account'], uk:['Головна','Калькулятор','Преміум','Акаунт'], id:['Dasbor','Kalkulator','Premium','Akun'],
+    vi:['Bảng điều khiển','Máy tính','Premium','Tài khoản']
   };
 
   const ids = { eyebrow:'research-eyebrow', title:'research-title', intro:'research-intro', publications:'research-papers-title', figure:'research-figure-note', support:'research-support-title', supportIntro:'research-support-intro', network:'research-network-label', address:'research-address-label', copy:'research-copy-address', explorer:'research-explorer-link', warning:'research-network-warning', disclaimer:'research-support-disclaimer' };
@@ -48,9 +48,11 @@
     const dashboard = document.getElementById('research-nav-dashboard');
     const calculator = document.getElementById('research-nav-calculator');
     const premium = document.getElementById('research-nav-premium');
+    const account = document.getElementById('research-nav-account');
     if (dashboard) { dashboard.textContent = nav[0]; dashboard.href = `index.html?lang=${encodeURIComponent(language)}`; }
     if (calculator) { calculator.textContent = nav[1]; calculator.href = `index.html?lang=${encodeURIComponent(language)}#calculator`; }
     if (premium) { premium.textContent = nav[2]; premium.href = `premium.html?lang=${encodeURIComponent(language)}`; }
+    if (account) { account.textContent = nav[3]; account.href = `https://btc2g-accounts.btc2g.workers.dev/?lang=${encodeURIComponent(language)}`; }
     const status = document.getElementById('research-copy-status');
     if (status) status.textContent = '';
   }

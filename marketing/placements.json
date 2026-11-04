@@ -9,13 +9,13 @@
   "latest_metrics":{
     "day":"2026-11-04",
     "time_zone":"Asia/Jerusalem",
-    "measured_at":"2026-11-04T03:08:18.759Z",
+    "measured_at":"2026-11-04T08:18:23.002Z",
     "source":"https://btc2g-accounts.btc2g.workers.dev/api/stats (Cloudflare D1)",
     "confirmed_accounts_total":0,
     "confirmed_accounts_today":0,
     "remaining_to_100":100,
-    "estimated_visitors_today_not_counted_as_users":0,
-    "page_views_today_not_counted_as_users":0,
+    "estimated_visitors_today_not_counted_as_users":5,
+    "page_views_today_not_counted_as_users":10,
     "confirmed_newsletter_subscribers_not_counted_as_accounts":0
   },
   "published":[{
@@ -47,7 +47,7 @@
   }],
   "scope":"Owner published one Reddit product-feedback post and one Telegram tools overview. Other platforms remain drafts.",
   "candidates":[
-    {"platform":"Reddit r/sideprojects","status":"draft_ready","draft_id":"next-placement-2026-11-03.json","rules_checked":"2026-11-03","rules_url":"https://www.reddit.com/r/sideprojects/about/rules/","blocker":"Not submitted: next platform selected and a distinct educational draft prepared. Check duplicate history and exact AI-assisted showcase flair before publication."},
+    {"platform":"Reddit r/sideprojects","status":"blocked","draft_id":"next-placement-2026-11-03.json","rules_checked":"2026-11-04","rules_url":"https://www.reddit.com/r/sideprojects/about/rules/","blocker":"Not submitted. Official rules were rechecked, but Reddit's Prove your humanity CAPTCHA blocked the composer before exact flair and authenticated duplicate history could be verified. Owner action and action-time confirmation are required before submission."},
     {"platform":"Reddit","status":"published","draft_id":"btc2g-reddit-en","blocker":null},
     {"platform":"Facebook","status":"draft_ready","draft_id":"btc2g-facebook-he","blocker":"Owner page/account and group-specific rules not verified."},
     {"platform":"Product Hunt","status":"login_required","draft_id":"btc2g-producthunt-en","blocker":"Public Product Hunt product search returned no BTC2G product, but the Chrome session is signed out, so account drafts and scheduled launches cannot be checked without owner login. No listing was created or submitted.","rules_checked":"2026-11-03: Product Hunt public search for BTC2G displayed ‘No products found’. The page offered Sign in, confirming that the current browser session is not authenticated.","verification":"Public search found no published BTC2G product. This does not rule out a private draft or scheduled launch inside the owner's account."},
