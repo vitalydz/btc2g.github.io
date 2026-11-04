@@ -33,6 +33,8 @@ test('registration fields explain their accepted format before submission', asyn
   assert.match(html, /id="username-hint">3–32 characters\. Start with a Latin letter/);
   assert.match(html, /id="username-privacy">Your username is used only for sign-in and is not displayed publicly/);
   assert.match(html, /aria-describedby="password-hint"/);
+  assert.match(html, /passwordrules="minlength: 12; maxlength: 128; required: upper; required: lower; required: digit;"/);
+  assert.match(html, /pattern="\(\?=\.\*\[a-z\]\)\(\?=\.\*\[A-Z\]\)\(\?=\.\*\[0-9\]\)\.\{12,128\}"/);
   assert.match(html, /id="password-hint">Use 12–128 characters with an uppercase letter, a lowercase letter, and a number/);
   assert.match(html, /id="registration-email"[^>]+type="email"[^>]+required/);
   assert.match(html, /id="accepted-terms"[^>]+type="checkbox"[^>]+required/);
@@ -183,7 +185,7 @@ test('signed-in account UI separates email verification from Premium and marketi
   assert.match(html, /id="account-email"[^>]+aria-describedby="account-email-hint"/);
   assert.match(html, /id="account-email"[^>]+enterkeyhint="send"/);
   assert.match(html, /id="account-email-hint"/);
-  assert.match(html, /id="password"[^>]+passwordrules="minlength: 12; maxlength: 128;"/);
+  assert.match(html, /id="password"[^>]+passwordrules="minlength: 12; maxlength: 128;/);
   assert.match(html, /id="password"[^>]+enterkeyhint="go"/);
   assert.match(html, /does not subscribe you to marketing or activate Premium/);
   assert.match(html, /https:\/\/btc2g\.com\/#subscribe/);
