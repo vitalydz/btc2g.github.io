@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   const texts = window.BTC2GSaveText;
-  const accountLabels = {en:'Create account',ru:'Создать аккаунт',he:'יצירת חשבון',de:'Konto erstellen',fr:'Créer un compte',es:'Crear cuenta',zh:'创建账户',it:'Crea account',pt:'Criar conta',ar:'إنشاء حساب',hi:'खाता बनाएँ',ja:'アカウント作成',ko:'계정 만들기',tr:'Hesap oluştur',pl:'Utwórz konto',nl:'Account maken',uk:'Створити акаунт',id:'Buat akun',vi:'Tạo tài khoản'};
+  const accountLabels = {en:'Create free account',ru:'Создать бесплатный аккаунт',he:'יצירת חשבון חינם',de:'Kostenloses Konto erstellen',fr:'Créer un compte gratuit',es:'Crear cuenta gratis',zh:'创建免费账户',it:'Crea account gratuito',pt:'Criar conta grátis',ar:'إنشاء حساب مجاني',hi:'मुफ़्त खाता बनाएँ',ja:'無料アカウントを作成',ko:'무료 계정 만들기',tr:'Ücretsiz hesap oluştur',pl:'Utwórz bezpłatne konto',nl:'Gratis account maken',uk:'Створити безкоштовний акаунт',id:'Buat akun gratis',vi:'Tạo tài khoản miễn phí'};
 
   const byId = id => document.getElementById(id);
   let lang = 'en';

@@ -1,6 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const read=p=>fs.readFileSync(p,'utf8');
 const expected=['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi'];
+const freeMarkers={en:'free',ru:'бесплатный',he:'חינם',de:'Kostenloses',fr:'gratuit',es:'gratis',zh:'免费',it:'gratuito',pt:'grátis',ar:'مجاني',hi:'मुफ़्त',ja:'無料',ko:'무료',tr:'Ücretsiz',pl:'bezpłatne',nl:'Gratis',uk:'безкоштовний',id:'gratis',vi:'miễn phí'};
 function page(lang,blocked=false){
  const nodes=new Map(); const node=id=>{if(!nodes.has(id))nodes.set(id,{value:'',checked:false,textContent:'',dataset:{},listeners:{},addEventListener(k,f){this.listeners[k]=f},setAttribute(k,v){this[k]=v},getAttribute(k){return this[k]}});return nodes.get(id)};
  for(const id of ['save-amount','save-moonpay','save-topper','save-confirm','save-currency','save-result','save-language','save-compare','save-clear','moonpay-rate','topper-rate','save-account-link'])node(id);
@@ -22,7 +23,7 @@ for(const lang of expected)test('SAVE renders and calculates in '+lang,()=>{
  for(const f of fields)assert.equal(f.textContent,c.window.BTC2GSaveText[lang][f.dataset.text]);
  node('save-moonpay').value='0.001';node('save-topper').value='0.0011';node('save-confirm').checked=true;node('save-compare').listeners.click();assert.ok(node('save-result').textContent.includes('Topper'));assert.ok(!node('save-result').textContent.includes('{'));
  for(const a of links)assert.ok(a.href.includes('lang='+lang));
- assert.ok(node('save-account-link').href.endsWith('lang='+lang));assert.ok(node('save-account-link').textContent.trim());
+ assert.ok(node('save-account-link').href.endsWith('lang='+lang));assert.ok(node('save-account-link').textContent.includes(freeMarkers[lang]),lang+' free account label');
  node('save-language').listeners.change({target:{value:lang==='en'?'de':'en'}});assert.ok(node('save-result').textContent.includes('Topper'));
 });
 test('regional language tags and denied storage are supported',()=>{assert.equal(page('ar-SA',true).c.document.documentElement.lang,'ar');assert.equal(page('xx',true).c.document.documentElement.lang,'en')});
