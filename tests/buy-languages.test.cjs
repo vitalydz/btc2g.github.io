@@ -7,6 +7,7 @@ const vm = require('node:vm');
 const html = fs.readFileSync(path.join(__dirname, '..', 'buy.html'), 'utf8');
 const moduleScript = html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
 const expected = ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi'];
+const freeMarkers = {en:'free',ru:'бесплатный',he:'בחינם',de:'Kostenloses',fr:'gratuit',es:'gratis',zh:'免费',it:'gratuito',pt:'grátis',ar:'مجاني',hi:'मुफ़्त',ja:'無料',ko:'무료',tr:'Ücretsiz',pl:'bezpłatne',nl:'Gratis',uk:'безкоштовний',id:'gratis',vi:'miễn phí'};
 
 function render(lang) {
   const nodes = new Map();
@@ -36,6 +37,7 @@ test('Buy Bitcoin offers and renders all 19 site languages', () => {
     assert.equal(element('save-link').href, 'save.html?lang=' + lang);
     assert.equal(element('account-link').href, 'https://btc2g-accounts.btc2g.workers.dev/?lang=' + lang);
     assert.ok(element('account-link').textContent.trim(), lang);
+    assert.ok(element('account-link').textContent.includes(freeMarkers[lang]), `${lang} free account label`);
     assert.equal(element('back-home').href, 'index.html?lang=' + lang);
   }
 });

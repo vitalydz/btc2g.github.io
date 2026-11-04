@@ -208,7 +208,7 @@
     </div>
 
     <p><a id="save-link" class="back-home" href="save.html">Compare final BTC quotes →</a></p>
-    <p><a id="account-link" class="back-home" href="https://btc2g-accounts.btc2g.workers.dev/">Create a BTC2G account →</a></p>
+    <p><a id="account-link" class="back-home" href="https://btc2g-accounts.btc2g.workers.dev/">Create a free BTC2G account →</a></p>
     <p class="footer-text" id="footer-text">Provider availability depends on country.</p>
   </div>
 
@@ -411,7 +411,7 @@
       const saveLabels = { en:'Compare final BTC quotes →', ru:'Сравнить итоговые котировки BTC →', he:'השוואת הצעות BTC סופיות ←', de:'Endgültige BTC-Angebote vergleichen →', fr:'Comparer les offres finales en BTC →', es:'Comparar cotizaciones finales de BTC →', zh:'比较最终 BTC 报价 →', it:'Confronta le quotazioni BTC finali →', pt:'Comparar cotações finais de BTC →', ar:'مقارنة عروض BTC النهائية ←', hi:'अंतिम BTC कोटेशन की तुलना करें →', ja:'最終BTC見積もりを比較 →', ko:'최종 BTC 견적 비교 →', tr:'Nihai BTC tekliflerini karşılaştır →', pl:'Porównaj końcowe oferty BTC →', nl:'Vergelijk definitieve BTC-offertes →', uk:'Порівняти підсумкові котирування BTC →', id:'Bandingkan penawaran BTC akhir →', vi:'So sánh báo giá BTC cuối cùng →' };
       document.getElementById('save-link').textContent = saveLabels[lang] || saveLabels.en;
       document.getElementById('save-link').href = 'save.html?lang=' + encodeURIComponent(lang);
-      const accountLabels = { en:'Create a BTC2G account →', ru:'Создать аккаунт BTC2G →', he:'יצירת חשבון BTC2G ←', de:'BTC2G-Konto erstellen →', fr:'Créer un compte BTC2G →', es:'Crear una cuenta BTC2G →', zh:'创建 BTC2G 账户 →', it:'Crea un account BTC2G →', pt:'Criar uma conta BTC2G →', ar:'إنشاء حساب BTC2G ←', hi:'BTC2G खाता बनाएँ →', ja:'BTC2Gアカウントを作成 →', ko:'BTC2G 계정 만들기 →', tr:'BTC2G hesabı oluştur →', pl:'Utwórz konto BTC2G →', nl:'BTC2G-account maken →', uk:'Створити обліковий запис BTC2G →', id:'Buat akun BTC2G →', vi:'Tạo tài khoản BTC2G →' };
+      const accountLabels = { en:'Create a free BTC2G account →', ru:'Создать бесплатный аккаунт BTC2G →', he:'יצירת חשבון BTC2G בחינם ←', de:'Kostenloses BTC2G-Konto erstellen →', fr:'Créer un compte BTC2G gratuit →', es:'Crear una cuenta BTC2G gratis →', zh:'创建免费 BTC2G 账户 →', it:'Crea un account BTC2G gratuito →', pt:'Criar uma conta BTC2G grátis →', ar:'إنشاء حساب BTC2G مجاني ←', hi:'मुफ़्त BTC2G खाता बनाएँ →', ja:'無料のBTC2Gアカウントを作成 →', ko:'무료 BTC2G 계정 만들기 →', tr:'Ücretsiz BTC2G hesabı oluştur →', pl:'Utwórz bezpłatne konto BTC2G →', nl:'Gratis BTC2G-account maken →', uk:'Створити безкоштовний обліковий запис BTC2G →', id:'Buat akun BTC2G gratis →', vi:'Tạo tài khoản BTC2G miễn phí →' };
       document.getElementById('account-link').textContent = accountLabels[lang] || accountLabels.en;
       document.getElementById('account-link').href = 'https://btc2g-accounts.btc2g.workers.dev/?lang=' + encodeURIComponent(lang);
     }
