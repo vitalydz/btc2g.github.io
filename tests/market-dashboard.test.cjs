@@ -66,7 +66,7 @@ test('three existing insight articles end with a functional signup form', () => 
   for (const file of ['bitcoin-vs-gold.html', 'bitcoin-gold-ratio.html', 'bitcoin-vs-gold-forecast-2026.html']) {
     const html = read(file);
     assert.match(html, /class="article-signup-form"/);
-    assert.match(html, /data-article-account[^>]+btc2g-accounts\.btc2g\.workers\.dev/);
+    assert.match(html, /data-article-account[^>]+btc2g-accounts\.btc2g\.workers\.dev[^>]*>Create a free BTC2G account<\/a>/);
     assert.match(html, /class="related-guides"/);
     assert.equal((html.match(/class="related-guides"[\s\S]*?<\/nav>/) || [''])[0].match(/<a /g)?.length, 2);
     assert.match(html, /assets\/js\/article-signup\.js/);
@@ -75,7 +75,7 @@ test('three existing insight articles end with a functional signup form', () => 
   }
   const language = read('assets/js/insight-article-language.js');
   assert.match(language, /url\.searchParams\.set\('lang', lang\)/);
-  assert.match(language, /'Create a BTC2G account': 'Создать аккаунт BTC2G'/);
+  assert.match(language, /'Create a free BTC2G account': 'Создать бесплатный аккаунт BTC2G'/);
   assert.match(language, /'Related BTC2G guides': 'Связанные материалы BTC2G'/);
 });
 

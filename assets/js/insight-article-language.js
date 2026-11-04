@@ -78,7 +78,7 @@
     'A short email when the published model direction changes or the ratio moves significantly. No daily spam.': 'Короткое письмо при изменении направления модели или значительном движении соотношения. Без ежедневного спама.',
     'Subscribe free': 'Подписаться бесплатно',
     'Email address': 'Адрес электронной почты',
-    'Create a BTC2G account': 'Создать аккаунт BTC2G'
+    'Create a free BTC2G account': 'Создать бесплатный аккаунт BTC2G'
   };
 
   const walker = root.document.createTreeWalker(root.document.body, NodeFilter.SHOW_TEXT);
