@@ -70,6 +70,7 @@ test('copy control uses the exact address and has all 19 translations', async ()
 });
 
 test('research navigation is translated and preserves the selected language', () => {
+  const freeMarkers = ['Free','Бесплатный','חינם','Kostenloses','gratuit','gratis','免费','gratuito','grátis','مجاني','मुफ़्त','無料','무료','Ücretsiz','Bezpłatne','Gratis','Безкоштовний','gratis','miễn phí'];
   const nodes = new Map();
   const document = {
     documentElement: {},
@@ -88,14 +89,15 @@ test('research navigation is translated and preserves the selected language', ()
   vm.createContext(context);
   vm.runInContext(script, context);
   assert.equal(Object.keys(context.window.BTC2GResearch.navigation).length, 19);
-  for (const labels of Object.values(context.window.BTC2GResearch.navigation)) {
+  for (const [index, labels] of Object.values(context.window.BTC2GResearch.navigation).entries()) {
     assert.equal(labels.length, 4);
     assert.ok(labels.every(label => label.trim()));
+    assert.ok(labels[3].includes(freeMarkers[index]));
   }
   assert.equal(nodes.get('research-nav-dashboard').textContent, 'Главная');
   assert.equal(nodes.get('research-nav-calculator').textContent, 'Калькулятор');
   assert.equal(nodes.get('research-nav-premium').textContent, 'Премиум');
-  assert.equal(nodes.get('research-nav-account').textContent, 'Аккаунт');
+  assert.equal(nodes.get('research-nav-account').textContent, 'Бесплатный аккаунт');
   assert.equal(nodes.get('research-nav-dashboard').href, 'index.html?lang=ru');
   assert.equal(nodes.get('research-nav-calculator').href, 'index.html?lang=ru#calculator');
   assert.equal(nodes.get('research-nav-premium').href, 'premium.html?lang=ru');

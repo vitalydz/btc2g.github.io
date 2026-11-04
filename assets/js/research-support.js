@@ -25,13 +25,13 @@
   };
 
   const navigation = {
-    en:['Dashboard','Calculator','Premium','Account'], ru:['Главная','Калькулятор','Премиум','Аккаунт'], he:['לוח מחוונים','מחשבון','פרימיום','חשבון'],
-    de:['Dashboard','Rechner','Premium','Konto'], fr:['Tableau de bord','Calculateur','Premium','Compte'], es:['Panel','Calculadora','Premium','Cuenta'],
-    zh:['仪表板','计算器','高级版','账户'], it:['Dashboard','Calcolatore','Premium','Account'], pt:['Painel','Calculadora','Premium','Conta'],
-    ar:['لوحة المعلومات','الحاسبة','بريميوم','الحساب'], hi:['डैशबोर्ड','कैलकुलेटर','प्रीमियम','खाता'], ja:['ダッシュボード','計算機','プレミアム','アカウント'],
-    ko:['대시보드','계산기','프리미엄','계정'], tr:['Panel','Hesaplayıcı','Premium','Hesap'], pl:['Panel','Kalkulator','Premium','Konto'],
-    nl:['Dashboard','Calculator','Premium','Account'], uk:['Головна','Калькулятор','Преміум','Акаунт'], id:['Dasbor','Kalkulator','Premium','Akun'],
-    vi:['Bảng điều khiển','Máy tính','Premium','Tài khoản']
+    en:['Dashboard','Calculator','Premium','Free account'], ru:['Главная','Калькулятор','Премиум','Бесплатный аккаунт'], he:['לוח מחוונים','מחשבון','פרימיום','חשבון חינם'],
+    de:['Dashboard','Rechner','Premium','Kostenloses Konto'], fr:['Tableau de bord','Calculateur','Premium','Compte gratuit'], es:['Panel','Calculadora','Premium','Cuenta gratis'],
+    zh:['仪表板','计算器','高级版','免费账户'], it:['Dashboard','Calcolatore','Premium','Account gratuito'], pt:['Painel','Calculadora','Premium','Conta grátis'],
+    ar:['لوحة المعلومات','الحاسبة','بريميوم','حساب مجاني'], hi:['डैशबोर्ड','कैलकुलेटर','प्रीमियम','मुफ़्त खाता'], ja:['ダッシュボード','計算機','プレミアム','無料アカウント'],
+    ko:['대시보드','계산기','프리미엄','무료 계정'], tr:['Panel','Hesaplayıcı','Premium','Ücretsiz hesap'], pl:['Panel','Kalkulator','Premium','Bezpłatne konto'],
+    nl:['Dashboard','Calculator','Premium','Gratis account'], uk:['Головна','Калькулятор','Преміум','Безкоштовний акаунт'], id:['Dasbor','Kalkulator','Premium','Akun gratis'],
+    vi:['Bảng điều khiển','Máy tính','Premium','Tài khoản miễn phí']
   };
 
   const ids = { eyebrow:'research-eyebrow', title:'research-title', intro:'research-intro', publications:'research-papers-title', figure:'research-figure-note', support:'research-support-title', supportIntro:'research-support-intro', network:'research-network-label', address:'research-address-label', copy:'research-copy-address', explorer:'research-explorer-link', warning:'research-network-warning', disclaimer:'research-support-disclaimer' };
