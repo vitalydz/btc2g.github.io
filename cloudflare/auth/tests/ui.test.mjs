@@ -59,6 +59,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
   vm.createContext(context);
   vm.runInContext(executable, context);
   assert.equal(context.window.__i18n.languages.length, 19);
+  const deliveryFolderTerms = {en:'junk',ru:'Спам',he:'ספאם',de:'Spam',fr:'indésirables',es:'spam',zh:'垃圾邮件',it:'spam',pt:'spam',ar:'غير المرغوب',hi:'स्पैम',ja:'迷惑メール',ko:'스팸함',tr:'spam',pl:'spam',nl:'spammap',uk:'Спам',id:'spam',vi:'spam'};
   for (const lang of options) {
     const dictionary = context.window.__i18n.dictionaries[lang];
     assert.ok(dictionary, lang);
@@ -68,6 +69,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(dictionary.usernameHint, lang);
     assert.ok(dictionary.emailHint, lang);
     assert.ok(dictionary.verificationSent, lang);
+    assert.ok(dictionary.verificationSent.includes(deliveryFolderTerms[lang]), `${lang} verification delivery hint`);
     assert.ok(dictionary.verificationFailed, lang);
     assert.equal(context.window.__i18n.registrationStepRows[lang].length, 7, lang);
     assert.ok(context.window.__i18n.registrationStepRows[lang].every(value => typeof value === 'string' && value.trim()), lang);
