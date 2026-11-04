@@ -33,7 +33,7 @@ test('registration fields explain their accepted format before submission', asyn
   assert.match(html, /id="username-hint">3–32 characters\. Start with a Latin letter/);
   assert.match(html, /id="username-privacy">Your username is used only for sign-in and is not displayed publicly/);
   assert.match(html, /aria-describedby="password-hint"/);
-  assert.match(html, /id="password-hint">Use at least 12 characters/);
+  assert.match(html, /id="password-hint">Use 12–128 characters with an uppercase letter, a lowercase letter, and a number/);
   assert.match(html, /id="registration-email"[^>]+type="email"[^>]+required/);
   assert.match(html, /id="accepted-terms"[^>]+type="checkbox"[^>]+required/);
   assert.match(script, /termsCheckbox\.required = mode === 'register'/);
@@ -68,6 +68,8 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(dictionary.usernamePrivacy, lang);
     assert.ok(dictionary.usernameHint, lang);
     assert.ok(dictionary.emailHint, lang);
+    assert.match(dictionary.passwordHint, /12/);
+    assert.match(dictionary.passwordHint, /128/);
     assert.ok(dictionary.verificationSent, lang);
     assert.ok(dictionary.verificationSent.includes(deliveryFolderTerms[lang]), `${lang} verification delivery hint`);
     assert.ok(dictionary.verificationFailed, lang);
@@ -82,6 +84,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
   assert.equal(context.window.__i18n.dictionaries.ru.title, 'Ваш аккаунт BTC2G');
   assert.match(context.window.__i18n.dictionaries.ru.trust, /не подписывает/);
   assert.match(html, /id="account-trust">Email verification does not subscribe you to marketing/);
+  assert.match(html, /id="password-hint">Use 12–128 characters with an uppercase letter, a lowercase letter, and a number/);
   assert.match(languageScript, /trust:'account-trust'/);
   assert.match(languageScript, /usernamePrivacy:'username-privacy'/);
   assert.match(languageScript, /usernameHint:'username-hint'/);
