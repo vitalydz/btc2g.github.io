@@ -67,6 +67,7 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(dictionary, lang);
     assert.ok(Object.values(dictionary).every(value => typeof value === 'string' && value.trim()), lang);
     assert.ok(dictionary.trust, lang);
+    assert.ok(dictionary.benefit, lang);
     assert.ok(dictionary.usernamePrivacy, lang);
     assert.ok(dictionary.usernameHint, lang);
     assert.ok(dictionary.emailHint, lang);
@@ -86,8 +87,10 @@ test('account page localizes its primary UI in all 19 site languages', async () 
   assert.equal(context.window.__i18n.dictionaries.ru.title, 'Ваш аккаунт BTC2G');
   assert.match(context.window.__i18n.dictionaries.ru.trust, /не подписывает/);
   assert.match(html, /id="account-trust">Email verification does not subscribe you to marketing/);
+  assert.match(html, /id="account-benefit">After email verification, you can submit product ideas privately to BTC2G/);
   assert.match(html, /id="password-hint">Use 12–128 characters with an uppercase letter, a lowercase letter, and a number/);
   assert.match(languageScript, /trust:'account-trust'/);
+  assert.match(languageScript, /benefit:'account-benefit'/);
   assert.match(languageScript, /usernamePrivacy:'username-privacy'/);
   assert.match(languageScript, /usernameHint:'username-hint'/);
   assert.match(languageScript, /emailHint:'registration-email-hint'/);
