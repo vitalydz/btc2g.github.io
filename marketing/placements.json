@@ -1,21 +1,21 @@
 {
   "site":"https://btc2g.com",
-  "checked":"2026-11-03",
+  "checked":"2026-11-04",
   "growth_target":{
     "confirmed_production_accounts":100,
     "counting_rule":"Only email-verified ordinary account rows reported by the production Cloudflare D1 statistics endpoint. Exclude administrators, tests, page views, clicks, unverified registrations and newsletter-only subscribers.",
     "digest_rule":"Do not enable or production-test the mailing on real addresses before the confirmed production account total reaches 100. Request final owner confirmation immediately before that production check."
   },
   "latest_metrics":{
-    "day":"2026-11-03",
+    "day":"2026-11-04",
     "time_zone":"Asia/Jerusalem",
-    "measured_at":"2026-11-03T04:03:36.773Z",
+    "measured_at":"2026-11-04T03:08:18.759Z",
     "source":"https://btc2g-accounts.btc2g.workers.dev/api/stats (Cloudflare D1)",
     "confirmed_accounts_total":0,
     "confirmed_accounts_today":0,
     "remaining_to_100":100,
-    "estimated_visitors_today_not_counted_as_users":4,
-    "page_views_today_not_counted_as_users":5,
+    "estimated_visitors_today_not_counted_as_users":0,
+    "page_views_today_not_counted_as_users":0,
     "confirmed_newsletter_subscribers_not_counted_as_accounts":0
   },
   "published":[{
@@ -32,12 +32,23 @@
     "evidence_path":"C:/Users/vitly/OneDrive/Documents/Playground/btc2g-reddit-sideproject-published.png",
     "verification":"Reddit displayed Posted; permalink opened with full post by u/vitdart and no moderation/removal warning. This does not establish audience reach or conversions.",
     "followup_2026_11_03":{"displayed_views":79,"displayed_score":2,"comment_counter":1,"comment_text":"Not displayed in the accessible comment region; no content or sentiment inferred.","interpretation":"Early post visibility, not site visits or attributed subscriptions. Owner test excluded."}
+  },{
+    "platform":"Telegram",
+    "community":"https://t.me/BTC2GNews",
+    "account":"@BTC2GNews",
+    "draft_id":"btc2g-telegram-tools-ru",
+    "language":"ru",
+    "status":"published",
+    "published_url":"https://t.me/BTC2GNews/8",
+    "published_at":"2026-11-03T19:11:33Z",
+    "title":"Что умеет BTC2G",
+    "rules_checked":"2026-11-03: owner identified @BTC2GNews as the destination and chose manual publication.",
+    "verification":"The public Telegram channel preview displayed post 8 with the prepared tools overview and both allowlisted utm_source=telegram links. This confirms publication, not traffic or registrations."
   }],
-  "scope":"Owner authorized one free useful demonstration; one Reddit post published. Other platforms remain drafts.",
+  "scope":"Owner published one Reddit product-feedback post and one Telegram tools overview. Other platforms remain drafts.",
   "candidates":[
     {"platform":"Reddit r/sideprojects","status":"draft_ready","draft_id":"next-placement-2026-11-03.json","rules_checked":"2026-11-03","rules_url":"https://www.reddit.com/r/sideprojects/about/rules/","blocker":"Not submitted: next platform selected and a distinct educational draft prepared. Check duplicate history and exact AI-assisted showcase flair before publication."},
     {"platform":"Reddit","status":"published","draft_id":"btc2g-reddit-en","blocker":null},
-    {"platform":"Telegram","community":"https://t.me/BTC2GNews","account":"@BTC2GNews","language":"ru","status":"draft_ready","draft_id":"btc2g-telegram-tools-ru","rules_checked":"2026-11-03: owner identified @BTC2GNews as the destination and chose manual publication.","blocker":"Prepared third starter post delivered to the owner for manual publication. Await a verified Telegram permalink before changing status to published."},
     {"platform":"Facebook","status":"draft_ready","draft_id":"btc2g-facebook-he","blocker":"Owner page/account and group-specific rules not verified."},
     {"platform":"Product Hunt","status":"login_required","draft_id":"btc2g-producthunt-en","blocker":"Public Product Hunt product search returned no BTC2G product, but the Chrome session is signed out, so account drafts and scheduled launches cannot be checked without owner login. No listing was created or submitted.","rules_checked":"2026-11-03: Product Hunt public search for BTC2G displayed ‘No products found’. The page offered Sign in, confirming that the current browser session is not authenticated.","verification":"Public search found no published BTC2G product. This does not rule out a private draft or scheduled launch inside the owner's account."},
     {"platform":"LinkedIn","status":"draft_ready","draft_id":"btc2g-linkedin-en","blocker":"Owner profile not verified in this task."}
