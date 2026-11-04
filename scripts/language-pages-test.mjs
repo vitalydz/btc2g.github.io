@@ -23,6 +23,8 @@ test('published language HTML has real translated headings, reciprocal alternate
       for(const script of d.querySelectorAll('script[src]'))assert.ok(script.src.startsWith('/')||script.src.startsWith('https://'));
       assert.equal(d.querySelectorAll('script[src="/assets/js/static-language.js"]').length,1);
       if(page==='index.html') {
+        assert.equal(d.querySelector('#refresh-chart-btn').hasAttribute('disabled'),false,`${lang}: initial market refresh must not be locked`);
+        assert.equal(d.querySelector('#refresh-chart-btn').hasAttribute('aria-busy'),false);
         const expected=d.querySelector('#site-purpose').textContent.trim();
         assert.equal(d.querySelector('meta[name="description"]').content,expected);
         assert.equal(d.querySelector('meta[property="og:description"]').content,expected);
@@ -60,4 +62,10 @@ test('language switch uses a crawlable path and internal navigation preserves la
   assert.equal(stopped,true);assert.equal(calls.pop(),'/ar/#forecast');
   listeners.get('click')({target:{closest:()=>({href:'https://btc2g.com/scenario.html?lang=he',target:''})},preventDefault(){}});
   assert.equal(calls.pop(),'/he/scenario.html');
+});
+
+test('localized homepage build releases its mocked market refresh lock',async()=>{
+  const {document}=parseHTML(await render('index.html','ru'));
+  assert.equal(document.querySelector('#refresh-chart-btn').hasAttribute('disabled'),false);
+  assert.equal(document.querySelector('#refresh-chart-btn').hasAttribute('aria-busy'),false);
 });

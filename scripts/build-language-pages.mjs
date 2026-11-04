@@ -40,6 +40,12 @@ export async function render(page, lang) {
   }
   document.dispatchEvent(new Event('DOMContentLoaded'));
   await Promise.resolve();
+  // Localization starts a mocked refresh; never publish its pending UI lock.
+  const refreshButton = document.getElementById('refresh-chart-btn');
+  if (refreshButton) {
+    refreshButton.removeAttribute('disabled');
+    refreshButton.removeAttribute('aria-busy');
+  }
   document.documentElement.lang=lang;
   document.documentElement.dir=['he','ar'].includes(lang)?'rtl':'ltr';
   document.documentElement.dataset.staticLanguage=lang;
