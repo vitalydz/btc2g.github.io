@@ -31,6 +31,9 @@ test('published language HTML has real translated headings, reciprocal alternate
         assert.equal(d.querySelector('meta[name="twitter:description"]').content,expected);
         assert.equal(JSON.parse(d.querySelector('script[type="application/ld+json"]').textContent).description,expected);
       }
+      if(page==='save.html') {
+        assert.equal(d.querySelector('meta[name="description"]').content,d.querySelector('.save-shell > .intro').textContent.trim());
+      }
       if(page==='scenario.html') {
         const expected=`${d.querySelector('#scenario-intro').textContent.trim()} ${d.querySelector('#disclaimer-title').textContent.trim()}`;
         assert.equal(d.querySelector('meta[name="description"]').content,expected);

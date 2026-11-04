@@ -53,10 +53,13 @@ export async function render(page, lang) {
   if(!title) throw new Error(`Missing heading: ${page}/${lang}`);
   document.title=`${title} | BTC2G`;
   const homePurpose=document.querySelector('#site-purpose')?.textContent.trim();
+  const saveIntro=document.querySelector('.save-shell > .intro')?.textContent.trim();
   const scenarioIntro=document.querySelector('#scenario-intro')?.textContent.trim();
   const scenarioDisclosure=document.querySelector('#disclaimer-title')?.textContent.trim();
   const description=page==='index.html' && homePurpose
     ? homePurpose
+    : page==='save.html' && saveIntro
+    ? saveIntro
     : page==='scenario.html' && scenarioIntro && scenarioDisclosure
     ? `${scenarioIntro} ${scenarioDisclosure}`
     : `${title} — BTC2G.`;
