@@ -200,6 +200,9 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
   termsCheckbox.required = mode === 'register';
   registrationEmailRow.hidden = mode === 'login';
   registrationEmail.required = mode === 'register';
+  password.type = 'password';
+  togglePassword.setAttribute('aria-pressed', 'false');
+  togglePassword.textContent = accountText('show');
   password.autocomplete = mode === 'register' ? 'new-password' : 'current-password';
   if (mode === 'register') {
     password.setAttribute('pattern', registrationPasswordPattern);

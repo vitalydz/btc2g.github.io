@@ -105,6 +105,9 @@ test('password can be revealed without changing registration or sign-in submissi
   assert.match(script, /password\.type = visible \? 'password' : 'text'/);
   assert.match(script, /togglePassword\.setAttribute\('aria-pressed', String\(!visible\)\)/);
   assert.match(script, /password\.focus\(\)/);
+  assert.match(script, /password\.type = 'password'/);
+  assert.match(script, /togglePassword\.setAttribute\('aria-pressed', 'false'\)/);
+  assert.match(script, /togglePassword\.textContent = accountText\('show'\)/);
   assert.match(css, /\.password-control button\s*\{/);
 });
 
