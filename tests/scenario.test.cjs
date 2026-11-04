@@ -40,16 +40,19 @@ test('scenario page exposes accessible controls, safety disclosure, and share ac
   assert.match(page, /scenario\.css\?v=20261103-3/);
   assert.match(page, /scenario-tools\.js\?v=20261103-6/);
   assert.match(fs.readFileSync(path.join(root, 'assets/css/scenario.css'), 'utf8'), /border:2px dashed #8a6f24/);
+  assert.match(fs.readFileSync(path.join(root, 'assets/css/scenario.css'), 'utf8'), /@media\(max-width:700px\).*\.scenario-header\{align-items:stretch;flex-direction:column\}.*html\[dir=rtl\] \.scenario-header nav\{[^}]*flex-direction:column-reverse/s);
   assert.match(page, /<script src="assets\/js\/traffic\.js\?v=\d{8}-\d+" defer><\/script>/);
   assert.match(homepage, /href="scenario\.html"/);
   assert.match(homepage, /BTC \/ Gold scenario/);
 });
 
 test('scenario and homepage entry provide complete text for all 19 languages', () => {
+  const freeMarkers = {en:'free',ru:'бесплатный',he:'חינם',de:'Kostenloses',fr:'gratuit',es:'gratis',zh:'免费',it:'gratuito',pt:'grátis',ar:'مجاني',hi:'मुफ़्त',ja:'無料',ko:'무료',tr:'Ücretsiz',pl:'bezpłatne',nl:'Gratis',uk:'безкоштовний',id:'gratis',vi:'miễn phí'};
   assert.equal(Object.keys(translations).length, 19);
   for (const [lang, text] of Object.entries(translations)) {
     assert.deepEqual(Object.keys(text), KEYS, lang);
     for (const key of KEYS) assert.ok(text[key].trim().length > 0, `${lang}.${key}`);
+    assert.ok(text.account.includes(freeMarkers[lang]), `${lang}.account is explicitly free`);
   }
   const nodes = new Map();
   const context = { document: { getElementById(id) { if (!nodes.has(id)) nodes.set(id,{textContent:'',href:''}); return nodes.get(id); } } };
