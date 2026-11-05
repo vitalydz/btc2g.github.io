@@ -1,6 +1,10 @@
-/* Shared home-screen shortcut UI. No service worker, cache or automatic install. */
+/* Shared home-screen install UI. The network-only worker never caches user or market data. */
 (() => {
   'use strict';
+  const localSecureHost = typeof location !== 'undefined' && ['localhost','127.0.0.1','[::1]'].includes(location.hostname);
+  if ('serviceWorker' in navigator && typeof location !== 'undefined' && (location.protocol === 'https:' || localSecureHost)) {
+    navigator.serviceWorker.register('/sw.js', {scope:'/'}).catch(() => {});
+  }
   const script = document.currentScript;
   const name = script?.dataset.siteName || document.title.split('—')[0].trim();
   const lang = (document.documentElement.lang || 'en').split('-')[0];

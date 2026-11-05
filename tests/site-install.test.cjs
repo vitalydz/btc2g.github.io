@@ -8,11 +8,14 @@ const code=fs.readFileSync(path.join(__dirname,'../home-screen/site-install.js')
 function setup(options={}) {
   const {document,Event}=parseHTML(`<html lang="${options.lang||'ru'}"><head><title>Test</title></head><body><footer></footer></body></html>`);
   const listeners={};
+  const registrations=[];
   const create=document.createElement.bind(document);
   document.createElement=tag=>{const e=create(tag);if(tag==='dialog'){e.showModal=()=>{e.open=true;e.setAttribute('open','');};e.close=()=>{e.open=false;e.removeAttribute('open');};}return e;};
-  const context={document,navigator:{userAgent:options.ios?'iPhone':'Android',platform:'',standalone:!!options.standalone},matchMedia:()=>({matches:!!options.standalone}),addEventListener:(type,fn)=>listeners[type]=fn};
+  const navigator={userAgent:options.ios?'iPhone':'Android',platform:'',standalone:!!options.standalone};
+  if(options.serviceWorker) navigator.serviceWorker={register:(...args)=>{registrations.push(args);return Promise.resolve();}};
+  const context={document,navigator,location:{protocol:options.protocol||'https:',hostname:options.hostname||'example.com'},matchMedia:()=>({matches:!!options.standalone}),addEventListener:(type,fn)=>listeners[type]=fn};
   vm.runInNewContext(code,context);
-  return {document,Event,listeners,button:()=>document.querySelector('[data-site-install]')};
+  return {document,Event,listeners,registrations,button:()=>document.querySelector('[data-site-install]')};
 }
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 test('no automatic prompt; a native prompt runs only after a click',async()=>{
@@ -52,6 +55,21 @@ test('manifest stays on the public site and has separate maskable icons',()=>{
   for(const size of ['192x192','512x512'])assert.ok(m.icons.some(i=>i.sizes===size&&i.purpose==='any'));
   assert.ok(m.icons.some(i=>i.purpose==='maskable'));
   for(const icon of m.icons)assert.ok(fs.existsSync(path.join(__dirname,'..',icon.src)));
+});
+
+test('HTTPS pages register a root-scoped network-only service worker',async()=>{
+  const secure=setup({serviceWorker:true});await tick();
+  assert.equal(secure.registrations.length,1);
+  assert.equal(secure.registrations[0][0],'/sw.js');
+  assert.equal(secure.registrations[0][1].scope,'/');
+  const insecure=setup({serviceWorker:true,protocol:'http:'});await tick();
+  assert.deepEqual(insecure.registrations,[]);
+  const localhost=setup({serviceWorker:true,protocol:'http:',hostname:'127.0.0.1'});await tick();
+  assert.equal(localhost.registrations.length,1);
+  const worker=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
+  assert.match(worker,/addEventListener\('fetch'/);
+  assert.match(worker,/event\.respondWith\(fetch\(request\)\)/);
+  assert.doesNotMatch(worker,/caches\.|cache\.put|CacheStorage/i);
 });
 
 test('the prominent mobile button triggers the same install flow without auto-installing',async()=>{
