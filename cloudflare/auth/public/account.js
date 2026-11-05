@@ -213,6 +213,7 @@ modeTabs.forEach(tab => tab.addEventListener('click', () => {
   document.querySelector('#account-title').textContent = accountText(signingIn ? 'loginTitle' : 'title');
   document.querySelector('#account-intro').textContent = accountText(signingIn ? 'loginIntro' : 'intro');
   document.querySelector('#registration-support').textContent = accountText(signingIn ? 'loginSupport' : 'registrationSupport');
+  document.title = accountText(signingIn ? 'loginTitle' : 'title');
   termsCheckbox.required = mode === 'register';
   registrationEmailRow.hidden = signingIn;
   registrationEmail.required = mode === 'register';

@@ -137,6 +137,7 @@ export function accountText(key) { return (key === 'create' ? freeAccountRows[ac
 export function applyAccountLanguage() {
   document.documentElement.lang = accountLanguage;
   document.documentElement.dir = ['he','ar'].includes(accountLanguage) ? 'rtl' : 'ltr';
+  document.title = accountText('title');
   try { localStorage.setItem('lang', accountLanguage); } catch {}
   const selector = document.querySelector('#account-language');
   selector.value = accountLanguage;
