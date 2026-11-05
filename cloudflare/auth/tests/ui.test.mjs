@@ -228,6 +228,8 @@ test('approved acquisition attribution is forwarded only through the account reg
   assert.match(account, /submitButton\.textContent = `\$\{submitLabel\}…`/);
   assert.match(account, /submitButton\.textContent = submitLabel/);
   assert.match(account, /submitButton\.removeAttribute\('aria-busy'\)/);
+  assert.match(accountPage, /id="message"[^>]+role="status"[^>]+aria-live="polite"[^>]+tabindex="-1"/);
+  assert.match(account, /setMessage\(error\.message\);\s*message\.focus\(\)/);
   assert.match(account, /emailForm\.setAttribute\('aria-busy', 'true'\)/);
   assert.match(account, /emailForm\.removeAttribute\('aria-busy'\)/);
   assert.match(account, /if \(emailSubmit\.disabled\) return/);

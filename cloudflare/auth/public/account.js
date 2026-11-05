@@ -296,6 +296,7 @@ form.addEventListener('submit', async event => {
     await refreshStats();
   } catch (error) {
     setMessage(error.message);
+    message.focus();
   } finally {
     submitButton.textContent = submitLabel;
     submitButton.disabled = false;
