@@ -1,0 +1,7 @@
+# Optional account explanation — 2026-11-05
+
+After checking current tasks and existing changes, the three existing research articles received one concise explanation: dashboard/calculators work without registration; an email-verified ordinary account can privately submit up to three product ideas for review; registration does not activate Premium or subscribe to email. This matches existing account functionality and requires no new API, event collection or access. Existing subscription consent and account links are retained. Russian client copy and script cache markers were updated. No new pages, placements or subscription messages created.
+
+186 Node tests passed after the content edits. This is a proposed improvement to account-purpose clarity, not proof of demand, new registrations or improved conversion. The last measured count is kept in a separate post-release snapshot rather than inferred from traffic. Source: Cloudflare D1 stats, ordinary active email-verified account rows; PostgreSQL newsletter subscriptions are separate.
+
+Production checks and measurement: `C:/Users/vitly/PycharmProjects/MPA_04/reports/account-help-2026-11-05/release.json`. Main's 85 pre-existing dirty/staged paths must retain their statuses and bytes on sync; the earlier preservation snapshot remains the reference. No production forms or visit-event API calls are used for testing. Existing promotion placements and artist mailing are not repeated.

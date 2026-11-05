@@ -29,6 +29,7 @@
   if (lang !== 'ru') return;
 
   const russian = {
+    'Browsing the dashboard and using the calculators do not require an account. An email-verified free account lets you privately submit up to three product ideas for review. It does not activate Premium or subscribe you to email updates.': 'Для просмотра данных и использования калькуляторов аккаунт не нужен. Бесплатный аккаунт с подтверждённым email позволяет приватно отправить до трёх идей улучшения продукта на рассмотрение. Он не активирует Premium и не подписывает на обновления по почте.',
     'Bitcoin versus gold, or Bitcoin Gold (BTG)?': 'Биткоин относительно золота или Bitcoin Gold (BTG)?',
     'BTC2G compares Bitcoin (BTC) with gold. It does not forecast the price of Bitcoin Gold (BTG), a separate cryptocurrency. See the': 'BTC2G сравнивает Биткоин (BTC) с золотом. Сайт не прогнозирует цену отдельной криптовалюты Bitcoin Gold (BTG). Подробнее о названии:',
     'Bitcoin Gold project': 'проект Bitcoin Gold',
