@@ -191,15 +191,21 @@ emailForm.addEventListener('submit', async event => {
 
 document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
   mode = tab.dataset.mode;
+  const signingIn = mode === 'login';
   document.querySelectorAll('.tab').forEach(item => {
     const active = item === tab;
     item.classList.toggle('active', active);
     item.setAttribute('aria-selected', String(active));
   });
-  termsRow.hidden = mode === 'login';
-  document.querySelector('.registration-steps').hidden = mode === 'login';
+  termsRow.hidden = signingIn;
+  document.querySelector('.registration-steps').hidden = signingIn;
+  document.querySelector('#account-trust').hidden = signingIn;
+  document.querySelector('#account-benefit').hidden = signingIn;
+  document.querySelector('#account-title').textContent = accountText(signingIn ? 'loginTitle' : 'title');
+  document.querySelector('#account-intro').textContent = accountText(signingIn ? 'loginIntro' : 'intro');
+  document.querySelector('#registration-support').textContent = accountText(signingIn ? 'loginSupport' : 'registrationSupport');
   termsCheckbox.required = mode === 'register';
-  registrationEmailRow.hidden = mode === 'login';
+  registrationEmailRow.hidden = signingIn;
   registrationEmail.required = mode === 'register';
   password.type = 'password';
   togglePassword.setAttribute('aria-pressed', 'false');

@@ -115,9 +115,16 @@ test('password can be revealed without changing registration or sign-in submissi
 });
 
 test('switching registration mode moves focus to the first account field', async () => {
-  const account = await readFile(new URL('account.js', root), 'utf8');
+  const [account, accountLanguage] = await Promise.all(['account.js', 'account-language.js'].map(path => readFile(new URL(path, root), 'utf8')));
   assert.match(account, /const usernameInput = document\.querySelector\('#username'\)/);
-  assert.match(account, /document\.querySelector\('\.registration-steps'\)\.hidden = mode === 'login'/);
+  assert.match(account, /document\.querySelector\('\.registration-steps'\)\.hidden = signingIn/);
+  assert.match(account, /document\.querySelector\('#account-trust'\)\.hidden = signingIn/);
+  assert.match(account, /accountText\(signingIn \? 'loginTitle' : 'title'\)/);
+  assert.match(account, /accountText\(signingIn \? 'loginIntro' : 'intro'\)/);
+  assert.match(account, /accountText\(signingIn \? 'loginSupport' : 'registrationSupport'\)/);
+  assert.match(accountLanguage, /const loginTitleRows = \{en:'Sign in to BTC2G',ru:'Войдите в BTC2G'/);
+  assert.match(accountLanguage, /const loginIntroRows = \{en:'Access your account with your username and password\.'/);
+  assert.match(accountLanguage, /const loginSupportRows = \{en:'Account trouble\? Contact support\.'/);
   assert.match(account, /usernameInput\.focus\(\)/);
 });
 
