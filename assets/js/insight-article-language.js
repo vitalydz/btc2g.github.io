@@ -29,6 +29,18 @@
   if (lang !== 'ru') return;
 
   const russian = {
+    'Bitcoin versus gold, or Bitcoin Gold (BTG)?': 'Биткоин относительно золота или Bitcoin Gold (BTG)?',
+    'BTC2G compares Bitcoin (BTC) with gold. It does not forecast the price of Bitcoin Gold (BTG), a separate cryptocurrency. See the': 'BTC2G сравнивает Биткоин (BTC) с золотом. Сайт не прогнозирует цену отдельной криптовалюты Bitcoin Gold (BTG). Подробнее о названии:',
+    'Bitcoin Gold project': 'проект Bitcoin Gold',
+    'for that name.': '.',
+    'How to read the relative-price scenario': 'Как читать сценарий относительной цены',
+    'The ratio divides a Bitcoin dollar reference price by the gold dollar reference price per troy ounce. If Bitcoin rises 10% while gold rises 5%, the ratio changes by 1.10 / 1.05 − 1, or about 4.76%. These are illustrative inputs, not a forecast.': 'Соотношение — это справочная долларовая цена Биткоина, делённая на справочную долларовую цену тройской унции золота. Если Биткоин растёт на 10%, а золото — на 5%, соотношение меняется на 1,10 / 1,05 − 1, то есть примерно на 4,76%. Это условный пример, а не прогноз.',
+    'Try your own inputs in the': 'Попробуйте свои исходные значения в',
+    'scenario calculator': 'калькуляторе сценариев',
+    ', or open the': 'или откройте',
+    'dashboard': 'главную страницу',
+    'to check its published market date and source metadata. A model direction is not an executable quote or a guaranteed return.': 'и проверьте опубликованную дату рыночных данных и сведения об источниках. Направление модели не является исполнимой котировкой или гарантией доходности.',
+
     'Bitcoin vs Gold': 'Биткоин и золото',
     'Bitcoin and gold are often compared because both are scarce assets that people use to think about long-term value storage. Gold has centuries of market history, broad cultural recognition, and deep liquidity. Bitcoin is newer, digital, globally transferable, and defined by a fixed supply schedule.': 'Биткоин и золото часто сравнивают, поскольку оба актива ограничены в предложении и рассматриваются как способы долгосрочного сохранения ценности. У золота — многовековая история, широкое признание и глубокая ликвидность. Биткоин появился позже: он цифровой, доступен по всему миру и имеет заранее заданный график выпуска.',
     'Why investors compare them': 'Почему их сравнивают',
