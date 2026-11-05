@@ -7,3 +7,10 @@
 .site-install-dialog p{font-size:16px;line-height:1.65;margin:0 0 20px;max-width:none;color:inherit}
 .site-install-dialog button{font:inherit;border:0;border-radius:999px;padding:10px 20px;background:#593d77;color:white;cursor:pointer}
 .site-install-button:focus-visible,.site-install-dialog button:focus-visible{outline:3px solid #b671e0;outline-offset:4px}
+
+.site-install-mobile-entry{display:none}
+.site-install-mobile-entry[hidden]{display:none!important}
+@media(max-width:750px){
+ .site-install-mobile-entry{display:flex;justify-content:center;position:relative;z-index:20;padding:8px 16px 12px;box-sizing:border-box;width:100%;background:transparent}
+ .site-install-mobile-entry .site-install-button{background:#593d77;color:#fff;border-color:transparent;font-weight:600;padding:11px 22px;box-shadow:0 3px 12px #30263b24}
+}

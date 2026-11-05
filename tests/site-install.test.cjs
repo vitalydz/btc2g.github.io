@@ -21,7 +21,7 @@ test('no automatic prompt; a native prompt runs only after a click',async()=>{
   assert.equal(calls,0);assert.equal(prevented,1);
   s.button().click();await tick();assert.equal(calls,1);
   assert.notEqual(s.button().hidden,true,'acceptance alone is not proof of installation');
-  s.listeners.appinstalled();assert.equal(s.button().hidden,true);
+  s.listeners.appinstalled();assert.equal(s.button().hidden,true);assert.equal(s.document.querySelector('.site-install-mobile-entry').hidden,true);
 });
 test('dismissed native prompt stays retryable with manual instructions',async()=>{
   const s=setup();let calls=0;
@@ -52,4 +52,10 @@ test('manifest stays on the public site and has separate maskable icons',()=>{
   for(const size of ['192x192','512x512'])assert.ok(m.icons.some(i=>i.sizes===size&&i.purpose==='any'));
   assert.ok(m.icons.some(i=>i.purpose==='maskable'));
   for(const icon of m.icons)assert.ok(fs.existsSync(path.join(__dirname,'..',icon.src)));
+});
+
+test('the prominent mobile button triggers the same install flow without auto-installing',async()=>{
+  const s=setup();const top=s.document.querySelector('[data-site-install-mobile]');
+  assert.ok(top);assert.equal(s.document.querySelector('dialog'),null);
+  top.click();await tick();assert.equal(s.document.querySelector('dialog').open,true);
 });

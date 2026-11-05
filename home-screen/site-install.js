@@ -27,7 +27,7 @@
   };
   const text = messages[lang] || messages.en;
   const standalone = () => navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
-  let pending = null, button, dialog;
+  let pending = null, button, dialog, mobileEntry, focusTarget;
   addEventListener('beforeinstallprompt', event => {
     if (standalone()) return;
     event.preventDefault(); pending = event;
@@ -35,6 +35,7 @@
   addEventListener('appinstalled', () => {
     pending = null;
     if (button) button.hidden = true;
+    if (mobileEntry) mobileEntry.hidden = true;
     if (dialog?.open) dialog.close();
   });
   function init() {
@@ -43,7 +44,18 @@
     button.type = 'button'; button.className = 'site-install-button';
     button.dataset.siteInstall = ''; button.textContent = text[0];
     (document.querySelector('footer') || document.body).append(button);
+    mobileEntry = document.createElement('div');
+    mobileEntry.className = 'site-install-mobile-entry';
+    const mobileButton = document.createElement('button');
+    mobileButton.type = 'button'; mobileButton.className = 'site-install-button';
+    mobileButton.dataset.siteInstallMobile = ''; mobileButton.textContent = text[0];
+    mobileEntry.append(mobileButton);
+    const header = document.querySelector('header');
+    if (header) header.after(mobileEntry);
+    else document.body.prepend(mobileEntry);
+    mobileButton.addEventListener('click', () => button.click());
     button.addEventListener('click', async () => {
+      focusTarget = document.activeElement || button;
       if (pending) {
         const request = pending; pending = null;
         try { await request.prompt(); await request.userChoice; return; }
@@ -60,7 +72,7 @@
         instructions.textContent = text[ios ? 2 : 1];
         const close = document.createElement('button');
         close.type = 'button'; close.textContent = text[3];
-        close.addEventListener('click', () => { dialog.close(); button.focus(); });
+        close.addEventListener('click', () => { dialog.close(); (focusTarget || button).focus(); });
         dialog.append(heading, instructions, close); document.body.append(dialog);
       }
       dialog.showModal();
