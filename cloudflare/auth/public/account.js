@@ -189,7 +189,8 @@ emailForm.addEventListener('submit', async event => {
   }
 });
 
-document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
+const modeTabs = [...document.querySelectorAll('.tab')];
+modeTabs.forEach(tab => tab.addEventListener('click', () => {
   mode = tab.dataset.mode;
   const signingIn = mode === 'login';
   if (typeof history !== 'undefined' && typeof location !== 'undefined') {
@@ -198,11 +199,13 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
     else url.searchParams.delete('mode');
     history.replaceState(null, '', url);
   }
-  document.querySelectorAll('.tab').forEach(item => {
+  modeTabs.forEach(item => {
     const active = item === tab;
     item.classList.toggle('active', active);
     item.setAttribute('aria-selected', String(active));
+    item.tabIndex = active ? 0 : -1;
   });
+  form.setAttribute('aria-labelledby', tab.id);
   termsRow.hidden = signingIn;
   document.querySelector('.registration-steps').hidden = signingIn;
   document.querySelector('#account-trust').hidden = signingIn;
@@ -229,6 +232,18 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
   setMessage('');
   usernameInput.focus();
 }));
+
+document.querySelector('#account-tabs').addEventListener('keydown', event => {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const activeIndex = modeTabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true');
+  const rtlDirection = document.documentElement.dir === 'rtl' ? -1 : 1;
+  const nextIndex = event.key === 'Home' ? 0
+    : event.key === 'End' ? modeTabs.length - 1
+    : (activeIndex + (event.key === 'ArrowRight' ? rtlDirection : -rtlDirection) + modeTabs.length) % modeTabs.length;
+  modeTabs[nextIndex].click();
+  modeTabs[nextIndex].focus();
+});
 
 if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('mode') === 'login') {
   document.querySelector('#login-tab').click();

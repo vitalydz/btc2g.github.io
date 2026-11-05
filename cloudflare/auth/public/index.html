@@ -37,11 +37,11 @@
         <li><strong id="step-inbox-title">Check your inbox</strong><span id="step-inbox-detail">Open the verification link within 30 minutes.</span></li>
         <li><strong id="step-verified-title">Email verified</strong><span id="step-verified-detail">Your registration is complete.</span></li>
       </ol>
-      <div class="tabs" role="tablist" aria-label="Account action">
-        <button class="tab active" id="register-tab" type="button" data-mode="register" role="tab" aria-selected="true">Create free account</button>
-        <button class="tab" id="login-tab" type="button" data-mode="login" role="tab" aria-selected="false">Sign in</button>
+      <div class="tabs" id="account-tabs" role="tablist" aria-label="Account action">
+        <button class="tab active" id="register-tab" type="button" data-mode="register" role="tab" aria-selected="true" aria-controls="account-form" tabindex="0">Create free account</button>
+        <button class="tab" id="login-tab" type="button" data-mode="login" role="tab" aria-selected="false" aria-controls="account-form" tabindex="-1">Sign in</button>
       </div>
-      <form id="account-form">
+      <form id="account-form" role="tabpanel" aria-labelledby="register-tab">
         <label><span id="username-label">Username</span>
           <input id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" enterkeyhint="next" minlength="3" maxlength="32" pattern="[A-Za-z][A-Za-z0-9_]{2,31}" aria-describedby="username-hint username-privacy" required>
           <small class="field-hint" id="username-hint">3–32 characters. Start with a Latin letter; use Latin letters, numbers, or underscores.</small>

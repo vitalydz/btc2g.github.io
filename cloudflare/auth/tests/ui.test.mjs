@@ -115,8 +115,17 @@ test('password can be revealed without changing registration or sign-in submissi
 });
 
 test('switching registration mode moves focus to the first account field', async () => {
-  const [account, accountLanguage] = await Promise.all(['account.js', 'account-language.js'].map(path => readFile(new URL(path, root), 'utf8')));
+  const [accountPage, account, accountLanguage] = await Promise.all(['index.html', 'account.js', 'account-language.js'].map(path => readFile(new URL(path, root), 'utf8')));
+  assert.match(accountPage, /id="register-tab"[^>]*aria-controls="account-form"[^>]*tabindex="0"/);
+  assert.match(accountPage, /id="login-tab"[^>]*aria-controls="account-form"[^>]*tabindex="-1"/);
+  assert.match(accountPage, /id="account-form" role="tabpanel" aria-labelledby="register-tab"/);
+  assert.match(accountPage, /class="tabs" id="account-tabs" role="tablist"/);
   assert.match(account, /const usernameInput = document\.querySelector\('#username'\)/);
+  assert.match(account, /item\.tabIndex = active \? 0 : -1/);
+  assert.match(account, /form\.setAttribute\('aria-labelledby', tab\.id\)/);
+  assert.match(account, /\['ArrowLeft', 'ArrowRight', 'Home', 'End'\]/);
+  assert.match(account, /document\.documentElement\.dir === 'rtl' \? -1 : 1/);
+  assert.match(account, /modeTabs\[nextIndex\]\.focus\(\)/);
   assert.match(account, /document\.querySelector\('\.registration-steps'\)\.hidden = signingIn/);
   assert.match(account, /document\.querySelector\('#account-trust'\)\.hidden = signingIn/);
   assert.match(account, /accountText\(signingIn \? 'loginTitle' : 'title'\)/);
