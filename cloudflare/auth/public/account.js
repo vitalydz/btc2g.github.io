@@ -169,7 +169,10 @@ ideaForm.addEventListener('submit', async event => {
 emailForm.addEventListener('submit', async event => {
   event.preventDefault();
   if (emailSubmit.disabled) return;
+  const emailSubmitLabel = emailSubmit.textContent;
   emailSubmit.disabled = true;
+  emailSubmit.setAttribute('aria-busy', 'true');
+  emailSubmit.textContent = `${emailSubmitLabel}…`;
   emailForm.setAttribute('aria-busy', 'true');
   emailMessage.textContent = '';
   emailMessage.classList.remove('success');
@@ -184,7 +187,9 @@ emailForm.addEventListener('submit', async event => {
   } catch (error) {
     emailMessage.textContent = error.message;
   } finally {
+    emailSubmit.textContent = emailSubmitLabel;
     emailSubmit.disabled = false;
+    emailSubmit.removeAttribute('aria-busy');
     emailForm.removeAttribute('aria-busy');
   }
 });

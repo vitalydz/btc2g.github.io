@@ -229,6 +229,11 @@ test('approved acquisition attribution is forwarded only through the account reg
   assert.match(account, /emailForm\.setAttribute\('aria-busy', 'true'\)/);
   assert.match(account, /emailForm\.removeAttribute\('aria-busy'\)/);
   assert.match(account, /if \(emailSubmit\.disabled\) return/);
+  assert.match(account, /const emailSubmitLabel = emailSubmit\.textContent/);
+  assert.match(account, /emailSubmit\.setAttribute\('aria-busy', 'true'\)/);
+  assert.match(account, /emailSubmit\.textContent = `\$\{emailSubmitLabel\}…`/);
+  assert.match(account, /emailSubmit\.textContent = emailSubmitLabel/);
+  assert.match(account, /emailSubmit\.removeAttribute\('aria-busy'\)/);
 });
 
 test('signed-in account UI separates email verification from Premium and marketing', async () => {
