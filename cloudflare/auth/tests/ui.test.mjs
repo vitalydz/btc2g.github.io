@@ -259,19 +259,21 @@ test('signed-in account UI separates email verification from Premium and marketi
   assert.match(script, /accountText\('emailMissing'\)/);
   assert.match(verification, /id="confirm-email"/);
   assert.match(verification, /no-referrer/);
-  assert.match(verificationScript, /import \{ accountLanguage \}/);
+  assert.match(verificationScript, /import \{ accountLanguage, accountText \}/);
   for (const language of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
     assert.match(verificationScript, new RegExp(`\\b${language}:\\[`));
   }
   assert.match(verificationScript, /document\.documentElement\.dir = \['he','ar'\]/);
   assert.match(verificationScript, /accountUrl = `\/\?lang=\$\{encodeURIComponent\(accountLanguage\)\}`/);
-  assert.match(verificationScript, /querySelector\('#verify-return'\)\.href = accountUrl/);
+  assert.match(verificationScript, /returnLink\.href = accountUrl/);
   assert.match(verificationScript, /error\.status === 400 \? text\[6\] : error\.status === 401 \? text\[8\] : error\.message/);
+  assert.match(verificationScript, /returnLink\.href = `\$\{accountUrl\}&mode=login`/);
+  assert.match(verificationScript, /returnLink\.textContent = accountText\('signIn'\)/);
   assert.match(verificationScript, /button\.setAttribute\('aria-busy', 'true'\)/);
   assert.match(verificationScript, /button\.textContent = `\$\{text\[3\]\}…`/);
   assert.match(verificationScript, /button\.hidden = true/);
   assert.match(verificationScript, /button\.removeAttribute\('aria-busy'\)/);
-  assert.match(verificationScript, /querySelector\('#verify-return'\)\.focus\(\)/);
+  assert.match(verificationScript, /returnLink\.focus\(\)/);
 });
 
 test('administrator UI supports passkey enrollment and second-factor sign-in', async () => {

@@ -1,5 +1,5 @@
 import { request } from './metrics-view.js';
-import { accountLanguage } from './account-language.js';
+import { accountLanguage, accountText } from './account-language.js';
 
 const copy = {
   en:['ACCOUNT EMAIL','Verify your email','Confirm the address for the BTC2G account that is currently signed in.','Confirm email','Return to account','Email verification does not subscribe you to marketing or activate Premium.','Invalid verification link.','Email verified. You can return to your account.','Sign in to confirm this email.'],
@@ -32,7 +32,8 @@ document.title = `${text[1]} · BTC2G`;
 const accountUrl = `/?lang=${encodeURIComponent(accountLanguage)}`;
 document.querySelector('#verify-account-link').setAttribute('aria-label', text[4]);
 document.querySelector('#verify-account-link').href = accountUrl;
-document.querySelector('#verify-return').href = accountUrl;
+const returnLink = document.querySelector('#verify-return');
+returnLink.href = accountUrl;
 
 const button = document.querySelector('#confirm-email');
 const message = document.querySelector('#verify-message');
@@ -59,11 +60,18 @@ button.addEventListener('click', async () => {
     message.textContent = text[7];
     message.classList.add('success');
     button.hidden = true;
-    document.querySelector('#verify-return').focus();
+    returnLink.focus();
   } catch (error) {
     message.textContent = error.status === 400 ? text[6] : error.status === 401 ? text[8] : error.message;
-    button.textContent = buttonLabel;
-    button.disabled = false;
+    if (error.status === 401) {
+      returnLink.href = `${accountUrl}&mode=login`;
+      returnLink.textContent = accountText('signIn');
+      button.hidden = true;
+      returnLink.focus();
+    } else {
+      button.textContent = buttonLabel;
+      button.disabled = false;
+    }
   } finally {
     button.removeAttribute('aria-busy');
   }
