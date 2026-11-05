@@ -179,7 +179,7 @@ emailForm.addEventListener('submit', async event => {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ email: emailInput.value, language: accountLanguage })
     });
-    emailMessage.textContent = accountLanguage === 'ru' ? 'Письмо подтверждения отправлено. Ссылка действует 30 минут.' : 'Verification email sent. The link expires in 30 minutes.';
+    emailMessage.textContent = accountText('verificationSent');
     emailMessage.classList.add('success');
   } catch (error) {
     emailMessage.textContent = error.message;

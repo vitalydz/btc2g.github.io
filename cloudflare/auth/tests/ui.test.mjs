@@ -252,6 +252,7 @@ test('signed-in account UI separates email verification from Premium and marketi
   assert.match(html, /https:\/\/btc2g\.com\/#subscribe/);
   assert.match(html, /Join the separate confirmed newsletter and choose the Sunday digest/);
   assert.match(script, /\/api\/email-verification\/request/);
+  assert.match(script, /emailMessage\.textContent = accountText\('verificationSent'\)/);
   assert.match(script, /accountText\('emailVerified'\)/);
   assert.match(script, /accountText\('emailPending'\)/);
   assert.match(script, /accountText\('emailMissing'\)/);
