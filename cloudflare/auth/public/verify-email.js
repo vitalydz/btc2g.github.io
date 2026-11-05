@@ -44,7 +44,10 @@ if (!token) {
 }
 
 button.addEventListener('click', async () => {
+  const buttonLabel = button.textContent;
   button.disabled = true;
+  button.setAttribute('aria-busy', 'true');
+  button.textContent = `${text[3]}…`;
   message.textContent = '';
   message.classList.remove('success');
   try {
@@ -55,9 +58,13 @@ button.addEventListener('click', async () => {
     });
     message.textContent = text[7];
     message.classList.add('success');
+    button.hidden = true;
     document.querySelector('#verify-return').focus();
   } catch (error) {
     message.textContent = error.status === 400 ? text[6] : error.status === 401 ? text[8] : error.message;
+    button.textContent = buttonLabel;
     button.disabled = false;
+  } finally {
+    button.removeAttribute('aria-busy');
   }
 });
