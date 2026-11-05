@@ -197,6 +197,7 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
     item.setAttribute('aria-selected', String(active));
   });
   termsRow.hidden = mode === 'login';
+  document.querySelector('.registration-steps').hidden = mode === 'login';
   termsCheckbox.required = mode === 'register';
   registrationEmailRow.hidden = mode === 'login';
   registrationEmail.required = mode === 'register';

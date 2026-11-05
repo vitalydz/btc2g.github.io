@@ -1,21 +1,21 @@
 {
   "site":"https://btc2g.com",
-  "checked":"2026-11-04",
+  "checked":"2026-11-05",
   "growth_target":{
     "confirmed_production_accounts":100,
     "counting_rule":"Only email-verified ordinary account rows reported by the production Cloudflare D1 statistics endpoint. Exclude administrators, tests, page views, clicks, unverified registrations and newsletter-only subscribers.",
     "digest_rule":"Do not enable or production-test the mailing on real addresses before the confirmed production account total reaches 100. Request final owner confirmation immediately before that production check."
   },
   "latest_metrics":{
-    "day":"2026-11-04",
+    "day":"2026-11-05",
     "time_zone":"Asia/Jerusalem",
-    "measured_at":"2026-11-04T20:25:05.736Z",
+    "measured_at":"2026-11-05T03:26:10.504Z",
     "source":"https://btc2g-accounts.btc2g.workers.dev/api/stats (Cloudflare D1)",
     "confirmed_accounts_total":0,
     "confirmed_accounts_today":0,
     "remaining_to_100":100,
-    "estimated_visitors_today_not_counted_as_users":13,
-    "page_views_today_not_counted_as_users":36,
+    "estimated_visitors_today_not_counted_as_users":0,
+    "page_views_today_not_counted_as_users":0,
     "confirmed_newsletter_subscribers_not_counted_as_accounts":0
   },
   "published":[{

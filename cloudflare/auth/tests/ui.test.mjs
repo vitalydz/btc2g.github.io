@@ -117,6 +117,7 @@ test('password can be revealed without changing registration or sign-in submissi
 test('switching registration mode moves focus to the first account field', async () => {
   const account = await readFile(new URL('account.js', root), 'utf8');
   assert.match(account, /const usernameInput = document\.querySelector\('#username'\)/);
+  assert.match(account, /document\.querySelector\('\.registration-steps'\)\.hidden = mode === 'login'/);
   assert.match(account, /usernameInput\.focus\(\)/);
 });
 
