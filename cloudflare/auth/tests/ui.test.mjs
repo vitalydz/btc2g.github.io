@@ -221,6 +221,11 @@ test('approved acquisition attribution is forwarded only through the account reg
   assert.match(account, /form\.setAttribute\('aria-busy', 'true'\)/);
   assert.match(account, /form\.removeAttribute\('aria-busy'\)/);
   assert.match(account, /if \(submitButton\.disabled\) return/);
+  assert.match(account, /const submitLabel = submitButton\.textContent/);
+  assert.match(account, /submitButton\.setAttribute\('aria-busy', 'true'\)/);
+  assert.match(account, /submitButton\.textContent = `\$\{submitLabel\}…`/);
+  assert.match(account, /submitButton\.textContent = submitLabel/);
+  assert.match(account, /submitButton\.removeAttribute\('aria-busy'\)/);
   assert.match(account, /emailForm\.setAttribute\('aria-busy', 'true'\)/);
   assert.match(account, /emailForm\.removeAttribute\('aria-busy'\)/);
   assert.match(account, /if \(emailSubmit\.disabled\) return/);

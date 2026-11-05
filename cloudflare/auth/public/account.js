@@ -253,7 +253,10 @@ if (typeof location !== 'undefined' && new URLSearchParams(location.search).get(
 form.addEventListener('submit', async event => {
   event.preventDefault();
   if (submitButton.disabled) return;
+  const submitLabel = submitButton.textContent;
   submitButton.disabled = true;
+  submitButton.setAttribute('aria-busy', 'true');
+  submitButton.textContent = `${submitLabel}…`;
   form.setAttribute('aria-busy', 'true');
   setMessage('');
   try {
@@ -288,7 +291,9 @@ form.addEventListener('submit', async event => {
   } catch (error) {
     setMessage(error.message);
   } finally {
+    submitButton.textContent = submitLabel;
     submitButton.disabled = false;
+    submitButton.removeAttribute('aria-busy');
     form.removeAttribute('aria-busy');
   }
 });
