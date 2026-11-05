@@ -457,3 +457,11 @@ Check these items:
 - Confirm Topper's expected bootstrap token payload with real sandbox credentials.
 - Update the CORS allowlist in `api/topper/token.ts` if the public frontend domain changes.
 - Keep `TOPPER_PRIVATE_JWK` only in Vercel environment variables and never commit it.
+
+## Mobile home-screen shortcut
+
+The public site provides an **Add to home screen** footer button in all 19 supported UI languages. It opens a native browser installation prompt when available, otherwise shows browser-menu instructions; iPhone/iPad instructions use Safari → Share → Add to Home Screen. Already installed standalone windows hide the button. No installation starts automatically, and no offline cache or service worker is added.
+
+`manifest.json` identifies BTC2G at the public origin with scope `/` and start URL `/?source=shortcut`. `home-screen/` contains the shared install UI, Apple 180px icon, Android 192/512px icons and a separately padded maskable icon, all derived from BTC2G's existing logo. Public HTML uses root-relative asset paths so language pages share the same shortcut identity.
+
+Validation: `node --test tests/site-install.test.cjs scripts/language-pages-test.mjs`. Check the actual launcher icon on a real Android/iOS device before claiming OS installation. The reusable cross-site procedure is saved in `SitePlatform/docs/home-screen-shortcuts.md` and its versioned VitdArt platform backup.
