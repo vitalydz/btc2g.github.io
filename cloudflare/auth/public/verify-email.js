@@ -41,7 +41,9 @@ const token = new URLSearchParams(location.search).get('token');
 
 if (!token) {
   button.disabled = true;
+  button.hidden = true;
   message.textContent = text[6];
+  returnLink.focus();
 }
 
 button.addEventListener('click', async () => {
