@@ -269,6 +269,7 @@ test('signed-in account UI separates email verification from Premium and marketi
   assert.match(verificationScript, /error\.status === 400 \? text\[6\] : error\.status === 401 \? text\[8\] : error\.message/);
   assert.match(verificationScript, /returnLink\.href = `\$\{accountUrl\}&mode=login`/);
   assert.match(verificationScript, /returnLink\.textContent = accountText\('signIn'\)/);
+  assert.match(verificationScript, /else if \(error\.status === 400\) \{\s*button\.hidden = true;\s*returnLink\.focus\(\)/);
   assert.match(verificationScript, /button\.setAttribute\('aria-busy', 'true'\)/);
   assert.match(verificationScript, /button\.textContent = `\$\{text\[3\]\}…`/);
   assert.match(verificationScript, /button\.hidden = true/);

@@ -68,6 +68,9 @@ button.addEventListener('click', async () => {
       returnLink.textContent = accountText('signIn');
       button.hidden = true;
       returnLink.focus();
+    } else if (error.status === 400) {
+      button.hidden = true;
+      returnLink.focus();
     } else {
       button.textContent = buttonLabel;
       button.disabled = false;
