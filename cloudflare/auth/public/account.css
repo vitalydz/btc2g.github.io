@@ -46,6 +46,7 @@ textarea { resize:vertical; min-height:96px; }
 .primary:disabled { opacity:.55; cursor:wait; }
 .message { min-height:1.4em; margin:0; color:var(--red); font-size:.9rem; }
 .message.success { color:var(--green); }
+.message:focus { outline:2px solid var(--gold); outline-offset:4px; border-radius:4px; }
 .form-support { margin:0; text-align:center; font-size:.88rem; }
 .form-support a { color:#b9cae2; }
 #signed-in { text-align:center; }

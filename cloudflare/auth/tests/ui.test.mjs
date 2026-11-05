@@ -206,9 +206,11 @@ test('homepage form receipt does not claim confirmation and Premium CTA uses exi
 });
 
 test('approved acquisition attribution is forwarded only through the account registration flow', async () => {
-  const [traffic, account] = await Promise.all([
+  const [traffic, account, accountPage, accountCss] = await Promise.all([
     readFile(new URL('../../../assets/js/traffic.js', import.meta.url), 'utf8'),
-    readFile(new URL('account.js', root), 'utf8')
+    readFile(new URL('account.js', root), 'utf8'),
+    readFile(new URL('index.html', root), 'utf8'),
+    readFile(new URL('account.css', root), 'utf8')
   ]);
   assert.match(traffic, /document\.referrer/);
   assert.match(traffic, /allowedSources\.has\(requestedSource\)/);
@@ -234,6 +236,9 @@ test('approved acquisition attribution is forwarded only through the account reg
   assert.match(account, /emailSubmit\.textContent = `\$\{emailSubmitLabel\}…`/);
   assert.match(account, /emailSubmit\.textContent = emailSubmitLabel/);
   assert.match(account, /emailSubmit\.removeAttribute\('aria-busy'\)/);
+  assert.match(accountPage, /id="email-message"[^>]+role="status"[^>]+aria-live="polite"[^>]+tabindex="-1"/);
+  assert.match(account, /emailMessage\.focus\(\)/);
+  assert.match(accountCss, /\.message:focus\s*\{/);
 });
 
 test('signed-in account UI separates email verification from Premium and marketing', async () => {

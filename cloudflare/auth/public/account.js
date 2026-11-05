@@ -291,6 +291,7 @@ form.addEventListener('submit', async event => {
     if (mode === 'register') {
       emailMessage.textContent = accountText(data.verificationEmailSent ? 'verificationSent' : 'verificationFailed');
       emailMessage.classList.toggle('success', data.verificationEmailSent);
+      emailMessage.focus();
     }
     await refreshStats();
   } catch (error) {
