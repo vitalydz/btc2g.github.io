@@ -19,3 +19,10 @@ Earlier audit page counts for VitdArt were corrected: 494 page URLs = 95 static 
 186 Node tests passed after content edits. Previous 27 Python tests passed in af47a57; they were not repeated for this text-only update. No production forms, traffic events, emails, indexing requests or social posts sent by these checks.
 
 VitdArt help was prepared separately at `C:/Users/vitly/PycharmProjects/MPA_04/vitdart-search-content`, commit f0f9bd5, but NOT published: live 0.20.0 is newer than canonical main 0.17.3. Its existing branch includes outreach features; this task did not merge or redeploy them. Production-source reconciliation is required before that draft can be released without rollback. 147 Node + 13 Python tests passed for that draft.
+
+
+## Later release outcome in this same task
+
+The VitdArt baseline mismatch was resolved for this patch without merging outreach work into main: the isolated change was rebased onto clean production-source commit 690284b (0.20.0), preserving existing tests and code, then released as 0.20.1 from b07998f. Worker version 54e15bf7-1440-4f96-9c84-b6b4da7579f9. 185 Node + 16 Python tests passed on that actual baseline. This supersedes the draft-only status above; canonical main remains 0.17.3 and is unsafe as a production release base until reconciled. Dedicated branch codex/search-content stores the release.
+
+BTC2G content commit b7d1e38 is published: forecast-scope section and cache version 20261105-2 verified in production. Read-only checks and account snapshot: `C:/Users/vitly/PycharmProjects/MPA_04/reports/search-content-2026-11-05/release.json`. Neither release establishes new registrations or improved search performance. No external social messages or posts sent.
