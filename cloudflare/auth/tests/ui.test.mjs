@@ -125,6 +125,10 @@ test('switching registration mode moves focus to the first account field', async
   assert.match(accountLanguage, /const loginTitleRows = \{en:'Sign in to BTC2G',ru:'Войдите в BTC2G'/);
   assert.match(accountLanguage, /const loginIntroRows = \{en:'Access your account with your username and password\.'/);
   assert.match(accountLanguage, /const loginSupportRows = \{en:'Account trouble\? Contact support\.'/);
+  assert.match(account, /url\.searchParams\.set\('mode', 'login'\)/);
+  assert.match(account, /url\.searchParams\.delete\('mode'\)/);
+  assert.match(account, /new URLSearchParams\(location\.search\)\.get\('mode'\) === 'login'/);
+  assert.match(account, /document\.querySelector\('#login-tab'\)\.click\(\)/);
   assert.match(account, /usernameInput\.focus\(\)/);
 });
 

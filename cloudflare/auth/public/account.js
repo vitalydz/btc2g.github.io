@@ -192,6 +192,12 @@ emailForm.addEventListener('submit', async event => {
 document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
   mode = tab.dataset.mode;
   const signingIn = mode === 'login';
+  if (typeof history !== 'undefined' && typeof location !== 'undefined') {
+    const url = new URL(location.href);
+    if (signingIn) url.searchParams.set('mode', 'login');
+    else url.searchParams.delete('mode');
+    history.replaceState(null, '', url);
+  }
   document.querySelectorAll('.tab').forEach(item => {
     const active = item === tab;
     item.classList.toggle('active', active);
@@ -223,6 +229,10 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
   setMessage('');
   usernameInput.focus();
 }));
+
+if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('mode') === 'login') {
+  document.querySelector('#login-tab').click();
+}
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
