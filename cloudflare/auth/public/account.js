@@ -114,10 +114,10 @@ function showUser(user) {
   document.querySelector('#admin-link').hidden = user.role !== 'admin';
   const displayedEmail = user.email || user.pendingEmail;
   document.querySelector('#email-status').textContent = user.emailVerified && user.email
-    ? `${accountLanguage === 'ru' ? 'Подтверждено' : 'Verified'}: ${user.email}`
+    ? `${accountText('emailVerified')}: ${user.email}`
     : displayedEmail
-      ? `${accountLanguage === 'ru' ? 'Ожидается подтверждение адреса' : 'Verification pending for'} ${displayedEmail}.`
-      : accountLanguage === 'ru' ? 'Подтверждённый email не добавлен.' : 'No verified email is attached.';
+      ? `${accountText('emailPending')}: ${displayedEmail}`
+      : accountText('emailMissing');
   if (displayedEmail) emailInput.value = displayedEmail;
   const isAdmin = user.role === 'admin';
   ideaPanel.hidden = false;

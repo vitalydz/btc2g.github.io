@@ -69,6 +69,9 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(dictionary.trust, lang);
     assert.ok(dictionary.benefit, lang);
     assert.ok(dictionary.registrationSupport, lang);
+    assert.ok(dictionary.emailVerified, lang);
+    assert.ok(dictionary.emailPending, lang);
+    assert.ok(dictionary.emailMissing, lang);
     assert.ok(dictionary.usernamePrivacy, lang);
     assert.ok(dictionary.usernameHint, lang);
     assert.ok(dictionary.emailHint, lang);
@@ -99,6 +102,10 @@ test('account page localizes its primary UI in all 19 site languages', async () 
   assert.match(languageScript, /emailHint:'registration-email-hint'/);
   assert.match(languageScript, /verificationSent:verificationSentRows\[lang\]/);
   assert.match(languageScript, /verificationFailed:verificationFailedRows\[lang\]/);
+  assert.match(languageScript, /emailVerified:emailStatusRows\[lang\]\[0\]/);
+  assert.match(languageScript, /emailPending:emailStatusRows\[lang\]\[1\]/);
+  assert.match(languageScript, /emailMissing:emailStatusRows\[lang\]\[2\]/);
+  assert.match(languageScript, /he:\['מאומת','ממתין לאימות'/);
   assert.match(homepage, /btc2g-accounts\.btc2g\.workers\.dev\/\?lang=' \+ encodeURIComponent\(lang\)/);
 });
 
@@ -233,6 +240,9 @@ test('signed-in account UI separates email verification from Premium and marketi
   assert.match(html, /https:\/\/btc2g\.com\/#subscribe/);
   assert.match(html, /Join the separate confirmed newsletter and choose the Sunday digest/);
   assert.match(script, /\/api\/email-verification\/request/);
+  assert.match(script, /accountText\('emailVerified'\)/);
+  assert.match(script, /accountText\('emailPending'\)/);
+  assert.match(script, /accountText\('emailMissing'\)/);
   assert.match(verification, /id="confirm-email"/);
   assert.match(verification, /no-referrer/);
   assert.match(verificationScript, /import \{ accountLanguage \}/);
