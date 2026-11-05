@@ -72,6 +72,9 @@ test('account page localizes its primary UI in all 19 site languages', async () 
     assert.ok(dictionary.emailVerified, lang);
     assert.ok(dictionary.emailPending, lang);
     assert.ok(dictionary.emailMissing, lang);
+    assert.ok(dictionary.emailPanelTitle, lang);
+    assert.ok(dictionary.emailSubmit, lang);
+    assert.ok(dictionary.emailPanelHint, lang);
     assert.ok(dictionary.usernamePrivacy, lang);
     assert.ok(dictionary.usernameHint, lang);
     assert.ok(dictionary.emailHint, lang);
@@ -105,6 +108,9 @@ test('account page localizes its primary UI in all 19 site languages', async () 
   assert.match(languageScript, /emailVerified:emailStatusRows\[lang\]\[0\]/);
   assert.match(languageScript, /emailPending:emailStatusRows\[lang\]\[1\]/);
   assert.match(languageScript, /emailMissing:emailStatusRows\[lang\]\[2\]/);
+  assert.match(languageScript, /emailPanelTitle:verificationPanelRows\[lang\]\[0\]/);
+  assert.match(languageScript, /emailSubmit:verificationPanelRows\[lang\]\[1\]/);
+  assert.match(languageScript, /emailPanelHint:verificationPanelRows\[lang\]\[2\]/);
   assert.match(languageScript, /he:\['מאומת','ממתין לאימות'/);
   assert.match(homepage, /btc2g-accounts\.btc2g\.workers\.dev\/\?lang=' \+ encodeURIComponent\(lang\)/);
 });
@@ -220,11 +226,12 @@ test('approved acquisition attribution is forwarded only through the account reg
 });
 
 test('signed-in account UI separates email verification from Premium and marketing', async () => {
-  const [html, script, verification, verificationScript] = await Promise.all([
+  const [html, script, verification, verificationScript, languageScript] = await Promise.all([
     readFile(new URL('index.html', root), 'utf8'),
     readFile(new URL('account.js', root), 'utf8'),
     readFile(new URL('verify-email.html', root), 'utf8'),
-    readFile(new URL('verify-email.js', root), 'utf8')
+    readFile(new URL('verify-email.js', root), 'utf8'),
+    readFile(new URL('account-language.js', root), 'utf8')
   ]);
   assert.match(html, /id="email-form"/);
   assert.match(html, /id="username"[^>]+autocapitalize="none"[^>]+spellcheck="false"/);
@@ -232,11 +239,16 @@ test('signed-in account UI separates email verification from Premium and marketi
   assert.match(html, /id="registration-email"[^>]+inputmode="email"/);
   assert.match(html, /id="registration-email"[^>]+enterkeyhint="next"/);
   assert.match(html, /id="account-email"[^>]+aria-describedby="account-email-hint"/);
+  assert.match(html, /id="account-email-label">Email address/);
   assert.match(html, /id="account-email"[^>]+enterkeyhint="send"/);
   assert.match(html, /id="account-email-hint"/);
   assert.match(html, /id="password"[^>]+passwordrules="minlength: 12; maxlength: 128;/);
   assert.match(html, /id="password"[^>]+enterkeyhint="go"/);
   assert.match(html, /does not subscribe you to marketing or activate Premium/);
+  assert.match(languageScript, /emailPanelTitle:'email-title'/);
+  assert.match(languageScript, /emailSubmit:'email-submit'/);
+  assert.match(languageScript, /emailPanelHint:'account-email-hint'/);
+  assert.match(languageScript, /querySelector\('#account-email-label'\)\.textContent = accountText\('email'\)/);
   assert.match(html, /https:\/\/btc2g\.com\/#subscribe/);
   assert.match(html, /Join the separate confirmed newsletter and choose the Sunday digest/);
   assert.match(script, /\/api\/email-verification\/request/);
