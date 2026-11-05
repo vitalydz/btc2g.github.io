@@ -1,0 +1,9 @@
+.site-install-button{font:inherit;font-size:14px;line-height:1.4;white-space:normal;border:1px solid currentColor;border-radius:999px;padding:9px 16px;background:transparent;color:inherit;cursor:pointer;max-width:100%}
+.site-install-button[hidden]{display:none!important}
+.site-install-dialog{box-sizing:border-box;width:min(440px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;border:1px solid #d9d1e2;border-radius:20px;padding:26px;background:#fff;color:#30263b;font-family:system-ui,sans-serif;box-shadow:0 15px 70px #0004;text-align:start}
+.site-install-dialog::backdrop{background:#15102080}
+.site-install-dialog:not([open]){display:none}
+.site-install-dialog h2{font-size:21px;line-height:1.35;margin:0 0 14px;letter-spacing:normal;color:inherit}
+.site-install-dialog p{font-size:16px;line-height:1.65;margin:0 0 20px;max-width:none;color:inherit}
+.site-install-dialog button{font:inherit;border:0;border-radius:999px;padding:10px 20px;background:#593d77;color:white;cursor:pointer}
+.site-install-button:focus-visible,.site-install-dialog button:focus-visible{outline:3px solid #b671e0;outline-offset:4px}
