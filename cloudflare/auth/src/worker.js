@@ -139,7 +139,7 @@ async function createAttributionToken(env, day, visitorHash, source) {
 async function verifiedAttributionSource(request, env, token) {
   if (!env.IP_HASH_SECRET || typeof token !== 'string') return null;
   const [day, source, signature, extra] = token.split('.');
-  if (extra !== undefined || day !== jerusalemDay() || !['producthunt', 'scenario', 'telegram'].includes(source) || !signature) return null;
+  if (extra !== undefined || day !== jerusalemDay() || !['producthunt', 'scenario', 'telegram', 'reddit', 'linkedin', 'directory'].includes(source) || !signature) return null;
   const visitorHash = await requestVisitorHash(request, env, day);
   const expected = await hmacSha256(env.IP_HASH_SECRET, `${day}:${visitorHash}:${source}`);
   return constantTimeEqual(signature, expected) ? source : null;
@@ -869,7 +869,12 @@ async function recordVisit(request, env) {
       ON CONFLICT(day, page_path) DO UPDATE SET views = daily_pageviews.views + 1
     `).bind(day, pagePath)
   ]);
-  const attribution = source ? await createAttributionToken(env, day, visitorHash, source) : null;
+  // Keep the signed registration label aligned with the visitor's first known source that day.
+  const storedSource = source ? await env.DB.prepare(
+    'SELECT acquisition_source FROM daily_visitors WHERE day = ? AND visitor_hash = ?'
+  ).bind(day, visitorHash).first() : null;
+  const attribution = storedSource?.acquisition_source
+    ? await createAttributionToken(env, day, visitorHash, storedSource.acquisition_source) : null;
   return json({ ok: true, attribution }, 202, cors);
 }
 
@@ -953,6 +958,18 @@ async function adminStats(request, env) {
     `).all()
   ]);
 
+  // Aggregate existing rows only: no new identifiers, raw referrers or email data.
+  const channelResult = await env.DB.prepare(`
+    WITH sources(source) AS (
+      VALUES ('producthunt'), ('scenario'), ('telegram'), ('reddit'), ('linkedin'), ('directory')
+    )
+    SELECT source,
+      (SELECT COUNT(*) FROM daily_visitors v WHERE v.day = ? AND v.acquisition_source = sources.source) AS visitors_today,
+      (SELECT COUNT(*) FROM users u WHERE u.role = 'user' AND u.disabled_at IS NULL AND u.created_day = ? AND u.acquisition_source = sources.source) AS accounts_created_today,
+      (SELECT COUNT(*) FROM users u WHERE u.role = 'user' AND u.disabled_at IS NULL AND u.email_verified_at IS NOT NULL AND u.email_verified_day = ? AND u.acquisition_source = sources.source) AS confirmed_today,
+      (SELECT COUNT(*) FROM users u WHERE u.role = 'user' AND u.disabled_at IS NULL AND u.email_verified_at IS NULL AND u.acquisition_source = sources.source) AS pending_total
+    FROM sources
+  `).bind(today, today, today).all();
   const traffic = trafficMetrics(summary);
   const subscriberStats = await subscriberStatsPromise;
   const visitorsToday = traffic.visitorsToday;
@@ -993,10 +1010,17 @@ async function adminStats(request, env) {
       telegramRegisteredToday,
       telegramConversionToday: registrationRatio(telegramRegisteredToday, telegramVisitorsToday)
     },
+    channels: (channelResult.results || []).map(row => ({
+      source: row.source,
+      visitorsToday: traffic.status === 'available' ? Number(row.visitors_today) : null,
+      accountsCreatedToday: Number(row.accounts_created_today),
+      confirmedToday: Number(row.confirmed_today),
+      pendingTotal: Number(row.pending_total)
+    })),
     daily: dailyResult.results || [],
     topPaths: pathsResult.results || [],
     recentRegistrations: recentResult.results || [],
-    methodology: 'Visitors are daily IP + browser hash estimates, not verified people. Raw IP addresses are not stored. A registration is counted only after the account email is verified. Product Hunt is detected from the browser-reported referrer; Scenario is detected from the trusted BTC2G page path; Telegram requires the exact normalized utm_source=telegram value. A registration is attributed only when a signed same-day token matches the same browser/network estimate. Arbitrary UTM values are not stored. Other registration/visitor ratios are not attributed conversion. Days before the earliest retained visit have no traffic data. Verified account emails are not marketing subscriptions.'
+    methodology: 'Visitors are daily IP + browser hash estimates, not verified people. Raw IP addresses are not stored. A registration is counted only after the account email is verified. Product Hunt is detected from the browser-reported referrer; Scenario is detected from the trusted BTC2G page path; Telegram and directory require allowlisted UTM sources; Reddit, LinkedIn and Product Hunt accept allowlisted UTM sources or HTTPS referrer hosts. These are browser-reported labels, not proof of an independent referral. Account creation and confirmed registrations are separate stages; daily confirmations can belong to accounts created on earlier days, so these counts are not a cohort funnel. No form-start or failed-attempt tracking is collected. A registration is attributed only when a signed same-day token matches the same browser/network estimate; the token uses the first known source of that daily estimate. Attribution is not recovered for old accounts, a different browser/network or an expired token. Arbitrary UTM values are not stored. Other registration/visitor ratios are not attributed conversion. Days before the earliest retained visit have no traffic data. Verified account emails are not marketing subscriptions.'
   });
 }
 

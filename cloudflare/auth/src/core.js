@@ -107,16 +107,21 @@ export function acquisitionSource(referrer) {
     const url = new URL(String(referrer || ''));
     if (url.protocol !== 'https:') return null;
     const host = url.hostname.toLowerCase();
-    return host === 'producthunt.com' || host.endsWith('.producthunt.com') ? 'producthunt' : null;
+    for (const [domain, source] of [['producthunt.com', 'producthunt'], ['reddit.com', 'reddit'], ['linkedin.com', 'linkedin']]) {
+      if (host === domain || host.endsWith('.' + domain)) return source;
+    }
+    return null;
   } catch {
     return null;
   }
 }
 
 export function pageAcquisitionSource(path) {
-  return normalizePagePath(path) === '/scenario.html' ? 'scenario' : null;
+  const normalized = normalizePagePath(path);
+  return /^\/(?:(?:en|ru|he|de|fr|es|zh|it|pt|ar|hi|ja|ko|tr|pl|nl|uk|id|vi)\/)?scenario\.html$/.test(normalized || '') ? 'scenario' : null;
 }
 
 export function campaignAcquisitionSource(value) {
-  return String(value || '').trim().toLocaleLowerCase('en-US') === 'telegram' ? 'telegram' : null;
+  const source = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return ['telegram', 'reddit', 'linkedin', 'directory', 'producthunt'].includes(source) ? source : null;
 }

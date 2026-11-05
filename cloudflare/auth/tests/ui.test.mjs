@@ -211,7 +211,8 @@ test('approved acquisition attribution is forwarded only through the account reg
     readFile(new URL('account.js', root), 'utf8')
   ]);
   assert.match(traffic, /document\.referrer/);
-  assert.match(traffic, /utm_source.*=== 'telegram'/s);
+  assert.match(traffic, /allowedSources\.has\(requestedSource\)/);
+  assert.match(traffic, /'reddit', 'linkedin', 'directory'/);
   assert.match(traffic, /campaignSource/);
   assert.match(traffic, /sessionStorage\.setItem\(storageKey, data\.attribution\)/);
   assert.match(traffic, /url\.searchParams\.set\('attribution'/);

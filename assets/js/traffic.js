@@ -4,8 +4,9 @@
   const storageKey = 'btc2g_attribution';
   if (!endpoint || navigator.webdriver || location.protocol === 'file:') return;
 
-  const campaignSource = new URLSearchParams(location.search).get('utm_source')?.trim().toLowerCase() === 'telegram'
-    ? 'telegram' : null;
+  const allowedSources = new Set(['telegram', 'reddit', 'linkedin', 'directory', 'producthunt']);
+  const requestedSource = new URLSearchParams(location.search).get('utm_source')?.trim().toLowerCase();
+  const campaignSource = allowedSources.has(requestedSource) ? requestedSource : null;
 
   function storedAttribution() {
     try { return sessionStorage.getItem(storageKey); } catch { return null; }

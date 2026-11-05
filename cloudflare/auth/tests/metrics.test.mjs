@@ -767,3 +767,192 @@ test('administrators submit without account or attempt limits and review other u
   const userMine = await (await worker.fetch(new Request('https://metrics.test/api/ideas/mine', { headers: userHeaders }), env)).json();
   assert.deepEqual(userMine.ideas.map(idea => idea.id), [userIdea.id]);
 });
+
+test('attributes a confirmed Reddit registration with an allowlisted UTM source and signed token', async t => {
+  const { env, db } = database(t);
+  let sent;
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    sent = JSON.parse(options.body);
+    return new Response(JSON.stringify({ id: 'local-email' }), { status: 200 });
+  });
+  const configured = {
+    ...env,
+    TERMS_VERSION: 'test',
+    RESEND_API_KEY: 'local-test-key',
+    EMAIL_FROM: 'BTC2G <accounts@btc2g.com>'
+  };
+  const commonHeaders = {
+    'CF-Connecting-IP': '192.0.2.46', 'User-Agent': 'reddit-local-test'
+  };
+  const visit = await worker.fetch(new Request('https://metrics.test/api/visit', {
+    method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: '/', campaignSource: 'reddit' })
+  }), configured);
+  const { attribution } = await visit.json();
+  assert.equal(visit.status, 202);
+  assert.match(attribution, /^\d{4}-\d{2}-\d{2}\.reddit\./);
+
+  const ignored = await worker.fetch(new Request('https://metrics.test/api/visit', {
+    method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: '/', campaignSource: 'reddit-news' })
+  }), configured);
+  assert.equal((await ignored.json()).attribution, null);
+
+  const registration = await worker.fetch(new Request('https://metrics.test/api/register', {
+    method: 'POST', headers: { ...commonHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'RedditUser', email: 'reddit@example.com', password: 'LongEnoughPass9', acceptedTerms: true, attribution })
+  }), configured);
+  assert.equal(registration.status, 201);
+  assert.equal(db.prepare("SELECT acquisition_source FROM users WHERE username_key = 'reddituser'").get().acquisition_source, 'reddit');
+
+  const adminHeaders = admin(db);
+  const before = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: adminHeaders }), configured)).json();
+  assert.equal(before.channels.find(row => row.source === 'reddit').confirmedToday, 0);
+  assert.equal(before.channels.find(row => row.source === 'reddit').pendingTotal, 1);
+  const token = new URL(sent.text.match(/https:\/\/\S+/)[0]).searchParams.get('token');
+  const confirmed = await worker.fetch(new Request('https://metrics.test/api/email-verification/confirm', {
+    method: 'POST',
+    headers: { Cookie: registration.headers.get('set-cookie'), Origin: configured.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  }), configured);
+  assert.equal(confirmed.status, 200);
+
+  const report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: adminHeaders }), configured)).json();
+  const channel = report.channels.find(row => row.source === 'reddit');
+  assert.equal(channel.visitorsToday, 1);
+  assert.equal(channel.accountsCreatedToday, 1);
+  assert.equal(channel.confirmedToday, 1);
+  assert.equal(channel.pendingTotal, 0);
+});
+
+
+test('attributes a confirmed Linkedin registration with an allowlisted UTM source and signed token', async t => {
+  const { env, db } = database(t);
+  let sent;
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    sent = JSON.parse(options.body);
+    return new Response(JSON.stringify({ id: 'local-email' }), { status: 200 });
+  });
+  const configured = {
+    ...env,
+    TERMS_VERSION: 'test',
+    RESEND_API_KEY: 'local-test-key',
+    EMAIL_FROM: 'BTC2G <accounts@btc2g.com>'
+  };
+  const commonHeaders = {
+    'CF-Connecting-IP': '192.0.2.46', 'User-Agent': 'linkedin-local-test'
+  };
+  const visit = await worker.fetch(new Request('https://metrics.test/api/visit', {
+    method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: '/', campaignSource: 'linkedin' })
+  }), configured);
+  const { attribution } = await visit.json();
+  assert.equal(visit.status, 202);
+  assert.match(attribution, /^\d{4}-\d{2}-\d{2}\.linkedin\./);
+
+  const ignored = await worker.fetch(new Request('https://metrics.test/api/visit', {
+    method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: '/', campaignSource: 'linkedin-news' })
+  }), configured);
+  assert.equal((await ignored.json()).attribution, null);
+
+  const registration = await worker.fetch(new Request('https://metrics.test/api/register', {
+    method: 'POST', headers: { ...commonHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'LinkedinUser', email: 'linkedin@example.com', password: 'LongEnoughPass9', acceptedTerms: true, attribution })
+  }), configured);
+  assert.equal(registration.status, 201);
+  assert.equal(db.prepare("SELECT acquisition_source FROM users WHERE username_key = 'linkedinuser'").get().acquisition_source, 'linkedin');
+
+  const adminHeaders = admin(db);
+  const before = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: adminHeaders }), configured)).json();
+  assert.equal(before.channels.find(row => row.source === 'linkedin').confirmedToday, 0);
+  assert.equal(before.channels.find(row => row.source === 'linkedin').pendingTotal, 1);
+  const token = new URL(sent.text.match(/https:\/\/\S+/)[0]).searchParams.get('token');
+  const confirmed = await worker.fetch(new Request('https://metrics.test/api/email-verification/confirm', {
+    method: 'POST',
+    headers: { Cookie: registration.headers.get('set-cookie'), Origin: configured.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  }), configured);
+  assert.equal(confirmed.status, 200);
+
+  const report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: adminHeaders }), configured)).json();
+  const channel = report.channels.find(row => row.source === 'linkedin');
+  assert.equal(channel.visitorsToday, 1);
+  assert.equal(channel.accountsCreatedToday, 1);
+  assert.equal(channel.confirmedToday, 1);
+  assert.equal(channel.pendingTotal, 0);
+});
+
+
+test('attributes a confirmed Directory registration with an allowlisted UTM source and signed token', async t => {
+  const { env, db } = database(t);
+  let sent;
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    sent = JSON.parse(options.body);
+    return new Response(JSON.stringify({ id: 'local-email' }), { status: 200 });
+  });
+  const configured = {
+    ...env,
+    TERMS_VERSION: 'test',
+    RESEND_API_KEY: 'local-test-key',
+    EMAIL_FROM: 'BTC2G <accounts@btc2g.com>'
+  };
+  const commonHeaders = {
+    'CF-Connecting-IP': '192.0.2.46', 'User-Agent': 'directory-local-test'
+  };
+  const visit = await worker.fetch(new Request('https://metrics.test/api/visit', {
+    method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: '/', campaignSource: 'directory' })
+  }), configured);
+  const { attribution } = await visit.json();
+  assert.equal(visit.status, 202);
+  assert.match(attribution, /^\d{4}-\d{2}-\d{2}\.directory\./);
+
+  const ignored = await worker.fetch(new Request('https://metrics.test/api/visit', {
+    method: 'POST', headers: { ...commonHeaders, Origin: env.PUBLIC_SITE_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: '/', campaignSource: 'directory-news' })
+  }), configured);
+  assert.equal((await ignored.json()).attribution, null);
+
+  const registration = await worker.fetch(new Request('https://metrics.test/api/register', {
+    method: 'POST', headers: { ...commonHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'DirectoryUser', email: 'directory@example.com', password: 'LongEnoughPass9', acceptedTerms: true, attribution })
+  }), configured);
+  assert.equal(registration.status, 201);
+  assert.equal(db.prepare("SELECT acquisition_source FROM users WHERE username_key = 'directoryuser'").get().acquisition_source, 'directory');
+
+  const adminHeaders = admin(db);
+  const before = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: adminHeaders }), configured)).json();
+  assert.equal(before.channels.find(row => row.source === 'directory').confirmedToday, 0);
+  assert.equal(before.channels.find(row => row.source === 'directory').pendingTotal, 1);
+  const token = new URL(sent.text.match(/https:\/\/\S+/)[0]).searchParams.get('token');
+  const confirmed = await worker.fetch(new Request('https://metrics.test/api/email-verification/confirm', {
+    method: 'POST',
+    headers: { Cookie: registration.headers.get('set-cookie'), Origin: configured.APP_ORIGIN, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  }), configured);
+  assert.equal(confirmed.status, 200);
+
+  const report = await (await worker.fetch(new Request('https://metrics.test/api/admin/stats', { headers: adminHeaders }), configured)).json();
+  const channel = report.channels.find(row => row.source === 'directory');
+  assert.equal(channel.visitorsToday, 1);
+  assert.equal(channel.accountsCreatedToday, 1);
+  assert.equal(channel.confirmedToday, 1);
+  assert.equal(channel.pendingTotal, 0);
+});
+
+
+test('daily first-source attribution stays aligned across multiple channels and cannot be forged', async t => {
+  const {env,db}=database(t);
+  const headers={Origin:env.PUBLIC_SITE_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.99','User-Agent':'local-multi-source'};
+  let token;
+  for(const source of ['reddit','linkedin']) {
+    const response=await worker.fetch(new Request('https://metrics.test/api/visit',{method:'POST',headers,body:JSON.stringify({path:'/',campaignSource:source})}),env);
+    token=(await response.json()).attribution;assert.match(token,/\.reddit\./);
+  }
+  const created=await worker.fetch(new Request('https://metrics.test/api/register',{method:'POST',headers:{...headers,Origin:env.APP_ORIGIN},body:JSON.stringify({username:'ForgedSource',email:'forged@example.com',password:'LongEnoughPass9',acceptedTerms:true,attribution:token.replace('.reddit.','.linkedin.')})}),{...env,TERMS_VERSION:'test'});
+  assert.equal(created.status,201);
+  assert.equal(db.prepare("SELECT acquisition_source FROM users WHERE username_key='forgedsource'").get().acquisition_source,null);
+  const stats=await(await worker.fetch(new Request('https://metrics.test/api/stats'),env)).json();
+  assert.equal(stats.totalAccounts,0);
+});

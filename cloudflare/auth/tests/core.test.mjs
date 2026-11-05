@@ -108,6 +108,22 @@ test('normalizes only the exact Telegram campaign source', () => {
   assert.equal(campaignAcquisitionSource('telegram'), 'telegram');
   assert.equal(campaignAcquisitionSource(' Telegram '), 'telegram');
   assert.equal(campaignAcquisitionSource('telegram-news'), null);
-  assert.equal(campaignAcquisitionSource('producthunt'), null);
+  assert.equal(campaignAcquisitionSource('producthunt'), 'producthunt');
   assert.equal(campaignAcquisitionSource(null), null);
+});
+
+
+test('allowlisted referral hosts and campaign labels exclude arbitrary personal input', () => {
+  for (const source of ['reddit', 'linkedin', 'directory', 'telegram', 'producthunt']) {
+    assert.equal(campaignAcquisitionSource(' ' + source.toUpperCase() + ' '), source);
+  }
+  assert.equal(acquisitionSource('https://old.reddit.com/r/SideProject/'), 'reddit');
+  assert.equal(acquisitionSource('https://www.linkedin.com/feed/'), 'linkedin');
+  for (const value of ['https://linkedin.com.evil.test/', 'https://evil.test/?reddit.com', 'http://reddit.com/']) assert.equal(acquisitionSource(value), null);
+  for (const value of ['email@example.com', 'directory-name', {}, null]) assert.equal(campaignAcquisitionSource(value), null);
+});
+
+test('all supported localized scenario paths preserve attribution without accepting lookalikes', () => {
+  for (const lang of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) assert.equal(pageAcquisitionSource('/' + lang + '/scenario.html?utm_source=ignored'), 'scenario');
+  for (const value of ['/xx/scenario.html', '/ru/scenario-copy.html', '/foo/ru/scenario.html', '//ru/scenario.html']) assert.equal(pageAcquisitionSource(value), null);
 });

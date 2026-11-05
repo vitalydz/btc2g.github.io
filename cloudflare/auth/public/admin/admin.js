@@ -145,6 +145,13 @@ async function loadStats() {
     document.querySelector('#telegram-visitors').textContent = formatCount(data.summary.telegramVisitorsToday);
     document.querySelector('#telegram-registrations').textContent = formatCount(data.summary.telegramRegisteredToday);
     document.querySelector('#telegram-conversion').textContent = percentage(data.summary.telegramConversionToday);
+    document.querySelector('#channel-body')?.replaceChildren(...(data.channels || []).map(row => {
+      const tr = document.createElement('tr');
+      [row.source, formatCount(row.visitorsToday), formatCount(row.accountsCreatedToday), formatCount(row.confirmedToday), formatCount(row.pendingTotal)].forEach(value => {
+        const td = document.createElement('td'); td.textContent = value; tr.append(td);
+      });
+      return tr;
+    }));
     document.querySelector('#daily-body').replaceChildren(...data.daily.map(row => {
       const tr = document.createElement('tr');
       const conversion = Number.isFinite(row.visitors) && row.visitors > 0 ? row.registrations / row.visitors : null;
@@ -172,6 +179,7 @@ async function loadStats() {
   } catch (error) {
     if (version !== requestVersion) return;
     document.querySelectorAll('.cards [data-count]').forEach(item => { item.textContent = 'Data unavailable'; });
+    document.querySelector('#channel-body')?.replaceChildren();
     document.querySelector('#daily-body').replaceChildren();
     document.querySelector('#top-paths').replaceChildren();
     document.querySelector('#recent-users').replaceChildren();
