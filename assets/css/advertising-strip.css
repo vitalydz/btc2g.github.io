@@ -1,10 +1,28 @@
-/* Compact, non-sticky advertising reservation and clearly separate own-site links. */
-.site-advertising-strip{box-sizing:border-box;position:static;clear:both;flex:0 0 auto;width:100%;max-width:none;margin:20px 0 0;padding:5px 16px;border:0;border-top:1px solid color-mix(in srgb,currentColor 20%,transparent);color:inherit;background:transparent;font:12px/1.4 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start}
-.site-advertising-strip .site-advertising-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 20px;max-width:1200px;margin:0 auto;padding:0}
-.site-advertising-strip .site-advertising-slot{flex:0 0 auto;font-size:11px;line-height:20px;font-weight:500;opacity:.8}
-.site-advertising-strip .site-advertising-links{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px 12px;margin:0;padding:0;border:0;background:none;font:inherit}
-.site-advertising-strip .site-advertising-caption{opacity:.75;font:inherit}
-.site-advertising-strip .site-advertising-links a{display:inline-flex;align-items:center;min-height:24px;margin:0;padding:2px 0;color:inherit;background:none;border:0;border-radius:2px;font:inherit;line-height:20px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
-.site-advertising-strip .site-advertising-links a:hover{text-decoration-thickness:2px}
-.site-advertising-strip .site-advertising-links a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
-@media(max-width:600px){.site-advertising-strip{padding:6px 12px}.site-advertising-strip .site-advertising-inner{gap:2px 10px}.site-advertising-strip .site-advertising-links{gap:2px 12px}}
+/* Twice-height footer with authentic local logos and original brand wordmarks. */
+.site-advertising-strip{box-sizing:border-box;position:static;clear:both;flex:0 0 auto;width:100%;max-width:none;min-height:76px;margin:20px 0 0;padding:14px 20px;border:0;border-top:1px solid color-mix(in srgb,currentColor 20%,transparent);color:inherit;background:transparent;font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-align:start}
+.site-advertising-strip .site-advertising-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 22px;min-height:46px;max-width:1320px;margin:0 auto;padding:0}
+.site-advertising-strip .site-advertising-slot{flex:0 0 auto;font-size:14px;line-height:22px;font-weight:600;opacity:.9}
+.site-advertising-strip .site-advertising-links{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 10px;margin:0;padding:0;border:0;background:none;font:inherit}
+.site-advertising-strip .site-advertising-caption{opacity:.8;font:inherit;margin-inline-end:2px}
+.site-advertising-strip .site-advertising-links a.site-brand{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;margin:0;padding:6px 10px;color:#fff;background:#071523;border:1px solid #62748466;border-radius:9px;font:700 20px/1.15 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;text-decoration:none;white-space:nowrap;direction:ltr;letter-spacing:0}
+.site-advertising-strip .site-brand-logo{display:block;flex:none;width:32px;height:32px;max-width:none;margin:0;object-fit:contain;border:0;border-radius:5px;box-shadow:none}
+.site-advertising-strip .site-brand-name{display:inline-flex;align-items:baseline;font:inherit;line-height:1.2;letter-spacing:-.5px;white-space:nowrap}
+.site-advertising-strip .site-advertising-links a.site-brand-bit2g{font-weight:750;letter-spacing:-1px}
+.site-advertising-strip .site-brand-bit2g .site-brand-logo{width:36px}
+.site-advertising-strip .site-advertising-links a.site-brand-vitdart{background:#f6f2e4;color:#19231e;border-color:#bbb5a7;font-family:Georgia,serif;font-weight:400}
+.site-advertising-strip .site-advertising-links a.site-brand-bmychance{background:#f6f2e4;color:#9230b0;border-color:#bbb5a7;font-weight:800}
+.site-advertising-strip .site-brand-bmychance .site-brand-name{letter-spacing:-1px}
+.site-advertising-strip .site-brand-aikickai .site-brand-logo{width:38px}
+.site-advertising-strip .site-brand-aikickai .site-brand-name{font-weight:800}
+.site-advertising-strip .site-brand-metal{font-weight:800;color:#dde3ed;background:linear-gradient(90deg,#788391 0%,#dce2ea 20%,#fff 30%,#8b97a6 45%,#dce2ea 58%,#fff 70%,#a3adba 90%);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.site-advertising-strip .site-brand-blue{color:#589cff;font-weight:600}.site-advertising-strip .site-brand-best{color:#fff;font-weight:600}
+.site-advertising-strip .site-advertising-links a.site-brand:hover{border-color:currentColor;filter:brightness(1.12)}
+.site-advertising-strip .site-advertising-links a.site-brand:focus-visible{outline:3px solid currentColor;outline-offset:3px}
+@media(max-width:600px){.site-advertising-strip{min-height:124px;padding:12px}.site-advertising-strip .site-advertising-inner{gap:8px}.site-advertising-strip .site-advertising-links{gap:8px}.site-advertising-strip .site-advertising-caption{flex-basis:100%;text-align:center}.site-advertising-strip .site-advertising-links a.site-brand{font-size:18px;min-height:44px;padding:5px 8px;gap:6px}.site-advertising-strip .site-brand-logo{width:28px;height:28px}.site-advertising-strip .site-brand-bit2g .site-brand-logo{width:32px}.site-advertising-strip .site-brand-aikickai .site-brand-logo{width:34px}}
+@media(forced-colors:active){.site-advertising-strip .site-brand-metal{-webkit-text-fill-color:CanvasText;background:none}}
+
+/* Original findbBest wordmark uses a separate metallic finish on each letter. */
+.site-advertising-strip .site-brand-metal{display:inline-flex;background:none;-webkit-text-fill-color:initial}
+.site-advertising-strip .site-brand-metal-letter{font-style:normal;display:inline-block;color:#dce2ea;background:linear-gradient(90deg,#788391 0%,#b4bdc9 22%,#dce2ea 39%,#fff 46%,#fff 53%,#dce2ea 60%,#a3adba 78%,#707b8a 100%);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.site-advertising-strip .site-brand-metal-n,.site-advertising-strip .site-brand-metal-d{background-image:linear-gradient(90deg,#788391 0%,#c5ced9 9%,#fff 15%,#fff 20%,#c5ced9 26%,#788391 39%,#a3adba 58%,#dce2ea 72%,#fff 78%,#fff 83%,#b4bdc9 90%,#707b8a 100%)}
+@media(forced-colors:active){.site-advertising-strip .site-brand-metal-letter{-webkit-text-fill-color:CanvasText;background:none}}
