@@ -13,7 +13,18 @@
       }));
   }
 
-  root.BTC2GMarketChartMath = { buildPurchasingPowerSeries };
+  const supportedChartModes = new Set(['ratio', 'btc', 'gold', 'score', 'purchasingPower']);
+
+  function chartModeFromSearch(search) {
+    try {
+      const selected = new URLSearchParams(search || '').get('chart');
+      return supportedChartModes.has(selected) ? selected : 'ratio';
+    } catch {
+      return 'ratio';
+    }
+  }
+
+  root.BTC2GMarketChartMath = { buildPurchasingPowerSeries, chartModeFromSearch };
   if (!root.document) return;
 
   const HISTORY_PATH = 'assets/btc_gold_history.json';
@@ -26,7 +37,7 @@
     purchasingPower: { label: 'Purchasing-power index', unit: ' index' },
   };
   let series = [];
-  let mode = 'ratio';
+  let mode = chartModeFromSearch(root.location?.search);
   let regimeAnalysis = null;
 
   function validHistory(data) {
@@ -176,6 +187,7 @@
 
   document.querySelectorAll('[data-chart-mode]').forEach(button => button.addEventListener('click', () => setMode(button.dataset.chartMode)));
   root.addEventListener('resize', draw);
-  root.BTC2GMarketChart = { load, setMode, validHistory, buildPurchasingPowerSeries };
+  root.BTC2GMarketChart = { load, setMode, validHistory, buildPurchasingPowerSeries, chartModeFromSearch };
+  setMode(mode);
   load();
 })(typeof window !== 'undefined' ? window : globalThis);

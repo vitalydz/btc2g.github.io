@@ -67,13 +67,24 @@ test('purchasing-power comparison indexes both assets to the same starting value
   assert.ok(Math.abs(indexed[1].gold_index - 110) < 1e-10);
 });
 
+test('chart deep links select only supported dashboard modes', () => {
+  const chartPath = path.join(root, 'assets/js/market-chart.js');
+  delete require.cache[require.resolve(chartPath)];
+  require(chartPath);
+  const select = globalThis.BTC2GMarketChartMath.chartModeFromSearch;
+  assert.equal(select('?chart=purchasingPower'), 'purchasingPower');
+  assert.equal(select('?chart=gold'), 'gold');
+  assert.equal(select('?chart=unknown'), 'ratio');
+  assert.equal(select('not a query'), 'ratio');
+});
+
 test('all localized homepages load the purchasing-power release assets', () => {
   const languages = ['ru', 'he', 'de', 'fr', 'es', 'zh', 'it', 'pt', 'ar', 'hi', 'ja', 'ko', 'tr', 'pl', 'nl', 'uk', 'id', 'vi'];
   for (const language of languages) {
     const html = read(`${language}/index.html`);
     assert.match(html, /assets\/css\/index\.css\?v=20261110-1/);
     assert.match(html, /assets\/js\/home-v2-text\.js\?v=20261110-1/);
-    assert.match(html, /assets\/js\/market-chart\.js\?v=20261110-1/);
+    assert.match(html, /assets\/js\/market-chart\.js\?v=20261110-2/);
   }
   const languageSource = read('assets/js/home-v2-text.js');
   assert.match(languageSource, /ensurePurchasingPowerElements/);
