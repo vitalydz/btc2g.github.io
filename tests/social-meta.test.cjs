@@ -28,6 +28,12 @@ test('homepage publishes valid multilingual WebSite structured data', () => {
   assert.equal(data['@type'], 'WebSite');
   assert.equal(data.name, 'BTC2G');
   assert.equal(data.url, 'https://btc2g.com/');
+  assert.deepEqual(data.featureList, [
+    'Bitcoin-to-gold ratio history',
+    'BTC and gold purchasing-power index',
+    'Reference calculator',
+    'What-if scenario simulator'
+  ]);
   assert.equal(data.inLanguage.length, 19);
 });
 
