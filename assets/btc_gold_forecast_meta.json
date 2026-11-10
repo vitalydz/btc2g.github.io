@@ -1,7 +1,7 @@
 {
-  "last_updated_utc": "2026-11-09T23:46:39.379855+00:00",
+  "last_updated_utc": "2026-11-10T11:08:58.093422+00:00",
   "status": "ok",
-  "market_date": "2026-11-06",
+  "market_date": "2026-11-09",
   "price_basis": "Latest completed daily close shared by BTC and gold; no forward-filled quotes",
   "source": "yfinance",
   "tickers": {
