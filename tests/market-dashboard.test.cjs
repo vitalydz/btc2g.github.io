@@ -30,7 +30,8 @@ test('published history is finite, sourced, ordered, and matches latest signal',
 
 test('homepage is data-first without fabricated audience totals', () => {
   const html = read('index.html');
-  for (const mode of ['ratio', 'btc', 'gold', 'score']) assert.match(html, new RegExp(`data-chart-mode="${mode}"`));
+  for (const mode of ['ratio', 'btc', 'gold', 'score', 'purchasingPower']) assert.match(html, new RegExp(`data-chart-mode="${mode}"`));
+  assert.match(html, /id="purchasing-power-note"[^>]+hidden/);
   assert.match(html, /assets\/btc_gold_history\.json/);
   assert.match(html, /id="ratio-change"/);
   assert.match(html, /id="subscribe"/);
@@ -49,6 +50,35 @@ test('homepage is data-first without fabricated audience totals', () => {
   assert.doesNotMatch(html, /1[\s ]247/);
   assert.doesNotMatch(html, /380\+|380 readers|380 читателей/i);
   assert.doesNotMatch(html, /id="research-support-title"/);
+});
+
+test('purchasing-power comparison indexes both assets to the same starting value', () => {
+  const chartPath = path.join(root, 'assets/js/market-chart.js');
+  delete require.cache[require.resolve(chartPath)];
+  require(chartPath);
+  const build = globalThis.BTC2GMarketChartMath.buildPurchasingPowerSeries;
+  const indexed = build([
+    {date: '2026-01-01', btc_usd: 100, gold_usd: 20},
+    {date: '2026-01-02', btc_usd: 125, gold_usd: 22},
+  ]);
+  assert.deepEqual(indexed[0], {date: '2026-01-01', btc_index: 100, gold_index: 100});
+  assert.equal(indexed[1].date, '2026-01-02');
+  assert.equal(indexed[1].btc_index, 125);
+  assert.ok(Math.abs(indexed[1].gold_index - 110) < 1e-10);
+});
+
+test('all localized homepages load the purchasing-power release assets', () => {
+  const languages = ['ru', 'he', 'de', 'fr', 'es', 'zh', 'it', 'pt', 'ar', 'hi', 'ja', 'ko', 'tr', 'pl', 'nl', 'uk', 'id', 'vi'];
+  for (const language of languages) {
+    const html = read(`${language}/index.html`);
+    assert.match(html, /assets\/css\/index\.css\?v=20261110-1/);
+    assert.match(html, /assets\/js\/home-v2-text\.js\?v=20261110-1/);
+    assert.match(html, /assets\/js\/market-chart\.js\?v=20261110-1/);
+  }
+  const languageSource = read('assets/js/home-v2-text.js');
+  assert.match(languageSource, /ensurePurchasingPowerElements/);
+  assert.match(languageSource, /purchasingPowerLabels/);
+  assert.match(languageSource, /purchasingPowerNotes/);
 });
 
 test('daily workflows publish chart history and Premium records explicit preferences', () => {

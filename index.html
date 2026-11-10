@@ -46,7 +46,7 @@
   
   
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/index.css?v=20261103-1" />
+  <link rel="stylesheet" href="assets/css/index.css?v=20261110-1" />
   <link rel="canonical" href="https://btc2g.com/" />
   <script type="application/ld+json">
     {
@@ -59,7 +59,7 @@
     }
   </script>
   <script src="/assets/js/static-language.js"></script>
-  <link rel="alternate" hreflang="en" href="https://btc2g.com/" />
+<link rel="manifest" href="/manifest.json"><link rel="apple-touch-icon" sizes="180x180" href="/home-screen/icon-180.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="BTC2G"><link rel="stylesheet" href="/home-screen/site-install.css?v=20261105-mobile2"><script src="/home-screen/site-install.js?v=20261105-mobile2" data-site-name="BTC2G" defer></script>  <link rel="alternate" hreflang="en" href="https://btc2g.com/" />
   <link rel="alternate" hreflang="ru" href="https://btc2g.com/ru/" />
   <link rel="alternate" hreflang="he" href="https://btc2g.com/he/" />
   <link rel="alternate" hreflang="de" href="https://btc2g.com/de/" />
@@ -79,7 +79,7 @@
   <link rel="alternate" hreflang="id" href="https://btc2g.com/id/" />
   <link rel="alternate" hreflang="vi" href="https://btc2g.com/vi/" />
   <link rel="alternate" hreflang="x-default" href="https://btc2g.com/" />
-<link rel="manifest" href="/manifest.json"><link rel="apple-touch-icon" sizes="180x180" href="/home-screen/icon-180.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="BTC2G"><link rel="stylesheet" href="/home-screen/site-install.css?v=20261105-mobile2"><script src="/home-screen/site-install.js?v=20261105-mobile2" data-site-name="BTC2G" defer></script></head>
+</head>
 <body>
   <div class="container">
     <header class="site-header">
@@ -153,6 +153,7 @@
           <button type="button" class="chart-mode" data-chart-mode="btc">BTC price</button>
           <button type="button" class="chart-mode" data-chart-mode="gold">Gold price</button>
           <button type="button" class="chart-mode" data-chart-mode="score">Model score</button>
+          <button type="button" class="chart-mode" data-chart-mode="purchasingPower">Purchasing power</button>
         </div>
       </div>
       <div class="interactive-chart-wrap">
@@ -160,6 +161,7 @@
         <p id="market-history-status" role="status">Loading published history…</p>
       </div>
       <p id="market-price-strip" class="market-price-strip">BTC and gold prices unavailable.</p>
+      <p id="purchasing-power-note" class="plain-explanation purchasing-power-note" hidden>BTC and gold are indexed to 100 on the first published date. This compares their change in USD value; it is not adjusted for consumer-price inflation.</p>
       <section id="regime-detector" class="regime-detector" aria-labelledby="regime-title" hidden>
         <div class="regime-heading">
           <div><p class="chart-kicker">HISTORICAL REGIME DETECTOR</p><h2 id="regime-title">BTC / Gold regimes</h2></div>
@@ -413,11 +415,11 @@
   <script src="assets/js/digest-preferences.js?v=20261030-5"></script>
   <script src="assets/js/subscription-copy.js?v=20261103-1"></script>
   <script src="assets/js/subscription-request.js?v=20261103-1"></script>
-  <script src="assets/js/home-v2-text.js?v=20261029-2"></script>
+  <script src="assets/js/home-v2-text.js?v=20261110-1"></script>
   <script src="assets/js/scenario-entry.js?v=20261030-1"></script>
   <script src="assets/js/regime-detector.js?v=20261030-1"></script>
   <script src="assets/js/multi-asset-dashboard.js?v=20261030-1"></script>
-  <script src="assets/js/market-chart.js?v=20261030-2"></script>
+  <script src="assets/js/market-chart.js?v=20261110-1"></script>
   <script src="assets/js/loading-promo.js?v=20261030-2"></script>
   <script>
     const CHART_PATH = 'assets/btc_gold_forecast.png';

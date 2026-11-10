@@ -1,5 +1,19 @@
 (function (root) {
   'use strict';
+
+  function buildPurchasingPowerSeries(rows) {
+    if (!Array.isArray(rows) || !rows.length) return [];
+    const first = rows.find(row => Number.isFinite(row?.btc_usd) && row.btc_usd > 0 && Number.isFinite(row?.gold_usd) && row.gold_usd > 0);
+    if (!first) return [];
+    return rows.filter(row => /^\d{4}-\d{2}-\d{2}$/.test(row?.date) && Number.isFinite(row.btc_usd) && row.btc_usd > 0 && Number.isFinite(row.gold_usd) && row.gold_usd > 0)
+      .map(row => ({
+        date: row.date,
+        btc_index: row.btc_usd / first.btc_usd * 100,
+        gold_index: row.gold_usd / first.gold_usd * 100,
+      }));
+  }
+
+  root.BTC2GMarketChartMath = { buildPurchasingPowerSeries };
   if (!root.document) return;
 
   const HISTORY_PATH = 'assets/btc_gold_history.json';
@@ -9,6 +23,7 @@
     btc: { key: 'btc_usd', color: '#f7931a', label: 'Bitcoin price', unit: ' USD' },
     gold: { key: 'gold_usd', color: '#d4af37', label: 'Gold futures proxy', unit: ' USD/oz' },
     score: { key: 'model_score', color: '#10b981', label: 'Model score', unit: '/100' },
+    purchasingPower: { label: 'Purchasing-power index', unit: ' index' },
   };
   let series = [];
   let mode = 'ratio';
@@ -26,6 +41,7 @@
     if (!Number.isFinite(value)) return '—';
     if (selectedMode === 'ratio') return `${value.toFixed(2)} oz t`;
     if (selectedMode === 'score') return `${Math.round(value)}/100`;
+    if (selectedMode === 'purchasingPower') return `${value.toFixed(1)}`;
     return new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: selectedMode === 'btc' ? 0 : 2 }).format(value);
   }
 
@@ -43,15 +59,22 @@
     ctx.clearRect(0, 0, width, height);
 
     const config = modes[mode];
-    const points = series.map(row => ({ date: row.date, value: row[config.key] })).filter(point => Number.isFinite(point.value));
-    if (points.length < 2) return;
-    const values = points.map(point => point.value);
+    const indexed = mode === 'purchasingPower' ? buildPurchasingPowerSeries(series) : [];
+    const plotSeries = mode === 'purchasingPower'
+      ? [
+          { label: 'BTC', color: '#f7931a', points: indexed.map(row => ({ date: row.date, value: row.btc_index })) },
+          { label: 'Gold', color: '#d4af37', points: indexed.map(row => ({ date: row.date, value: row.gold_index })) },
+        ]
+      : [{ label: config.label, color: config.color, points: series.map(row => ({ date: row.date, value: row[config.key] })).filter(point => Number.isFinite(point.value)) }];
+    const points = plotSeries[0]?.points || [];
+    if (points.length < 2 || plotSeries.some(item => item.points.length !== points.length)) return;
+    const values = plotSeries.flatMap(item => item.points.map(point => point.value));
     let min = Math.min(...values);
     let max = Math.max(...values);
     const padding = Math.max((max - min) * 0.1, max * 0.01, 1);
     min -= padding;
     max += padding;
-    const left = 66, right = 20, top = 32, bottom = 44;
+    const left = 66, right = 20, top = mode === 'purchasingPower' ? 52 : 32, bottom = 44;
     const plotWidth = width - left - right;
     const plotHeight = height - top - bottom;
     const x = index => left + index / (points.length - 1) * plotWidth;
@@ -89,21 +112,24 @@
     ctx.textAlign = 'right';
     ctx.fillText(points[points.length - 1].date, width - right, height - 14);
 
-    const gradient = ctx.createLinearGradient(0, top, 0, height - bottom);
-    gradient.addColorStop(0, `${config.color}55`);
-    gradient.addColorStop(1, `${config.color}00`);
-    ctx.beginPath();
-    points.forEach((point, index) => index ? ctx.lineTo(x(index), y(point.value)) : ctx.moveTo(x(index), y(point.value)));
-    ctx.lineTo(x(points.length - 1), height - bottom); ctx.lineTo(left, height - bottom); ctx.closePath();
-    ctx.fillStyle = gradient; ctx.fill();
-    ctx.beginPath();
-    points.forEach((point, index) => index ? ctx.lineTo(x(index), y(point.value)) : ctx.moveTo(x(index), y(point.value)));
-    ctx.strokeStyle = config.color; ctx.lineWidth = 2.5; ctx.stroke();
-
-    const last = points[points.length - 1];
-    ctx.beginPath(); ctx.arc(x(points.length - 1), y(last.value), 4, 0, Math.PI * 2); ctx.fillStyle = config.color; ctx.fill();
-    ctx.fillStyle = '#f8fafc'; ctx.font = '600 13px Inter, system-ui, sans-serif'; ctx.textAlign = 'left';
-    ctx.fillText(`${config.label}: ${formatValue(last.value)}`, left, 18);
+    plotSeries.forEach((item, seriesIndex) => {
+      if (plotSeries.length === 1) {
+        const gradient = ctx.createLinearGradient(0, top, 0, height - bottom);
+        gradient.addColorStop(0, `${item.color}55`);
+        gradient.addColorStop(1, `${item.color}00`);
+        ctx.beginPath();
+        item.points.forEach((point, index) => index ? ctx.lineTo(x(index), y(point.value)) : ctx.moveTo(x(index), y(point.value)));
+        ctx.lineTo(x(item.points.length - 1), height - bottom); ctx.lineTo(left, height - bottom); ctx.closePath();
+        ctx.fillStyle = gradient; ctx.fill();
+      }
+      ctx.beginPath();
+      item.points.forEach((point, index) => index ? ctx.lineTo(x(index), y(point.value)) : ctx.moveTo(x(index), y(point.value)));
+      ctx.strokeStyle = item.color; ctx.lineWidth = 2.5; ctx.stroke();
+      const last = item.points[item.points.length - 1];
+      ctx.beginPath(); ctx.arc(x(item.points.length - 1), y(last.value), 4, 0, Math.PI * 2); ctx.fillStyle = item.color; ctx.fill();
+      ctx.fillStyle = item.color; ctx.font = '600 13px Inter, system-ui, sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText(`${item.label}: ${formatValue(last.value)}`, left, 18 + seriesIndex * 20);
+    });
   }
 
   function setMode(nextMode) {
@@ -114,6 +140,8 @@
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+    const note = document.getElementById('purchasing-power-note');
+    if (note) note.hidden = mode !== 'purchasingPower';
     draw();
   }
 
@@ -148,6 +176,6 @@
 
   document.querySelectorAll('[data-chart-mode]').forEach(button => button.addEventListener('click', () => setMode(button.dataset.chartMode)));
   root.addEventListener('resize', draw);
-  root.BTC2GMarketChart = { load, setMode, validHistory };
+  root.BTC2GMarketChart = { load, setMode, validHistory, buildPurchasingPowerSeries };
   load();
 })(typeof window !== 'undefined' ? window : globalThis);
