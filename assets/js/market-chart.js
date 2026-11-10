@@ -24,7 +24,16 @@
     }
   }
 
-  root.BTC2GMarketChartMath = { buildPurchasingPowerSeries, chartModeFromSearch };
+  function chartSearchWithMode(search, nextMode) {
+    if (!supportedChartModes.has(nextMode)) return search || '';
+    const params = new URLSearchParams(search || '');
+    if (nextMode === 'ratio') params.delete('chart');
+    else params.set('chart', nextMode);
+    const query = params.toString();
+    return query ? `?${query}` : '';
+  }
+
+  root.BTC2GMarketChartMath = { buildPurchasingPowerSeries, chartModeFromSearch, chartSearchWithMode };
   if (!root.document) return;
 
   const HISTORY_PATH = 'assets/btc_gold_history.json';
@@ -143,7 +152,7 @@
     });
   }
 
-  function setMode(nextMode) {
+  function setMode(nextMode, syncUrl = false) {
     if (!modes[nextMode]) return;
     mode = nextMode;
     document.querySelectorAll('[data-chart-mode]').forEach(button => {
@@ -153,6 +162,10 @@
     });
     const note = document.getElementById('purchasing-power-note');
     if (note) note.hidden = mode !== 'purchasingPower';
+    if (syncUrl && root.history?.replaceState && root.location) {
+      const nextSearch = chartSearchWithMode(root.location.search, mode);
+      root.history.replaceState(root.history.state, '', `${root.location.pathname}${nextSearch}${root.location.hash}`);
+    }
     draw();
   }
 
@@ -185,9 +198,9 @@
     }
   }
 
-  document.querySelectorAll('[data-chart-mode]').forEach(button => button.addEventListener('click', () => setMode(button.dataset.chartMode)));
+  document.querySelectorAll('[data-chart-mode]').forEach(button => button.addEventListener('click', () => setMode(button.dataset.chartMode, true)));
   root.addEventListener('resize', draw);
-  root.BTC2GMarketChart = { load, setMode, validHistory, buildPurchasingPowerSeries, chartModeFromSearch };
+  root.BTC2GMarketChart = { load, setMode, validHistory, buildPurchasingPowerSeries, chartModeFromSearch, chartSearchWithMode };
   setMode(mode);
   load();
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -78,13 +78,24 @@ test('chart deep links select only supported dashboard modes', () => {
   assert.equal(select('not a query'), 'ratio');
 });
 
+test('chart selection builds a shareable URL without dropping campaign parameters', () => {
+  const chartPath = path.join(root, 'assets/js/market-chart.js');
+  delete require.cache[require.resolve(chartPath)];
+  require(chartPath);
+  const update = globalThis.BTC2GMarketChartMath.chartSearchWithMode;
+  assert.equal(update('?utm_source=telegram', 'purchasingPower'), '?utm_source=telegram&chart=purchasingPower');
+  assert.equal(update('?chart=gold&utm_source=reddit', 'btc'), '?chart=btc&utm_source=reddit');
+  assert.equal(update('?chart=gold&utm_source=reddit', 'ratio'), '?utm_source=reddit');
+  assert.equal(update('?chart=gold', 'unknown'), '?chart=gold');
+});
+
 test('all localized homepages load the purchasing-power release assets', () => {
   const languages = ['ru', 'he', 'de', 'fr', 'es', 'zh', 'it', 'pt', 'ar', 'hi', 'ja', 'ko', 'tr', 'pl', 'nl', 'uk', 'id', 'vi'];
   for (const language of languages) {
     const html = read(`${language}/index.html`);
     assert.match(html, /assets\/css\/index\.css\?v=20261110-1/);
     assert.match(html, /assets\/js\/home-v2-text\.js\?v=20261110-1/);
-    assert.match(html, /assets\/js\/market-chart\.js\?v=20261110-2/);
+    assert.match(html, /assets\/js\/market-chart\.js\?v=20261110-3/);
   }
   const languageSource = read('assets/js/home-v2-text.js');
   assert.match(languageSource, /ensurePurchasingPowerElements/);
