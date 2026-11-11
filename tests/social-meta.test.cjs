@@ -54,6 +54,20 @@ test('TimeT research hub publishes a complete preview using its existing illustr
   assert.match(html, /name="twitter:image:alt" content="TimeT illustration of discrete temporal transitions"/);
 });
 
+test('Buy page preview identifies external providers without implying payment processing', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'buy.html'), 'utf8');
+  assert.match(html, /<title>Buy Bitcoin Provider Links \| BTC2G<\/title>/);
+  assert.match(html, /name="description" content="[^"]*official MoonPay and Topper[^"]*BTC2G does not process payments/);
+  assert.match(html, /property="og:title" content="Buy Bitcoin Provider Links \| BTC2G"/);
+  assert.match(html, /property="og:url" content="https:\/\/btc2g\.com\/buy\.html"/);
+  assert.match(html, /property="og:image" content="https:\/\/btc2g\.com\/icons\/icon-512\.png"/);
+  assert.match(html, /property="og:image:width" content="512"/);
+  assert.match(html, /property="og:image:height" content="496"/);
+  assert.match(html, /name="twitter:card" content="summary"/);
+  assert.match(html, /name="twitter:description" content="[^"]*BTC2G does not process payments/);
+  assert.doesNotMatch(html, /guaranteed return|guaranteed profit|best rate/i);
+});
+
 test('scenario simulator publishes localized large-image social previews', () => {
   const root = path.join(__dirname, '..');
   for (const lang of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
