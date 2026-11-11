@@ -81,6 +81,20 @@ test('About page preview keeps its educational and non-advisory context', () => 
   assert.match(html, /name="twitter:description" content="[^"]*Not financial advice/);
 });
 
+test('SAVE preview keeps the manual, private comparison boundaries', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'save.html'), 'utf8');
+  assert.match(html, /name="robots" content="index,follow,max-image-preview:large"/);
+  assert.match(html, /property="og:title" content="Compare Bitcoin purchase quotes \| BTC2G SAVE"/);
+  assert.match(html, /property="og:description" content="[^"]*private, manual comparison[^"]*No assumed fees[^"]*BTC2G does not process purchases/);
+  assert.match(html, /property="og:url" content="https:\/\/btc2g\.com\/save\.html"/);
+  assert.match(html, /property="og:image" content="https:\/\/btc2g\.com\/assets\/btc_gold_forecast\.png"/);
+  assert.match(html, /property="og:image:width" content="2800"/);
+  assert.match(html, /property="og:image:height" content="1400"/);
+  assert.match(html, /name="twitter:card" content="summary_large_image"/);
+  assert.match(html, /name="twitter:description" content="[^"]*no purchases processed by BTC2G/);
+  assert.match(html, /Quotes are not saved or sent to BTC2G/);
+});
+
 test('scenario simulator publishes localized large-image social previews', () => {
   const root = path.join(__dirname, '..');
   for (const lang of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
