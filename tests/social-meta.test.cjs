@@ -88,6 +88,7 @@ test('research articles publish complete large-image social previews', () => {
   const root = path.join(__dirname, '..');
   for (const file of ['bitcoin-vs-gold.html', 'bitcoin-gold-ratio.html', 'bitcoin-vs-gold-forecast-2026.html']) {
     const html = fs.readFileSync(path.join(root, file), 'utf8');
+    assert.match(html, /<meta name="robots" content="index,follow,max-image-preview:large"\s*\/>/);
     assert.match(html, /<meta property="og:type" content="article"\s*\/>/);
     assert.match(html, /<meta property="og:site_name" content="BTC2G"\s*\/>/);
     assert.match(html, /<meta property="og:title" content="[^"]+"\s*\/>/);
