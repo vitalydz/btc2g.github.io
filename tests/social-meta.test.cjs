@@ -110,9 +110,13 @@ test('research articles keep canonical, Open Graph and structured-data URLs alig
   const root = path.join(__dirname, '..');
   for (const file of ['bitcoin-vs-gold.html', 'bitcoin-gold-ratio.html', 'bitcoin-vs-gold-forecast-2026.html']) {
     const html = fs.readFileSync(path.join(root, file), 'utf8');
-    const canonical = html.match(/<link rel="canonical" href="([^"]+)"\s*\/>/)?.[1];
+    const head = html.match(/<head>([\s\S]*?)<\/head>/)?.[1];
+    const canonicals = [...html.matchAll(/<link rel="canonical" href="([^"]+)"\s*\/>/g)];
+    const canonical = canonicals[0]?.[1];
     const openGraphUrl = html.match(/<meta property="og:url" content="([^"]+)"\s*\/>/)?.[1];
     const script = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+    assert.equal(canonicals.length, 1, file);
+    assert.ok(head.includes(canonicals[0][0]), file);
     assert.ok(canonical, file);
     assert.equal(openGraphUrl, canonical, file);
     assert.equal(JSON.parse(script).mainEntityOfPage, canonical, file);
