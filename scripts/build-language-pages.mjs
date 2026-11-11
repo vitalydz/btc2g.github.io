@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const languages = ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi'];
+export const openGraphLocales = ['en_US','ru_RU','he_IL','de_DE','fr_FR','es_ES','zh_CN','it_IT','pt_PT','ar_SA','hi_IN','ja_JP','ko_KR','tr_TR','pl_PL','nl_NL','uk_UA','id_ID','vi_VN'];
 export const pages = ['index.html','save.html','scenario.html','premium.html'];
 const origin = 'https://btc2g.com';
 export const pageURL = (page, lang) => lang === 'en' ? `${origin}/${page === 'index.html' ? '' : page}` : `${origin}/${lang}/${page === 'index.html' ? '' : page}`;
@@ -66,6 +67,7 @@ export async function render(page, lang) {
   for(const meta of document.querySelectorAll('meta[name="description"],meta[property="og:description"],meta[name="twitter:description"]')) meta.content=description;
   for(const meta of document.querySelectorAll('meta[property="og:title"],meta[name="twitter:title"]')) meta.content=document.title;
   for(const meta of document.querySelectorAll('meta[property="og:url"]')) meta.content=pageURL(page,lang);
+  for(const meta of document.querySelectorAll('meta[property="og:locale"]')) meta.content=openGraphLocales[languages.indexOf(lang)];
   const structuredData=document.querySelector('script[type="application/ld+json"]');
   if(structuredData) {
     const data=JSON.parse(structuredData.textContent);

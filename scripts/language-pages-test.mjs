@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
 import {parseHTML} from 'linkedom';
-import {root,languages,pages,pageURL,render} from './build-language-pages.mjs';
+import {root,languages,openGraphLocales,pages,pageURL,render} from './build-language-pages.mjs';
 
 test('published language HTML has real translated headings, reciprocal alternates and correct asset roots',()=>{
   for(const page of pages) {
@@ -15,6 +15,8 @@ test('published language HTML has real translated headings, reciprocal alternate
       assert.equal(d.documentElement.dir,['he','ar'].includes(lang)?'rtl':'ltr');
       assert.notEqual(d.querySelector('h1').textContent.trim(),english,`${lang}/${page} must contain a translated heading without running JS`);
       assert.equal(d.querySelector('link[rel="canonical"]').href,pageURL(page,lang));
+      const openGraphLocale=d.querySelector('meta[property="og:locale"]');
+      if(openGraphLocale) assert.equal(openGraphLocale.content,openGraphLocales[languages.indexOf(lang)],`${lang}/${page} must declare its own Open Graph locale`);
       assert.equal(d.querySelector('base').getAttribute('href'),'https://btc2g.com/');
       const alternates=[...d.querySelectorAll('link[hreflang]')];
       assert.equal(alternates.length,20);
