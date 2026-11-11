@@ -106,6 +106,20 @@ test('research articles publish complete large-image social previews', () => {
   }
 });
 
+test('Premium publishes complete large-image previews in all 19 languages', () => {
+  const root = path.join(__dirname, '..');
+  const languages = ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi'];
+  for (const language of languages) {
+    const file = language === 'en' ? 'premium.html' : path.join(language, 'premium.html');
+    const html = fs.readFileSync(path.join(root, file), 'utf8');
+    assert.match(html, /<meta property="og:image:type" content="image\/png"\s*\/?>/);
+    assert.match(html, /<meta property="og:image:width" content="2800"\s*\/?>/);
+    assert.match(html, /<meta property="og:image:height" content="1400"\s*\/?>/);
+    assert.match(html, /<meta property="og:image:alt" content="BTC2G Bitcoin-to-gold research dashboard"\s*\/?>/);
+    assert.match(html, /<meta name="twitter:image:alt" content="BTC2G Bitcoin-to-gold research dashboard"\s*\/?>/);
+  }
+});
+
 test('research articles publish valid Article structured data without invented dates', () => {
   const root = path.join(__dirname, '..');
   for (const file of ['bitcoin-vs-gold.html', 'bitcoin-gold-ratio.html', 'bitcoin-vs-gold-forecast-2026.html']) {
