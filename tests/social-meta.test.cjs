@@ -94,10 +94,15 @@ test('research articles publish complete large-image social previews', () => {
     assert.match(html, /<meta property="og:description" content="[^"]+"\s*\/>/);
     assert.match(html, /<meta property="og:url" content="https:\/\/btc2g\.com\/[^"]+"\s*\/>/);
     assert.match(html, /<meta property="og:image" content="https:\/\/btc2g\.com\/assets\/btc_gold_forecast\.png"\s*\/>/);
+    assert.match(html, /<meta property="og:image:type" content="image\/png"\s*\/>/);
+    assert.match(html, /<meta property="og:image:width" content="2800"\s*\/>/);
+    assert.match(html, /<meta property="og:image:height" content="1400"\s*\/>/);
+    assert.match(html, /<meta property="og:image:alt" content="BTC2G Bitcoin-to-gold research chart"\s*\/>/);
     assert.match(html, /<meta name="twitter:card" content="summary_large_image"\s*\/>/);
     assert.match(html, /<meta name="twitter:title" content="[^"]+"\s*\/>/);
     assert.match(html, /<meta name="twitter:description" content="[^"]+"\s*\/>/);
     assert.match(html, /<meta name="twitter:image" content="https:\/\/btc2g\.com\/assets\/btc_gold_forecast\.png"\s*\/>/);
+    assert.match(html, /<meta name="twitter:image:alt" content="BTC2G Bitcoin-to-gold research chart"\s*\/>/);
   }
 });
 
