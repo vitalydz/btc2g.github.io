@@ -108,6 +108,20 @@ test('Support preview names its account, privacy and security scope', () => {
   assert.match(html, /name="twitter:description" content="[^"]*privacy[^"]*security/);
 });
 
+test('Contest preview is complete and keeps the in-preparation status explicit', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'contest.html'), 'utf8');
+  assert.match(html, /name="robots" content="index,follow,max-image-preview:large"/);
+  assert.match(html, /property="og:title" content="Help shape BTC2G"/);
+  assert.match(html, /property="og:description" content="[^"]*contest in preparation[^"]*launch awaits reviewed rules and prize terms/);
+  assert.match(html, /property="og:image" content="https:\/\/btc2g\.com\/assets\/images\/contest-preview\.jpg"/);
+  assert.match(html, /property="og:image:type" content="image\/jpeg"/);
+  assert.match(html, /property="og:image:width" content="1200"/);
+  assert.match(html, /property="og:image:height" content="630"/);
+  assert.match(html, /property="og:image:alt" content="BTC2G community ideas contest preview"/);
+  assert.match(html, /name="twitter:description" content="[^"]*submissions and voting are not open/);
+  assert.match(html, /name="twitter:image:alt" content="BTC2G community ideas contest preview"/);
+});
+
 test('scenario simulator publishes localized large-image social previews', () => {
   const root = path.join(__dirname, '..');
   for (const lang of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
