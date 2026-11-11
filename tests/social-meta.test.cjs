@@ -91,6 +91,7 @@ test('research articles publish complete large-image social previews', () => {
     assert.match(html, /<meta name="robots" content="index,follow,max-image-preview:large"\s*\/>/);
     assert.match(html, /<meta property="og:type" content="article"\s*\/>/);
     assert.match(html, /<meta property="og:site_name" content="BTC2G"\s*\/>/);
+    assert.match(html, /<meta property="og:locale" content="en_US"\s*\/>/);
     assert.match(html, /<meta property="og:title" content="[^"]+"\s*\/>/);
     assert.match(html, /<meta property="og:description" content="[^"]+"\s*\/>/);
     assert.match(html, /<meta property="og:url" content="https:\/\/btc2g\.com\/[^"]+"\s*\/>/);
