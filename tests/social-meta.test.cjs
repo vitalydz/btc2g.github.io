@@ -218,10 +218,13 @@ test('research articles keep canonical, Open Graph and structured-data URLs alig
 test('Premium publishes complete large-image previews in all 19 languages', () => {
   const root = path.join(__dirname, '..');
   const languages = ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi'];
-  for (const language of languages) {
+  const locales = ['en_US','ru_RU','he_IL','de_DE','fr_FR','es_ES','zh_CN','it_IT','pt_PT','ar_SA','hi_IN','ja_JP','ko_KR','tr_TR','pl_PL','nl_NL','uk_UA','id_ID','vi_VN'];
+  for (const [index, language] of languages.entries()) {
     const file = language === 'en' ? 'premium.html' : path.join(language, 'premium.html');
     const html = fs.readFileSync(path.join(root, file), 'utf8');
     assert.match(html, /<meta name="robots" content="index,follow,max-image-preview:large"\s*\/>/);
+    assert.match(html, /<meta property="og:site_name" content="BTC2G"\s*\/?>/);
+    assert.ok(html.includes(`<meta property="og:locale" content="${locales[index]}"`), language);
     assert.match(html, /<meta property="og:image:type" content="image\/png"\s*\/?>/);
     assert.match(html, /<meta property="og:image:width" content="2800"\s*\/?>/);
     assert.match(html, /<meta property="og:image:height" content="1400"\s*\/?>/);
