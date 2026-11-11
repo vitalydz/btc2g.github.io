@@ -106,6 +106,19 @@ test('research articles publish complete large-image social previews', () => {
   }
 });
 
+test('research articles keep canonical, Open Graph and structured-data URLs aligned', () => {
+  const root = path.join(__dirname, '..');
+  for (const file of ['bitcoin-vs-gold.html', 'bitcoin-gold-ratio.html', 'bitcoin-vs-gold-forecast-2026.html']) {
+    const html = fs.readFileSync(path.join(root, file), 'utf8');
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"\s*\/>/)?.[1];
+    const openGraphUrl = html.match(/<meta property="og:url" content="([^"]+)"\s*\/>/)?.[1];
+    const script = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+    assert.ok(canonical, file);
+    assert.equal(openGraphUrl, canonical, file);
+    assert.equal(JSON.parse(script).mainEntityOfPage, canonical, file);
+  }
+});
+
 test('Premium publishes complete large-image previews in all 19 languages', () => {
   const root = path.join(__dirname, '..');
   const languages = ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi'];
