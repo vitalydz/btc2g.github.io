@@ -65,6 +65,8 @@ test('language switch uses a crawlable path and internal navigation preserves la
   assert.equal(stopped,true);assert.equal(calls.pop(),'/ar/?chart=purchasingPower&utm_source=telegram#forecast');
   listeners.get('click')({target:{closest:()=>({href:'https://btc2g.com/scenario.html?lang=he&btc=10&gold=-5&target=20&utm_source=telegram&secret=drop',target:''})},preventDefault(){}});
   assert.equal(calls.pop(),'/he/scenario.html?btc=10&gold=-5&target=20&utm_source=telegram');
+  listeners.get('click')({target:{closest:()=>({href:'https://btc2g.com/he/#calculator',target:''})},preventDefault(){}});
+  assert.equal(calls.pop(),'/he/?chart=purchasingPower&utm_source=telegram#calculator');
 });
 
 test('localized homepage build releases its mocked market refresh lock',async()=>{

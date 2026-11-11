@@ -31,9 +31,13 @@
     const a=event.target.closest?.('a[href]');if(!a || event.ctrlKey || event.metaKey || a.target==='_blank')return;
     const url=new URL(a.href,location.href);
     if(url.origin!==location.origin)return;
-    const file=url.pathname.slice(1)||'index.html';
+    const pathParts=url.pathname.split('/').filter(Boolean);
+    const targetLanguage=languages.includes(pathParts[0])?pathParts[0]:null;
+    const file=(targetLanguage?pathParts[1]:pathParts[0])||'index.html';
     if(!pages.includes(file))return;
     if(!language)return;
-    event.preventDefault();location.assign(target(language,file)+preservedSearch(file,url.search)+url.hash);
+    if(targetLanguage && targetLanguage!==language)return;
+    const search=url.search||(file===page?location.search:'');
+    event.preventDefault();location.assign(target(language,file)+preservedSearch(file,search)+url.hash);
   });
 })();
