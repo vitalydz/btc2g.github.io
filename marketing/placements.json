@@ -1,6 +1,6 @@
 {
   "site":"https://btc2g.com",
-  "checked":"2026-11-05",
+  "checked":"2026-11-11",
   "growth_target":{
     "confirmed_production_accounts":100,
     "counting_rule":"Only email-verified ordinary account rows reported by the production Cloudflare D1 statistics endpoint. Exclude administrators, tests, page views, clicks, unverified registrations and newsletter-only subscribers.",
@@ -54,7 +54,7 @@
     "published_url":"https://www.producthunt.com/products/btc2g",
     "published_at":"2026-11-03T00:01:00-08:00",
     "title":"BTC2G: Bitcoin vs Gold Forecast",
-    "verification":"Authenticated Product Hunt showed launchState=live for post 1297456 and the public product page displayed BTC2G, the btc2g.com website link, maker Vitaly, one public maker comment, 1 point and 2 followers. The launch dashboard displayed position #554. These are Product Hunt display metrics, not verified site visits, registrations or conversions. No listing fields or public interactions were changed during verification."
+    "verification":"Authenticated Product Hunt showed launchState=live for post 1297456 and the public product page displayed BTC2G, the btc2g.com website link, maker Vitaly, one public maker comment, 1 point and 2 followers. The launch dashboard displayed position #554. Reverified on 2026-11-11 in a signed-out public session: the direct product URL remained live with the same point and follower counts, while Product Hunt product and launch searches returned no BTC2G result. These are Product Hunt display metrics, not verified site visits, registrations or conversions. No listing fields or public interactions were changed during verification."
   }],
   "scope":"Verified published placements: one Reddit product-feedback post, one Telegram tools overview and the live Product Hunt listing. Other platforms remain drafts.",
   "candidates":[
