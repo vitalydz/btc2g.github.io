@@ -68,6 +68,19 @@ test('Buy page preview identifies external providers without implying payment pr
   assert.doesNotMatch(html, /guaranteed return|guaranteed profit|best rate/i);
 });
 
+test('About page preview keeps its educational and non-advisory context', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'about.html'), 'utf8');
+  assert.match(html, /name="robots" content="index,follow,max-image-preview:large"/);
+  assert.match(html, /property="og:title" content="About BTC2G"/);
+  assert.match(html, /property="og:description" content="[^"]*Educational Bitcoin and gold charts[^"]*Not financial advice/);
+  assert.match(html, /property="og:url" content="https:\/\/btc2g\.com\/about\.html"/);
+  assert.match(html, /property="og:image" content="https:\/\/btc2g\.com\/assets\/btc_gold_forecast\.png"/);
+  assert.match(html, /property="og:image:width" content="2800"/);
+  assert.match(html, /property="og:image:height" content="1400"/);
+  assert.match(html, /name="twitter:card" content="summary_large_image"/);
+  assert.match(html, /name="twitter:description" content="[^"]*Not financial advice/);
+});
+
 test('scenario simulator publishes localized large-image social previews', () => {
   const root = path.join(__dirname, '..');
   for (const lang of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
