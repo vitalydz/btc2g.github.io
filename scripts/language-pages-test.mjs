@@ -58,13 +58,13 @@ test('language generation rejects unsupported routes and preserves model/privacy
 
 test('language switch uses a crawlable path and internal navigation preserves language',()=>{
   const listeners=new Map();const calls=[];
-  const context=vm.createContext({URL,URLSearchParams,location:{pathname:'/he/',search:'',hash:'#forecast',origin:'https://btc2g.com',href:'https://btc2g.com/he/',assign:url=>calls.push(url),replace:url=>calls.push(url)},localStorage:{setItem(){}},document:{addEventListener:(type,fn)=>listeners.set(type,fn)}});
+  const context=vm.createContext({URL,URLSearchParams,location:{pathname:'/he/',search:'?chart=purchasingPower&utm_source=telegram&secret=drop',hash:'#forecast',origin:'https://btc2g.com',href:'https://btc2g.com/he/?chart=purchasingPower&utm_source=telegram&secret=drop#forecast',assign:url=>calls.push(url),replace:url=>calls.push(url)},localStorage:{setItem(){}},document:{addEventListener:(type,fn)=>listeners.set(type,fn)}});
   vm.runInContext(fs.readFileSync(path.join(root,'assets/js/static-language.js'),'utf8'),context);
   let stopped=false;
   listeners.get('change')({target:{id:'language-select',value:'ar'},stopImmediatePropagation(){stopped=true;}});
-  assert.equal(stopped,true);assert.equal(calls.pop(),'/ar/#forecast');
-  listeners.get('click')({target:{closest:()=>({href:'https://btc2g.com/scenario.html?lang=he',target:''})},preventDefault(){}});
-  assert.equal(calls.pop(),'/he/scenario.html');
+  assert.equal(stopped,true);assert.equal(calls.pop(),'/ar/?chart=purchasingPower&utm_source=telegram#forecast');
+  listeners.get('click')({target:{closest:()=>({href:'https://btc2g.com/scenario.html?lang=he&btc=10&gold=-5&target=20&utm_source=telegram&secret=drop',target:''})},preventDefault(){}});
+  assert.equal(calls.pop(),'/he/scenario.html?btc=10&gold=-5&target=20&utm_source=telegram');
 });
 
 test('localized homepage build releases its mocked market refresh lock',async()=>{
