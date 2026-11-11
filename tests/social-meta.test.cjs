@@ -198,6 +198,7 @@ test('Premium publishes complete large-image previews in all 19 languages', () =
   for (const language of languages) {
     const file = language === 'en' ? 'premium.html' : path.join(language, 'premium.html');
     const html = fs.readFileSync(path.join(root, file), 'utf8');
+    assert.match(html, /<meta name="robots" content="index,follow,max-image-preview:large"\s*\/>/);
     assert.match(html, /<meta property="og:image:type" content="image\/png"\s*\/?>/);
     assert.match(html, /<meta property="og:image:width" content="2800"\s*\/?>/);
     assert.match(html, /<meta property="og:image:height" content="1400"\s*\/?>/);
