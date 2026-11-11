@@ -34,7 +34,12 @@ test('published language HTML has real translated headings, reciprocal alternate
         assert.equal(JSON.parse(d.querySelector('script[type="application/ld+json"]').textContent).description,expected);
       }
       if(page==='save.html') {
-        assert.equal(d.querySelector('meta[name="description"]').content,d.querySelector('.save-shell > .intro').textContent.trim());
+        const expected=d.querySelector('.save-shell > .intro').textContent.trim();
+        assert.equal(d.querySelector('meta[name="description"]').content,expected);
+        assert.equal(d.querySelector('meta[property="og:description"]').content,expected);
+        assert.equal(d.querySelector('meta[name="twitter:description"]').content,expected);
+        assert.equal(d.querySelector('meta[property="og:url"]').content,pageURL(page,lang));
+        assert.equal(d.querySelector('meta[property="og:site_name"]').content,'BTC2G');
       }
       if(page==='scenario.html') {
         const expected=`${d.querySelector('#scenario-intro').textContent.trim()} ${d.querySelector('#disclaimer-title').textContent.trim()}`;

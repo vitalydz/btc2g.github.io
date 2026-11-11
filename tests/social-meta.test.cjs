@@ -95,12 +95,17 @@ test('SAVE preview keeps the manual, private comparison boundaries', () => {
   assert.match(html, /Quotes are not saved or sent to BTC2G/);
 });
 
-test('all 19 SAVE language pages allow large search-result previews', () => {
+test('all 19 SAVE language pages publish complete large-image previews', () => {
   const root = path.join(__dirname, '..');
   for (const language of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
     const file = language === 'en' ? 'save.html' : path.join(language, 'save.html');
     const html = fs.readFileSync(path.join(root, file), 'utf8');
     assert.match(html, /<meta name="robots" content="index,follow,max-image-preview:large"\s*\/?>/, language);
+    assert.match(html, /<meta property="og:site_name" content="BTC2G"\s*\/?>/, language);
+    assert.match(html, /<meta property="og:image" content="https:\/\/btc2g\.com\/assets\/btc_gold_forecast\.png"\s*\/?>/, language);
+    assert.match(html, /<meta property="og:image:width" content="2800"\s*\/?>/, language);
+    assert.match(html, /<meta property="og:image:height" content="1400"\s*\/?>/, language);
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image"\s*\/?>/, language);
   }
 });
 
