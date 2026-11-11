@@ -95,6 +95,15 @@ test('SAVE preview keeps the manual, private comparison boundaries', () => {
   assert.match(html, /Quotes are not saved or sent to BTC2G/);
 });
 
+test('all 19 SAVE language pages allow large search-result previews', () => {
+  const root = path.join(__dirname, '..');
+  for (const language of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
+    const file = language === 'en' ? 'save.html' : path.join(language, 'save.html');
+    const html = fs.readFileSync(path.join(root, file), 'utf8');
+    assert.match(html, /<meta name="robots" content="index,follow,max-image-preview:large"\s*\/?>/, language);
+  }
+});
+
 test('Support preview names its account, privacy and security scope', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'support.html'), 'utf8');
   assert.match(html, /name="robots" content="index,follow,max-image-preview:large"/);
