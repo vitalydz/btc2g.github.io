@@ -41,6 +41,19 @@ test('homepage allows large search-result image previews', () => {
   assert.match(homepage, /name="robots" content="index,follow,max-image-preview:large"/);
 });
 
+test('TimeT research hub publishes a complete preview using its existing illustration', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'research.html'), 'utf8');
+  assert.match(html, /name="robots" content="index,follow,max-image-preview:large"/);
+  assert.match(html, /property="og:title" content="TimeT Independent Research · BTC2G"/);
+  assert.match(html, /property="og:url" content="https:\/\/btc2g\.com\/research\.html"/);
+  assert.match(html, /property="og:image" content="https:\/\/btc2g\.com\/assets\/images\/timet-document-2-figure-no-logo\.png"/);
+  assert.match(html, /property="og:image:width" content="1055"/);
+  assert.match(html, /property="og:image:height" content="1491"/);
+  assert.match(html, /property="og:image:alt" content="TimeT illustration of discrete temporal transitions"/);
+  assert.match(html, /name="twitter:card" content="summary_large_image"/);
+  assert.match(html, /name="twitter:image:alt" content="TimeT illustration of discrete temporal transitions"/);
+});
+
 test('scenario simulator publishes localized large-image social previews', () => {
   const root = path.join(__dirname, '..');
   for (const lang of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
