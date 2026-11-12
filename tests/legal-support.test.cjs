@@ -9,6 +9,7 @@ const read = file => readFileSync(path.join(root, file), 'utf8');
 test('Terms describe current accounts, passkeys, providers, forecasts, and support boundaries', () => {
   const terms = read('terms.html');
   assert.match(terms, /Version 2026-10-29\.3/);
+  assert.match(terms, /<meta name="description" content="[^"]*educational research tools[^"]*service limitations\." \/>/);
   assert.match(terms, /No Financial Advice/);
   assert.match(terms, /Administrator passkeys/);
   assert.match(terms, /Joining an email list or verifying an account email does not purchase or activate Premium/);
@@ -18,6 +19,11 @@ test('Terms describe current accounts, passkeys, providers, forecasts, and suppo
   assert.match(terms, /support\.html/);
   assert.match(terms, /Private Idea Submissions/);
   assert.match(terms, /not automatically published, entered into a contest, or opened for voting/);
+});
+
+test('Legal pages publish focused search descriptions', () => {
+  const privacy = read('privacy.html');
+  assert.match(privacy, /<meta name="description" content="[^"]*email verification[^"]*request access or deletion\." \/>/);
 });
 
 test('Support routes requests without asking users to disclose secrets', () => {
