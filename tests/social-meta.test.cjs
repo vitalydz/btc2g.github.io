@@ -138,7 +138,9 @@ test('Contest preview is complete and keeps the in-preparation status explicit',
 
 test('scenario simulator publishes localized large-image social previews', () => {
   const root = path.join(__dirname, '..');
-  for (const lang of ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']) {
+  const languages = ['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi'];
+  const locales = ['en_US','ru_RU','he_IL','de_DE','fr_FR','es_ES','zh_CN','it_IT','pt_PT','ar_SA','hi_IN','ja_JP','ko_KR','tr_TR','pl_PL','nl_NL','uk_UA','id_ID','vi_VN'];
+  for (const [index, lang] of languages.entries()) {
     const file = lang === 'en' ? path.join(root, 'scenario.html') : path.join(root, lang, 'scenario.html');
     const html = fs.readFileSync(file, 'utf8');
     const title = html.match(/<title>([^<]+)<\/title>/)?.[1];
@@ -146,13 +148,14 @@ test('scenario simulator publishes localized large-image social previews', () =>
     const canonical = html.match(/<link rel="canonical" href="([^"]+)">/)?.[1];
     assert.ok(title && description && canonical, lang);
     assert.match(html, /name="robots" content="index,follow,max-image-preview:large"/);
-    assert.ok(html.includes(`<meta property="og:title" content="${title}" />`), lang);
-    assert.ok(html.includes(`<meta property="og:description" content="${description}" />`), lang);
-    assert.ok(html.includes(`<meta property="og:url" content="${canonical}" />`), lang);
+    assert.ok(html.includes(`<meta property="og:locale" content="${locales[index]}"`), lang);
+    assert.ok(html.includes(`<meta property="og:title" content="${title}"`), lang);
+    assert.ok(html.includes(`<meta property="og:description" content="${description}"`), lang);
+    assert.ok(html.includes(`<meta property="og:url" content="${canonical}"`), lang);
     assert.match(html, /property="og:image" content="https:\/\/btc2g\.com\/assets\/btc_gold_forecast\.png"/);
     assert.match(html, /name="twitter:card" content="summary_large_image"/);
-    assert.ok(html.includes(`<meta name="twitter:title" content="${title}" />`), lang);
-    assert.ok(html.includes(`<meta name="twitter:description" content="${description}" />`), lang);
+    assert.ok(html.includes(`<meta name="twitter:title" content="${title}"`), lang);
+    assert.ok(html.includes(`<meta name="twitter:description" content="${description}"`), lang);
   }
 });
 

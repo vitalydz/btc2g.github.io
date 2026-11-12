@@ -46,6 +46,8 @@ test('published language HTML has real translated headings, reciprocal alternate
         assert.equal(d.querySelector('meta[name="description"]').content,expected);
         assert.equal(d.querySelector('meta[property="og:description"]').content,expected);
         assert.equal(d.querySelector('meta[name="twitter:description"]').content,expected);
+        assert.equal(d.querySelector('meta[property="og:image:alt"]').content,d.title);
+        assert.equal(d.querySelector('meta[name="twitter:image:alt"]').content,d.title);
         const structured=JSON.parse(d.querySelector('script[type="application/ld+json"]').textContent);
         assert.equal(structured.description,expected);
         assert.equal(structured.inLanguage,lang);

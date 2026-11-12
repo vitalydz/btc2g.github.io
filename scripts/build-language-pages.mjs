@@ -68,6 +68,7 @@ export async function render(page, lang) {
   for(const meta of document.querySelectorAll('meta[property="og:title"],meta[name="twitter:title"]')) meta.content=document.title;
   for(const meta of document.querySelectorAll('meta[property="og:url"]')) meta.content=pageURL(page,lang);
   for(const meta of document.querySelectorAll('meta[property="og:locale"]')) meta.content=openGraphLocales[languages.indexOf(lang)];
+  if(page==='scenario.html') for(const meta of document.querySelectorAll('meta[property="og:image:alt"],meta[name="twitter:image:alt"]')) meta.content=document.title;
   const structuredData=document.querySelector('script[type="application/ld+json"]');
   if(structuredData) {
     const data=JSON.parse(structuredData.textContent);
