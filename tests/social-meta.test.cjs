@@ -135,6 +135,21 @@ test('Legal pages publish complete logo previews with their canonical URLs', () 
   }
 });
 
+test('Legal pages publish canonical WebPage structured data', () => {
+  for (const [file, name] of [['privacy.html', 'Privacy Policy - BTC2G'], ['terms.html', 'Terms of Service - BTC2G']]) {
+    const html = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+    const match = html.match(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/);
+    assert.ok(match, file);
+    const data = JSON.parse(match[1]);
+    assert.equal(data['@context'], 'https://schema.org', file);
+    assert.equal(data['@type'], 'WebPage', file);
+    assert.equal(data.name, name, file);
+    assert.equal(data.url, `https://btc2g.com/${file}`, file);
+    assert.equal(data.inLanguage, 'en', file);
+    assert.deepEqual(data.isPartOf, { '@type': 'WebSite', name: 'BTC2G', url: 'https://btc2g.com/' }, file);
+  }
+});
+
 test('Contest preview is complete and keeps the in-preparation status explicit', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'contest.html'), 'utf8');
   assert.match(html, /name="robots" content="index,follow,max-image-preview:large"/);
