@@ -31,6 +31,8 @@ test('published language HTML has real translated headings, reciprocal alternate
         assert.equal(d.querySelector('meta[name="description"]').content,expected);
         assert.equal(d.querySelector('meta[property="og:description"]').content,expected);
         assert.equal(d.querySelector('meta[name="twitter:description"]').content,expected);
+        assert.equal(d.querySelector('meta[property="og:image:alt"]').content,d.title);
+        assert.equal(d.querySelector('meta[name="twitter:image:alt"]').content,d.title);
         assert.equal(JSON.parse(d.querySelector('script[type="application/ld+json"]').textContent).description,expected);
       }
       if(page==='save.html') {
