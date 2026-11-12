@@ -122,6 +122,19 @@ test('Support preview names its account, privacy and security scope', () => {
   assert.match(html, /name="twitter:description" content="[^"]*privacy[^"]*security/);
 });
 
+test('Legal pages publish complete logo previews with their canonical URLs', () => {
+  for (const [file, title] of [['privacy.html', 'Privacy Policy - BTC2G'], ['terms.html', 'Terms of Service - BTC2G']]) {
+    const html = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+    const canonical = `https://btc2g.com/${file}`;
+    assert.ok(html.includes(`<meta property="og:title" content="${title}" />`), file);
+    assert.ok(html.includes(`<meta property="og:url" content="${canonical}" />`), file);
+    assert.match(html, /property="og:image" content="https:\/\/btc2g\.com\/icons\/icon-512\.png" \/>/, file);
+    assert.match(html, /property="og:image:alt" content="BTC2G logo" \/>/, file);
+    assert.match(html, /name="twitter:card" content="summary" \/>/, file);
+    assert.match(html, /name="twitter:image:alt" content="BTC2G logo" \/>/, file);
+  }
+});
+
 test('Contest preview is complete and keeps the in-preparation status explicit', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'contest.html'), 'utf8');
   assert.match(html, /name="robots" content="index,follow,max-image-preview:large"/);
