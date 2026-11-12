@@ -1,0 +1,30 @@
+# BTC2G
+
+> BTC2G is a free multilingual educational research site for comparing Bitcoin with gold using published daily reference data.
+
+## Public tools and research
+
+- [Bitcoin-to-gold dashboard](https://btc2g.com/): Historical ratio, purchasing-power comparison, reference calculator, disclosed market dates, and model context.
+- [What-if scenario simulator](https://btc2g.com/scenario.html): Arithmetic BTC and gold price-change scenarios; not predictions or return promises.
+- [SAVE quote comparison](https://btc2g.com/save.html): A private, manual comparison of provider quotes. BTC2G does not process purchases.
+- [TimeT research](https://btc2g.com/research.html): Public research documents and explanations.
+- [About BTC2G](https://btc2g.com/about.html): Data sources, methodology, and limitations.
+- [Support](https://btc2g.com/support.html): Help with accounts, privacy requests, security reports, and feedback.
+
+## Important limitations
+
+- BTC2G provides educational information, not investment, financial, trading, tax, legal, or accounting advice.
+- Market data may be delayed, incomplete, unavailable, or corrected. Forecasts and simulations are scenarios, not guaranteed future results.
+- BTC2G does not custody funds or crypto assets, execute trades, or store payment-card details. External provider terms and availability apply.
+- Premium is in development. The community contest is in preparation; submissions and voting are not open.
+
+## Languages
+
+The dashboard, SAVE comparison, scenario simulator, and Premium information have server-rendered pages in 19 languages: English, Russian, Hebrew, German, French, Spanish, Chinese, Italian, Portuguese, Arabic, Hindi, Japanese, Korean, Turkish, Polish, Dutch, Ukrainian, Indonesian, and Vietnamese.
+
+## Policies
+
+- [Terms of Service](https://btc2g.com/terms.html)
+- [Privacy Policy](https://btc2g.com/privacy.html)
+
+The canonical public URL inventory is [sitemap.xml](https://btc2g.com/sitemap.xml). Search or AI inclusion is not guaranteed.
