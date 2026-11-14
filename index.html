@@ -358,7 +358,7 @@
 
     <section class="share-section" aria-labelledby="share-title">
       <h2 id="share-title">Share BTC2G</h2>
-      <p id="share-text">BTC2G: Bitcoin vs Gold forecast and model-based BTC signal</p>
+      <p id="share-text">Compare Bitcoin and gold purchasing power with transparent historical data.</p>
       <div class="share-buttons">
         <button id="native-share-btn" class="share-button native-share-button" type="button" hidden>Share</button>
         <button id="copy-link-btn" class="share-button" type="button">Copy link</button>
@@ -421,7 +421,7 @@
   <script src="assets/js/digest-preferences.js?v=20261030-5"></script>
   <script src="assets/js/subscription-copy.js?v=20261103-1"></script>
   <script src="assets/js/subscription-request.js?v=20261103-1"></script>
-  <script src="assets/js/home-v2-text.js?v=20261110-1"></script>
+  <script src="assets/js/home-v2-text.js?v=20261114-1"></script>
   <script src="assets/js/scenario-entry.js?v=20261030-1"></script>
   <script src="assets/js/regime-detector.js?v=20261030-1"></script>
   <script src="assets/js/multi-asset-dashboard.js?v=20261030-1"></script>
@@ -756,9 +756,10 @@
     }
 
     function getSharePayload() {
+      const text = getCurrentText();
       return {
-        title: 'BTC2G - Bitcoin vs Gold Forecast',
-        text: 'BTC2G: Bitcoin vs Gold forecast and model-based BTC signal',
+        title: text.shareTitle,
+        text: text.shareText,
         url: window.location.href,
       };
     }
@@ -913,7 +914,7 @@
         moonpay: 'MoonPay',
         topper: 'Topper',
         shareTitle: 'Share BTC2G',
-        shareText: 'BTC2G: Bitcoin vs Gold forecast and model-based BTC signal',
+        shareText: 'Compare Bitcoin and gold purchasing power with transparent historical data.',
         nativeShare: 'Share',
         copyLink: 'Copy link',
         linkCopied: 'Link copied',
@@ -1422,7 +1423,7 @@
         buyText: 'Используйте внешнего провайдера для покупки BTC. BTC2G не обрабатывает платежи напрямую.',
         providerNote: 'Доступность зависит от провайдера и страны.',
         shareTitle: 'Поделиться BTC2G',
-        shareText: 'BTC2G: прогноз Bitcoin vs Gold и модельный BTC-сигнал',
+        shareText: 'Сравните покупательную способность Bitcoin и золота на прозрачных исторических данных.',
         nativeShare: 'Поделиться',
         copyLink: 'Копировать ссылку',
         linkCopied: 'Ссылка скопирована',
@@ -1444,7 +1445,7 @@
         buyText: 'השתמש בספק חיצוני כדי לקנות BTC. BTC2G לא מעבד תשלומים ישירות.',
         providerNote: 'הזמינות תלויה בספק ובמדינה.',
         shareTitle: 'שתף את BTC2G',
-        shareText: 'BTC2G: תחזית ביטקוין מול זהב ואיתות BTC מבוסס מודל',
+        shareText: 'השוו את כוח הקנייה של ביטקוין וזהב באמצעות נתונים היסטוריים שקופים.',
         nativeShare: 'שתף',
         copyLink: 'העתק קישור',
         linkCopied: 'הקישור הועתק',
@@ -1466,7 +1467,7 @@
         buyText: 'Nutzen Sie einen externen Anbieter, um BTC zu kaufen. BTC2G verarbeitet Zahlungen nicht direkt.',
         providerNote: 'Die Verfügbarkeit hängt von Anbieter und Land ab.',
         shareTitle: 'BTC2G teilen',
-        shareText: 'BTC2G: Bitcoin-vs-Gold-Prognose und modellbasiertes BTC-Signal',
+        shareText: 'Vergleichen Sie die Kaufkraft von Bitcoin und Gold anhand transparenter historischer Daten.',
         nativeShare: 'Teilen',
         copyLink: 'Link kopieren',
         linkCopied: 'Link kopiert',
@@ -1488,7 +1489,7 @@
         buyText: 'Utilisez un fournisseur externe pour acheter du BTC. BTC2G ne traite pas les paiements directement.',
         providerNote: 'La disponibilité dépend du fournisseur et du pays.',
         shareTitle: 'Partager BTC2G',
-        shareText: 'BTC2G : prévision Bitcoin contre or et signal BTC basé sur un modèle',
+        shareText: 'Comparez le pouvoir d’achat du Bitcoin et de l’or à partir de données historiques transparentes.',
         nativeShare: 'Partager',
         copyLink: 'Copier le lien',
         linkCopied: 'Lien copié',
@@ -1510,7 +1511,7 @@
         buyText: 'Usa un proveedor externo para comprar BTC. BTC2G no procesa pagos directamente.',
         providerNote: 'La disponibilidad depende del proveedor y del país.',
         shareTitle: 'Compartir BTC2G',
-        shareText: 'BTC2G: pronóstico Bitcoin vs oro y señal BTC basada en modelo',
+        shareText: 'Compara el poder adquisitivo de Bitcoin y el oro con datos históricos transparentes.',
         nativeShare: 'Compartir',
         copyLink: 'Copiar enlace',
         linkCopied: 'Enlace copiado',
@@ -1532,7 +1533,7 @@
         buyText: '使用外部服务商购买 BTC。BTC2G 不直接处理付款。',
         providerNote: '可用性取决于服务商和国家/地区。',
         shareTitle: '分享 BTC2G',
-        shareText: 'BTC2G：比特币与黄金预测及基于模型的 BTC 信号',
+        shareText: '使用透明的历史数据比较比特币和黄金的购买力。',
         nativeShare: '分享',
         copyLink: '复制链接',
         linkCopied: '链接已复制',
@@ -1589,7 +1590,7 @@
         premiumUnlock: 'Apri Premium',
         premiumPageLink: 'Vedi Premium',
         shareTitle: 'Condividi BTC2G',
-        shareText: 'BTC2G: previsione Bitcoin vs oro e segnale BTC basato su modello',
+        shareText: 'Confronta il potere d’acquisto di Bitcoin e oro con dati storici trasparenti.',
         nativeShare: 'Condividi',
         copyLink: 'Copia link',
         linkCopied: 'Link copiato',
@@ -1650,7 +1651,7 @@
         premiumUnlock: 'Abrir Premium',
         premiumPageLink: 'Ver Premium',
         shareTitle: 'Partilhar BTC2G',
-        shareText: 'BTC2G: previsão Bitcoin vs ouro e sinal BTC baseado em modelo',
+        shareText: 'Compare o poder de compra do Bitcoin e do ouro com dados históricos transparentes.',
         nativeShare: 'Partilhar',
         copyLink: 'Copiar link',
         linkCopied: 'Link copiado',
@@ -1710,7 +1711,7 @@
         premiumUnlock: 'افتح Premium',
         premiumPageLink: 'عرض Premium',
         shareTitle: 'شارك BTC2G',
-        shareText: 'BTC2G: توقعات Bitcoin مقابل الذهب وإشارة BTC مبنية على نموذج',
+        shareText: 'قارن القوة الشرائية لبيتكوين والذهب باستخدام بيانات تاريخية شفافة.',
         nativeShare: 'مشاركة',
         copyLink: 'نسخ الرابط',
         linkCopied: 'تم نسخ الرابط',
@@ -1770,7 +1771,7 @@
         premiumUnlock: 'Premium खोलें',
         premiumPageLink: 'Premium देखें',
         shareTitle: 'BTC2G साझा करें',
-        shareText: 'BTC2G: Bitcoin बनाम सोना पूर्वानुमान और मॉडल-आधारित BTC संकेत',
+        shareText: 'पारदर्शी ऐतिहासिक डेटा से Bitcoin और सोने की क्रय शक्ति की तुलना करें।',
         nativeShare: 'साझा करें',
         copyLink: 'लिंक कॉपी करें',
         linkCopied: 'लिंक कॉपी हुआ',
@@ -1830,7 +1831,7 @@
         premiumUnlock: 'Premiumを開く',
         premiumPageLink: 'Premiumを見る',
         shareTitle: 'BTC2Gを共有',
-        shareText: 'BTC2G: Bitcoin対Gold予測とモデルベースのBTCシグナル',
+        shareText: '透明性のある過去データでBitcoinとGoldの購買力を比較できます。',
         nativeShare: '共有',
         copyLink: 'リンクをコピー',
         linkCopied: 'リンクをコピーしました',
@@ -1890,7 +1891,7 @@
         premiumUnlock: 'Premium 열기',
         premiumPageLink: 'Premium 보기',
         shareTitle: 'BTC2G 공유',
-        shareText: 'BTC2G: Bitcoin 대 Gold 전망 및 모델 기반 BTC 신호',
+        shareText: '투명한 과거 데이터로 Bitcoin과 금의 구매력을 비교하세요.',
         nativeShare: '공유',
         copyLink: '링크 복사',
         linkCopied: '링크가 복사됨',
@@ -1950,7 +1951,7 @@
         premiumUnlock: 'Premium’u aç',
         premiumPageLink: 'Premium’u görüntüle',
         shareTitle: 'BTC2G paylaş',
-        shareText: 'BTC2G: Bitcoin ve altın tahmini ve model tabanlı BTC sinyali',
+        shareText: 'Şeffaf geçmiş verilerle Bitcoin ve altının satın alma gücünü karşılaştırın.',
         nativeShare: 'Paylaş',
         copyLink: 'Bağlantıyı kopyala',
         linkCopied: 'Bağlantı kopyalandı',
@@ -2010,7 +2011,7 @@
         premiumUnlock: 'Otwórz Premium',
         premiumPageLink: 'Zobacz Premium',
         shareTitle: 'Udostępnij BTC2G',
-        shareText: 'BTC2G: prognoza Bitcoin vs złoto i modelowy sygnał BTC',
+        shareText: 'Porównaj siłę nabywczą Bitcoina i złota na podstawie przejrzystych danych historycznych.',
         nativeShare: 'Udostępnij',
         copyLink: 'Kopiuj link',
         linkCopied: 'Link skopiowany',
@@ -2070,7 +2071,7 @@
         premiumUnlock: 'Open Premium',
         premiumPageLink: 'Bekijk Premium',
         shareTitle: 'Deel BTC2G',
-        shareText: 'BTC2G: Bitcoin versus goud voorspelling en modelgebaseerd BTC-signaal',
+        shareText: 'Vergelijk de koopkracht van Bitcoin en goud met transparante historische gegevens.',
         nativeShare: 'Delen',
         copyLink: 'Link kopiëren',
         linkCopied: 'Link gekopieerd',
@@ -2130,7 +2131,7 @@
         premiumUnlock: 'Відкрити Premium',
         premiumPageLink: 'Переглянути Premium',
         shareTitle: 'Поділитися BTC2G',
-        shareText: 'BTC2G: прогноз Bitcoin і золота та модельний BTC-сигнал',
+        shareText: 'Порівняйте купівельну спроможність Bitcoin і золота за прозорими історичними даними.',
         nativeShare: 'Поділитися',
         copyLink: 'Копіювати посилання',
         linkCopied: 'Посилання скопійовано',
@@ -2190,7 +2191,7 @@
         premiumUnlock: 'Buka Premium',
         premiumPageLink: 'Lihat Premium',
         shareTitle: 'Bagikan BTC2G',
-        shareText: 'BTC2G: prakiraan Bitcoin vs emas dan sinyal BTC berbasis model',
+        shareText: 'Bandingkan daya beli Bitcoin dan emas dengan data historis yang transparan.',
         nativeShare: 'Bagikan',
         copyLink: 'Salin tautan',
         linkCopied: 'Tautan disalin',
@@ -2250,7 +2251,7 @@
         premiumUnlock: 'Mở Premium',
         premiumPageLink: 'Xem Premium',
         shareTitle: 'Chia sẻ BTC2G',
-        shareText: 'BTC2G: dự báo Bitcoin so với vàng và tín hiệu BTC dựa trên mô hình',
+        shareText: 'So sánh sức mua của Bitcoin và vàng bằng dữ liệu lịch sử minh bạch.',
         nativeShare: 'Chia sẻ',
         copyLink: 'Sao chép liên kết',
         linkCopied: 'Đã sao chép liên kết',

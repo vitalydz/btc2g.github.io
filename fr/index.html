@@ -338,7 +338,7 @@
 
     <section class="share-section" aria-labelledby="share-title">
       <h2 id="share-title">Partager BTC2G</h2>
-      <p id="share-text">BTC2G : prévision Bitcoin contre or et signal BTC basé sur un modèle</p>
+      <p id="share-text">Comparez le pouvoir d’achat du Bitcoin et de l’or à partir de données historiques transparentes.</p>
       <div class="share-buttons">
         <button id="native-share-btn" class="share-button native-share-button" type="button" hidden>Partager</button>
         <button id="copy-link-btn" class="share-button" type="button">Copier le lien</button>
@@ -394,7 +394,7 @@
   <script src="/assets/js/digest-preferences.js?v=20261030-5"></script>
   <script src="/assets/js/subscription-copy.js?v=20261103-1"></script>
   <script src="/assets/js/subscription-request.js?v=20261103-1"></script>
-  <script src="/assets/js/home-v2-text.js?v=20261110-1"></script>
+  <script src="/assets/js/home-v2-text.js?v=20261114-1"></script>
   <script src="/assets/js/scenario-entry.js?v=20261030-1"></script>
   <script src="/assets/js/regime-detector.js?v=20261030-1"></script>
   <script src="/assets/js/multi-asset-dashboard.js?v=20261030-1"></script>
@@ -729,9 +729,10 @@
     }
 
     function getSharePayload() {
+      const text = getCurrentText();
       return {
-        title: 'BTC2G - Bitcoin vs Gold Forecast',
-        text: 'BTC2G: Bitcoin vs Gold forecast and model-based BTC signal',
+        title: text.shareTitle,
+        text: document.getElementById('share-text').textContent,
         url: window.location.href,
       };
     }
@@ -1461,7 +1462,7 @@
         buyText: 'Utilisez un fournisseur externe pour acheter du BTC. BTC2G ne traite pas les paiements directement.',
         providerNote: 'La disponibilité dépend du fournisseur et du pays.',
         shareTitle: 'Partager BTC2G',
-        shareText: 'BTC2G : prévision Bitcoin contre or et signal BTC basé sur un modèle',
+        shareText: 'Comparez le pouvoir d’achat du Bitcoin et de l’or à partir de données historiques transparentes.',
         nativeShare: 'Partager',
         copyLink: 'Copier le lien',
         linkCopied: 'Lien copié',

@@ -338,7 +338,7 @@
 
     <section class="share-section" aria-labelledby="share-title">
       <h2 id="share-title">BTC2G साझा करें</h2>
-      <p id="share-text">BTC2G: Bitcoin बनाम सोना पूर्वानुमान और मॉडल-आधारित BTC संकेत</p>
+      <p id="share-text">पारदर्शी ऐतिहासिक डेटा से Bitcoin और सोने की क्रय शक्ति की तुलना करें।</p>
       <div class="share-buttons">
         <button id="native-share-btn" class="share-button native-share-button" type="button" hidden>साझा करें</button>
         <button id="copy-link-btn" class="share-button" type="button">लिंक कॉपी करें</button>
@@ -394,7 +394,7 @@
   <script src="/assets/js/digest-preferences.js?v=20261030-5"></script>
   <script src="/assets/js/subscription-copy.js?v=20261103-1"></script>
   <script src="/assets/js/subscription-request.js?v=20261103-1"></script>
-  <script src="/assets/js/home-v2-text.js?v=20261110-1"></script>
+  <script src="/assets/js/home-v2-text.js?v=20261114-1"></script>
   <script src="/assets/js/scenario-entry.js?v=20261030-1"></script>
   <script src="/assets/js/regime-detector.js?v=20261030-1"></script>
   <script src="/assets/js/multi-asset-dashboard.js?v=20261030-1"></script>
@@ -729,9 +729,10 @@
     }
 
     function getSharePayload() {
+      const text = getCurrentText();
       return {
-        title: 'BTC2G - Bitcoin vs Gold Forecast',
-        text: 'BTC2G: Bitcoin vs Gold forecast and model-based BTC signal',
+        title: text.shareTitle,
+        text: document.getElementById('share-text').textContent,
         url: window.location.href,
       };
     }
@@ -1743,7 +1744,7 @@
         premiumUnlock: 'Premium खोलें',
         premiumPageLink: 'Premium देखें',
         shareTitle: 'BTC2G साझा करें',
-        shareText: 'BTC2G: Bitcoin बनाम सोना पूर्वानुमान और मॉडल-आधारित BTC संकेत',
+        shareText: 'पारदर्शी ऐतिहासिक डेटा से Bitcoin और सोने की क्रय शक्ति की तुलना करें।',
         nativeShare: 'साझा करें',
         copyLink: 'लिंक कॉपी करें',
         linkCopied: 'लिंक कॉपी हुआ',

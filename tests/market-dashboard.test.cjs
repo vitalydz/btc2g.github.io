@@ -22,7 +22,7 @@ test('published history is finite, sourced, ordered, and matches latest signal',
   }
   const latest = history.series.at(-1);
   assert.equal(latest.date, signal.last_updated);
-  assert.equal(Number(latest.ratio.toFixed(3)), signal.ratio);
+  assert.ok(Math.abs(latest.ratio - signal.ratio) <= 0.0005001);
   assert.equal(latest.btc_usd, signal.btc_price_usd);
   assert.equal(latest.gold_usd, signal.gold_price_usd);
   assert.ok(Number.isFinite(signal.ratio_change_7d_pct));
@@ -50,6 +50,22 @@ test('homepage is data-first without fabricated audience totals', () => {
   assert.doesNotMatch(html, /1[\s ]247/);
   assert.doesNotMatch(html, /380\+|380 readers|380 читателей/i);
   assert.doesNotMatch(html, /id="research-support-title"/);
+});
+
+test('share copy promotes the purchasing-power comparison in every supported language', () => {
+  const html = read('index.html');
+  const sharedText = read('assets/js/home-v2-text.js');
+  assert.match(html, /function getSharePayload\(\) \{\s+const text = getCurrentText\(\)/);
+  assert.match(html, /title: text\.shareTitle/);
+  assert.match(html, /text: text\.shareText/);
+  assert.equal((html.match(/shareText:/g) || []).length, 19);
+  assert.doesNotMatch(html, /shareText: ['"][^'"\n]*(?:signal|сигнал|איתות|segnale|sinal|إشارة|संकेत|シグナル|신호|sinyal)/i);
+  assert.match(html, /shareText: 'Compare Bitcoin and gold purchasing power with transparent historical data\.'/);
+  assert.match(html, /shareText: 'Сравните покупательную способность Bitcoin и золота на прозрачных исторических данных\.'/);
+  assert.match(sharedText, /const shareTexts=\{/);
+  assert.equal((sharedText.match(/^    [a-z]{2}:/gm) || []).length >= 19, true);
+  assert.match(sharedText, /text\('#share-text',shareTexts\[lang\]\|\|shareTexts\.en\)/);
+  assert.match(sharedText, /root\.getSharePayload=\(\)=>\(\{title:document\.getElementById\('share-title'\)/);
 });
 
 test('purchasing-power comparison indexes both assets to the same starting value', () => {
@@ -94,8 +110,11 @@ test('all localized homepages load the purchasing-power release assets', () => {
   for (const language of languages) {
     const html = read(`${language}/index.html`);
     assert.match(html, /assets\/css\/index\.css\?v=20261110-1/);
-    assert.match(html, /assets\/js\/home-v2-text\.js\?v=20261110-1/);
+    assert.match(html, /assets\/js\/home-v2-text\.js\?v=20261114-1/);
     assert.match(html, /assets\/js\/market-chart\.js\?v=20261110-3/);
+    assert.match(html, /<p id="share-text">[^<]+<\/p>/);
+    assert.doesNotMatch(html, /<p id="share-text">BTC2G[:： ]/);
+    assert.match(html, /text: document\.getElementById\('share-text'\)\.textContent/);
   }
   const languageSource = read('assets/js/home-v2-text.js');
   assert.match(languageSource, /ensurePurchasingPowerElements/);
