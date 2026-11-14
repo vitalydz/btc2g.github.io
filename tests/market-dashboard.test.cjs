@@ -65,7 +65,22 @@ test('share copy promotes the purchasing-power comparison in every supported lan
   assert.match(sharedText, /const shareTexts=\{/);
   assert.equal((sharedText.match(/^    [a-z]{2}:/gm) || []).length >= 19, true);
   assert.match(sharedText, /text\('#share-text',shareTexts\[lang\]\|\|shareTexts\.en\)/);
-  assert.match(sharedText, /root\.getSharePayload=\(\)=>\(\{title:document\.getElementById\('share-title'\)/);
+  assert.match(sharedText, /root\.getSharePayload=\(\)=>\{const url=new URL\(root\.location\.href\)/);
+  assert.match(sharedText, /url\.searchParams\.set\('chart','purchasingPower'\)/);
+});
+
+test('homepage sharing deep-links to purchasing power and preserves campaign parameters', () => {
+  const html = read('index.html');
+  assert.match(html, /function getPurchasingPowerShareUrl\(\)/);
+  assert.match(html, /url\.searchParams\.set\('chart', 'purchasingPower'\)/);
+  assert.match(html, /url: getPurchasingPowerShareUrl\(\)/);
+  assert.match(html, /navigator\.clipboard\.writeText\(shareUrl\)/);
+  const source = html.match(/function getPurchasingPowerShareUrl\(\) \{[\s\S]*?\n    \}/)[0];
+  const getShareUrl = new Function('window', `${source}; return getPurchasingPowerShareUrl();`);
+  assert.equal(
+    getShareUrl({location:{href:'https://btc2g.com/?utm_source=telegram&chart=gold'}}),
+    'https://btc2g.com/?utm_source=telegram&chart=purchasingPower'
+  );
 });
 
 test('purchasing-power comparison indexes both assets to the same starting value', () => {
@@ -115,6 +130,8 @@ test('all localized homepages load the purchasing-power release assets', () => {
     assert.match(html, /<p id="share-text">[^<]+<\/p>/);
     assert.doesNotMatch(html, /<p id="share-text">BTC2G[:： ]/);
     assert.match(html, /text: document\.getElementById\('share-text'\)\.textContent/);
+    assert.match(html, /url: getPurchasingPowerShareUrl\(\)/);
+    assert.match(html, /navigator\.clipboard\.writeText\(shareUrl\)/);
   }
   const languageSource = read('assets/js/home-v2-text.js');
   assert.match(languageSource, /ensurePurchasingPowerElements/);

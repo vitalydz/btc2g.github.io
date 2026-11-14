@@ -728,12 +728,18 @@
       document.getElementById('chart-error').style.display = 'block';
     }
 
+    function getPurchasingPowerShareUrl() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('chart', 'purchasingPower');
+      return url.toString();
+    }
+
     function getSharePayload() {
       const text = getCurrentText();
       return {
         title: text.shareTitle,
         text: document.getElementById('share-text').textContent,
-        url: window.location.href,
+        url: getPurchasingPowerShareUrl(),
       };
     }
 
@@ -743,13 +749,14 @@
 
     async function copyCurrentLink() {
       const statusEl = document.getElementById('share-status');
+      const shareUrl = getPurchasingPowerShareUrl();
       try {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(shareUrl);
         statusEl.textContent = getCurrentText().linkCopied;
         trackEvent('copy_link_click');
       } catch (error) {
         console.log('Copy link failed.', error);
-        statusEl.textContent = window.location.href;
+        statusEl.textContent = shareUrl;
       }
     }
 
