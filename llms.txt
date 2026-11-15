@@ -12,6 +12,10 @@
 - [About BTC2G](https://btc2g.com/about.html): Data sources, methodology, and limitations.
 - [Support](https://btc2g.com/support.html): Help with accounts, privacy requests, security reports, and feedback.
 
+## Account access
+
+- [Create or sign in to a BTC2G account](https://btc2g-accounts.btc2g.workers.dev/). New accounts require email confirmation; account access is separate from newsletter subscriptions.
+
 ## Important limitations
 
 - BTC2G provides educational information, not investment, financial, trading, tax, legal, or accounting advice.

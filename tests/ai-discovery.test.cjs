@@ -14,6 +14,7 @@ test('llms.txt summarizes only public BTC2G tools and their limitations', () => 
     'https://btc2g.com/research.html',
     'https://btc2g.com/about.html',
     'https://btc2g.com/support.html',
+    'https://btc2g-accounts.btc2g.workers.dev/',
     'https://btc2g.com/terms.html',
     'https://btc2g.com/privacy.html',
     'https://btc2g.com/sitemap.xml'
@@ -25,5 +26,7 @@ test('llms.txt summarizes only public BTC2G tools and their limitations', () => 
   assert.match(llms, /server-rendered pages in 19 languages/);
   assert.match(llms, /indexed to 100 on the first published date/);
   assert.match(llms, /not adjusted for consumer-price inflation/);
+  assert.match(llms, /New accounts require email confirmation/);
+  assert.match(llms, /account access is separate from newsletter subscriptions/);
   assert.doesNotMatch(llms, /guaranteed (?:profit|return|ranking|indexing)/i);
 });
