@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 import json
 import os
 from pathlib import Path
@@ -16,7 +17,7 @@ import re
 import sys
 import time
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlencode, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 SITES = ["bmychance.com", "btc2g.com", "bit2g.com", "vitdart.com", "findbbest.com", "aikickai.com"]
@@ -111,19 +112,74 @@ def checkhost(url: str, cities: list[str], wait: int = 18) -> list[dict]:
     return out
 
 
-def parse_globalping_result(record: dict) -> dict:
+class PageAssetsParser(HTMLParser):
+    """Extract CSS and JS URLs from the remote HTTP response body (up to 10 KiB)."""
+
+    def __init__(self, base: str):
+        super().__init__(convert_charrefs=True)
+        self.base = base
+        self.assets: list[dict[str, str]] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = dict(attrs)
+        kind = None
+        target = None
+        if tag == "script" and values.get("src"):
+            kind, target = "script", values["src"]
+        if tag == "link" and values.get("href"):
+            rel = (values.get("rel") or "").casefold()
+            if "stylesheet" in rel:
+                kind, target = "stylesheet", values["href"]
+            elif "preload" in rel or "modulepreload" in rel:
+                kind, target = values.get("as") or "preload", values["href"]
+        if not target:
+            return
+        url = urljoin(self.base, target)
+        if urlparse(url).scheme not in ("https", "http"):
+            return
+        if not any(r["url"] == url for r in self.assets):
+            self.assets.append({"type": kind or "resource", "url": url})
+
+
+def globalping_payload(url: str, city: str) -> dict:
+    """Globalping takes a hostname target, NOT a full URL."""
+    parsed = urlparse(site_url(url))
+    if not parsed.hostname:
+        raise ValueError("Missing hostname")
+    opts = {
+        "protocol": "HTTPS" if parsed.scheme == "https" else "HTTP",
+        "request": {"method": "GET", "path": parsed.path or "/"},
+    }
+    if parsed.query:
+        opts["request"]["query"] = parsed.query
+    if parsed.port:
+        opts["port"] = parsed.port
+    return {"type": "http", "target": parsed.hostname,
+            "locations": [{"country": "RU", "city": city}],
+            "limit": 1, "measurementOptions": opts}
+
+
+def parse_globalping_result(record: dict, requested_url: str = "") -> dict:
     result = record.get("result", {})
     if result.get("status") in ("offline", "failed"):
         return {"state": "network_error", "detail": result.get("rawOutput", "probe offline")[:240]}
     status = result.get("statusCode", result.get("statusCodeValue"))
     if status is None:
-        # Globalping's result uses statusCode for HTTP, otherwise leave unknown.
         status = (result.get("response") or {}).get("statusCode")
     try:
         code = int(status) if status is not None else None
     except (ValueError, TypeError):
         code = None
-    return {"state": categorize_http(code), "code": code, "detail": result.get("rawOutput", "")[:240]}
+    out = {"state": categorize_http(code), "code": code,
+           "detail": str(result.get("rawOutput", ""))[:240]}
+    if isinstance(result.get("rawBody"), str) and requested_url:
+        parser = PageAssetsParser(requested_url)
+        parser.feed(result["rawBody"])
+        out["asset_candidates"] = parser.assets[:30]
+        out["html_preview_truncated"] = bool(result.get("truncated"))
+    if result.get("resolvedAddress"):
+        out["resolved_ip"] = result["resolvedAddress"]
+    return out
 
 
 def globalping(url: str, cities: list[str], wait: int = 25) -> list[dict]:
@@ -131,7 +187,7 @@ def globalping(url: str, cities: list[str], wait: int = 25) -> list[dict]:
     for city in cities:
         item = {"provider": "Globalping", "city": city, "url": url}
         try:
-            start = request_json(GLOBALPING, payload={"type": "http", "target": url, "locations": [{"country": "RU", "city": city}], "limit": 1})
+            start = request_json(GLOBALPING, payload=globalping_payload(url, city))
             measurement_id = start["id"]
             item["measurement_id"] = measurement_id
             deadline = time.monotonic() + wait
@@ -146,11 +202,12 @@ def globalping(url: str, cities: list[str], wait: int = 25) -> list[dict]:
                 item.update({"state": "no_probe" if not records else "location_mismatch"})
             else:
                 item["probe"] = valid[0]["probe"].get("network", "")
-                item.update(parse_globalping_result(valid[0]))
+                item.update(parse_globalping_result(valid[0], url))
             if result.get("status") == "in-progress":
                 item["state"] = "pending"
         except RuntimeError as exc:
-            item.update({"state": "no_probe" if "no_probes_found" in str(exc) else "provider_error", "detail": str(exc)[:240]})
+            msg = str(exc)
+            item.update({"state": "no_probe" if ("no_probes_found" in msg or "not enough probes" in msg.lower()) else "provider_error", "detail": msg[:240]})
         except (KeyError, ValueError) as exc:
             item.update({"state": "provider_error", "detail": str(exc)[:240]})
         out.append(item)
