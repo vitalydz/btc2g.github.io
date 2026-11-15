@@ -56,7 +56,8 @@ test('homepage publishes valid multilingual WebSite structured data', () => {
     'Bitcoin-to-gold ratio history',
     'BTC and gold purchasing-power index',
     'Reference calculator',
-    'What-if scenario simulator'
+    'What-if scenario simulator',
+    'Free email-verified accounts with private idea submissions'
   ]);
   assert.equal(data.inLanguage.length, 19);
 });

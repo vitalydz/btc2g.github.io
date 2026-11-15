@@ -9,7 +9,7 @@
   "latest_metrics":{
     "day":"2026-11-15",
     "time_zone":"Asia/Jerusalem",
-    "measured_at":"2026-11-15T10:03:43.849Z",
+    "measured_at":"2026-11-15T11:07:39.169Z",
     "source":"https://btc2g-accounts.btc2g.workers.dev/api/stats (Cloudflare D1)",
     "confirmed_accounts_total":1,
     "confirmed_accounts_today":0,
