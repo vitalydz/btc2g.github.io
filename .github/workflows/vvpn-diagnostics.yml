@@ -29,9 +29,15 @@ jobs:
       - name: BMyChance - multiple Russian cities through Globalping
         continue-on-error: true
         run: python tools/vvpn/vvpn.py bmychance.com --backend globalping --cities "Saint Petersburg,Novosibirsk,Yekaterinburg,Vladivostok" --timeout 25 --output vvpn-results/cities
+      - name: All six sites - Vladivostok through Globalping
+        continue-on-error: true
+        run: python tools/vvpn/vvpn.py --all --backend globalping --cities Vladivostok --timeout 25 --output vvpn-results/all-vladivostok
       - name: Critical CSS and JS for all six sites - Moscow
         continue-on-error: true
         run: python tools/vvpn/check_assets.py --source vvpn-results/moscow/report.json --max-per-site 4 --output vvpn-results/assets-moscow
+      - name: Critical CSS and JS for all six sites - Vladivostok
+        continue-on-error: true
+        run: python tools/vvpn/check_assets.py --source vvpn-results/all-vladivostok/report.json --max-per-site 4 --output vvpn-results/assets-all-vladivostok
       - name: All discovered BMyChance CSS and JS - Vladivostok
         continue-on-error: true
         run: python tools/vvpn/check_assets.py --source vvpn-results/cities/report.json --city Vladivostok --max-per-site 12 --output vvpn-results/assets-vladivostok
