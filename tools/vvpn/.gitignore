@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+vvpn-report/
+playwright-report/
+.env
+*.png
