@@ -9,6 +9,7 @@ export const languages = ['en','ru','he','de','fr','es','zh','it','pt','ar','hi'
 export const openGraphLocales = ['en_US','ru_RU','he_IL','de_DE','fr_FR','es_ES','zh_CN','it_IT','pt_PT','ar_SA','hi_IN','ja_JP','ko_KR','tr_TR','pl_PL','nl_NL','uk_UA','id_ID','vi_VN'];
 export const pages = ['index.html','save.html','scenario.html','premium.html'];
 const origin = 'https://btc2g.com';
+export const homepageDescriptions = JSON.parse(fs.readFileSync(path.join(root,'assets','homepage-meta-descriptions.json'),'utf8'));
 export const pageURL = (page, lang) => lang === 'en' ? `${origin}/${page === 'index.html' ? '' : page}` : `${origin}/${lang}/${page === 'index.html' ? '' : page}`;
 
 export async function render(page, lang) {
@@ -53,12 +54,11 @@ export async function render(page, lang) {
   const title=document.querySelector('h1')?.textContent.trim();
   if(!title) throw new Error(`Missing heading: ${page}/${lang}`);
   document.title=`${title} | BTC2G`;
-  const homePurpose=document.querySelector('#site-purpose')?.textContent.trim();
   const saveIntro=document.querySelector('.save-shell > .intro')?.textContent.trim();
   const scenarioIntro=document.querySelector('#scenario-intro')?.textContent.trim();
   const scenarioDisclosure=document.querySelector('#disclaimer-title')?.textContent.trim();
-  const description=page==='index.html' && homePurpose
-    ? homePurpose
+  const description=page==='index.html' && homepageDescriptions[lang]
+    ? homepageDescriptions[lang]
     : page==='save.html' && saveIntro
     ? saveIntro
     : page==='scenario.html' && scenarioIntro && scenarioDisclosure
@@ -76,7 +76,7 @@ export async function render(page, lang) {
       data.name=document.title;data.url=pageURL(page,lang);data.description=description;data.inLanguage=lang;
       structuredData.textContent=`\n${JSON.stringify(data,null,2)}\n  `;
     } else if(data['@type']==='WebSite') {
-      data.description=description;
+      data.url=pageURL(page,lang);data.description=description;data.inLanguage=lang;
       structuredData.textContent=`\n${JSON.stringify(data,null,2)}\n  `;
     }
   }

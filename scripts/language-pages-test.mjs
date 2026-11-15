@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
 import {parseHTML} from 'linkedom';
-import {root,languages,openGraphLocales,pages,pageURL,render} from './build-language-pages.mjs';
+import {root,languages,openGraphLocales,pages,pageURL,homepageDescriptions,render} from './build-language-pages.mjs';
 
 test('published language HTML has real translated headings, reciprocal alternates and correct asset roots',()=>{
   for(const page of pages) {
@@ -27,13 +27,18 @@ test('published language HTML has real translated headings, reciprocal alternate
       if(page==='index.html') {
         assert.equal(d.querySelector('#refresh-chart-btn').hasAttribute('disabled'),false,`${lang}: initial market refresh must not be locked`);
         assert.equal(d.querySelector('#refresh-chart-btn').hasAttribute('aria-busy'),false);
-        const expected=d.querySelector('#site-purpose').textContent.trim();
+        const expected=homepageDescriptions[lang];
         assert.equal(d.querySelector('meta[name="description"]').content,expected);
         assert.equal(d.querySelector('meta[property="og:description"]').content,expected);
         assert.equal(d.querySelector('meta[name="twitter:description"]').content,expected);
         assert.equal(d.querySelector('meta[property="og:image:alt"]').content,d.title);
         assert.equal(d.querySelector('meta[name="twitter:image:alt"]').content,d.title);
-        assert.equal(JSON.parse(d.querySelector('script[type="application/ld+json"]').textContent).description,expected);
+        const structured=JSON.parse(d.querySelector('script[type="application/ld+json"]').textContent);
+        assert.equal(structured.url,pageURL(page,lang));
+        assert.equal(structured.description,expected);
+        assert.equal(structured.inLanguage,lang);
+        assert.ok(structured.featureList.includes('BTC and gold purchasing-power index'));
+        assert.ok(structured.featureList.includes('Free email-verified accounts with private idea submissions'));
       }
       if(page==='save.html') {
         const expected=d.querySelector('.save-shell > .intro').textContent.trim();
