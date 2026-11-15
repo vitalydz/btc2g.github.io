@@ -1,7 +1,8 @@
 """Regression tests for VVPN Moscow CSS, image and JavaScript discovery."""
 import unittest
 
-from moscow_media import MediaParser, safe_asset, verify_mime
+from types import SimpleNamespace
+from moscow_media import MediaParser, safe_asset, verify_mime, redacted_url, http_error_record
 
 
 class MediaParserTests(unittest.TestCase):
@@ -58,6 +59,47 @@ class MediaParserTests(unittest.TestCase):
         self.assertEqual(
             verify_mime({"state": "network_error", "code": None}, "image")["state"],
             "network_error",
+        )
+
+
+class MoscowBrowserNetworkTests(unittest.TestCase):
+    def test_redacted_url_removes_query_fragment_and_userinfo(self):
+        self.assertEqual(
+            redacted_url("https://user:password@bmychance.com/api/me?token=secret#private"),
+            "https://bmychance.com/api/me",
+        )
+
+    def test_non_http_url_omitted(self):
+        self.assertEqual(redacted_url("data:text/plain,secret"), "<non-http-url>")
+
+    def test_xhr_401_is_attributed(self):
+        response = SimpleNamespace(
+            status=401,
+            url="https://bmychance.com/api/current?auth=secret",
+            request=SimpleNamespace(resource_type="fetch"),
+        )
+        self.assertEqual(
+            http_error_record(response),
+            {"type": "fetch", "url": "https://bmychance.com/api/current", "http_status": 401},
+        )
+
+    def test_http_200_not_an_error(self):
+        response = SimpleNamespace(
+            status=200,
+            url="https://btc2g.com/",
+            request=SimpleNamespace(resource_type="document"),
+        )
+        self.assertIsNone(http_error_record(response))
+
+    def test_css_404_reports_resource_type(self):
+        response = SimpleNamespace(
+            status=404,
+            url="https://btc2g.com/assets/site.css?v=1",
+            request=SimpleNamespace(resource_type="stylesheet"),
+        )
+        self.assertEqual(
+            http_error_record(response),
+            {"type": "stylesheet", "url": "https://btc2g.com/assets/site.css", "http_status": 404},
         )
 
 
