@@ -73,13 +73,14 @@ test('homepage sharing deep-links to purchasing power and preserves campaign par
   const html = read('index.html');
   assert.match(html, /function getPurchasingPowerShareUrl\(\)/);
   assert.match(html, /url\.searchParams\.set\('chart', 'purchasingPower'\)/);
+  assert.match(html, /url\.hash = 'forecast'/);
   assert.match(html, /url: getPurchasingPowerShareUrl\(\)/);
   assert.match(html, /navigator\.clipboard\.writeText\(shareUrl\)/);
   const source = html.match(/function getPurchasingPowerShareUrl\(\) \{[\s\S]*?\n    \}/)[0];
   const getShareUrl = new Function('window', `${source}; return getPurchasingPowerShareUrl();`);
   assert.equal(
     getShareUrl({location:{href:'https://btc2g.com/?utm_source=telegram&chart=gold'}}),
-    'https://btc2g.com/?utm_source=telegram&chart=purchasingPower'
+    'https://btc2g.com/?utm_source=telegram&chart=purchasingPower#forecast'
   );
 });
 
@@ -131,6 +132,7 @@ test('all localized homepages load the purchasing-power release assets', () => {
     assert.doesNotMatch(html, /<p id="share-text">BTC2G[:： ]/);
     assert.match(html, /text: document\.getElementById\('share-text'\)\.textContent/);
     assert.match(html, /url: getPurchasingPowerShareUrl\(\)/);
+    assert.match(html, /url\.hash = 'forecast'/);
     assert.match(html, /navigator\.clipboard\.writeText\(shareUrl\)/);
   }
   const languageSource = read('assets/js/home-v2-text.js');

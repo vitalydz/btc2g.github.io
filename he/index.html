@@ -731,6 +731,7 @@
     function getPurchasingPowerShareUrl() {
       const url = new URL(window.location.href);
       url.searchParams.set('chart', 'purchasingPower');
+      url.hash = 'forecast';
       return url.toString();
     }
 
