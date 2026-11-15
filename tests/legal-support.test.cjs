@@ -49,12 +49,14 @@ test('Support is discoverable and new account acceptance uses the current Terms 
   assert.match(workerConfig, /"TERMS_VERSION": "2026-10-29\.3"/);
 });
 
-test('Public footers link safely to vitdart.com', () => {
+test('Public footers keep existing VitdArt links while About identifies the maintainer', () => {
   for (const file of ['index.html', 'premium.html', 'research.html']) {
     const page = read(file);
     assert.match(page, /href="https:\/\/vitdart\.com\/"[^>]+target="_blank"[^>]+rel="noopener noreferrer"/);
   }
-  assert.match(read('about.html'), /href="https:\/\/vitdart\.com\/"[^>]+target="_blank"[^>]+rel="noopener noreferrer"/);
+  const about = read('about.html');
+  assert.match(about, /href="https:\/\/www\.linkedin\.com\/in\/vitaly-dz"[^>]+target="_blank"[^>]+rel="noopener noreferrer"/);
+  assert.doesNotMatch(about, /vitdart\.com/i);
 });
 
 test('About page describes market sources without claiming real-time data or guaranteed forecasts', () => {

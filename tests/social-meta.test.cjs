@@ -104,6 +104,11 @@ test('About page preview keeps its educational and non-advisory context', () => 
   assert.match(html, /property="og:image:height" content="1400"/);
   assert.match(html, /name="twitter:card" content="summary_large_image"/);
   assert.match(html, /name="twitter:description" content="[^"]*Not financial advice/);
+  assert.match(html, /Vitaly Dziubov/);
+  assert.match(html, /QA and Automation Engineer based in Israel/);
+  assert.match(html, /href="https:\/\/www\.linkedin\.com\/in\/vitaly-dz"/);
+  assert.doesNotMatch(html, /vitdart\.com/i);
+  assert.match(html, /\.container\s*\{[^}]*box-sizing:\s*border-box;[^}]*width:\s*100%;/s);
 });
 
 test('SAVE preview keeps the manual, private comparison boundaries', () => {
