@@ -1,10 +1,8 @@
 name: VVPN Russian DNS retest
 
+# Vladivostok is deliberately deferred until Moscow browser testing is complete.
+# This diagnostics workflow remains available for a manual later-stage rerun.
 on:
-  pull_request:
-    paths:
-      - ".github/workflows/vvpn-dns-retest.yml"
-      - ".github/scripts/vvpn_dns_retest.py"
   workflow_dispatch:
 
 permissions:
