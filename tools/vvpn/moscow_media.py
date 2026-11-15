@@ -14,7 +14,7 @@ from html.parser import HTMLParser
 import json
 from pathlib import Path
 import re
-from urllib.parse import urljoin, urlparse, parse_qsl
+from urllib.parse import urljoin, urlparse, parse_qsl, urlunparse
 from urllib.request import Request, urlopen
 
 from vvpn import SITES, globalping, site_url, write_report
@@ -33,6 +33,31 @@ def safe_asset(base, value):
     if any(k.lower() in DANGEROUS_QUERY_KEYS for k, _ in parse_qsl(parsed.query)):
         return None
     return url
+
+
+def redacted_url(value):
+    """Remove auth, query and fragments from browser network error evidence."""
+    try:
+        parsed = urlparse(str(value))
+        if parsed.scheme not in ("http", "https") or not parsed.hostname:
+            return "<non-http-url>"
+        hostname = parsed.hostname
+        if ":" in hostname:
+            hostname = "[" + hostname + "]"
+        if parsed.port:
+            hostname += ":" + str(parsed.port)
+        return urlunparse((parsed.scheme, hostname, parsed.path, "", "", ""))
+    except (ValueError, TypeError):
+        return "<invalid-url>"
+
+
+def http_error_record(response):
+    """Log failed fetch/XHR/document/media requests, not only images and scripts."""
+    if response.status < 400:
+        return None
+    request = response.request
+    return {"type": request.resource_type, "url": redacted_url(response.url),
+            "http_status": response.status}
 
 
 def srcset_list(value):
@@ -179,7 +204,7 @@ async def browser_smoke(output, timeout=25):
                 context = await browser.new_context(viewport={"width": 1365, "height": 900}, service_workers="block")
                 page = await context.new_page()
                 found = {"site": site, "images": [], "scripts": [], "stylesheets": []}
-                failed, js_errors, console_errors, resources = [], [], [], []
+                failed, js_errors, console_errors, resources, http_errors = [], [], [], [], []
 
                 def on_request(request):
                     if request.resource_type in ("script", "image", "stylesheet"):
@@ -190,6 +215,9 @@ async def browser_smoke(output, timeout=25):
                             found[bucket].append(request.url)
 
                 def on_response(response):
+                    error_record = http_error_record(response)
+                    if error_record:
+                        http_errors.append(error_record)
                     for item in reversed(resources):
                         if item["url"] == response.url and item["status"] is None:
                             item["status"] = response.status
@@ -198,7 +226,8 @@ async def browser_smoke(output, timeout=25):
                 page.on("request", on_request)
                 page.on("response", on_response)
                 page.on("requestfailed", lambda request: failed.append({
-                    "type": request.resource_type, "url": request.url, "error": str(request.failure)[:140]}))
+                    "type": request.resource_type, "url": redacted_url(request.url),
+                    "error": str(request.failure)[:140]}))
                 page.on("pageerror", lambda error: js_errors.append(str(error)[:200]))
                 page.on("console", lambda message: console_errors.append(message.text[:200]) if message.type == "error" else None)
                 report = {"site": site, "browser_exit": "GitHub hosted runner (NOT Moscow)", "state": "browser_error"}
@@ -254,18 +283,20 @@ async def browser_smoke(output, timeout=25):
                 except Exception as exc:
                     report["error"] = str(exc)[:240]
                 report["failed_requests"] = failed[:40]
+                report["http_errors"] = http_errors[:40]
                 report["critical_failed_requests"] = [x for x in failed if x["type"] in ("script", "stylesheet", "image")][:40]
                 report["failed_resource_statuses"] = [x for x in resources if x["status"] is not None and x["status"] >= 400][:40]
                 report["javascript_exceptions"] = js_errors[:20]
                 report["console_errors"] = console_errors[:20]
                 report["resource_responses"] = resources[:200]
-                if report["state"] == "loaded" and (report["critical_failed_requests"] or report["failed_resource_statuses"] or report.get("pending_image_count", 0)):
+                if report["state"] == "loaded" and (report["critical_failed_requests"] or report["failed_resource_statuses"] or report["http_errors"] or report["console_errors"] or report.get("pending_image_count", 0)):
                     report["state"] = "loaded_with_warnings"
                 rows.append(report)
                 discovered.append(found)
                 print("BROWSER US", site, report["state"], "HTTP", report.get("http"),
                       "images", report.get("image_count"), "broken", report.get("broken_image_count"),
-                      "JS exceptions", len(js_errors), "failed requests", len(failed), flush=True)
+                      "JS exceptions", len(js_errors), "failed requests", len(failed),
+                      "HTTP errors", json.dumps(http_errors[:10]), flush=True)
                 await context.close()
         finally:
             await browser.close()
