@@ -68,6 +68,27 @@ class VVPNTests(unittest.TestCase):
         response["result"]["headers"]["Content-Type"] = "text/css; charset=utf-8"
         self.assertEqual(vvpn.parse_globalping_result(response, "https://bmychance.com/site.css")["state"], "ok")
 
+    def test_proxy_geo_requires_public_ip_country_and_city(self):
+        valid = {"success": True, "ip": "5.45.60.70", "country_code": "RU", "city": "Moscow"}
+        self.assertTrue(vvpn.evaluate_proxy_location(valid, "Moscow")["matches"])
+        self.assertFalse(vvpn.evaluate_proxy_location({**valid, "city": "Saint Petersburg"}, "Moscow")["matches"])
+        self.assertFalse(vvpn.evaluate_proxy_location({**valid, "country_code": "DE"}, "Moscow")["matches"])
+        self.assertFalse(vvpn.evaluate_proxy_location({**valid, "ip": "127.0.0.1"}, "Moscow")["matches"])
+        self.assertFalse(vvpn.evaluate_proxy_location({**valid, "success": False}, "Moscow")["matches"])
+        self.assertFalse(vvpn.evaluate_proxy_location({}, "Moscow")["matches"])
+
+    @patch("vvpn.globalping")
+    def test_all_sites_must_succeed_not_just_one(self, probe):
+        probe.side_effect = [
+            [{"provider": "Globalping", "city": "Moscow", "url": "https://bmychance.com", "state": "ok", "code": 200}],
+            [{"provider": "Globalping", "city": "Moscow", "url": "https://btc2g.com", "state": "network_error", "code": None}],
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            result = vvpn.main(["bmychance.com", "btc2g.com", "--backend", "globalping",
+                                "--cities", "Moscow", "--output", directory])
+            self.assertEqual(result, 2)
+            self.assertEqual(probe.call_count, 2)
+
     def test_report(self):
         with tempfile.TemporaryDirectory() as d:
             vvpn.write_report([{"provider": "Check-Host", "city": "Moscow", "url": "https://bmychance.com", "state": "ok", "code": 200}], Path(d))
