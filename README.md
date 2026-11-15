@@ -2,11 +2,11 @@
 
 BTC2G is a free, multilingual research dashboard for comparing Bitcoin with gold using published daily reference data.
 
-- Live site: [btc2g.com](https://btc2g.com/)
-- Purchasing-power comparison: [open the chart](https://btc2g.com/?chart=purchasingPower#forecast)
-- What-if simulator: [scenario.html](https://btc2g.com/scenario.html)
+- Live site: [btc2g.com](https://btc2g.com/?utm_source=directory)
+- Purchasing-power comparison: [open the chart](https://btc2g.com/?utm_source=directory&chart=purchasingPower#forecast)
+- What-if simulator: [scenario.html](https://btc2g.com/scenario.html?utm_source=directory)
 - Free account: [create an email-verified account](https://btc2g-accounts.btc2g.workers.dev/) to submit ideas privately
-- Methodology and limitations: [about.html](https://btc2g.com/about.html)
+- Methodology and limitations: [about.html](https://btc2g.com/about.html?utm_source=directory)
 
 The public interface supports 19 languages, including RTL layouts. It provides the historical BTC/gold ratio, a purchasing-power index, a reference calculator, arithmetic scenarios, and disclosed market dates. Purchasing-power lines are indexed to 100 on the first published date and compare changes in USD value; they are not adjusted for consumer-price inflation.
 
