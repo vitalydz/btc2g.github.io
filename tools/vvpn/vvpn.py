@@ -7,6 +7,7 @@ requires Playwright and an independently provided Russian proxy/VPN endpoint.
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import asyncio
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -224,8 +225,58 @@ def globalping(url: str, cities: list[str], wait: int = 25) -> list[dict]:
     return out
 
 
+
+def evaluate_proxy_location(data: dict, expected_city: str) -> dict:
+    """Classify a geo-IP response. A CLI city label is not location evidence."""
+    if not isinstance(data, dict) or data.get("success") is False or data.get("error"):
+        return {"matches": False, "reason": "geo_service_error"}
+    ip_str = str(data.get("ip") or "")
+    try:
+        ip = ipaddress.ip_address(ip_str)
+        is_public = ip.is_global
+    except ValueError:
+        is_public = False
+    country = str(data.get("country_code") or data.get("countryCode") or "").upper()
+    city = str(data.get("city") or "")
+    return {
+        "matches": bool(is_public and country == "RU" and city_key(city) == city_key(expected_city)),
+        "ip": ip_str if is_public else "",
+        "country": country,
+        "city": city,
+    }
+
+
+async def verify_browser_egress(context, expected_city: str) -> dict:
+    """Visit two geo-IP services THROUGH Chromium's configured proxy.
+
+    Fail closed if a service is unavailable, the IPs differ, or either location
+    disagrees. This is geo-IP evidence, not a residential ISP certification.
+    """
+    checks = []
+    for source in ("https://ipwho.is/", "https://ipapi.co/json/"):
+        page = await context.new_page()
+        check = {"source": source, "matches": False}
+        try:
+            response = await page.goto(source, wait_until="domcontentloaded", timeout=10000)
+            if response is None or response.status != 200:
+                check["error"] = f"geo_service_http_{response.status if response else 'none'}"
+            else:
+                data = json.loads(await page.locator("body").inner_text(timeout=5000))
+                check.update(evaluate_proxy_location(data, expected_city))
+        except Exception as exc:
+            check["error"] = str(exc)[:140]
+        finally:
+            await page.close()
+        checks.append(check)
+    ips = {check.get("ip") for check in checks if check.get("ip")}
+    verified = len(checks) == 2 and len(ips) == 1 and all(check.get("matches") for check in checks)
+    return {"verified": verified, "expected_city": expected_city,
+            "verification": "two independent geo-IP services through proxy",
+            "checks": checks}
+
+
 async def browser_check(urls: list[str], proxy_server: str, output: Path, city: str, timeout: int) -> list[dict]:
-    """Real CSS/JS screenshot test; traffic exits through user-provided proxy."""
+    """Test Chromium via authorized proxy; never claim an unverified Moscow exit."""
     try:
         from playwright.async_api import async_playwright
     except ImportError as exc:
@@ -236,38 +287,92 @@ async def browser_check(urls: list[str], proxy_server: str, output: Path, city: 
     if os.environ.get("VVPN_PROXY_USER"):
         proxy["username"] = os.environ["VVPN_PROXY_USER"]
         proxy["password"] = os.environ.get("VVPN_PROXY_PASSWORD", "")
+    output.mkdir(parents=True, exist_ok=True)
     results = []
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True, proxy=proxy)
         try:
-            context = await browser.new_context(ignore_https_errors=False, viewport={"width": 1365, "height": 850})
-            for ix, url in enumerate(urls):
-                page = await context.new_page()
-                errors = []
-                resources = []
-                page.on("requestfailed", lambda req: errors.append({"url": req.url, "error": req.failure, "type": req.resource_type}))
-                page.on("response", lambda resp: resources.append({"url": resp.url, "status": resp.status, "type": resp.request.resource_type}) if resp.request.resource_type in ("stylesheet", "script", "font") else None)
-                item = {"provider": "Playwright proxy", "city": city, "url": url, "state": "network_error"}
-                try:
-                    resp = await page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
-                    await page.wait_for_timeout(3500)
-                    item["code"] = resp.status if resp else None
-                    item["final_url"] = page.url
-                    item["title"] = await page.title()
-                    item["stylesheets"] = await page.evaluate("document.styleSheets.length")
-                    item["resources"] = resources
-                    item["failures"] = errors
-                    item["state"] = categorize_http(item["code"])
-                    if any(r["status"] >= 400 for r in resources if r["type"] == "stylesheet") or any(e["type"] == "stylesheet" for e in errors):
-                        item["state"] = "css_failure"
-                    screenshot = output / f"browser_{ix}_{urlparse(url).hostname}.png"
-                    await page.screenshot(path=str(screenshot), full_page=True)
-                    item["screenshot"] = str(screenshot)
-                except Exception as exc:
-                    item["detail"] = str(exc)[:280]
-                finally:
-                    await page.close()
-                results.append(item)
+            context = await browser.new_context(ignore_https_errors=False,
+                                                viewport={"width": 1365, "height": 850})
+            try:
+                egress = await verify_browser_egress(context, city)
+                for ix, url in enumerate(urls):
+                    page = await context.new_page()
+                    failures, resources, js_errors, console_errors = [], [], [], []
+                    page.on("requestfailed", lambda req: failures.append(
+                        {"url": req.url, "error": str(req.failure)[:140], "type": req.resource_type}))
+                    page.on("response", lambda resp: resources.append(
+                        {"url": resp.url, "status": resp.status, "type": resp.request.resource_type})
+                        if resp.request.resource_type in ("stylesheet", "script", "font", "image") else None)
+                    page.on("pageerror", lambda exc: js_errors.append(str(exc)[:200]))
+                    page.on("console", lambda msg: console_errors.append(msg.text[:200])
+                            if msg.type == "error" else None)
+                    item = {"provider": "Playwright authorized proxy", "city": city, "url": url,
+                            "state": "network_error", "egress_verification": egress}
+                    try:
+                        response = await page.goto(url, wait_until="domcontentloaded",
+                                                   timeout=timeout * 1000)
+                        await page.wait_for_timeout(1800)
+                        await page.evaluate("""async () => {
+                            const height = Math.min(document.documentElement.scrollHeight, 12000);
+                            for (let n = 1; n <= 6; n++) {
+                                scrollTo(0, (height * n) / 6);
+                                await new Promise(resolve => setTimeout(resolve, 200));
+                            }
+                            scrollTo(0, 0);
+                        }""")
+                        await page.wait_for_timeout(650)
+                        item["code"] = response.status if response else None
+                        item["final_url"] = page.url
+                        item["title"] = await page.title()
+                        item["dom"] = await page.evaluate("""() => ({
+                            ready_state: document.readyState,
+                            forms: document.querySelectorAll('form').length,
+                            buttons: document.querySelectorAll('button').length,
+                            links: document.querySelectorAll('a[href]').length,
+                            stylesheets: document.styleSheets.length,
+                            body_display: getComputedStyle(document.body).display,
+                            body_background: getComputedStyle(document.body).backgroundColor
+                        })""")
+                        images = await page.evaluate("""() => [...document.images].slice(0,200).map(img => ({
+                            src: img.currentSrc || img.src,
+                            complete: img.complete,
+                            width: img.naturalWidth
+                        }))""")
+                        item["image_count"] = len(images)
+                        item["broken_images"] = [im for im in images
+                                                 if im["complete"] and im["width"] == 0][:30]
+                        item["pending_images"] = [im for im in images if not im["complete"]][:30]
+                        item["state"] = categorize_http(item["code"])
+                        if item["state"] == "ok":
+                            critical_errors = [row for row in failures
+                                               if row["type"] in ("script", "stylesheet", "image")]
+                            bad_http = [row for row in resources if row["status"] >= 400]
+                            if any(row["type"] == "stylesheet" for row in critical_errors + bad_http):
+                                item["state"] = "css_failure"
+                            elif any(row["type"] == "script" for row in critical_errors + bad_http) or js_errors:
+                                item["state"] = "js_failure"
+                            elif any(row["type"] == "image" for row in critical_errors + bad_http) or item["broken_images"]:
+                                item["state"] = "image_failure"
+                            elif item["pending_images"]:
+                                item["state"] = "incomplete_images"
+                        screenshot = output / f"browser_{ix}_{urlparse(url).hostname}.png"
+                        await page.screenshot(path=str(screenshot), full_page=True, animations="disabled")
+                        item["screenshot"] = str(screenshot)
+                    except Exception as exc:
+                        item["detail"] = str(exc)[:280]
+                    finally:
+                        item["resources"] = resources
+                        item["failures"] = failures
+                        item["javascript_exceptions"] = js_errors
+                        item["console_errors"] = console_errors
+                        item["browser_state"] = item["state"]
+                        if not egress["verified"]:
+                            item["state"] = "unverified_proxy"
+                        await page.close()
+                    results.append(item)
+            finally:
+                await context.close()
         finally:
             await browser.close()
     return results
@@ -328,7 +433,8 @@ def main(argv: list[str] | None = None) -> int:
     for r in rows:
         print(f"{r['provider']:17} {r['city']:19} {r['url']:32} {r['state']:17} {r.get('code', '—')}")
     print(f"\nReports: {output / 'report.md'} and {output / 'report.json'}")
-    return 0 if any(r["state"] in ("ok", "redirect") for r in rows) else 2
+    # A single HTTP 200 must not hide other failed URLs, probes or browser resources.
+    return 0 if rows and all(r["state"] == "ok" for r in rows) else 2
 
 
 if __name__ == "__main__":
