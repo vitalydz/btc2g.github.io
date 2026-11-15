@@ -20,6 +20,29 @@ test('homepage social preview declares all supported locale variants', () => {
   assert.deepEqual(alternateLocales, ['ru_RU','he_IL','de_DE','fr_FR','es_ES','zh_CN','it_IT','pt_PT','ar_SA','hi_IN','ja_JP','ko_KR','tr_TR','pl_PL','nl_NL','uk_UA','id_ID','vi_VN']);
 });
 
+test('homepage share previews describe purchasing power in all 19 languages', () => {
+  const terms = {
+    en: 'purchasing power', ru: 'покупательную способность', he: 'כוח הקנייה',
+    de: 'Kaufkraft', fr: 'pouvoir d’achat', es: 'poder adquisitivo', zh: '购买力',
+    it: 'potere d’acquisto', pt: 'poder de compra', ar: 'القوة الشرائية', hi: 'क्रय शक्ति',
+    ja: '購買力', ko: '구매력', tr: 'satın alma gücünü', pl: 'siłę nabywczą',
+    nl: 'koopkracht', uk: 'купівельну спроможність', id: 'daya beli', vi: 'sức mua'
+  };
+  for (const [language, term] of Object.entries(terms)) {
+    const file = language === 'en' ? 'index.html' : `${language}/index.html`;
+    const html = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+    const descriptions = [
+      html.match(/<meta name="description" content="([^"]+)"/),
+      html.match(/<meta property="og:description" content="([^"]+)"/),
+      html.match(/<meta name="twitter:description" content="([^"]+)"/)
+    ];
+    for (const match of descriptions) {
+      assert.ok(match, `${language} description is present`);
+      assert.ok(match[1].toLocaleLowerCase().includes(term.toLocaleLowerCase()), `${language} mentions purchasing power`);
+    }
+  }
+});
+
 test('homepage publishes valid multilingual WebSite structured data', () => {
   const match = homepage.match(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/);
   assert.ok(match);
