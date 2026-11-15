@@ -62,6 +62,12 @@ class VVPNTests(unittest.TestCase):
             {"type": "script", "url": "https://cdn.example.org/app.js"},
         ])
 
+    def test_invalid_css_mime(self):
+        response = {"result": {"statusCode": 200, "headers": {"Content-Type": "text/html"}}}
+        self.assertEqual(vvpn.parse_globalping_result(response, "https://bmychance.com/site.css")["state"], "invalid_mime")
+        response["result"]["headers"]["Content-Type"] = "text/css; charset=utf-8"
+        self.assertEqual(vvpn.parse_globalping_result(response, "https://bmychance.com/site.css")["state"], "ok")
+
     def test_report(self):
         with tempfile.TemporaryDirectory() as d:
             vvpn.write_report([{"provider": "Check-Host", "city": "Moscow", "url": "https://bmychance.com", "state": "ok", "code": 200}], Path(d))
