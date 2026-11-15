@@ -13,7 +13,7 @@ permissions:
 jobs:
   images-and-javascript:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,22 +25,28 @@ jobs:
           PYTHONPATH=tools/vvpn python -m unittest discover -s tools/vvpn/tests -v
       - name: Install Chromium for US-runner functional smoke test
         id: chromium
-        continue-on-error: true
         run: |
           pip install playwright
           python -m playwright install --with-deps chromium
       - name: Run Chromium script and image smoke (GitHub runner, NOT Moscow)
         id: browser
-        continue-on-error: true
         if: steps.chromium.outcome == 'success'
         run: |
           python tools/vvpn/moscow_media.py --mode browser --output vvpn-results/browser-github-runner
-      - name: Probe JavaScript and image URLs from Moscow via Globalping
+      - name: Probe every discovered CSS, JavaScript and image URL from Moscow
         id: remote
+        if: always()
         run: |
-          python tools/vvpn/moscow_media.py --mode moscow --images 8 --scripts 7 \
+          python tools/vvpn/moscow_media.py --mode moscow --images 30 --scripts 30 --stylesheets 30 \
             --browser-assets vvpn-results/browser-github-runner/discovered_assets.json \
             --output vvpn-results/moscow-media
+      - name: Verify all six pages via independent Check-Host Moscow nodes
+        id: checkhost
+        if: always()
+        continue-on-error: true
+        run: |
+          python tools/vvpn/vvpn.py --all --backend checkhost --cities Moscow --timeout 25 \
+            --output vvpn-results/checkhost-moscow
       - name: Generate results summary
         if: always()
         run: |
@@ -50,19 +56,29 @@ jobs:
           from pathlib import Path
           remote = Path("vvpn-results/moscow-media/report.json")
           browser = Path("vvpn-results/browser-github-runner/report.json")
+          independent = Path("vvpn-results/checkhost-moscow/report.json")
           out = ["## Moscow JavaScript and images", "", "Remote HTTP checks: Moscow Globalping. Browser: GitHub-hosted runner outside Russia.", ""]
           if remote.exists():
               results = json.loads(remote.read_text())["results"]
               out += [f"Remote probes: {len(results)}; states: {dict(Counter(r['state'] for r in results))}", ""]
+              for site in ("bmychance.com", "btc2g.com", "bit2g.com", "vitdart.com", "findbbest.com", "aikickai.com"):
+                  group = [r for r in results if r.get("page_url") == "https://" + site]
+                  if group:
+                      out.append(f"- {site}: {dict(Counter((r.get('asset_kind'), r['state']) for r in group))}")
+              out.append("")
               for r in results:
                   if r["state"] != "ok":
                       out.append(f"- {r.get('page_url', r['url'])}: {r.get('asset_kind', 'discovery')} {r['state']}: {r['url']}")
           else:
               out.append("No Moscow report was created.")
+          if independent.exists():
+              out += ["", "### Independent Check-Host Moscow nodes", ""]
+              for r in json.loads(independent.read_text())["results"]:
+                  out.append(f"- {r['url']}: {r['state']}, HTTP {r.get('code')}, node {r.get('node', 'none')}")
           if browser.exists():
               out += ["", "### Chromium (GitHub runner, NOT Moscow)", ""]
               for r in json.loads(browser.read_text())["results"]:
-                  out.append(f"- {r['site']}: {r['state']}; HTTP {r.get('http')}; {r.get('image_count','?')} DOM images, {r.get('broken_image_count','?')} broken; {len(r.get('javascript_exceptions',[]))} JS exceptions; {len(r.get('failed_requests',[]))} failed requests")
+                  out.append(f"- {r['site']}: {r['state']}; HTTP {r.get('http')}; {r.get('image_count','?')} DOM images, {r.get('broken_image_count','?')} broken, {r.get('pending_image_count','?')} pending; {len(r.get('javascript_exceptions',[]))} JS exceptions; {len(r.get('failed_requests',[]))} failed requests; {len(r.get('failed_resource_statuses',[]))} HTTP resource errors")
           else:
               out.append("No browser report was created.")
           Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text("\n".join(out) + "\n")
