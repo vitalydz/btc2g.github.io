@@ -8,6 +8,7 @@ const llms = readFileSync(path.join(__dirname, '..', 'llms.txt'), 'utf8');
 test('llms.txt summarizes only public BTC2G tools and their limitations', () => {
   for (const url of [
     'https://btc2g.com/',
+    'https://btc2g.com/?chart=purchasingPower#forecast',
     'https://btc2g.com/scenario.html',
     'https://btc2g.com/save.html',
     'https://btc2g.com/research.html',
@@ -22,5 +23,7 @@ test('llms.txt summarizes only public BTC2G tools and their limitations', () => 
   assert.match(llms, /Premium is in development/);
   assert.match(llms, /submissions and voting are not open/);
   assert.match(llms, /server-rendered pages in 19 languages/);
+  assert.match(llms, /indexed to 100 on the first published date/);
+  assert.match(llms, /not adjusted for consumer-price inflation/);
   assert.doesNotMatch(llms, /guaranteed (?:profit|return|ranking|indexing)/i);
 });

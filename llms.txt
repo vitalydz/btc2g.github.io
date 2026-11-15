@@ -5,6 +5,7 @@
 ## Public tools and research
 
 - [Bitcoin-to-gold dashboard](https://btc2g.com/): Historical ratio, purchasing-power comparison, reference calculator, disclosed market dates, and model context.
+- [Purchasing-power chart](https://btc2g.com/?chart=purchasingPower#forecast): BTC and gold are indexed to 100 on the first published date to compare changes in USD value. The chart is not adjusted for consumer-price inflation.
 - [What-if scenario simulator](https://btc2g.com/scenario.html): Arithmetic BTC and gold price-change scenarios; not predictions or return promises.
 - [SAVE quote comparison](https://btc2g.com/save.html): A private, manual comparison of provider quotes. BTC2G does not process purchases.
 - [TimeT research](https://btc2g.com/research.html): Public research documents and explanations.
