@@ -51,6 +51,7 @@ test('homepage publishes valid multilingual WebSite structured data', () => {
   assert.equal(data['@type'], 'WebSite');
   assert.equal(data.name, 'BTC2G');
   assert.equal(data.url, 'https://btc2g.com/');
+  assert.equal(data.description, 'Compare Bitcoin and gold purchasing power, published BTC/gold ratio history, model context, and a reference calculator.');
   assert.deepEqual(data.featureList, [
     'Bitcoin-to-gold ratio history',
     'BTC and gold purchasing-power index',
