@@ -47,6 +47,21 @@ class VVPNTests(unittest.TestCase):
         row = vvpn.globalping("https://bmychance.com", ["Vladivostok"])[0]
         self.assertEqual(row["state"], "location_mismatch")
 
+    def test_globalping_payload_uses_hostname_not_url(self):
+        p = vvpn.globalping_payload("https://bmychance.com/hello?q=1", "Moscow")
+        self.assertEqual(p["target"], "bmychance.com")
+        self.assertEqual(p["measurementOptions"]["protocol"], "HTTPS")
+        self.assertEqual(p["measurementOptions"]["request"], {"method": "GET", "path": "/hello", "query": "q=1"})
+
+    def test_globalping_extracts_css_and_js_sources(self):
+        rec = {"result": {"statusCode": 200, "rawBody": '<html><head><link rel="stylesheet" href="/style.css"><script src="https://cdn.example.org/app.js"></script></head></html>'}}
+        result = vvpn.parse_globalping_result(rec, "https://bmychance.com")
+        self.assertEqual(result["state"], "ok")
+        self.assertEqual(result["asset_candidates"], [
+            {"type": "stylesheet", "url": "https://bmychance.com/style.css"},
+            {"type": "script", "url": "https://cdn.example.org/app.js"},
+        ])
+
     def test_report(self):
         with tempfile.TemporaryDirectory() as d:
             vvpn.write_report([{"provider": "Check-Host", "city": "Moscow", "url": "https://bmychance.com", "state": "ok", "code": 200}], Path(d))
