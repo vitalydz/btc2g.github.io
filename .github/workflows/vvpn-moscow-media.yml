@@ -7,6 +7,11 @@ on:
       - ".github/workflows/vvpn-moscow-media.yml"
   workflow_dispatch:
 
+# A newer PR revision supersedes older, quota-consuming Globalping runs.
+concurrency:
+  group: vvpn-moscow-media-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
