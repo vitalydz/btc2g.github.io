@@ -1,0 +1,50 @@
+name: VVPN Moscow HTTP and DNS network diversity
+
+on:
+  pull_request:
+    paths:
+      - "tools/vvpn/moscow_diversity.py"
+      - "tools/vvpn/tests/test_moscow_diversity.py"
+      - ".github/workflows/vvpn-moscow-diversity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Avoid duplicate runs while refining probe code.
+concurrency:
+  group: vvpn-moscow-diversity-pr11
+  cancel-in-progress: true
+
+jobs:
+  moscow-networks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run all VVPN unit tests
+        env:
+          PYTHONPATH: tools/vvpn
+        run: python -m unittest discover -s tools/vvpn/tests -v
+      - name: Measure six sites from up to two distinct Moscow probes via Globalping
+        env:
+          PYTHONPATH: tools/vvpn
+        run: python tools/vvpn/moscow_diversity.py --output vvpn-results/moscow-diversity
+      - name: Report precise provider results
+        if: always()
+        run: |
+          if [ -f vvpn-results/moscow-diversity/report.md ]; then
+            cat vvpn-results/moscow-diversity/report.md >> "$GITHUB_STEP_SUMMARY"
+            cat vvpn-results/moscow-diversity/report.json
+          fi
+      - name: Save JSON, provider ASNs and exact HTTP and DNS results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vvpn-moscow-multi-node-dns-http
+          path: vvpn-results/moscow-diversity/
+          if-no-files-found: warn
+          retention-days: 7
