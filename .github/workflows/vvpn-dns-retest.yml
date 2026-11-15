@@ -1,0 +1,40 @@
+name: VVPN Russian DNS retest
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/vvpn-dns-retest.yml"
+      - ".github/scripts/vvpn_dns_retest.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dns-retest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Retest six DNS failures from Vladivostok using two resolvers
+        env:
+          PYTHONPATH: tools/vvpn
+        run: python .github/scripts/vvpn_dns_retest.py
+      - name: Show raw result report
+        if: always()
+        run: |
+          if [ -f vvpn-dns-retest/report.json ]; then
+            cat vvpn-dns-retest/report.json
+            cat vvpn-dns-retest/report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Save evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vvpn-vladivostok-dns-retest
+          path: vvpn-dns-retest/
+          if-no-files-found: warn
+          retention-days: 14
