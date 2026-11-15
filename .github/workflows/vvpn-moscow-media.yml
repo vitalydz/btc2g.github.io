@@ -1,0 +1,78 @@
+name: VVPN Moscow JavaScript and images
+
+on:
+  pull_request:
+    paths:
+      - "tools/vvpn/moscow_media.py"
+      - ".github/workflows/vvpn-moscow-media.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  images-and-javascript:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate VVPN code
+        run: |
+          python -m py_compile tools/vvpn/moscow_media.py
+          PYTHONPATH=tools/vvpn python -m unittest discover -s tools/vvpn/tests -v
+      - name: Install Chromium for US-runner functional smoke test
+        id: chromium
+        continue-on-error: true
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Run Chromium script and image smoke (GitHub runner, NOT Moscow)
+        id: browser
+        continue-on-error: true
+        if: steps.chromium.outcome == 'success'
+        run: |
+          python tools/vvpn/moscow_media.py --mode browser --output vvpn-results/browser-github-runner
+      - name: Probe JavaScript and image URLs from Moscow via Globalping
+        id: remote
+        run: |
+          python tools/vvpn/moscow_media.py --mode moscow --images 8 --scripts 7 \
+            --browser-assets vvpn-results/browser-github-runner/discovered_assets.json \
+            --output vvpn-results/moscow-media
+      - name: Generate results summary
+        if: always()
+        run: |
+          python - <<'PY'
+          from collections import Counter
+          import json, os
+          from pathlib import Path
+          remote = Path("vvpn-results/moscow-media/report.json")
+          browser = Path("vvpn-results/browser-github-runner/report.json")
+          out = ["## Moscow JavaScript and images", "", "Remote HTTP checks: Moscow Globalping. Browser: GitHub-hosted runner outside Russia.", ""]
+          if remote.exists():
+              results = json.loads(remote.read_text())["results"]
+              out += [f"Remote probes: {len(results)}; states: {dict(Counter(r['state'] for r in results))}", ""]
+              for r in results:
+                  if r["state"] != "ok":
+                      out.append(f"- {r.get('page_url', r['url'])}: {r.get('asset_kind', 'discovery')} {r['state']}: {r['url']}")
+          else:
+              out.append("No Moscow report was created.")
+          if browser.exists():
+              out += ["", "### Chromium (GitHub runner, NOT Moscow)", ""]
+              for r in json.loads(browser.read_text())["results"]:
+                  out.append(f"- {r['site']}: {r['state']}; HTTP {r.get('http')}; {r.get('image_count','?')} DOM images, {r.get('broken_image_count','?')} broken; {len(r.get('javascript_exceptions',[]))} JS exceptions; {len(r.get('failed_requests',[]))} failed requests")
+          else:
+              out.append("No browser report was created.")
+          Path(os.environ["GITHUB_STEP_SUMMARY"]).write_text("\n".join(out) + "\n")
+          print("\n".join(out))
+          PY
+      - name: Upload diagnostic reports and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vvpn-moscow-images-javascript
+          path: vvpn-results/
+          if-no-files-found: warn
+          retention-days: 7
