@@ -7,6 +7,8 @@ const readme = readFileSync(path.join(__dirname, '..', 'README.md'), 'utf8');
 
 test('README leads with the current public product and honest limitations', () => {
   assert.match(readme, /https:\/\/btc2g\.com\/\?chart=purchasingPower#forecast/);
+  assert.match(readme, /https:\/\/btc2g-accounts\.btc2g\.workers\.dev\//);
+  assert.match(readme, /email-verified account.*submit ideas privately/);
   assert.match(readme, /supports 19 languages/);
   assert.match(readme, /not adjusted for consumer-price inflation/);
   assert.match(readme, /not financial advice/);
