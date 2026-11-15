@@ -23,12 +23,12 @@ jobs:
         run: python -m unittest discover -s tools/vvpn/tests -v
         env:
           PYTHONPATH: tools/vvpn
-      - name: Six sites - independent Moscow HTTP probes
+      - name: Six sites - Moscow through Globalping
         continue-on-error: true
-        run: python tools/vvpn/vvpn.py --all --backend checkhost --cities Moscow --timeout 20 --output vvpn-results/moscow
-      - name: BMyChance - Russian city HTTP probes
+        run: python tools/vvpn/vvpn.py --all --backend globalping --cities Moscow --timeout 25 --output vvpn-results/moscow
+      - name: BMyChance - multiple Russian cities through Globalping
         continue-on-error: true
-        run: python tools/vvpn/vvpn.py bmychance.com --backend globalping --cities "Moscow,Saint Petersburg,Novosibirsk,Vladivostok" --timeout 20 --output vvpn-results/cities
+        run: python tools/vvpn/vvpn.py bmychance.com --backend globalping --cities "Saint Petersburg,Novosibirsk,Yekaterinburg,Vladivostok" --timeout 25 --output vvpn-results/cities
       - name: Summarize remote results
         if: always()
         shell: bash
@@ -38,6 +38,13 @@ jobs:
               echo "### ${p}" >> "$GITHUB_STEP_SUMMARY"
               cat "$p" >> "$GITHUB_STEP_SUMMARY"
               echo >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+          for p in vvpn-results/*/report.json; do
+            if [ -f "$p" ]; then
+              echo "=== ${p} ==="
+              cat "$p"
+              echo
             fi
           done
       - name: Store evidence
