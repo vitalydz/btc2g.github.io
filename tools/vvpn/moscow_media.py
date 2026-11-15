@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""VVPN: Moscow image/script HTTP probes and independent browser smoke tests.
+"""VVPN: Moscow CSS/JavaScript/image HTTP probes and independent browser smoke tests.
 
 Only Globalping probes are in Moscow. Chromium runs on GitHub Actions, outside
 Russia, and NEVER serves as proof of browser behavior from a Moscow IP.
@@ -43,11 +43,11 @@ class MediaParser(HTMLParser):
     def __init__(self, base):
         super().__init__(convert_charrefs=True)
         self.base = base
-        self.images, self.scripts = [], []
+        self.images, self.scripts, self.stylesheets = [], [], []
         self.in_style, self.styles = False, []
 
     def add(self, kind, candidate):
-        target = self.images if kind == "image" else self.scripts
+        target = {"image": self.images, "script": self.scripts, "stylesheet": self.stylesheets}[kind]
         url = safe_asset(self.base, candidate)
         if url and url not in target:
             target.append(url)
@@ -66,7 +66,13 @@ class MediaParser(HTMLParser):
                 for val in srcset_list(a.get(field)):
                     self.add("image", val)
         if tag == "link":
-            if "icon" in (a.get("rel") or "").lower() or (a.get("as") or "").lower() == "image":
+            rel = (a.get("rel") or "").lower()
+            kind = (a.get("as") or "").lower()
+            if "stylesheet" in rel or (("preload" in rel or "modulepreload" in rel) and kind == "style"):
+                self.add("stylesheet", a.get("href"))
+            if ("preload" in rel or "modulepreload" in rel) and kind == "script":
+                self.add("script", a.get("href"))
+            if "icon" in rel or kind == "image":
                 self.add("image", a.get("href"))
         if tag == "meta" and (a.get("property") or a.get("name") or "").lower() in ("og:image", "twitter:image"):
             self.add("image", a.get("content"))
@@ -84,7 +90,8 @@ class MediaParser(HTMLParser):
     def finish(self):
         for stylesheet in self.styles:
             for url in CSS_URL.findall(stylesheet):
-                self.add("image", url)
+                if not re.search(r"\.(?:woff2?|ttf|otf|eot)(?:[?#]|$)", url, re.I):
+                    self.add("image", url)
 
 
 def discover_html(url):
@@ -102,12 +109,16 @@ def verify_mime(row, kind):
         typ = str(row.get("content_type", "")).lower()
         if kind == "image" and typ and not typ.startswith("image/"):
             row["state"] = "invalid_image_mime"
-        if kind == "script" and typ and "javascript" not in typ:
+        if kind == "script" and typ and not ("javascript" in typ or "ecmascript" in typ):
             row["state"] = "invalid_script_mime"
+        if kind == "stylesheet" and typ and not typ.startswith("text/css"):
+            row["state"] = "invalid_css_mime"
+        if not typ:
+            row["state"] = "missing_mime"
     return row
 
 
-def remote_moscow(output, images=7, scripts=6, browser_assets=None):
+def remote_moscow(output, images=7, scripts=6, stylesheets=10, browser_assets=None):
     output.mkdir(parents=True, exist_ok=True)
     by_site = {r["site"]: r for r in (browser_assets or [])}
     rows, findings = [], []
@@ -125,13 +136,17 @@ def remote_moscow(output, images=7, scripts=6, browser_assets=None):
                 parser.add("image", src)
             for src in dynamic.get("scripts", []):
                 parser.add("script", src)
+            for src in dynamic.get("stylesheets", []):
+                parser.add("stylesheet", src)
             info["discovered_images"] = len(parser.images)
             info["discovered_scripts"] = len(parser.scripts)
+            info["discovered_stylesheets"] = len(parser.stylesheets)
             info["image_candidates"] = parser.images[:images]
             info["script_candidates"] = parser.scripts[:scripts]
+            info["stylesheet_candidates"] = parser.stylesheets[:stylesheets]
             if not parser.images:
                 info["image_warning"] = "No static image URL found; browser-generated images may exist"
-            for kind, urls, cap in (("script", parser.scripts, scripts), ("image", parser.images, images)):
+            for kind, urls, cap in (("script", parser.scripts, scripts), ("stylesheet", parser.stylesheets, stylesheets), ("image", parser.images, images)):
                 for asset in urls[:cap]:
                     for result in globalping(asset, ["Moscow"], wait=30):
                         result["page_url"] = url
@@ -163,14 +178,14 @@ async def browser_smoke(output, timeout=25):
                 url = site_url(site)
                 context = await browser.new_context(viewport={"width": 1365, "height": 900}, service_workers="block")
                 page = await context.new_page()
-                found = {"site": site, "images": [], "scripts": []}
+                found = {"site": site, "images": [], "scripts": [], "stylesheets": []}
                 failed, js_errors, console_errors, resources = [], [], [], []
 
                 def on_request(request):
                     if request.resource_type in ("script", "image", "stylesheet"):
                         resources.append({"type": request.resource_type, "url": request.url, "status": None})
-                    if request.resource_type in ("script", "image") and safe_asset(url, request.url):
-                        bucket = "scripts" if request.resource_type == "script" else "images"
+                    if request.resource_type in ("script", "image", "stylesheet") and safe_asset(url, request.url):
+                        bucket = {"script": "scripts", "image": "images", "stylesheet": "stylesheets"}[request.resource_type]
                         if request.url not in found[bucket]:
                             found[bucket].append(request.url)
 
@@ -189,12 +204,23 @@ async def browser_smoke(output, timeout=25):
                 report = {"site": site, "browser_exit": "GitHub hosted runner (NOT Moscow)", "state": "browser_error"}
                 try:
                     main_response = await page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
-                    await page.wait_for_timeout(3000)
+                    await page.wait_for_timeout(1500)
+                    # Passive scrolling triggers lazy-loaded images, without form submission.
+                    await page.evaluate("""async () => {
+                        const h = Math.min(document.documentElement.scrollHeight, 10000);
+                        for (let i = 1; i <= 8; i++) {
+                            window.scrollTo(0, (h * i) / 8);
+                            await new Promise(resolve => setTimeout(resolve, 250));
+                        }
+                        window.scrollTo(0, 0);
+                    }""")
+                    await page.wait_for_timeout(800)
                     image_nodes = await page.evaluate("""() => [...document.images].slice(0,150).map(img => ({
                         src: img.currentSrc || img.src, complete: img.complete,
                         width: img.naturalWidth, height: img.naturalHeight
                     }))""")
                     broken = [img for img in image_nodes if img["complete"] and img["width"] == 0]
+                    pending = [img for img in image_nodes if not img["complete"]]
                     for img in image_nodes:
                         candidate = safe_asset(url, img.get("src"))
                         if candidate and candidate not in found["images"]:
@@ -210,6 +236,14 @@ async def browser_smoke(output, timeout=25):
                         "image_count": len(image_nodes),
                         "broken_images": broken[:20],
                         "broken_image_count": len(broken),
+                        "pending_image_count": len(pending),
+                        "dom": await page.evaluate("""() => ({
+                            lang: document.documentElement.lang,
+                            forms: document.querySelectorAll('form').length,
+                            buttons: document.querySelectorAll('button').length,
+                            links: document.querySelectorAll('a[href]').length,
+                            ready_state: document.readyState
+                        })"""),
                     })
                     screenshot = output / (site + ".png")
                     await page.screenshot(path=str(screenshot), full_page=True, animations="disabled")
@@ -220,9 +254,13 @@ async def browser_smoke(output, timeout=25):
                 except Exception as exc:
                     report["error"] = str(exc)[:240]
                 report["failed_requests"] = failed[:40]
+                report["critical_failed_requests"] = [x for x in failed if x["type"] in ("script", "stylesheet", "image")][:40]
+                report["failed_resource_statuses"] = [x for x in resources if x["status"] is not None and x["status"] >= 400][:40]
                 report["javascript_exceptions"] = js_errors[:20]
                 report["console_errors"] = console_errors[:20]
-                report["resource_responses"] = resources[:100]
+                report["resource_responses"] = resources[:200]
+                if report["state"] == "loaded" and (report["critical_failed_requests"] or report["failed_resource_statuses"] or report.get("pending_image_count", 0)):
+                    report["state"] = "loaded_with_warnings"
                 rows.append(report)
                 discovered.append(found)
                 print("BROWSER US", site, report["state"], "HTTP", report.get("http"),
@@ -241,17 +279,18 @@ def main():
     cli.add_argument("--mode", choices=("moscow", "browser"), required=True)
     cli.add_argument("--images", type=int, default=7)
     cli.add_argument("--scripts", type=int, default=6)
+    cli.add_argument("--stylesheets", type=int, default=10)
     cli.add_argument("--output", type=Path, required=True)
     cli.add_argument("--browser-assets", type=Path)
     args = cli.parse_args()
-    if not 0 <= args.images <= 15 or not 0 <= args.scripts <= 15:
-        cli.error("Caps must be 0-15")
+    if not all(0 <= value <= 40 for value in (args.images, args.scripts, args.stylesheets)):
+        cli.error("Caps must be 0-40")
     if args.mode == "browser":
         return asyncio.run(browser_smoke(args.output))
     assets = None
     if args.browser_assets and args.browser_assets.is_file():
         assets = json.loads(args.browser_assets.read_text(encoding="utf-8"))
-    return remote_moscow(args.output, args.images, args.scripts, assets)
+    return remote_moscow(args.output, args.images, args.scripts, args.stylesheets, assets)
 
 
 if __name__ == "__main__":
