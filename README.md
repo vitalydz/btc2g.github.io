@@ -1,6 +1,30 @@
 # BTC2G
 
-BTC2G is a static GitHub Pages website with a Vercel Serverless Function for creating Topper bootstrap tokens.
+BTC2G is a free, multilingual research dashboard for comparing Bitcoin with gold using published daily reference data.
+
+- Live site: [btc2g.com](https://btc2g.com/)
+- Purchasing-power comparison: [open the chart](https://btc2g.com/?chart=purchasingPower#forecast)
+- What-if simulator: [scenario.html](https://btc2g.com/scenario.html)
+- Methodology and limitations: [about.html](https://btc2g.com/about.html)
+
+The public interface supports 19 languages, including RTL layouts. It provides the historical BTC/gold ratio, a purchasing-power index, a reference calculator, arithmetic scenarios, and disclosed market dates. Purchasing-power lines are indexed to 100 on the first published date and compare changes in USD value; they are not adjusted for consumer-price inflation.
+
+BTC2G is educational software, not financial advice, a trading venue, or a promise of returns. Market data can be delayed or corrected. External providers have their own terms and availability; BTC2G does not custody assets or process payments.
+
+## Development
+
+```powershell
+npm install
+$testFiles = (Get-ChildItem tests -Filter '*.test.cjs').FullName
+node --test $testFiles
+npm run test:languages
+```
+
+The static site is published through GitHub Pages. Account and audience services are separate Cloudflare-backed applications; do not copy production credentials into local development or frontend files.
+
+## Historical implementation notes
+
+The sections below document earlier integration and deployment work. They are retained for engineering context and must not be read as confirmation that an experimental payment, email, or Premium flow is active in production.
 
 ## Topper serverless token endpoint
 
@@ -79,7 +103,7 @@ cd C:\Users\vitly\PycharmProjects\BTC2G\btc2g.github.io
 npm install
 ```
 
-This repository currently has no `test` or `build` scripts in `package.json`, so `npm test` and `npm run build` are not available unless scripts are added later.
+Run the public-site regression files with `node --test` as shown above; server-rendered language checks are available through `npm run test:languages`. The complete account-service suite additionally requires a Node release that provides `node:sqlite`.
 
 Run the offline regression checks from the repository root after installing the Python requirements:
 
