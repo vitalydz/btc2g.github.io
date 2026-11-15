@@ -177,6 +177,16 @@ def parse_globalping_result(record: dict, requested_url: str = "") -> dict:
         parser.feed(result["rawBody"])
         out["asset_candidates"] = parser.assets[:30]
         out["html_preview_truncated"] = bool(result.get("truncated"))
+    headers = result.get("headers") or {}
+    content_type = str(next((v for k, v in headers.items() if k.lower() == "content-type"), ""))
+    if content_type:
+        out["content_type"] = content_type
+    path = urlparse(requested_url).path.lower()
+    if code == 200 and content_type:
+        if path.endswith(".css") and not content_type.lower().startswith("text/css"):
+            out["state"] = "invalid_mime"
+        if path.endswith(".js") and "javascript" not in content_type.lower():
+            out["state"] = "invalid_mime"
     if result.get("resolvedAddress"):
         out["resolved_ip"] = result["resolvedAddress"]
     return out
