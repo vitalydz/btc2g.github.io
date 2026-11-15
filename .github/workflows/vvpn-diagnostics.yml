@@ -1,0 +1,50 @@
+name: VVPN Russian site diagnostics
+
+on:
+  pull_request:
+    paths:
+      - "tools/vvpn/**"
+      - ".github/workflows/vvpn-diagnostics.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate VVPN
+        run: python -m unittest discover -s tools/vvpn/tests -v
+        env:
+          PYTHONPATH: tools/vvpn
+      - name: Six sites - independent Moscow HTTP probes
+        continue-on-error: true
+        run: python tools/vvpn/vvpn.py --all --backend checkhost --cities Moscow --timeout 20 --output vvpn-results/moscow
+      - name: BMyChance - Russian city HTTP probes
+        continue-on-error: true
+        run: python tools/vvpn/vvpn.py bmychance.com --backend globalping --cities "Moscow,Saint Petersburg,Novosibirsk,Vladivostok" --timeout 20 --output vvpn-results/cities
+      - name: Summarize remote results
+        if: always()
+        shell: bash
+        run: |
+          for p in vvpn-results/*/report.md; do
+            if [ -f "$p" ]; then
+              echo "### ${p}" >> "$GITHUB_STEP_SUMMARY"
+              cat "$p" >> "$GITHUB_STEP_SUMMARY"
+              echo >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+      - name: Store evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vvpn-russia-probe-results
+          path: vvpn-results/
+          if-no-files-found: warn
+          retention-days: 14
