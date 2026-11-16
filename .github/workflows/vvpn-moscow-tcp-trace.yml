@@ -1,0 +1,49 @@
+name: VVPN Moscow TCP443 trace comparison
+
+on:
+  pull_request:
+    paths:
+      - "tools/vvpn/moscow_tcp_trace.py"
+      - "tools/vvpn/tests/test_moscow_tcp_trace.py"
+      - ".github/workflows/vvpn-moscow-tcp-trace.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vvpn-moscow-tcp-trace-pr11
+  cancel-in-progress: true
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run all VVPN tests
+        env:
+          PYTHONPATH: tools/vvpn
+        run: python -m unittest discover -s tools/vvpn/tests -v
+      - name: Diagnose TCP443 routes from two verified Moscow ASNs
+        env:
+          PYTHONPATH: tools/vvpn
+        run: python tools/vvpn/moscow_tcp_trace.py --output vvpn-results/moscow-tcp-trace
+      - name: Summary
+        if: "!cancelled()"
+        run: |
+          if [ -f vvpn-results/moscow-tcp-trace/report.md ]; then
+            cat vvpn-results/moscow-tcp-trace/report.md >> "$GITHUB_STEP_SUMMARY"
+            cat vvpn-results/moscow-tcp-trace/report.json
+          fi
+      - name: Preserve trace hops and exact source ASNs
+        if: "!cancelled()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: vvpn-moscow-hostkey-timeweb-tcp443-traces
+          path: vvpn-results/moscow-tcp-trace/
+          if-no-files-found: warn
+          retention-days: 7
