@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "tools/vvpn/moscow_diversity.py"
+      - "tools/vvpn/moscow_media.py"
       - "tools/vvpn/tests/test_moscow_diversity.py"
       - ".github/workflows/vvpn-moscow-diversity.yml"
   workflow_dispatch:
@@ -29,10 +30,10 @@ jobs:
         env:
           PYTHONPATH: tools/vvpn
         run: python -m unittest discover -s tools/vvpn/tests -v
-      - name: Measure six sites from up to two distinct Moscow probes via Globalping
+      - name: Measure six sites and critical CSS, JS and images on two Moscow networks
         env:
           PYTHONPATH: tools/vvpn
-        run: python tools/vvpn/moscow_diversity.py --output vvpn-results/moscow-diversity
+        run: python tools/vvpn/moscow_diversity.py --critical-assets --output vvpn-results/moscow-diversity
       - name: Report precise provider results
         if: always()
         run: |
