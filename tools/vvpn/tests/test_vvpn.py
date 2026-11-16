@@ -128,6 +128,49 @@ class VVPNTests(unittest.TestCase):
         self.assertEqual(open_url.call_count, 1)
         pause.assert_not_called()
 
+    def test_browser_transport_requires_single_approved_route(self):
+        self.assertEqual(vvpn.validate_browser_transport(None, "wss://cdp.example.org/browser"), "cdp")
+        self.assertEqual(vvpn.validate_browser_transport("socks5://proxy.example.org:1080", None), "proxy")
+        for proxy, cdp in (
+            (None, None),
+            ("http://proxy.example.org:3128", "wss://cdp.example.org/browser"),
+            (None, "ftp://unsupported.example.org/browser"),
+        ):
+            with self.subTest(proxy=proxy is not None, cdp=cdp is not None):
+                with self.assertRaises(ValueError):
+                    vvpn.validate_browser_transport(proxy, cdp)
+
+    def test_remote_cdp_mode_uses_env_not_command_line(self):
+        from unittest.mock import AsyncMock
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.dict("os.environ", {"VVPN_CDP_ENDPOINT": "wss://cdp.example.org/browser"}, clear=True):
+                with patch("vvpn.browser_check", new_callable=AsyncMock) as browser:
+                    browser.return_value = [
+                        {"provider": "Playwright remote CDP", "city": "Moscow",
+                         "url": "https://bmychance.com", "state": "ok", "code": 200}]
+                    result = vvpn.main([
+                        "bmychance.com", "--backend", "browser", "--cdp-from-env",
+                        "--proxy-city", "Moscow", "--output", directory])
+                    self.assertEqual(result, 0)
+                    self.assertEqual(browser.call_args.kwargs["cdp_endpoint"],
+                                     "wss://cdp.example.org/browser")
+                    self.assertIsNone(browser.call_args.args[1])
+
+    def test_cdp_without_endpoint_fails_closed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.dict("os.environ", {}, clear=True):
+                with self.assertRaises(SystemExit) as exc:
+                    vvpn.main(["bmychance.com", "--backend", "browser", "--cdp-from-env",
+                               "--output", directory])
+                self.assertEqual(exc.exception.code, 2)
+
+    def test_form_audit_is_read_only_and_excludes_field_values(self):
+        source = vvpn.FORM_AUDIT_JS
+        self.assertIn("form.elements", source)
+        self.assertIn("visible_unlabeled", source)
+        for forbidden in (".submit(", ".click(", ".fill(", ".value", "form.action"):
+            self.assertNotIn(forbidden, source)
+
     def test_report(self):
         with tempfile.TemporaryDirectory() as d:
             vvpn.write_report([{"provider": "Check-Host", "city": "Moscow", "url": "https://bmychance.com", "state": "ok", "code": 200}], Path(d))
