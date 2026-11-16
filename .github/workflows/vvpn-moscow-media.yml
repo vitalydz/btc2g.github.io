@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "tools/vvpn/moscow_media.py"
+      - "tools/vvpn/vvpn.py"
       - ".github/workflows/vvpn-moscow-media.yml"
   workflow_dispatch:
 
