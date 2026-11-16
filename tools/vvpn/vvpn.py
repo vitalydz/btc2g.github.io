@@ -15,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import re
+import ssl
 import sys
 import time
 from urllib.error import HTTPError, URLError
@@ -46,14 +47,24 @@ def request_json(url: str, *, params: dict | None = None, payload: dict | None =
         url += "?" + urlencode(params, doseq=True)
     data = json.dumps(payload).encode() if payload is not None else None
     req = Request(url, data=data, headers={"Accept": "application/json", "User-Agent": "VVPN/1.0 (site diagnostics)", **({"Content-Type": "application/json"} if data else {})})
-    try:
-        with urlopen(req, timeout=timeout) as response:
-            return json.load(response)
-    except HTTPError as exc:
-        detail = exc.read(400).decode("utf-8", errors="replace")
-        raise RuntimeError(f"Provider HTTP {exc.code}: {detail}") from exc
-    except (URLError, TimeoutError) as exc:
-        raise RuntimeError(f"Provider unreachable: {exc}") from exc
+    # Polling a measurement is a safe GET, so one intermittent TLS or socket
+    # failure should not invalidate an entire 150+ resource audit. Never retry
+    # measurement-creation POSTs: a lost response could duplicate work/quota.
+    # TLS verification remains enabled on EVERY attempt.
+    delays = (0.5, 1.0) if payload is None else ()
+    for attempt in range(len(delays) + 1):
+        try:
+            with urlopen(req, timeout=timeout) as response:
+                return json.load(response)
+        except HTTPError as exc:
+            # In particular, don't hammer providers replying with HTTP 429.
+            detail = exc.read(400).decode("utf-8", errors="replace")
+            raise RuntimeError(f"Provider HTTP {exc.code}: {detail}") from exc
+        except (URLError, TimeoutError, ssl.SSLError) as exc:
+            if attempt < len(delays):
+                time.sleep(delays[attempt])
+                continue
+            raise RuntimeError(f"Provider unreachable after {attempt + 1} attempt(s): {exc}") from exc
 
 
 def categorize_http(code: int | None, finished: bool = True) -> str:
