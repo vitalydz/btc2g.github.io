@@ -75,6 +75,23 @@ class MoscowDiversityTests(unittest.TestCase):
             ("image", "https://bmychance.com/hero.jpg"),
         ])
 
+
+    def test_critical_assets_prefer_site_css_and_painting(self):
+        from unittest.mock import patch
+        html = ('<html><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto">'
+                '<link rel="stylesheet" href="/static/style.css">'
+                '<script src="https://cdn.example.com/vendor.js"></script>'
+                '<script src="/static/platform.js"></script>'
+                '<img src="/static/brand-logo.png">'
+                '<img src="/images/painting-id"></html>')
+        with patch("moscow_diversity.discover_html", return_value=html):
+            result = critical_assets("vitdart.com")
+        self.assertEqual(result, [
+            ("stylesheet", "https://vitdart.com/static/style.css"),
+            ("script", "https://vitdart.com/static/platform.js"),
+            ("image", "https://vitdart.com/images/painting-id"),
+        ])
+
     def test_critical_assets_missing_are_not_silently_ignored(self):
         from unittest.mock import patch
         with patch("moscow_diversity.discover_html", return_value="<html></html>"):
