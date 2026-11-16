@@ -1,7 +1,9 @@
 import tempfile
 import unittest
+from io import BytesIO
 from pathlib import Path
 from unittest.mock import patch
+from urllib.error import HTTPError, URLError
 import vvpn
 
 
@@ -88,6 +90,43 @@ class VVPNTests(unittest.TestCase):
                                 "--cities", "Moscow", "--output", directory])
             self.assertEqual(result, 2)
             self.assertEqual(probe.call_count, 2)
+
+    def test_provider_get_retries_transient_tls_failure(self):
+        with patch("vvpn.urlopen", side_effect=[
+            URLError("[SSL: CERTIFICATE_VERIFY_FAILED] hostname mismatch"),
+            BytesIO(b'{"status":"finished"}'),
+        ]) as open_url, patch("vvpn.time.sleep") as pause:
+            self.assertEqual(vvpn.request_json("https://api.globalping.io/v1/measurements/abc"),
+                             {"status": "finished"})
+        self.assertEqual(open_url.call_count, 2)
+        pause.assert_called_once_with(0.5)
+
+    def test_provider_get_stops_after_three_transport_failures(self):
+        with patch("vvpn.urlopen", side_effect=URLError("connection reset")) as open_url, \
+             patch("vvpn.time.sleep") as pause:
+            with self.assertRaisesRegex(RuntimeError, "after 3 attempt"):
+                vvpn.request_json("https://api.globalping.io/v1/measurements/abc")
+        self.assertEqual(open_url.call_count, 3)
+        self.assertEqual(pause.call_count, 2)
+
+    def test_provider_post_is_never_retried(self):
+        with patch("vvpn.urlopen", side_effect=URLError("TLS error")) as open_url, \
+             patch("vvpn.time.sleep") as pause:
+            with self.assertRaisesRegex(RuntimeError, "after 1 attempt"):
+                vvpn.request_json("https://api.globalping.io/v1/measurements",
+                                  payload={"type": "http", "target": "example.org"})
+        self.assertEqual(open_url.call_count, 1)
+        pause.assert_not_called()
+
+    def test_provider_429_is_never_retried(self):
+        error = HTTPError("https://api.globalping.io/v1/measurements/abc", 429,
+                          "Too Many Requests", {}, BytesIO(b"rate limit"))
+        with patch("vvpn.urlopen", side_effect=error) as open_url, \
+             patch("vvpn.time.sleep") as pause:
+            with self.assertRaisesRegex(RuntimeError, "Provider HTTP 429"):
+                vvpn.request_json("https://api.globalping.io/v1/measurements/abc")
+        self.assertEqual(open_url.call_count, 1)
+        pause.assert_not_called()
 
     def test_report(self):
         with tempfile.TemporaryDirectory() as d:
