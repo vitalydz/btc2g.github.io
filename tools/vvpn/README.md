@@ -53,6 +53,18 @@ For a proxy requiring authentication, set `VVPN_PROXY_USER` and `VVPN_PROXY_PASS
 
 Browser mode records response statuses for stylesheet/script/font resources, network failures, final URL, and a full-page PNG. Modern web apps may have ongoing network connections; screenshots are taken shortly after DOM loading, so some delayed UI may require a manual review. No registration or login is attempted.
 
+## Moscow: two independent networks for main pages and selected resources
+
+Run from `tools/vvpn`:
+
+```bash
+python moscow_diversity.py --critical-assets --output vvpn-results/moscow-diversity
+```
+
+This independently requests **two Moscow probes with distinct ASNs/networks** for each of six HTTPS homepages, six DNS A lookups, and one selected **first-party stylesheet, JavaScript and meaningful image** for each site (30 targets, up to 60 returned probe observations). All 200 responses and the expected MIME types must be reported for each chosen resource. DNS accepts an actual A record, not merely a NOERROR response containing a CNAME. Discovery takes place on the runner, **not from Moscow**; only the resource probes are Moscow-sourced.
+
+A single 200 or two probes from the same network is **incomplete coverage**, not a pass and not proof of site failure. Full-resource coverage remains the separate `moscow_media.py` audit (which tests all HTML/browser-discovered resources from Moscow probes, usually one node per resource). Neither test proves Moscow Chromium rendering.
+
 ## Reading results
 
 | Result | Meaning |
