@@ -41,14 +41,16 @@ jobs:
           python tools/vvpn/moscow_media.py --mode browser --output vvpn-results/browser-github-runner
       - name: Probe every discovered CSS, JavaScript and image URL from Moscow
         id: remote
-        if: always()
+        # Preserve the resource audit after browser failures, but never start
+        # 150+ remote requests after a superseding PR run cancels this job.
+        if: ${{ !cancelled() }}
         run: |
           python tools/vvpn/moscow_media.py --mode moscow --images 30 --scripts 30 --stylesheets 30 \
             --browser-assets vvpn-results/browser-github-runner/discovered_assets.json \
             --output vvpn-results/moscow-media
       - name: Verify all six pages via independent Check-Host Moscow nodes
         id: checkhost
-        if: always()
+        if: ${{ !cancelled() }}
         continue-on-error: true
         run: |
           python tools/vvpn/vvpn.py --all --backend checkhost --cities Moscow --timeout 25 \
