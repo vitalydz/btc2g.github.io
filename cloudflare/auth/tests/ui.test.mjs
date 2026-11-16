@@ -9,7 +9,7 @@ test('preserves hidden authenticated state and offers useful public tools', asyn
   assert.match(script, /form\.hidden = true/);
   assert.match(css, /\[hidden\]\s*\{\s*display\s*:\s*none\s*!important;\s*\}/);
   assert.match(html, /https:\/\/btc2g.com\/save.html/);
-  assert.match(html, /https:\/\/btc2g.com\/index.html#calculator/);
+  assert.match(html, /https:\/\/btc2g.com\/#calculator/);
 });
 
 test('unavailable subscriber totals stay out of the public account summary', async () => {

@@ -7,7 +7,7 @@ function page(lang,blocked=false){
  for(const id of ['save-amount','save-moonpay','save-topper','save-confirm','save-currency','save-result','save-language','save-compare','save-clear','moonpay-rate','topper-rate','save-account-link'])node(id);
  node('save-currency').value='USD';node('save-amount').value='100';
  const fields=[...read('save.html').matchAll(/data-text="([^"]+)"/g)].map(x=>({dataset:{text:x[1]},textContent:''}));
- const links=[{href:'index.html',getAttribute(){return this.href},setAttribute(k,v){this[k]=v}},{href:'index.html#calculator',getAttribute(){return this.href},setAttribute(k,v){this[k]=v}}];
+ const links=[{href:'/',getAttribute(){return this.href},setAttribute(k,v){this[k]=v}},{href:'/#calculator',getAttribute(){return this.href},setAttribute(k,v){this[k]=v}}];
  let saved='en';const document={documentElement:{},getElementById:node,querySelector:()=>({content:''}),querySelectorAll(s){if(s==='[data-text]')return fields;if(s.startsWith('a['))return links;return []}};
  const c={window:{},document,location:{search:'?lang='+lang,href:'https://btc2g.com/save.html?lang='+lang},localStorage:{getItem(){if(blocked)throw Error();return saved},setItem(k,v){if(blocked)throw Error();saved=v}},navigator:{language:'en'},URL,URLSearchParams,Intl};vm.createContext(c);
  for(const p of ['quote-compare.js','save-text.js','save.js'])vm.runInContext(read('assets/js/'+p),c);

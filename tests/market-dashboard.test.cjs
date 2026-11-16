@@ -130,7 +130,7 @@ test('all localized homepages load the purchasing-power release assets', () => {
     assert.match(html, /assets\/js\/market-chart\.js\?v=20261110-3/);
     assert.match(html, /<p id="share-text">[^<]+<\/p>/);
     assert.doesNotMatch(html, /<p id="share-text">BTC2G[:： ]/);
-    assert.match(html, /text: document\.getElementById\('share-text'\)\.textContent/);
+    assert.match(html, /text: text\.shareText/);
     assert.match(html, /url: getPurchasingPowerShareUrl\(\)/);
     assert.match(html, /url\.hash = 'forecast'/);
     assert.match(html, /navigator\.clipboard\.writeText\(shareUrl\)/);

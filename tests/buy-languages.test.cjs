@@ -38,6 +38,6 @@ test('Buy Bitcoin offers and renders all 19 site languages', () => {
     assert.equal(element('account-link').href, 'https://btc2g-accounts.btc2g.workers.dev/?lang=' + lang);
     assert.ok(element('account-link').textContent.trim(), lang);
     assert.ok(element('account-link').textContent.includes(freeMarkers[lang]), `${lang} free account label`);
-    assert.equal(element('back-home').href, 'index.html?lang=' + lang);
+    assert.equal(element('back-home').href, '/?lang=' + lang);
   }
 });

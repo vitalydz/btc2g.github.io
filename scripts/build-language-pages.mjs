@@ -106,7 +106,7 @@ export async function render(page, lang) {
   bootstrap.src='/assets/js/static-language.js';
   document.querySelectorAll('script[src="/assets/js/static-language.js"]').forEach(node=>node.remove());
   document.head.insertBefore(bootstrap,document.head.firstChild);
-  return '<!DOCTYPE html>\n'+document.documentElement.outerHTML.replace(/^[ \t]+(?=\r?$)/gm,'')+'\n';
+  return '<!DOCTYPE html>\n'+document.documentElement.outerHTML.replace(/[ \t]+(?=\r?$)/gm,'')+'\n';
 }
 
 export async function build() {

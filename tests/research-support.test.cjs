@@ -98,8 +98,8 @@ test('research navigation is translated and preserves the selected language', ()
   assert.equal(nodes.get('research-nav-calculator').textContent, 'Калькулятор');
   assert.equal(nodes.get('research-nav-premium').textContent, 'Премиум');
   assert.equal(nodes.get('research-nav-account').textContent, 'Бесплатный аккаунт');
-  assert.equal(nodes.get('research-nav-dashboard').href, 'index.html?lang=ru');
-  assert.equal(nodes.get('research-nav-calculator').href, 'index.html?lang=ru#calculator');
+  assert.equal(nodes.get('research-nav-dashboard').href, '/?lang=ru');
+  assert.equal(nodes.get('research-nav-calculator').href, '/?lang=ru#calculator');
   assert.equal(nodes.get('research-nav-premium').href, 'premium.html?lang=ru');
   assert.equal(nodes.get('research-nav-account').href, 'https://btc2g-accounts.btc2g.workers.dev/?lang=ru');
 });

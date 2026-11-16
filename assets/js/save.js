@@ -51,8 +51,8 @@
     document.querySelector('meta[name=description]').content = t().intro;
     byId('save-account-link').textContent = accountLabels[lang];
     byId('save-account-link').href = 'https://btc2g-accounts.btc2g.workers.dev/?lang=' + encodeURIComponent(lang);
-    document.querySelectorAll('a[href^="index.html"]').forEach(a => {
-      const u = new URL(a.getAttribute('href'), location.href); u.searchParams.set('lang', lang); a.setAttribute('href', 'index.html' + u.search + u.hash);
+    document.querySelectorAll('a[data-home-link]').forEach(a => {
+      const u = new URL(a.getAttribute('href'), location.href); u.searchParams.set('lang', lang); a.setAttribute('href', '/' + u.search + u.hash);
     });
     document.querySelectorAll('[data-text]').forEach(element => { element.textContent = t()[element.dataset.text]; });
     if (compared) renderComparison();

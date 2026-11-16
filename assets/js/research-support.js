@@ -49,8 +49,8 @@
     const calculator = document.getElementById('research-nav-calculator');
     const premium = document.getElementById('research-nav-premium');
     const account = document.getElementById('research-nav-account');
-    if (dashboard) { dashboard.textContent = nav[0]; dashboard.href = `index.html?lang=${encodeURIComponent(language)}`; }
-    if (calculator) { calculator.textContent = nav[1]; calculator.href = `index.html?lang=${encodeURIComponent(language)}#calculator`; }
+    if (dashboard) { dashboard.textContent = nav[0]; dashboard.href = `/?lang=${encodeURIComponent(language)}`; }
+    if (calculator) { calculator.textContent = nav[1]; calculator.href = `/?lang=${encodeURIComponent(language)}#calculator`; }
     if (premium) { premium.textContent = nav[2]; premium.href = `premium.html?lang=${encodeURIComponent(language)}`; }
     if (account) { account.textContent = nav[3]; account.href = `https://btc2g-accounts.btc2g.workers.dev/?lang=${encodeURIComponent(language)}`; }
     const status = document.getElementById('research-copy-status');
