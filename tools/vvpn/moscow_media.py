@@ -17,7 +17,7 @@ import re
 from urllib.parse import urljoin, urlparse, parse_qsl, urlunparse
 from urllib.request import Request, urlopen
 
-from vvpn import SITES, globalping, site_url, write_report
+from vvpn import FORM_AUDIT_JS, SITES, globalping, site_url, write_report
 
 CSS_URL = re.compile(r"url\(\s*['\"]?([^'\"\)]+)", re.I)
 DANGEROUS_QUERY_KEYS = {"token", "secret", "auth", "key", "signature", "sig", "access_token", "password", "jwt", "credential"}
@@ -58,6 +58,31 @@ def http_error_record(response):
     request = response.request
     return {"type": request.resource_type, "url": redacted_url(response.url),
             "http_status": response.status}
+
+
+def classify_browser_report(report):
+    """Hard-fail render/critical asset faults; keep background API errors visible as warnings."""
+    state = report.get("state")
+    if state not in ("loaded", "loaded_with_warnings", "loaded_with_errors"):
+        return state or "browser_error"
+    if not isinstance(report.get("http"), int) or not 200 <= report["http"] < 300:
+        return "http_error"
+    if (state == "loaded_with_errors" or report.get("broken_image_count", 0)
+            or report.get("javascript_exceptions")
+            or report.get("critical_failed_requests")
+            or report.get("failed_resource_statuses")):
+        return "loaded_with_errors"
+    if (report.get("failed_requests") or report.get("http_errors")
+            or report.get("console_errors") or report.get("pending_image_count", 0)):
+        return "loaded_with_warnings"
+    return "loaded"
+
+
+def browser_exit_status(rows):
+    """Site background warnings must not be confused with a failed diagnostic run."""
+    return 0 if (len(rows) == len(SITES)
+                 and {r.get("site") for r in rows} == set(SITES)
+                 and all(r.get("state") in ("loaded", "loaded_with_warnings") for r in rows)) else 1
 
 
 def srcset_list(value):
@@ -266,6 +291,7 @@ async def browser_smoke(output, timeout=25):
                         "broken_images": broken[:20],
                         "broken_image_count": len(broken),
                         "pending_image_count": len(pending),
+                        "form_audit": await page.evaluate(FORM_AUDIT_JS),
                         "dom": await page.evaluate("""() => ({
                             lang: document.documentElement.lang,
                             forms: document.querySelectorAll('form').length,
@@ -288,12 +314,11 @@ async def browser_smoke(output, timeout=25):
                 report["failed_resource_statuses"] = [x for x in resources if x["status"] is not None and x["status"] >= 400][:40]
                 report["javascript_exceptions"] = js_errors[:20]
                 report["console_errors"] = console_errors[:20]
-                report["resource_responses"] = resources[:200]
-                if report["state"] == "loaded" and (report["critical_failed_requests"] or report["failed_resource_statuses"] or report["http_errors"] or report["console_errors"] or report.get("pending_image_count", 0)):
-                    report["state"] = "loaded_with_warnings"
+                report["resource_responses"] = [{**x, "url": redacted_url(x["url"])} for x in resources[:200]]
+                report["state"] = classify_browser_report(report)
                 rows.append(report)
                 discovered.append(found)
-                print("BROWSER US", site, report["state"], "HTTP", report.get("http"),
+                print("BROWSER GH-RUNNER", site, report["state"], "HTTP", report.get("http"),
                       "images", report.get("image_count"), "broken", report.get("broken_image_count"),
                       "JS exceptions", len(js_errors), "failed requests", len(failed),
                       "HTTP errors", json.dumps(http_errors[:10]), flush=True)
@@ -302,7 +327,7 @@ async def browser_smoke(output, timeout=25):
             await browser.close()
     (output / "report.json").write_text(json.dumps({"results": rows}, ensure_ascii=False, indent=2), encoding="utf-8")
     (output / "discovered_assets.json").write_text(json.dumps(discovered, ensure_ascii=False, indent=2), encoding="utf-8")
-    return 0 if all(r["state"] == "loaded" for r in rows) else 1
+    return browser_exit_status(rows)
 
 
 def main():
