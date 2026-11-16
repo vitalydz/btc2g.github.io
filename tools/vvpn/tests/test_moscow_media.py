@@ -2,7 +2,9 @@
 import unittest
 
 from types import SimpleNamespace
-from moscow_media import MediaParser, safe_asset, verify_mime, redacted_url, http_error_record
+from moscow_media import (MediaParser, safe_asset, verify_mime, redacted_url,
+                          http_error_record, classify_browser_report, browser_exit_status)
+from vvpn import SITES
 
 
 class MediaParserTests(unittest.TestCase):
@@ -102,6 +104,38 @@ class MoscowBrowserNetworkTests(unittest.TestCase):
             {"type": "stylesheet", "url": "https://btc2g.com/assets/site.css", "http_status": 404},
         )
 
+
+class BrowserResultClassificationTests(unittest.TestCase):
+    def test_anonymous_background_401_is_reported_without_failing_browser(self):
+        page = {"site": SITES[0], "state": "loaded", "http": 200,
+                "http_errors": [{"type": "fetch", "http_status": 401}]}
+        self.assertEqual(classify_browser_report(page), "loaded_with_warnings")
+        rows = [{"site": site, "state": "loaded", "http": 200} for site in SITES]
+        rows[0]["state"] = classify_browser_report(page)
+        self.assertEqual(browser_exit_status(rows), 0)
+
+    def test_critical_asset_failure_and_js_exception_fail(self):
+        for error in ({"critical_failed_requests": [{"type": "stylesheet"}]},
+                      {"failed_resource_statuses": [{"type": "script", "status": 404}]},
+                      {"javascript_exceptions": ["ReferenceError"]},
+                      {"broken_image_count": 1}):
+            with self.subTest(error=error):
+                row = {"state": "loaded", "http": 200, **error}
+                self.assertEqual(classify_browser_report(row), "loaded_with_errors")
+        rows = [{"site": site, "state": "loaded", "http": 200} for site in SITES]
+        rows[1]["state"] = "loaded_with_errors"
+        self.assertEqual(browser_exit_status(rows), 1)
+
+    def test_missing_or_duplicated_site_cannot_pass(self):
+        rows = [{"site": site, "state": "loaded", "http": 200} for site in SITES]
+        self.assertEqual(browser_exit_status(rows[:-1]), 1)
+        rows[-1]["site"] = SITES[0]
+        self.assertEqual(browser_exit_status(rows), 1)
+
+    def test_http_or_browser_error_cannot_pass(self):
+        for state in ("http_error", "browser_error"):
+            self.assertEqual(classify_browser_report({"state": state, "http": 500}), state)
+        self.assertEqual(classify_browser_report({"state": "loaded", "http": 500}), "http_error")
 
 if __name__ == "__main__":
     unittest.main()
