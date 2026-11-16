@@ -282,29 +282,75 @@ async def verify_browser_egress(context, expected_city: str) -> dict:
     ips = {check.get("ip") for check in checks if check.get("ip")}
     verified = len(checks) == 2 and len(ips) == 1 and all(check.get("matches") for check in checks)
     return {"verified": verified, "expected_city": expected_city,
-            "verification": "two independent geo-IP services through proxy",
+            "verification": "two independent geo-IP services through browser network exit",
             "checks": checks}
 
 
-async def browser_check(urls: list[str], proxy_server: str, output: Path, city: str, timeout: int) -> list[dict]:
-    """Test Chromium via authorized proxy; never claim an unverified Moscow exit."""
+# Passive form diagnostics never read typed values or submit, click or fill a form.
+# Designed for anonymous smoke tests; counts and accessibility shape only.
+FORM_AUDIT_JS = """() => [...document.forms].slice(0, 40).map(form => {
+    const controls = [...form.elements].filter(
+        e => ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.tagName)
+    );
+    const visible = e => !!(e.offsetWidth || e.offsetHeight || e.getClientRects().length);
+    const named = e => !!(e.labels && e.labels.length) ||
+        !!e.getAttribute('aria-label') || !!e.getAttribute('aria-labelledby');
+    return {
+        method: (form.getAttribute('method') || 'get').toUpperCase(),
+        controls: controls.length,
+        required: controls.filter(e => e.required).length,
+        visible_unlabeled: controls.filter(e =>
+            visible(e) && e.type !== 'hidden' && !named(e)
+        ).length,
+        submit_controls: [...form.elements].filter(e =>
+            (e.tagName === 'BUTTON' && (e.getAttribute('type') || 'submit') === 'submit') ||
+            (e.tagName === 'INPUT' && ['submit', 'image'].includes(e.type))
+        ).length
+    };
+})"""
+
+
+def validate_browser_transport(proxy_server: str | None, cdp_endpoint: str | None) -> str:
+    """Choose one explicit, authorized network route; never infer Moscow from labels."""
+    if bool(proxy_server) == bool(cdp_endpoint):
+        raise ValueError("Browser mode requires exactly one authorized proxy or CDP endpoint")
+    if cdp_endpoint:
+        if not cdp_endpoint.startswith(("ws://", "wss://", "http://", "https://")):
+            raise ValueError("VVPN_CDP_ENDPOINT requires a valid browser CDP URL")
+        return "cdp"
+    if not proxy_server.startswith(("socks5://", "http://", "https://")):
+        raise ValueError("Proxy must use SOCKS5 or HTTP(S)")
+    return "proxy"
+
+
+async def browser_check(urls: list[str], proxy_server: str | None, output: Path, city: str,
+                        timeout: int, *, cdp_endpoint: str | None = None) -> list[dict]:
+    """Test via authorized proxy OR remote CDP; report verified egress or fail closed."""
     try:
         from playwright.async_api import async_playwright
     except ImportError as exc:
         raise RuntimeError("Install Playwright: pip install playwright && python -m playwright install chromium") from exc
-    if not proxy_server or not proxy_server.startswith(("socks5://", "http://", "https://")):
-        raise ValueError("--proxy-server must be a SOCKS5 or HTTP(S) proxy URL")
-    proxy = {"server": proxy_server}
-    if os.environ.get("VVPN_PROXY_USER"):
-        proxy["username"] = os.environ["VVPN_PROXY_USER"]
-        proxy["password"] = os.environ.get("VVPN_PROXY_PASSWORD", "")
+    transport = validate_browser_transport(proxy_server, cdp_endpoint)
+    proxy = None
+    if transport == "proxy":
+        proxy = {"server": proxy_server}
+        if os.environ.get("VVPN_PROXY_USER"):
+            proxy["username"] = os.environ["VVPN_PROXY_USER"]
+            proxy["password"] = os.environ.get("VVPN_PROXY_PASSWORD", "")
     output.mkdir(parents=True, exist_ok=True)
     results = []
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True, proxy=proxy)
+        # A provider-created remote browser may already expose its configured
+        # region via its default context. Use it instead of creating a context
+        # that could silently route through a different region. Geo verify anyway.
+        browser = (await p.chromium.connect_over_cdp(cdp_endpoint, timeout=timeout * 1000)
+                   if transport == "cdp"
+                   else await p.chromium.launch(headless=True, proxy=proxy))
         try:
-            context = await browser.new_context(ignore_https_errors=False,
-                                                viewport={"width": 1365, "height": 850})
+            owns_context = transport != "cdp" or not browser.contexts
+            context = (await browser.new_context(ignore_https_errors=False,
+                                                 viewport={"width": 1365, "height": 850})
+                       if owns_context else browser.contexts[0])
             try:
                 egress = await verify_browser_egress(context, city)
                 for ix, url in enumerate(urls):
@@ -318,7 +364,7 @@ async def browser_check(urls: list[str], proxy_server: str, output: Path, city: 
                     page.on("pageerror", lambda exc: js_errors.append(str(exc)[:200]))
                     page.on("console", lambda msg: console_errors.append(msg.text[:200])
                             if msg.type == "error" else None)
-                    item = {"provider": "Playwright authorized proxy", "city": city, "url": url,
+                    item = {"provider": "Playwright remote CDP" if transport == "cdp" else "Playwright authorized proxy", "city": city, "url": url,
                             "state": "network_error", "egress_verification": egress}
                     try:
                         response = await page.goto(url, wait_until="domcontentloaded",
@@ -336,6 +382,7 @@ async def browser_check(urls: list[str], proxy_server: str, output: Path, city: 
                         item["code"] = response.status if response else None
                         item["final_url"] = page.url
                         item["title"] = await page.title()
+                        item["form_audit"] = await page.evaluate(FORM_AUDIT_JS)
                         item["dom"] = await page.evaluate("""() => ({
                             ready_state: document.readyState,
                             forms: document.querySelectorAll('form').length,
@@ -383,7 +430,8 @@ async def browser_check(urls: list[str], proxy_server: str, output: Path, city: 
                         await page.close()
                     results.append(item)
             finally:
-                await context.close()
+                if owns_context:
+                    await context.close()
         finally:
             await browser.close()
     return results
@@ -407,6 +455,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--cities", default=",".join(CITIES), help="Comma-separated English city names")
     parser.add_argument("--backend", choices=("checkhost", "globalping", "both", "browser"), default="checkhost")
     parser.add_argument("--proxy-server", default=os.environ.get("VVPN_PROXY_SERVER"), help="Browser proxy URL; no proxy credentials in argument")
+    parser.add_argument("--cdp-from-env", action="store_true", help="Connect to authorized remote Chromium via VVPN_CDP_ENDPOINT environment variable (never log secret URL)")
     parser.add_argument("--proxy-city", default="Unverified proxy city", help="Label only; cannot verify proxy geolocation")
     parser.add_argument("--output", default="vvpn-report", help="Report folder")
     parser.add_argument("--timeout", type=int, default=25)
@@ -425,10 +474,11 @@ def main(argv: list[str] | None = None) -> int:
     output.mkdir(parents=True, exist_ok=True)
     rows = []
     if args.backend == "browser":
-        if not args.proxy_server:
-            parser.error("Browser mode requires --proxy-server (Russian proxy/VPN endpoint)")
+        cdp_endpoint = os.environ.get("VVPN_CDP_ENDPOINT") if args.cdp_from_env else None
         try:
-            rows = asyncio.run(browser_check(urls, args.proxy_server, output, args.proxy_city, args.timeout))
+            validate_browser_transport(args.proxy_server, cdp_endpoint)
+            rows = asyncio.run(browser_check(urls, args.proxy_server, output, args.proxy_city,
+                                             args.timeout, cdp_endpoint=cdp_endpoint))
         except (RuntimeError, ValueError) as exc:
             parser.error(str(exc))
     else:
