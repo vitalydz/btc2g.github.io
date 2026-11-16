@@ -11,6 +11,7 @@ import argparse
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+from urllib.parse import urlparse
 import time
 
 from vvpn import (
@@ -138,12 +139,19 @@ def critical_assets(site: str) -> list[tuple[str, str]]:
         if not candidates:
             raise ValueError(f"No {kind} URL discovered for {site}")
         if kind == "image":
+            # Prefer the actual artwork/chart/hero rather than a favicon or brand icon.
             url = next((u for u in candidates
-                        if not any(t in u.lower() for t in
-                                   ("favicon", "/icon", "social.svg", "/logo"))),
-                       candidates[0])
+                        if any(t in urlparse(u).path.lower() for t in
+                               ("/images/", "forecast", "hero", "storybook", "robot-logo"))),
+                       next((u for u in candidates
+                             if not any(t in urlparse(u).path.lower() for t in
+                                        ("favicon", "icon", "social", "brand-logo"))),
+                            candidates[0]))
         else:
-            url = candidates[0]
+            # An external font provider is useful but not a replacement for
+            # checking the site's own critical stylesheet or JavaScript.
+            url = next((u for u in candidates if urlparse(u).hostname == site),
+                       candidates[0])
         selected.append((kind, url))
     return selected
 
