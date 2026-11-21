@@ -1,11 +1,11 @@
 {
   "signal": "BUY",
   "confidence": 0.63,
-  "ratio": 16.796,
-  "ratio_7d_ago": 18.362,
-  "ratio_change_7d_pct": -8.53,
-  "btc_price_usd": 61901.82,
-  "gold_price_usd": 3685.5,
-  "last_updated": "2026-11-19",
+  "ratio": 16.726,
+  "ratio_7d_ago": 17.562,
+  "ratio_change_7d_pct": -4.76,
+  "btc_price_usd": 58798.98,
+  "gold_price_usd": 3515.4,
+  "last_updated": "2026-11-20",
   "note": "BTC appears undervalued compared to gold based on the model"
 }
