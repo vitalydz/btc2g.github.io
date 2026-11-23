@@ -1,0 +1,75 @@
+name: VVPN Russian site diagnostics
+
+on:
+  pull_request:
+    paths:
+      - "tools/vvpn/**"
+      - ".github/workflows/vvpn-diagnostics.yml"
+  workflow_dispatch:
+
+# Moscow is the first stage. Avoid burning free probe quotas on duplicate
+# pull-request runs; Vladivostok will be resumed after Moscow browser proof.
+concurrency:
+  group: vvpn-moscow-pages-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit tests — fail if any regression occurs
+        run: python -m unittest discover -s tools/vvpn/tests -v
+        env:
+          PYTHONPATH: tools/vvpn
+      - name: Six main pages from Moscow through Globalping
+        id: pages
+        run: python tools/vvpn/vvpn.py --all --backend globalping --cities Moscow --timeout 25 --output vvpn-results/moscow
+      - name: Critical CSS and JS on each page — Moscow
+        if: always()
+        run: |
+          if [ -f vvpn-results/moscow/report.json ]; then
+            python tools/vvpn/check_assets.py --source vvpn-results/moscow/report.json \
+              --max-per-site 4 --output vvpn-results/assets-moscow
+          fi
+      - name: Summarize exact HTTP results and failures
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from collections import Counter
+          from pathlib import Path
+          paths = ("vvpn-results/moscow/report.json", "vvpn-results/assets-moscow/report.json")
+          lines = ["# VVPN Moscow — page and asset HTTP results", "",
+                   "HTTP success is not proof of full browser functionality.", ""]
+          for file in paths:
+              path = Path(file)
+              if not path.exists():
+                  lines += [f"{file}: report missing (incomplete test)", ""]
+                  continue
+              results = json.loads(path.read_text(encoding="utf-8")).get("results", [])
+              lines += [f"## {file}", "", f"Total: {len(results)}; states: {dict(Counter(r['state'] for r in results))}", ""]
+              for r in results:
+                  lines.append(f"- {r['city']} {r['url']}: HTTP {r.get('code')} / {r['state']}")
+              lines.append("")
+          summary = "\n".join(lines)
+          print(summary)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write(summary)
+          PY
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vvpn-moscow-http-asset-results
+          path: vvpn-results/
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,49 @@
+name: VVPN Moscow consumer-ISP probes
+
+on:
+  pull_request:
+    paths:
+      - "tools/vvpn/moscow_eyeball.py"
+      - "tools/vvpn/tests/test_moscow_eyeball.py"
+      - ".github/workflows/vvpn-moscow-eyeball.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vvpn-moscow-eyeball-pr11
+  cancel-in-progress: true
+
+jobs:
+  consumer-network:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate tool with unit tests
+        env:
+          PYTHONPATH: tools/vvpn
+        run: python -m unittest discover -s tools/vvpn/tests -v
+      - name: Probe six sites with Moscow eyeball-network nodes (not Chromium)
+        env:
+          PYTHONPATH: tools/vvpn
+        run: python tools/vvpn/moscow_eyeball.py --output vvpn-results/moscow-eyeball
+      - name: Print exact status, network type, and HTTP codes
+        if: always()
+        run: |
+          if [ -f vvpn-results/moscow-eyeball/report.md ]; then
+            cat vvpn-results/moscow-eyeball/report.md >> "$GITHUB_STEP_SUMMARY"
+            cat vvpn-results/moscow-eyeball/report.json
+          fi
+      - name: Upload JSON and Markdown observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vvpn-moscow-consumer-isp
+          path: vvpn-results/moscow-eyeball/
+          if-no-files-found: warn
+          retention-days: 7

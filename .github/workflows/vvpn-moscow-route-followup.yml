@@ -1,0 +1,49 @@
+name: VVPN Moscow HOSTKEY route follow-up
+
+on:
+  pull_request:
+    paths:
+      - "tools/vvpn/moscow_route_followup.py"
+      - "tools/vvpn/tests/test_moscow_route_followup.py"
+      - ".github/workflows/vvpn-moscow-route-followup.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vvpn-moscow-route-followup-pr11
+  cancel-in-progress: true
+
+jobs:
+  compare-routes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run all VVPN regression tests
+        env:
+          PYTHONPATH: tools/vvpn
+        run: python -m unittest discover -s tools/vvpn/tests -v
+      - name: Compare 5 public URLs on HOSTKEY and Timeweb Moscow ASNs
+        env:
+          PYTHONPATH: tools/vvpn
+        run: python tools/vvpn/moscow_route_followup.py --output vvpn-results/moscow-route-followup
+      - name: Report exact ASN, HTTP status and errors
+        if: "!cancelled()"
+        run: |
+          if [ -f vvpn-results/moscow-route-followup/report.md ]; then
+            cat vvpn-results/moscow-route-followup/report.md >> "$GITHUB_STEP_SUMMARY"
+            cat vvpn-results/moscow-route-followup/report.json
+          fi
+      - name: Save per-AS diagnostic JSON and summary
+        if: "!cancelled()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: vvpn-moscow-hostkey-timeweb-followup
+          path: vvpn-results/moscow-route-followup/
+          if-no-files-found: warn
+          retention-days: 7
