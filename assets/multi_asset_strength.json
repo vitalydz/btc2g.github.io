@@ -8,7 +8,7 @@
   },
   "price_basis": "Latest completed common daily close; no forward-filled quotes",
   "updated_for_market_date": "2026-11-23",
-  "generated_at_utc": "2026-11-24T13:40:22.759631+00:00",
+  "generated_at_utc": "2026-11-24T23:53:12.703761+00:00",
   "pairs": {
     "btc_gold": {
       "label": "BTC / Gold",
