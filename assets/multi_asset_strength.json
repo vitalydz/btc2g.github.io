@@ -7,8 +7,8 @@
     "SPX": "^GSPC"
   },
   "price_basis": "Latest completed common daily close; no forward-filled quotes",
-  "updated_for_market_date": "2026-11-20",
-  "generated_at_utc": "2026-11-24T02:12:29.793798+00:00",
+  "updated_for_market_date": "2026-11-23",
+  "generated_at_utc": "2026-11-24T13:40:22.759631+00:00",
   "pairs": {
     "btc_gold": {
       "label": "BTC / Gold",
@@ -34,36 +34,29 @@
   "current": {
     "pairs": {
       "btc_gold": {
-        "value": 16.726114,
-        "change_7d_pct": -4.76,
-        "change_30d_pct": -17.38
+        "value": 16.763703,
+        "change_7d_pct": -0.41,
+        "change_30d_pct": -17.13
       },
       "btc_silver": {
-        "value": 1432.898274,
-        "change_7d_pct": 2.94,
-        "change_30d_pct": -2.06
+        "value": 1418.661443,
+        "change_7d_pct": 2.34,
+        "change_30d_pct": -6.01
       },
       "btc_spx": {
-        "value": 8.508779,
-        "change_7d_pct": -5.73,
-        "change_30d_pct": -21.43
+        "value": 8.457862,
+        "change_7d_pct": -3.28,
+        "change_30d_pct": -20.47
       },
       "gold_spx": {
-        "value": 0.508712,
-        "change_7d_pct": -1.02,
-        "change_30d_pct": -4.91
+        "value": 0.504534,
+        "change_7d_pct": -2.88,
+        "change_30d_pct": -4.03
       }
     },
     "strongest_btc_30d": "btc_silver"
   },
   "series": [
-    {
-      "date": "2025-06-11",
-      "btc_gold": 32.504898,
-      "btc_silver": 3005.215503,
-      "btc_spx": 18.047541,
-      "gold_spx": 0.555225
-    },
     {
       "date": "2025-06-12",
       "btc_gold": 31.133629,
@@ -2611,6 +2604,13 @@
       "btc_silver": 1432.898274,
       "btc_spx": 8.508779,
       "gold_spx": 0.508712
+    },
+    {
+      "date": "2026-11-23",
+      "btc_gold": 16.763703,
+      "btc_silver": 1418.661443,
+      "btc_spx": 8.457862,
+      "gold_spx": 0.504534
     }
   ],
   "disclaimer": "Relative price ratios, not exchange rates or investment recommendations."
