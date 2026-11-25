@@ -87,12 +87,29 @@ def load_targets(path):
     return targets
 
 
-def codex_environment():
+def codex_environment(standalone=False):
     # Codex keeps its own login, but never inherits the bridge's GitHub credentials.
-    return {key: value for key, value in os.environ.items()
+    environment = {key: value for key, value in os.environ.items()
             if key.upper() not in {"ACC_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN", "GH_ENTERPRISE_TOKEN",
                                    "GITHUB_ENTERPRISE_TOKEN", "GIT_ASKPASS", "SSH_ASKPASS"}
             and not key.upper().startswith(("GIT_CONFIG_", "ACC_BRIDGE_"))}
+    if standalone:
+        # These describe the parent desktop app's runtime service, not permissions.
+        # The standalone package supplies its own runtime; keep permission/policy settings.
+        for key in ("CODEX_APP_RUNTIME_CLI_PATH", "CODEX_APP_TOOLS_PIPE_PATH",
+                    "CODEX_WINDOWS_REGISTERED_CORE", "CODEX_WINDOWS_SANDBOX_PACKAGE_FAMILY"):
+            environment.pop(key, None)
+    return environment
+
+
+def local_codex_executable():
+    root = Path(__file__).resolve().parent
+    relative = Path("runtime/node_modules/@openai/codex-win32-x64/vendor/x86_64-pc-windows-msvc/bin/codex.exe")
+    for base in (root, root / "ACC_1_3"):
+        executable = base / relative
+        if executable.is_file() and (executable.parent.parent / "codex-package.json").is_file():
+            return str(executable)
+    return "codex"
 
 
 def redact(text, secrets=()):
@@ -113,8 +130,9 @@ def dialogue_result(text):
 
 
 class CodexExecutor:
-    def __init__(self, executable="codex"):
-        self.executable = executable
+    def __init__(self, executable=None):
+        self.executable = executable or local_codex_executable()
+        self.standalone = (Path(self.executable).parent.parent / "codex-package.json").is_file()
         self.launch_count = 0
 
     def execute(self, target, session_id, prompt, cancel, notify):
@@ -143,7 +161,7 @@ class CodexExecutor:
                 + ("Local target scope:\n" + target["context"] + "\n\n" if target.get("context") else "")
                 + "User message:\n" + prompt)
             with (Path(directory) / "stderr.txt").open("w", encoding="utf-8") as stderr:
-                proc = subprocess.Popen(command, cwd=target["project"], env=codex_environment(),
+                proc = subprocess.Popen(command, cwd=target["project"], env=codex_environment(self.standalone),
                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=stderr,
                     text=True, encoding="utf-8", errors="replace", bufsize=1,
                     creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),

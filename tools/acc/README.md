@@ -80,3 +80,10 @@ ACC now polls a configured GitHub Issue every five seconds independently of Code
 Task messages queue and resume a dedicated CLI session; status and cancel require no model call.
 Use the **Vita / Codex** button. See [VITA_INBOX.md](VITA_INBOX.md) for the live test channel,
 message format, target configuration, stop command, and limitations.
+
+## Standalone runtime repair
+
+ACC prefers a complete official CLI installation under `runtime/`. Run
+`Install_ACC_Runtime.bat` in ACC_1_3 to install pinned version 0.172.0 with npm.
+Desktop service bindings are removed only from the standalone child environment;
+sandbox and permission settings remain enforced. See RUNTIME_FIX.md.

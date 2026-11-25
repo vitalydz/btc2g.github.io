@@ -143,3 +143,10 @@ Codex может вернуть WAITING_USER. Очередь цели ждёт �
 блокируется из-за отсутствия отдельной привязки VitdArt или другого сайта.
 Режим read-only: общие вопросы и проверка данных. Доступ к инструментам
 проверяется отдельно от доставки сообщения. mpa остаётся для MPA_04.
+
+## Standalone runtime repair
+
+ACC prefers a complete official CLI installation under `runtime/`. Run
+`Install_ACC_Runtime.bat` in ACC_1_3 to install pinned version 0.172.0 with npm.
+Desktop service bindings are removed only from the standalone child environment;
+sandbox and permission settings remain enforced. See RUNTIME_FIX.md.

@@ -271,6 +271,20 @@ class ProtocolTests(unittest.TestCase):
         self.assertNotIn("GIT_CONFIG_VALUE_0", env)
         self.assertEqual(env["PATH"], "keep")
 
+    def test_standalone_runtime_drops_app_binding_but_preserves_policy(self):
+        bindings = {"CODEX_APP_RUNTIME_CLI_PATH": "desktop-cli",
+                    "CODEX_APP_TOOLS_PIPE_PATH": "desktop-pipe",
+                    "CODEX_WINDOWS_REGISTERED_CORE": "desktop-core",
+                    "CODEX_WINDOWS_SANDBOX_PACKAGE_FAMILY": "desktop-family"}
+        with patch.dict(os.environ, dict(bindings, CODEX_PERMISSION_PROFILE="restricted", CODEX_HOME="existing-home")):
+            standalone = codex_environment(standalone=True)
+            desktop = codex_environment()
+        for key in bindings:
+            self.assertNotIn(key, standalone)
+            self.assertEqual(desktop[key], bindings[key])
+        self.assertEqual(standalone["CODEX_PERMISSION_PROFILE"], "restricted")
+        self.assertEqual(standalone["CODEX_HOME"], "existing-home")
+
     def test_result_redaction(self):
         result = redact("fake-secret-token and ghp_abcdefghijk", ("fake-secret-token",))
         self.assertNotIn("fake-secret-token", result)
