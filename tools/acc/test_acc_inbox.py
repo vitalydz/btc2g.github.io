@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from acc_github_bridge import BridgeError, StateStore
-from acc_codex_inbox import Inbox, MARKER, codex_environment, load_targets, parse_message, redact
+from acc_codex_inbox import Inbox, MARKER, codex_environment, load_targets, parse_message, redact, dialogue_result
 
 SESSION = "11111111-1111-4111-8111-111111111111"
 
@@ -89,6 +89,35 @@ class InboxTests(unittest.TestCase):
             self.inbox.tick()
         self.assertEqual(self.client.reads, 20)
         self.assertEqual(len(self.executor.calls), 0)
+
+    def test_question_pauses_tasks_and_reply_resumes_same_session(self):
+        self.client.comments = [message(1), message(2)]
+        self.inbox.ingest(self.client.comments)
+        self.inbox.sessions['test'] = SESSION
+        self.inbox.record('1', 'WAITING_USER', 'Which colour?')
+        self.inbox.dispatch()
+        self.assertEqual(self.executor.calls, [])
+        self.assertIn('reply_to=1', self.inbox.status('test'))
+        self.client.comments.append(message(3, 'reply', reply_to='1', prompt='Blue'))
+        self.inbox.tick()
+        self.assertTrue(self.executor.entered.wait(1))
+        self.assertEqual(self.executor.calls[0][1:], (SESSION, 'Blue'))
+        self.assertEqual(self.inbox.messages['1']['state'], 'ANSWERED')
+        self.assertEqual(self.inbox.messages['2']['state'], 'QUEUED')
+
+    def test_stale_reply_rejected_without_execution(self):
+        self.client.comments = [message(1, 'reply', reply_to='999', prompt='Blue')]
+        self.inbox.tick()
+        self.assertEqual(self.inbox.messages['1']['state'], 'REJECTED')
+        self.assertEqual(self.executor.calls, [])
+
+    def test_cancel_clears_waiting_question(self):
+        self.client.comments = [message(1)]
+        self.inbox.ingest(self.client.comments)
+        self.inbox.record('1', 'WAITING_USER', 'Which colour?')
+        self.client.comments.append(message(2, 'cancel'))
+        self.inbox.tick()
+        self.assertEqual(self.inbox.messages['1']['state'], 'CANCELLED')
 
     def test_changed_alias_binding_is_rejected(self):
         with self.assertRaises(BridgeError):
@@ -217,6 +246,12 @@ class InboxTests(unittest.TestCase):
 
 
 class ProtocolTests(unittest.TestCase):
+    def test_question_marker_only_at_start(self):
+        self.assertEqual(dialogue_result('ACC_QUESTION: Which colour?'),
+                         {'state': 'WAITING_USER', 'result': 'Which colour?'})
+        self.assertEqual(dialogue_result('Example ACC_QUESTION: test')['state'], 'COMPLETED')
+        self.assertEqual(dialogue_result('Done')['state'], 'COMPLETED')
+
     def test_owner_runner_and_reply_filters(self):
         m = message(1)
         self.assertIsNone(parse_message(m, "someone-else", "test-runner"))

@@ -183,7 +183,7 @@
       "post": {
         "operationId": "sendAccInboxMessage",
         "summary": "Send a task, status request or cancellation to ACC",
-        "description": "Append one new owner-authorized message to the configured inbox issue (test: 12). Body starts with <!-- acc-inbox:v1 --> and one fenced JSON block: runner, action (task/status/cancel), target alias, and prompt for task only. Test runner win11, target acc-test. Do not resend on timeout: read comments first. Never include secrets. COMPLETED receipt, not comment creation, confirms completion.",
+        "description": "Append one new owner-authorized message to the configured inbox issue (current: 2). Body starts with <!-- acc-inbox:v1 --> and one fenced JSON block: runner, action (task/status/cancel), target alias, and prompt for task only. Test runner win11, target acc-test. Do not resend on timeout: read comments first. Never include secrets. COMPLETED receipt, not comment creation, confirms completion. Dialogue: on WAITING_USER relay the question to the user, then send action reply with prompt and reply_to set to the original Message ID. Preserve target. Read VITA_RELAY_INSTRUCTIONS.md for the relay protocol.",
         "x-openai-isConsequential": true,
         "parameters": [
           {

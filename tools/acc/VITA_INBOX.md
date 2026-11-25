@@ -6,7 +6,7 @@ ACC проверяет комментарии GitHub каждые 5 секунд
 
 ## Проверить сейчас
 
-Канал: https://github.com/vitalydz/btc2g.github.io/issues/12
+Текущий канал (переключён после уточнения пользователя; первоначальные автоматические тесты прошли в Issue №12): https://github.com/vitalydz/btc2g.github.io/issues/2
 
 На Win11 запущен отдельный фоновый приёмник. Доступная цель — `acc-test`:
 тестовая папка, read-only, отдельная сессия Codex с сохранением контекста.
@@ -15,7 +15,7 @@ ACC проверяет комментарии GitHub каждые 5 секунд
 
 Передайте Vita такую инструкцию:
 
-> Для общения с ACC добавляй новый комментарий в Issue 12 репозитория
+> Для общения с ACC добавляй новый комментарий в Issue 2 репозитория
 > vitalydz/btc2g.github.io. Начинай комментарий с `<!-- acc-inbox:v1 -->`,
 > затем один блок JSON. runner: win11, target: acc-test. Для задания action:
 > task и prompt с текстом пользователя; для состояния action: status; для
@@ -86,13 +86,13 @@ Credential Manager. Токены не записываются в настрой
 Из папки ACC_1_3:
 
 ```powershell
-python acc_codex_inbox.py --repo vitalydz/btc2g.github.io --owner vitalydz --runner win11 --issue 12 --targets "$env:USERPROFILE\.acc\vita-inbox-targets.json" --allow-tasks
+python acc_codex_inbox.py --repo vitalydz/btc2g.github.io --owner vitalydz --runner win11 --issue 2 --targets "$env:USERPROFILE\.acc\vita-inbox-targets.json" --allow-tasks
 ```
 
 Остановка такого приёмника из другого терминала:
 
 ```powershell
-python acc_codex_inbox.py --repo vitalydz/btc2g.github.io --owner vitalydz --runner win11 --issue 12 --stop
+python acc_codex_inbox.py --repo vitalydz/btc2g.github.io --owner vitalydz --runner win11 --issue 2 --stop
 ```
 
 Дождитесь выхода процесса перед запуском через GUI. Два приёмника одной
@@ -122,3 +122,9 @@ Win10/VITALY PC в этой проверке не участвовал.
 
 Публикация версий — отдельный протокол `acc-job:v1`, см. GITHUB_MOBILE_CLOUD.md.
 Данная очередь `acc-inbox:v1` доставляет обычные задания Codex.
+
+## Диалог через Vita
+
+Постоянная инструкция посредника: [VITA_RELAY_INSTRUCTIONS.md](VITA_RELAY_INSTRUCTIONS.md).
+Codex может вернуть WAITING_USER. Очередь цели ждёт сообщения action=reply
+с prompt и reply_to (Message ID вопроса). Ответ продолжает ту же сессию.

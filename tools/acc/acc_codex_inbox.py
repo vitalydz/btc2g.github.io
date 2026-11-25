@@ -20,7 +20,7 @@ import uuid
 from acc_github_bridge import BridgeError, GitHubClient, RateLimited, StateStore, github_token
 
 MARKER = "<!-- acc-inbox:v1 -->"
-TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "UNKNOWN", "REJECTED"}
+TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "UNKNOWN", "REJECTED", "WAITING_USER", "ANSWERED"}
 
 
 def now():
@@ -44,14 +44,17 @@ def parse_message(comment, owner, runner):
         return None
     action = job.get("action")
     allowed = {"task": {"runner", "action", "target", "prompt"},
+               "reply": {"runner", "action", "target", "prompt", "reply_to"},
                "status": {"runner", "action", "target"},
                "cancel": {"runner", "action", "target"}}
     if action not in allowed or set(job) - allowed[action]:
         raise BridgeError("Only task, status and cancel are accepted; no shell/path/session overrides.")
     if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", str(job.get("target", ""))):
         raise BridgeError("A configured target alias is required.")
-    if action == "task" and (not isinstance(job.get("prompt"), str) or not 1 <= len(job["prompt"].strip()) <= 20000):
+    if action in {"task", "reply"} and (not isinstance(job.get("prompt"), str) or not 1 <= len(job["prompt"].strip()) <= 20000):
         raise BridgeError("Task prompt must contain 1–20000 characters.")
+    if action == "reply" and not re.fullmatch(r"[0-9]{1,30}", str(job.get("reply_to", ""))):
+        raise BridgeError("reply_to must identify the message that is waiting for the user.")
     return job
 
 
@@ -97,6 +100,15 @@ def redact(text, secrets=()):
                   "[REDACTED]", text)
 
 
+def dialogue_result(text):
+    marker = "ACC_QUESTION:"
+    if text.strip().startswith(marker):
+        question = text.strip()[len(marker):].strip()
+        if question:
+            return {"state": "WAITING_USER", "result": question}
+    return {"state": "COMPLETED", "result": text or "Task completed."}
+
+
 class CodexExecutor:
     def __init__(self, executable="codex"):
         self.executable = executable
@@ -120,6 +132,10 @@ class CodexExecutor:
             instructions = (
                 "This is an ACC-delivered task. Do not poll GitHub or wait for further messages. "
                 "Complete this task and return a concise result. Do not publish secrets. "
+                "You are speaking to the user through Vita, a relay. Answer in the user's language. "
+                "If a necessary clarification or approval is missing, end this turn with a final answer "
+                "starting exactly ACC_QUESTION: followed by the question. Do not wait or poll; "
+                "the user's reply will arrive as another turn in this same session. "
                 "Do not push, deploy or publish externally unless this task explicitly requests it.\n\n" + prompt)
             with (Path(directory) / "stderr.txt").open("w", encoding="utf-8") as stderr:
                 proc = subprocess.Popen(command, cwd=target["project"], env=codex_environment(),
@@ -188,7 +204,7 @@ class CodexExecutor:
                             "result": "ACC stopped its Codex process. Inspect any partial file changes."}
                 text = output.read_text(encoding="utf-8").strip() if output.exists() else ""
                 if code == 0 and done and not turn_failed and discovered:
-                    return {"state": "COMPLETED", "session_id": discovered, "result": text or "Task completed."}
+                    return dict(dialogue_result(text), session_id=discovered)
                 return {"state": "FAILED" if code != 0 or turn_failed else "UNKNOWN", "session_id": discovered,
                         "result": text or f"Codex did not confirm successful completion (exit {code}). Check local Codex configuration/authentication."}
 
@@ -293,23 +309,31 @@ class Inbox:
                 self.record(key, "COMPLETED", self.status(job["target"]))
             elif job["action"] == "cancel":
                 for other, row in list(self.messages.items()):
-                    if other != key and row["job"]["target"] == job["target"] and row["state"] in {"QUEUED", "RECEIVED"}:
+                    if other != key and row["job"]["target"] == job["target"] and row["state"] in {"QUEUED", "RECEIVED", "WAITING_USER"}:
                         self.record(other, "CANCELLED", "Cancelled by an explicit owner command.")
                 if self.active and self.messages[self.active]["job"]["target"] == job["target"]:
                     self.cancel.set()
                 self.record(key, "COMPLETED", "Cancellation requested for ACC-owned work; unrelated Codex chats were not touched.")
             else:
+                if job["action"] == "reply":
+                    parent = self.messages.get(str(job["reply_to"]))
+                    if not parent or parent["state"] != "WAITING_USER" or parent["job"]["target"] != job["target"]:
+                        self.record(key, "REJECTED", "Reply does not match a question currently waiting on this target.")
+                        continue
                 state = "QUEUED" if self.auto else "RECEIVED"
                 self.record(key, state, "Queued; Codex receives nothing until its turn." if self.auto else "Waiting for local approval.")
 
     def status(self, target):
         rows = [(key, r) for key, r in self.messages.items()
-                if r["job"]["target"] == target and r["job"]["action"] == "task"]
+                if r["job"]["target"] == target and r["job"]["action"] in {"task", "reply"}]
         running = [key for key, r in rows if r["state"] == "RUNNING"]
         waiting = [key for key, r in rows if r["state"] in {"QUEUED", "RECEIVED"}]
         recent = next(((key, r) for key, r in reversed(rows) if r["state"] in TERMINAL), None)
         summary = f"ACC status (no model call): running={running or 'none'}, queued={waiting or 'none'}."
         summary += f"\nSession: {self.sessions.get(target) or self.targets[target].get('session_id') or 'not created yet'}"
+        for key, row in rows:
+            if row["state"] == "WAITING_USER":
+                summary += f"\nWAITING_USER; reply_to={key}: {row['detail'][:1500]}"
         if recent:
             summary += f"\nLast task {recent[0]}: {recent[1]['state']}\n{recent[1]['detail'][:1500]}"
         return summary
@@ -351,7 +375,14 @@ class Inbox:
                 continue
             target_name = row["job"]["target"]
             target = self.targets[target_name]
-            if any(other["state"] == "UNKNOWN" and other["job"]["action"] == "task"
+            waiting = {k for k, r in self.messages.items() if r["state"] == "WAITING_USER" and r["job"]["target"] == target_name}
+            if row["job"]["action"] == "reply":
+                if str(row["job"]["reply_to"]) not in waiting:
+                    self.record(key, "REJECTED", "Question has already been answered or cancelled.")
+                    continue
+            elif waiting:
+                continue
+            if any(other["state"] == "UNKNOWN" and other["job"]["action"] in {"task", "reply"}
                    and (other["job"]["target"] == target_name or
                         os.path.normcase(self.targets.get(other["job"]["target"], {}).get("project", ""))
                         == os.path.normcase(target["project"])) for other in self.messages.values()):
@@ -377,6 +408,9 @@ class Inbox:
                 self.project_lock = None
                 raise
             self.active = key
+            if row["job"]["action"] == "reply":
+                parent_key = str(row["job"]["reply_to"])
+                self.record(parent_key, "ANSWERED", self.messages[parent_key]["detail"])
             self.cancel = threading.Event()
             session = self.sessions.get(target_name) or target.get("session_id")
 
