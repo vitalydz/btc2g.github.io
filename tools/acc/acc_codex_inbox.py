@@ -81,6 +81,9 @@ def load_targets(path):
                 raise BridgeError(f"Target {alias}: use a session UUID or null for a dedicated new chat.") from None
         if target.get("sandbox", "workspace-write") not in {"read-only", "workspace-write"}:
             raise BridgeError("Inbox targets cannot disable sandboxing.")
+        context = target.get("context", "")
+        if not isinstance(context, str) or len(context) > 20000:
+            raise BridgeError("Local target context must be text up to 20000 characters.")
     return targets
 
 
@@ -136,7 +139,9 @@ class CodexExecutor:
                 "If a necessary clarification or approval is missing, end this turn with a final answer "
                 "starting exactly ACC_QUESTION: followed by the question. Do not wait or poll; "
                 "the user's reply will arrive as another turn in this same session. "
-                "Do not push, deploy or publish externally unless this task explicitly requests it.\n\n" + prompt)
+                "Do not push, deploy or publish externally unless this task explicitly requests it.\n\n"
+                + ("Local target scope:\n" + target["context"] + "\n\n" if target.get("context") else "")
+                + "User message:\n" + prompt)
             with (Path(directory) / "stderr.txt").open("w", encoding="utf-8") as stderr:
                 proc = subprocess.Popen(command, cwd=target["project"], env=codex_environment(),
                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=stderr,
