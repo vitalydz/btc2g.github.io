@@ -1,0 +1,37 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "btc2g-accounts",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-29",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "triggers": {
+    "crons": ["17 1 * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "btc2g-users",
+      "database_id": "c84b5fe0-b86e-4a79-bfaf-097d424e0a87",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "APP_ORIGIN": "https://btc2g-accounts.btc2g.workers.dev",
+    "PUBLIC_SITE_ORIGIN": "https://btc2g.com",
+    "AUDIENCE_STATS_URL": "https://btc2g-audience.vercel.app/api/stats",
+    "APP_VERSION": "2026.11.10.1",
+    "TERMS_VERSION": "2026-10-29.3",
+    "REGISTRATION_LIMIT_PER_HOUR": "5",
+    "EMAIL_FROM": "BTC2G <accounts@btc2g.com>",
+    "WEBAUTHN_RP_ID": "btc2g-accounts.btc2g.workers.dev",
+    "WEBAUTHN_RP_NAME": "BTC2G",
+    "METRICS_RETENTION_DAYS": "400"
+  }
+}
+

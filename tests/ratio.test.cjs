@@ -13,6 +13,7 @@ for (const file of fs.readdirSync(root).filter(name => name.endsWith('.html'))) 
   }
 }
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+assert.doesNotMatch(html, /getElementById\('current-date'\)\.textContent/);
 const renderRatio = html.match(/    function renderRatio\(\) \{[\s\S]*?\n    \}/)[0];
 const output = {};
 const context = vm.createContext({

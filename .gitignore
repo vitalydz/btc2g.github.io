@@ -1,4 +1,8 @@
 node_modules/
+.wrangler/
+**/__pycache__/
+cloudflare/auth/.dev.vars
+cloudflare/auth/.secrets/
 .env
 .env.local
 

@@ -1,0 +1,1224 @@
+import {
+  EMAIL_VERIFICATION_MAX_AGE_SECONDS,
+  PASSWORD_ITERATIONS,
+  SESSION_MAX_AGE_SECONDS,
+  acquisitionSource,
+  campaignAcquisitionSource,
+  clearSessionCookie,
+  jerusalemDay,
+  normalizeEmail,
+  normalizePagePath,
+  pageAcquisitionSource,
+  normalizeUsername,
+  parseCookies,
+  publicStats,
+  sessionCookie,
+  validateEmail,
+  validateRegistration
+} from './core.js';
+import { confirmedSubscriptions, confirmedSubscriptionsFromAudience, registrationRatio, trafficMetrics } from './metrics.js';
+import {
+  generateAuthenticationOptions,
+  generateRegistrationOptions,
+  verifyAuthenticationResponse,
+  verifyRegistrationResponse
+} from '@simplewebauthn/server';
+
+const encoder = new TextEncoder();
+const LOGIN_WINDOW_SECONDS = 15 * 60;
+const LOGIN_LOCK_SECONDS = 15 * 60;
+const LOGIN_PAIR_LIMIT = 5;
+const LOGIN_IDENTITY_LIMIT = 20;
+const LOGIN_IP_LIMIT = 30;
+const WEBAUTHN_CHALLENGE_SECONDS = 5 * 60;
+const WEBAUTHN_ALGORITHMS = [-7, -257];
+const IDEA_LIMIT_PER_ACCOUNT = 3;
+const IDEA_ATTEMPT_LIMIT_PER_MINUTE = 5;
+const ACCOUNT_LANGUAGES = new Set(['en','ru','he','de','fr','es','zh','it','pt','ar','hi','ja','ko','tr','pl','nl','uk','id','vi']);
+
+function accountLanguage(value) {
+  const language = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return ACCOUNT_LANGUAGES.has(language) ? language : 'en';
+}
+
+function json(data, status = 200, headers = {}) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers }
+  });
+}
+
+const SECURITY_HEADERS = {
+  'content-security-policy': "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests",
+  'permissions-policy': 'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
+  'referrer-policy': 'no-referrer',
+  'strict-transport-security': 'max-age=31536000; includeSubDomains',
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY'
+};
+
+function secured(response) {
+  const headers = new Headers(response.headers);
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) headers.set(name, value);
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+function corsHeaders(origin, env) {
+  if (!origin || origin !== env.PUBLIC_SITE_ORIGIN) return {};
+  return {
+    'access-control-allow-origin': origin,
+    'access-control-allow-methods': 'POST, OPTIONS',
+    'access-control-allow-headers': 'content-type',
+    'access-control-max-age': '86400',
+    vary: 'Origin'
+  };
+}
+
+function bytesToBase64Url(bytes) {
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
+}
+
+function randomToken(byteLength = 32) {
+  return bytesToBase64Url(crypto.getRandomValues(new Uint8Array(byteLength)));
+}
+
+async function sha256(value) {
+  return bytesToBase64Url(new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(value))));
+}
+
+async function hmacSha256(secret, value) {
+  const key = await crypto.subtle.importKey(
+    'raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  return bytesToBase64Url(new Uint8Array(await crypto.subtle.sign('HMAC', key, encoder.encode(value))));
+}
+
+async function passwordHash(password, salt, iterations = PASSWORD_ITERATIONS) {
+  // Workers cap one PBKDF2 operation at 100k iterations. Chain supported
+  // rounds so the stored work factor remains 210k without exceeding the API cap.
+  let material = encoder.encode(password);
+  let remaining = iterations;
+  let round = 0;
+  while (remaining > 0) {
+    const roundIterations = Math.min(remaining, 100000);
+    const key = await crypto.subtle.importKey('raw', material, 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', hash: 'SHA-256', salt: encoder.encode(`${salt}:${round}`), iterations: roundIterations },
+      key,
+      256
+    );
+    material = new Uint8Array(bits);
+    remaining -= roundIterations;
+    round += 1;
+  }
+  return bytesToBase64Url(material);
+}
+
+function constantTimeEqual(left, right) {
+  if (left.length !== right.length) return false;
+  let difference = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    difference |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+  return difference === 0;
+}
+
+async function requestVisitorHash(request, env, day) {
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const userAgent = (request.headers.get('User-Agent') || 'unknown').slice(0, 256);
+  return hmacSha256(env.IP_HASH_SECRET, `${day}:${ip}:${userAgent}`);
+}
+
+async function createAttributionToken(env, day, visitorHash, source) {
+  const signature = await hmacSha256(env.IP_HASH_SECRET, `${day}:${visitorHash}:${source}`);
+  return `${day}.${source}.${signature}`;
+}
+
+async function verifiedAttributionSource(request, env, token) {
+  if (!env.IP_HASH_SECRET || typeof token !== 'string') return null;
+  const [day, source, signature, extra] = token.split('.');
+  if (extra !== undefined || day !== jerusalemDay() || !['producthunt', 'scenario', 'telegram', 'reddit', 'linkedin', 'directory'].includes(source) || !signature) return null;
+  const visitorHash = await requestVisitorHash(request, env, day);
+  const expected = await hmacSha256(env.IP_HASH_SECRET, `${day}:${visitorHash}:${source}`);
+  return constantTimeEqual(signature, expected) ? source : null;
+}
+
+function sameOrigin(request, env) {
+  const origin = request.headers.get('Origin');
+  return !origin || origin === env.APP_ORIGIN || origin === new URL(request.url).origin;
+}
+
+function userView(user) {
+  return {
+    username: user.username,
+    role: user.role,
+    email: user.email || null,
+    emailVerified: Boolean(user.email_verified_at)
+  };
+}
+
+function ideaView(idea) {
+  return {
+    id: idea.id,
+    title: idea.title,
+    audience: idea.audience,
+    problem: idea.problem,
+    solution: idea.solution,
+    status: idea.status,
+    moderationNote: idea.moderation_note || null,
+    createdAt: idea.created_at,
+    updatedAt: idea.updated_at
+  };
+}
+
+async function body(request) {
+  const type = request.headers.get('content-type') || '';
+  if (!type.includes('application/json')) throw new Error('Content-Type must be application/json.');
+  return request.json();
+}
+
+function ideaText(value, name, minimum, maximum) {
+  if (typeof value !== 'string') throw new Error(`${name} is required.`);
+  const text = value.trim().replace(/\r\n?/g, '\n');
+  if (text.length < minimum || text.length > maximum) {
+    throw new Error(`${name} must be ${minimum}–${maximum} characters.`);
+  }
+  if (/\0|[\u0001-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(text)) {
+    throw new Error(`${name} contains unsupported characters.`);
+  }
+  return text;
+}
+
+async function enforceRegistrationLimit(request, env) {
+  if (!env.IP_HASH_SECRET) throw new Error('Registration is temporarily unavailable.');
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const ipHash = await sha256(`${env.IP_HASH_SECRET}:${ip}`);
+  const now = Math.floor(Date.now() / 1000);
+  const windowStart = Math.floor(now / 3600) * 3600;
+  const result = await env.DB.prepare(`
+    INSERT INTO registration_attempts (ip_hash, window_start, attempt_count)
+    VALUES (?, ?, 1)
+    ON CONFLICT(ip_hash, window_start)
+    DO UPDATE SET attempt_count = attempt_count + 1
+    RETURNING attempt_count
+  `).bind(ipHash, windowStart).first();
+  const limit = Number(env.REGISTRATION_LIMIT_PER_HOUR || 5);
+  return Number(result?.attempt_count || 1) <= limit;
+}
+
+async function loginScopes(request, env, usernameKey) {
+  if (!env.IP_HASH_SECRET) throw new Error('Sign-in protection is unavailable.');
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const [pair, identity, network] = await Promise.all([
+    sha256(`${env.IP_HASH_SECRET}:login:pair:${ip}:${usernameKey}`),
+    sha256(`${env.IP_HASH_SECRET}:login:identity:${usernameKey}`),
+    sha256(`${env.IP_HASH_SECRET}:login:network:${ip}`)
+  ]);
+  return [
+    { key: pair, limit: LOGIN_PAIR_LIMIT },
+    { key: identity, limit: LOGIN_IDENTITY_LIMIT },
+    { key: network, limit: LOGIN_IP_LIMIT }
+  ];
+}
+
+async function loginBlocked(env, scopes, now) {
+  const row = await env.DB.prepare(`
+    SELECT locked_until FROM login_rate_limits
+    WHERE scope_key IN (?, ?, ?) AND locked_until > ?
+    ORDER BY locked_until DESC LIMIT 1
+  `).bind(scopes[0].key, scopes[1].key, scopes[2].key, now).first();
+  return Number(row?.locked_until || 0);
+}
+
+async function recordLoginFailure(env, scopes, now) {
+  const cutoff = now - LOGIN_WINDOW_SECONDS;
+  const lockUntil = now + LOGIN_LOCK_SECONDS;
+  let blockedUntil = 0;
+  for (const scope of scopes) {
+    const row = await env.DB.prepare(`
+      INSERT INTO login_rate_limits
+        (scope_key, window_start, failure_count, locked_until, last_failed_at)
+      VALUES (?, ?, 1, 0, ?)
+      ON CONFLICT(scope_key) DO UPDATE SET
+        failure_count = CASE
+          WHEN login_rate_limits.window_start <= ? THEN 1
+          ELSE login_rate_limits.failure_count + 1
+        END,
+        window_start = CASE
+          WHEN login_rate_limits.window_start <= ? THEN ?
+          ELSE login_rate_limits.window_start
+        END,
+        locked_until = CASE
+          WHEN (CASE
+            WHEN login_rate_limits.window_start <= ? THEN 1
+            ELSE login_rate_limits.failure_count + 1
+          END) >= ? THEN ?
+          ELSE login_rate_limits.locked_until
+        END,
+        last_failed_at = ?
+      RETURNING locked_until
+    `).bind(scope.key, now, now, cutoff, cutoff, now, cutoff, scope.limit, lockUntil, now).first();
+    blockedUntil = Math.max(blockedUntil, Number(row?.locked_until || 0));
+  }
+  return blockedUntil;
+}
+
+async function clearLoginFailures(env, scopes) {
+  // A successful password clears the account-specific scopes. Network-wide
+  // failures remain so one valid login cannot reset a distributed spray attack.
+  await env.DB.prepare('DELETE FROM login_rate_limits WHERE scope_key IN (?, ?)')
+    .bind(scopes[0].key, scopes[1].key).run();
+}
+
+function passkeyConfiguration(env) {
+  if (!env.WEBAUTHN_RP_ID || !env.WEBAUTHN_RP_NAME || !env.APP_ORIGIN) {
+    throw new Error('Passkey authentication is not configured.');
+  }
+  return { rpID: env.WEBAUTHN_RP_ID, rpName: env.WEBAUTHN_RP_NAME, origin: env.APP_ORIGIN };
+}
+
+function transports(value) {
+  try {
+    const parsed = JSON.parse(value || '[]');
+    return Array.isArray(parsed) ? parsed.filter(item => typeof item === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+async function userPasskeys(env, userId) {
+  const result = await env.DB.prepare(`
+    SELECT credential_id, public_key, counter, transports, device_type, backed_up,
+           display_name, created_at, last_used_at
+    FROM passkeys WHERE user_id = ? ORDER BY created_at ASC
+  `).bind(userId).all();
+  return result.results || [];
+}
+
+async function saveWebAuthnChallenge(env, userId, purpose, challenge) {
+  const challengeId = randomToken(24);
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM webauthn_challenges WHERE user_id = ? AND purpose = ?')
+      .bind(userId, purpose),
+    env.DB.prepare(`
+      INSERT INTO webauthn_challenges
+        (challenge_id, user_id, purpose, challenge, created_at, expires_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(challengeId, userId, purpose, challenge, now, now + WEBAUTHN_CHALLENGE_SECONDS)
+  ]);
+  return challengeId;
+}
+
+async function consumeWebAuthnChallenge(env, challengeId, purpose, userId = null) {
+  const now = Math.floor(Date.now() / 1000);
+  return env.DB.prepare(`
+    DELETE FROM webauthn_challenges
+    WHERE challenge_id = ? AND purpose = ? AND expires_at > ?
+      AND (? IS NULL OR user_id = ?)
+    RETURNING challenge_id, user_id, challenge
+  `).bind(challengeId, purpose, now, userId, userId).first();
+}
+
+async function beginPasskeyAuthentication(env, user) {
+  const config = passkeyConfiguration(env);
+  const keys = await userPasskeys(env, user.id);
+  if (!keys.length) return null;
+  const options = await generateAuthenticationOptions({
+    rpID: config.rpID,
+    allowCredentials: keys.map(key => ({ id: key.credential_id, transports: transports(key.transports) })),
+    userVerification: 'required'
+  });
+  const challengeId = await saveWebAuthnChallenge(env, user.id, 'authentication', options.challenge);
+  return { passkeyRequired: true, challengeId, options };
+}
+
+async function createSession(env, userId, { passkeyVerified = false } = {}) {
+  const token = randomToken();
+  const tokenHash = await sha256(token);
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.prepare(`
+    INSERT INTO sessions
+      (token_hash, user_id, created_at, expires_at, passkey_verified_at)
+    VALUES (?, ?, ?, ?, ?)
+  `).bind(tokenHash, userId, now, now + SESSION_MAX_AGE_SECONDS, passkeyVerified ? now : null).run();
+  return token;
+}
+
+async function register(request, env, { admin = false } = {}) {
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  const validation = validateRegistration(input, { allowReserved: admin });
+  if (!validation.ok) return json({ error: validation.errors[0], errors: validation.errors }, 400);
+  if (admin && validation.usernameKey !== 'codex_admin') return json({ error: 'Bootstrap username must be Codex_admin.' }, 400);
+
+  if (!admin) {
+    try {
+      if (!(await enforceRegistrationLimit(request, env))) {
+        return json({ error: 'Registration limit reached for this network. Try again later.' }, 429);
+      }
+    } catch {
+      return json({ error: 'Registration is temporarily unavailable.' }, 503);
+    }
+    const duplicateEmail = await env.DB.prepare(`
+      SELECT id FROM users WHERE email_key = ? AND disabled_at IS NULL LIMIT 1
+    `).bind(validation.emailKey).first();
+    if (duplicateEmail) return json({ error: 'That email is already attached to an account.' }, 409);
+    const pendingEmail = await env.DB.prepare(`
+      SELECT user_id FROM email_verification_tokens
+      WHERE email_key = ? AND expires_at > ? LIMIT 1
+    `).bind(validation.emailKey, Math.floor(Date.now() / 1000)).first();
+    if (pendingEmail) return json({ error: 'That email is awaiting verification for another account.' }, 409);
+  }
+
+  const salt = randomToken(16);
+  const hash = await passwordHash(input.password, salt);
+  const now = Math.floor(Date.now() / 1000);
+  const id = crypto.randomUUID();
+  const source = admin ? null : await verifiedAttributionSource(request, env, input?.attribution);
+  try {
+    await env.DB.prepare(`
+      INSERT INTO users
+        (id, username, username_key, password_hash, password_salt, password_iterations, role,
+         created_at, created_day, accepted_terms_at, terms_version, acquisition_source)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      id, validation.username, validation.usernameKey, hash, salt, PASSWORD_ITERATIONS,
+      admin ? 'admin' : 'user', now, jerusalemDay(now * 1000), now, env.TERMS_VERSION, source
+    ).run();
+  } catch (error) {
+    if (String(error).toLowerCase().includes('unique')) return json({ error: 'That username is already registered.' }, 409);
+    throw error;
+  }
+  const token = await createSession(env, id);
+  let verificationEmailSent = false;
+  if (!admin) {
+    try {
+      await issueEmailVerification(env, { id, username: validation.username }, {
+        ok: true, email: validation.email, emailKey: validation.emailKey
+      }, { checkDuplicate: false, language: accountLanguage(input?.language) });
+      verificationEmailSent = true;
+    } catch {
+      // Keep the pending account accessible so the owner can sign in and retry delivery.
+    }
+  }
+  return json(
+    {
+      user: {
+        username: validation.username,
+        role: admin ? 'admin' : 'user',
+        email: null,
+        emailVerified: false,
+        pendingEmail: admin ? null : validation.email
+      },
+      verificationEmailSent
+    },
+    201,
+    { 'set-cookie': sessionCookie(token) }
+  );
+}
+
+async function bootstrapAdmin(request, env) {
+  if (!env.BOOTSTRAP_TOKEN) return json({ error: 'Admin bootstrap is disabled.' }, 404);
+  if (request.headers.get('Authorization') !== `Bearer ${env.BOOTSTRAP_TOKEN}`) {
+    return json({ error: 'Unauthorized.' }, 401);
+  }
+  const existing = await env.DB.prepare("SELECT id FROM users WHERE role = 'admin' LIMIT 1").first();
+  if (existing) return json({ error: 'An administrator already exists.' }, 409);
+  return register(request, env, { admin: true });
+}
+
+async function login(request, env) {
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  const usernameKey = normalizeUsername(input?.username).slice(0, 64);
+  const suppliedPassword = String(input?.password || '');
+  const passwordCandidate = suppliedPassword.length <= 128 ? suppliedPassword : '[invalid-password-length]';
+  const now = Math.floor(Date.now() / 1000);
+  let scopes;
+  try {
+    scopes = await loginScopes(request, env, usernameKey);
+    if (await loginBlocked(env, scopes, now)) {
+      return json({ error: 'Too many sign-in attempts. Try again in 15 minutes.' }, 429, { 'retry-after': '900' });
+    }
+  } catch {
+    return json({ error: 'Sign in is temporarily unavailable.' }, 503);
+  }
+  const user = await env.DB.prepare(`
+    SELECT id, username, role, email, email_verified_at,
+           password_hash, password_salt, password_iterations
+    FROM users WHERE username_key = ? AND disabled_at IS NULL
+  `).bind(usernameKey).first();
+  const hash = user
+    ? await passwordHash(passwordCandidate, user.password_salt, user.password_iterations)
+    : await passwordHash(passwordCandidate, 'btc2g-unknown-user', PASSWORD_ITERATIONS);
+  const valid = Boolean(user) && suppliedPassword.length <= 128 && constantTimeEqual(hash, user.password_hash);
+  if (!valid) {
+    const blockedUntil = await recordLoginFailure(env, scopes, now);
+    if (blockedUntil > now) {
+      return json({ error: 'Too many sign-in attempts. Try again in 15 minutes.' }, 429, { 'retry-after': '900' });
+    }
+    return json({ error: 'Invalid username or password.' }, 401);
+  }
+  if (user.role === 'admin') {
+    const passkey = await beginPasskeyAuthentication(env, user);
+    if (passkey) return json(passkey);
+  }
+  await clearLoginFailures(env, scopes);
+  const token = await createSession(env, user.id);
+  return json({ user: userView(user) }, 200, { 'set-cookie': sessionCookie(token) });
+}
+
+async function currentUser(request, env) {
+  const token = parseCookies(request.headers.get('Cookie')).btc2g_session;
+  if (!token) return null;
+  const tokenHash = await sha256(token);
+  const now = Math.floor(Date.now() / 1000);
+  return env.DB.prepare(`
+    SELECT users.id, users.username, users.role, users.email, users.email_verified_at,
+           sessions.passkey_verified_at
+    FROM sessions JOIN users ON users.id = sessions.user_id
+    WHERE sessions.token_hash = ? AND sessions.expires_at > ? AND users.disabled_at IS NULL
+  `).bind(tokenHash, now).first();
+}
+
+function passkeyView(key) {
+  return {
+    id: key.credential_id.slice(-12),
+    name: key.display_name,
+    deviceType: key.device_type || null,
+    backedUp: Boolean(key.backed_up),
+    createdAt: key.created_at,
+    lastUsedAt: key.last_used_at || null
+  };
+}
+
+async function listPasskeys(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  return json({ passkeys: (await userPasskeys(env, user.id)).map(passkeyView) });
+}
+
+async function beginPasskeyRegistration(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  const config = passkeyConfiguration(env);
+  const keys = await userPasskeys(env, user.id);
+  if (keys.length && !user.passkey_verified_at) {
+    return json({ error: 'Sign out and sign in with an existing passkey before adding another.' }, 403);
+  }
+  const account = await env.DB.prepare(`
+    SELECT password_hash, password_salt, password_iterations FROM users WHERE id = ?
+  `).bind(user.id).first();
+  const suppliedPassword = String(input?.password || '');
+  const candidate = suppliedPassword.length <= 128 ? suppliedPassword : '[invalid-password-length]';
+  const hash = await passwordHash(candidate, account.password_salt, account.password_iterations);
+  if (suppliedPassword.length > 128 || !constantTimeEqual(hash, account.password_hash)) {
+    const now = Math.floor(Date.now() / 1000);
+    const scopes = await loginScopes(request, env, normalizeUsername(user.username));
+    const blockedUntil = await recordLoginFailure(env, scopes, now);
+    if (blockedUntil > now) {
+      return json({ error: 'Too many password attempts. Try again in 15 minutes.' }, 429, { 'retry-after': '900' });
+    }
+    return json({ error: 'Administrator password is incorrect.' }, 401);
+  }
+  await clearLoginFailures(env, await loginScopes(request, env, normalizeUsername(user.username)));
+  const options = await generateRegistrationOptions({
+    rpName: config.rpName,
+    rpID: config.rpID,
+    userID: encoder.encode(user.id),
+    userName: user.username,
+    userDisplayName: user.username,
+    attestationType: 'none',
+    excludeCredentials: keys.map(key => ({ id: key.credential_id, transports: transports(key.transports) })),
+    authenticatorSelection: { residentKey: 'preferred', userVerification: 'required' },
+    supportedAlgorithmIDs: WEBAUTHN_ALGORITHMS
+  });
+  const challengeId = await saveWebAuthnChallenge(env, user.id, 'registration', options.challenge);
+  return json({ challengeId, options });
+}
+
+async function finishPasskeyRegistration(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  if (typeof input?.challengeId !== 'string' || !input?.credential || JSON.stringify(input).length > 20000) {
+    return json({ error: 'Invalid passkey registration response.' }, 400);
+  }
+  const pending = await consumeWebAuthnChallenge(env, input.challengeId, 'registration', user.id);
+  if (!pending) return json({ error: 'Passkey setup expired. Start again.' }, 400);
+  const config = passkeyConfiguration(env);
+  let verification;
+  try {
+    verification = await verifyRegistrationResponse({
+      response: input.credential,
+      expectedChallenge: pending.challenge,
+      expectedOrigin: config.origin,
+      expectedRPID: config.rpID,
+      requireUserVerification: true,
+      supportedAlgorithmIDs: WEBAUTHN_ALGORITHMS
+    });
+  } catch {
+    return json({ error: 'Passkey registration could not be verified.' }, 400);
+  }
+  if (!verification.verified || !verification.registrationInfo) {
+    return json({ error: 'Passkey registration could not be verified.' }, 400);
+  }
+  const { credential, credentialDeviceType, credentialBackedUp } = verification.registrationInfo;
+  const now = Math.floor(Date.now() / 1000);
+  const displayName = String(input.name || `Passkey ${new Date().toISOString().slice(0, 10)}`)
+    .trim().slice(0, 50) || 'Passkey';
+  try {
+    await env.DB.prepare(`
+      INSERT INTO passkeys
+        (credential_id, user_id, public_key, counter, transports, device_type,
+         backed_up, display_name, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      credential.id, user.id, credential.publicKey, credential.counter,
+      JSON.stringify(credential.transports || input.credential?.response?.transports || []),
+      credentialDeviceType, credentialBackedUp ? 1 : 0, displayName, now
+    ).run();
+  } catch (error) {
+    const storageError = String(error).toLowerCase();
+    if (storageError.includes('unique')) {
+      return json({ error: 'This passkey is already registered.' }, 409);
+    }
+    throw error;
+  }
+  const sessionToken = parseCookies(request.headers.get('Cookie')).btc2g_session;
+  const sessionHash = await sha256(sessionToken);
+  await env.DB.batch([
+    env.DB.prepare('UPDATE sessions SET passkey_verified_at = ? WHERE token_hash = ? AND user_id = ?')
+      .bind(now, sessionHash, user.id),
+    env.DB.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?')
+      .bind(user.id, sessionHash)
+  ]);
+  return json({ ok: true, passkeys: (await userPasskeys(env, user.id)).map(passkeyView) });
+}
+
+async function finishPasskeyAuthentication(request, env) {
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  if (typeof input?.challengeId !== 'string' || typeof input?.credential?.id !== 'string'
+      || JSON.stringify(input).length > 20000) {
+    return json({ error: 'Invalid passkey response.' }, 400);
+  }
+  const pending = await consumeWebAuthnChallenge(env, input.challengeId, 'authentication');
+  if (!pending) return json({ error: 'Passkey request expired. Sign in again.' }, 400);
+  const key = await env.DB.prepare(`
+    SELECT passkeys.credential_id, passkeys.public_key, passkeys.counter, passkeys.transports,
+           users.id AS user_id, users.username, users.role, users.email, users.email_verified_at
+    FROM passkeys JOIN users ON users.id = passkeys.user_id
+    WHERE passkeys.credential_id = ? AND passkeys.user_id = ?
+      AND users.disabled_at IS NULL AND users.role = 'admin'
+  `).bind(input.credential.id, pending.user_id).first();
+  if (!key) return json({ error: 'Passkey authentication failed.' }, 401);
+  const config = passkeyConfiguration(env);
+  let verification;
+  try {
+    verification = await verifyAuthenticationResponse({
+      response: input.credential,
+      expectedChallenge: pending.challenge,
+      expectedOrigin: config.origin,
+      expectedRPID: config.rpID,
+      credential: {
+        id: key.credential_id,
+        publicKey: new Uint8Array(key.public_key),
+        counter: Number(key.counter || 0),
+        transports: transports(key.transports)
+      },
+      requireUserVerification: true
+    });
+  } catch {
+    return json({ error: 'Passkey authentication failed.' }, 401);
+  }
+  if (!verification.verified) return json({ error: 'Passkey authentication failed.' }, 401);
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.prepare('UPDATE passkeys SET counter = ?, last_used_at = ? WHERE credential_id = ?')
+    .bind(verification.authenticationInfo.newCounter, now, key.credential_id).run();
+  const scopes = await loginScopes(request, env, normalizeUsername(key.username));
+  await clearLoginFailures(env, scopes);
+  const token = await createSession(env, key.user_id, { passkeyVerified: true });
+  return json({ user: userView(key) }, 200, { 'set-cookie': sessionCookie(token) });
+}
+
+async function sendVerificationEmail(env, user, email, token, language = 'en') {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM || !env.APP_ORIGIN) {
+    throw new Error('Email delivery is not configured.');
+  }
+  const link = new URL('/verify-email.html', env.APP_ORIGIN);
+  link.searchParams.set('token', token);
+  link.searchParams.set('lang', accountLanguage(language));
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'content-type': 'application/json',
+      'idempotency-key': `btc2g-email-verification/${await sha256(token)}`
+    },
+    body: JSON.stringify({
+      from: env.EMAIL_FROM,
+      to: [email],
+      reply_to: 'support@btc2g.com',
+      subject: 'Verify your BTC2G email',
+      text: `Hello ${user.username},\n\nConfirm this email for your BTC2G account:\n${link}\n\nThe link expires in 30 minutes. This does not subscribe you to marketing or activate Premium.`,
+      html: `<p>Hello ${user.username},</p><p>Confirm this email for your BTC2G account:</p><p><a href="${link}">Verify email</a></p><p>The link expires in 30 minutes. This does not subscribe you to marketing or activate Premium.</p>`
+    })
+  });
+  if (!response.ok) throw new Error('Email delivery failed.');
+}
+
+async function issueEmailVerification(env, user, validation, { checkDuplicate = true, language = 'en' } = {}) {
+  if (checkDuplicate) {
+    const duplicate = await env.DB.prepare(`
+      SELECT id FROM users WHERE email_key = ? AND id <> ? AND disabled_at IS NULL LIMIT 1
+    `).bind(validation.emailKey, user.id).first();
+    if (duplicate) {
+      const error = new Error('That email is already attached to an account.');
+      error.status = 409;
+      throw error;
+    }
+    const pendingDuplicate = await env.DB.prepare(`
+      SELECT user_id FROM email_verification_tokens
+      WHERE email_key = ? AND user_id <> ? AND expires_at > ? LIMIT 1
+    `).bind(validation.emailKey, user.id, Math.floor(Date.now() / 1000)).first();
+    if (pendingDuplicate) {
+      const error = new Error('That email is awaiting verification for another account.');
+      error.status = 409;
+      throw error;
+    }
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  const recent = await env.DB.prepare(`
+    SELECT COUNT(*) AS count FROM email_verification_tokens
+    WHERE user_id = ? AND created_at >= ?
+  `).bind(user.id, now - 3600).first();
+  if (Number(recent?.count || 0) >= 5) {
+    const error = new Error('Too many verification emails. Try again later.');
+    error.status = 429;
+    throw error;
+  }
+
+  const token = randomToken();
+  const tokenHash = await sha256(token);
+  await env.DB.prepare(`
+    INSERT INTO email_verification_tokens
+      (token_hash, user_id, email, email_key, created_at, expires_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).bind(tokenHash, user.id, validation.email, validation.emailKey, now,
+    now + EMAIL_VERIFICATION_MAX_AGE_SECONDS).run();
+  try {
+    await sendVerificationEmail(env, user, validation.email, token, language);
+  } catch {
+    await env.DB.prepare('DELETE FROM email_verification_tokens WHERE token_hash = ?').bind(tokenHash).run();
+    const error = new Error('Verification email could not be sent. Try again later.');
+    error.status = 503;
+    throw error;
+  }
+  return { expiresIn: EMAIL_VERIFICATION_MAX_AGE_SECONDS };
+}
+
+async function requestEmailVerification(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'Sign in before adding an email.' }, 401);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  const validation = validateEmail(input?.email);
+  if (!validation.ok) return json({ error: 'Enter a valid email address.' }, 400);
+
+  try {
+    const result = await issueEmailVerification(env, user, validation, { language: accountLanguage(input?.language) });
+    return json({ ok: true, ...result });
+  } catch (error) {
+    return json({ error: error.message }, error.status || 503);
+  }
+}
+
+async function confirmEmailVerification(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'Sign in to confirm this email.' }, 401);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  if (typeof input?.token !== 'string' || input.token.length < 32 || input.token.length > 128) {
+    return json({ error: 'Invalid verification link.' }, 400);
+  }
+  const tokenHash = await sha256(input.token);
+  const now = Math.floor(Date.now() / 1000);
+  const pending = await env.DB.prepare(`
+    SELECT email, email_key FROM email_verification_tokens
+    WHERE token_hash = ? AND user_id = ? AND expires_at > ?
+  `).bind(tokenHash, user.id, now).first();
+  if (!pending) return json({ error: 'This verification link is invalid or expired.' }, 400);
+
+  try {
+    await env.DB.batch([
+      env.DB.prepare(`
+        UPDATE users SET email = ?, email_key = ?, email_verified_at = ?, email_verified_day = ?
+        WHERE id = ? AND disabled_at IS NULL
+      `).bind(pending.email, normalizeEmail(pending.email_key), now, jerusalemDay(now * 1000), user.id),
+      env.DB.prepare('DELETE FROM email_verification_tokens WHERE user_id = ?').bind(user.id)
+    ]);
+  } catch (error) {
+    if (String(error).toLowerCase().includes('unique')) {
+      return json({ error: 'That email is already attached to an account.' }, 409);
+    }
+    throw error;
+  }
+  return json({ user: { ...userView(user), email: pending.email, emailVerified: true } });
+}
+
+async function logout(request, env) {
+  const token = parseCookies(request.headers.get('Cookie')).btc2g_session;
+  if (token) await env.DB.prepare('DELETE FROM sessions WHERE token_hash = ?').bind(await sha256(token)).run();
+  return json({ ok: true }, 200, { 'set-cookie': clearSessionCookie() });
+}
+
+async function audienceConfirmedSubscriptions(env) {
+  if (!env.AUDIENCE_STATS_URL || !env.AUDIENCE_STATS_TOKEN) return confirmedSubscriptions();
+  try {
+    const url = new URL(env.AUDIENCE_STATS_URL);
+    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash || url.pathname !== '/api/stats') {
+      return confirmedSubscriptions();
+    }
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${env.AUDIENCE_STATS_TOKEN}`,
+        Accept: 'application/json',
+        'Cache-Control': 'no-cache'
+      },
+      redirect: 'manual', signal: AbortSignal.timeout(5000)
+    });
+    if (!response.ok) throw new Error(`Audience statistics request failed with HTTP ${response.status}.`);
+    const text = await response.text();
+    if (text.length > 16384) throw new Error('Audience statistics response is too large.');
+    return confirmedSubscriptionsFromAudience(JSON.parse(text));
+  } catch (error) {
+    console.warn('Audience statistics bridge unavailable:', error?.name || 'Error', error?.message || 'Unknown error');
+    return {
+      status: 'unavailable', total: null, newToday: null,
+      reason: 'The confirmed subscriber source is temporarily unavailable.'
+    };
+  }
+}
+
+async function stats(env) {
+  const day = jerusalemDay();
+  const [row, subscriberStats] = await Promise.all([env.DB.prepare(`
+    SELECT COUNT(*) AS total_accounts,
+           SUM(CASE WHEN email_verified_day = ? THEN 1 ELSE 0 END) AS new_today
+    FROM users
+    WHERE disabled_at IS NULL AND role = 'user' AND email_verified_at IS NOT NULL
+  `).bind(day).first(), audienceConfirmedSubscriptions(env)]);
+  let traffic;
+  try {
+    const trafficRow = await env.DB.prepare(`
+      SELECT
+        (SELECT MIN(first_seen_at) FROM daily_visitors) AS first_seen_at,
+        (SELECT COUNT(*) FROM daily_visitors WHERE day = ?) AS visitors_today,
+        (SELECT COALESCE(SUM(views), 0) FROM daily_pageviews WHERE day = ?) AS views_today
+    `).bind(day, day).first();
+    traffic = trafficMetrics(trafficRow);
+  } catch {
+    traffic = { status: 'unavailable', visitorsToday: null, viewsToday: null,
+      firstRecordedVisitAt: null, reason: 'Traffic storage is unavailable.' };
+  }
+  return json({
+    ...publicStats(row?.total_accounts, row?.new_today), day, timeZone: 'Asia/Jerusalem',
+    measuredAt: new Date().toISOString(), source: 'Cloudflare D1',
+    traffic, confirmedSubscribers: subscriberStats
+  });
+}
+
+async function recordVisit(request, env) {
+  const origin = request.headers.get('Origin');
+  const cors = corsHeaders(origin, env);
+  if (!cors['access-control-allow-origin']) return json({ error: 'Origin not allowed.' }, 403);
+  if (!env.IP_HASH_SECRET) return json({ error: 'Metrics are temporarily unavailable.' }, 503, cors);
+
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400, cors); }
+  const pagePath = normalizePagePath(input?.path);
+  if (!pagePath) return json({ error: 'Invalid page path.' }, 400, cors);
+
+  const day = jerusalemDay();
+  const source = campaignAcquisitionSource(input?.campaignSource)
+    || acquisitionSource(input?.referrer)
+    || pageAcquisitionSource(pagePath);
+  const visitorHash = await requestVisitorHash(request, env, day);
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.batch([
+    env.DB.prepare(`
+      INSERT INTO daily_visitors
+        (day, visitor_hash, first_path, last_path, first_seen_at, last_seen_at, views, acquisition_source)
+      VALUES (?, ?, ?, ?, ?, ?, 1, ?)
+      ON CONFLICT(day, visitor_hash) DO UPDATE SET
+        last_path = excluded.last_path,
+        last_seen_at = excluded.last_seen_at,
+        acquisition_source = COALESCE(daily_visitors.acquisition_source, excluded.acquisition_source),
+        views = daily_visitors.views + 1
+    `).bind(day, visitorHash, pagePath, pagePath, now, now, source),
+    env.DB.prepare(`
+      INSERT INTO daily_pageviews (day, page_path, views) VALUES (?, ?, 1)
+      ON CONFLICT(day, page_path) DO UPDATE SET views = daily_pageviews.views + 1
+    `).bind(day, pagePath)
+  ]);
+  // Keep the signed registration label aligned with the visitor's first known source that day.
+  const storedSource = source ? await env.DB.prepare(
+    'SELECT acquisition_source FROM daily_visitors WHERE day = ? AND visitor_hash = ?'
+  ).bind(day, visitorHash).first() : null;
+  const attribution = storedSource?.acquisition_source
+    ? await createAttributionToken(env, day, visitorHash, storedSource.acquisition_source) : null;
+  return json({ ok: true, attribution }, 202, cors);
+}
+
+async function adminMarketHealth(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  const { marketHealth } = await import('./market-health.js');
+  return json(await marketHealth());
+}
+
+async function adminStats(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  const url = new URL(request.url);
+  const requestedDays = Number.parseInt(url.searchParams.get('days') || '7', 10);
+  const days = [7, 30, 90].includes(requestedDays) ? requestedDays : 7;
+  const today = jerusalemDay();
+  const subscriberStatsPromise = audienceConfirmedSubscriptions(env);
+
+  const [summary, dailyResult, pathsResult, recentResult] = await Promise.all([
+    env.DB.prepare(`
+      SELECT
+        (SELECT MIN(first_seen_at) FROM daily_visitors) AS first_seen_at,
+        (SELECT COUNT(*) FROM daily_visitors WHERE day = ?) AS visitors_today,
+        (SELECT COALESCE(SUM(views), 0) FROM daily_pageviews WHERE day = ?) AS views_today,
+        (SELECT COUNT(*) FROM daily_visitors WHERE day = ? AND acquisition_source = 'producthunt') AS producthunt_visitors_today,
+        (SELECT COUNT(*) FROM daily_visitors WHERE day = ? AND acquisition_source = 'scenario') AS scenario_visitors_today,
+        (SELECT COUNT(*) FROM daily_visitors WHERE day = ? AND acquisition_source = 'telegram') AS telegram_visitors_today,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NOT NULL) AS registered_total,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_day = ?) AS registered_today,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NOT NULL) AS verified_email_total,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NULL) AS pending_email_total,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_day = ? AND acquisition_source = 'producthunt') AS producthunt_registered_today,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_day = ? AND acquisition_source = 'scenario') AS scenario_registered_today,
+        (SELECT COUNT(*) FROM users WHERE role = 'user' AND disabled_at IS NULL AND email_verified_day = ? AND acquisition_source = 'telegram') AS telegram_registered_today
+    `).bind(today, today, today, today, today, today, today, today, today).first(),
+    env.DB.prepare(`
+      WITH RECURSIVE dates(day) AS (
+        SELECT date(?, '-' || ? || ' day')
+        UNION ALL SELECT date(day, '+1 day') FROM dates WHERE day < ?
+      ), coverage AS (
+        SELECT MIN(day) AS first_day FROM daily_visitors
+      ), traffic AS (
+        SELECT day, COUNT(*) AS visitors, COALESCE(SUM(views), 0) AS views,
+               SUM(CASE WHEN acquisition_source = 'producthunt' THEN 1 ELSE 0 END) AS producthunt_visitors,
+               SUM(CASE WHEN acquisition_source = 'telegram' THEN 1 ELSE 0 END) AS telegram_visitors
+        FROM daily_visitors GROUP BY day
+      ), registrations AS (
+        SELECT email_verified_day AS day, COUNT(*) AS registrations,
+               SUM(CASE WHEN acquisition_source = 'producthunt' THEN 1 ELSE 0 END) AS producthunt_registrations,
+               SUM(CASE WHEN acquisition_source = 'telegram' THEN 1 ELSE 0 END) AS telegram_registrations
+        FROM users
+        WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NOT NULL
+        GROUP BY email_verified_day
+      )
+      SELECT dates.day,
+             CASE WHEN dates.day >= coverage.first_day THEN COALESCE(traffic.visitors, 0) ELSE NULL END AS visitors,
+             CASE WHEN dates.day >= coverage.first_day THEN COALESCE(traffic.views, 0) ELSE NULL END AS views,
+             COALESCE(registrations.registrations, 0) AS registrations,
+             CASE WHEN dates.day >= coverage.first_day THEN COALESCE(traffic.producthunt_visitors, 0) ELSE NULL END AS producthunt_visitors,
+             COALESCE(registrations.producthunt_registrations, 0) AS producthunt_registrations,
+             CASE WHEN dates.day >= coverage.first_day THEN COALESCE(traffic.telegram_visitors, 0) ELSE NULL END AS telegram_visitors,
+             COALESCE(registrations.telegram_registrations, 0) AS telegram_registrations
+      FROM dates
+      CROSS JOIN coverage
+      LEFT JOIN traffic ON traffic.day = dates.day
+      LEFT JOIN registrations ON registrations.day = dates.day
+      ORDER BY dates.day DESC
+    `).bind(today, days - 1, today).all(),
+    env.DB.prepare(`
+      SELECT page_path AS path, SUM(views) AS views
+      FROM daily_pageviews
+      WHERE day >= date(?, '-' || ? || ' day')
+      GROUP BY page_path ORDER BY views DESC, page_path ASC LIMIT 10
+    `).bind(today, days - 1).all(),
+    env.DB.prepare(`
+      SELECT username, email_verified_at AS created_at, email_verified_day AS created_day, 1 AS email_verified
+      FROM users
+      WHERE role = 'user' AND disabled_at IS NULL AND email_verified_at IS NOT NULL
+      ORDER BY email_verified_at DESC LIMIT 20
+    `).all()
+  ]);
+
+  // Aggregate existing rows only: no new identifiers, raw referrers or email data.
+  const channelResult = await env.DB.prepare(`
+    WITH sources(source) AS (
+      VALUES ('producthunt'), ('scenario'), ('telegram'), ('reddit'), ('linkedin'), ('directory')
+    )
+    SELECT source,
+      (SELECT COUNT(*) FROM daily_visitors v WHERE v.day = ? AND v.acquisition_source = sources.source) AS visitors_today,
+      (SELECT COUNT(*) FROM users u WHERE u.role = 'user' AND u.disabled_at IS NULL AND u.created_day = ? AND u.acquisition_source = sources.source) AS accounts_created_today,
+      (SELECT COUNT(*) FROM users u WHERE u.role = 'user' AND u.disabled_at IS NULL AND u.email_verified_at IS NOT NULL AND u.email_verified_day = ? AND u.acquisition_source = sources.source) AS confirmed_today,
+      (SELECT COUNT(*) FROM users u WHERE u.role = 'user' AND u.disabled_at IS NULL AND u.email_verified_at IS NULL AND u.acquisition_source = sources.source) AS pending_total
+    FROM sources
+  `).bind(today, today, today).all();
+  const traffic = trafficMetrics(summary);
+  const subscriberStats = await subscriberStatsPromise;
+  const visitorsToday = traffic.visitorsToday;
+  const registeredToday = Number(summary?.registered_today || 0);
+  const productHuntVisitorsToday = traffic.status === 'available'
+    ? Number(summary?.producthunt_visitors_today || 0) : null;
+  const productHuntRegisteredToday = Number(summary?.producthunt_registered_today || 0);
+  const scenarioVisitorsToday = traffic.status === 'available'
+    ? Number(summary?.scenario_visitors_today || 0) : null;
+  const scenarioRegisteredToday = Number(summary?.scenario_registered_today || 0);
+  const telegramVisitorsToday = traffic.status === 'available'
+    ? Number(summary?.telegram_visitors_today || 0) : null;
+  const telegramRegisteredToday = Number(summary?.telegram_registered_today || 0);
+  return json({
+    appVersion: env.APP_VERSION || 'unknown',
+    rangeDays: days,
+    day: today,
+    timeZone: 'Asia/Jerusalem',
+    measuredAt: new Date().toISOString(),
+    source: 'Cloudflare D1',
+    traffic,
+    confirmedSubscribers: subscriberStats,
+    summary: {
+      visitorsToday,
+      viewsToday: traffic.viewsToday,
+      registeredToday,
+      registeredTotal: Number(summary?.registered_total || 0),
+      verifiedEmailTotal: Number(summary?.verified_email_total || 0),
+      pendingEmailTotal: Number(summary?.pending_email_total || 0),
+      conversionToday: registrationRatio(registeredToday, visitorsToday),
+      productHuntVisitorsToday,
+      productHuntRegisteredToday,
+      productHuntConversionToday: registrationRatio(productHuntRegisteredToday, productHuntVisitorsToday),
+      scenarioVisitorsToday,
+      scenarioRegisteredToday,
+      scenarioConversionToday: registrationRatio(scenarioRegisteredToday, scenarioVisitorsToday),
+      telegramVisitorsToday,
+      telegramRegisteredToday,
+      telegramConversionToday: registrationRatio(telegramRegisteredToday, telegramVisitorsToday)
+    },
+    channels: (channelResult.results || []).map(row => ({
+      source: row.source,
+      visitorsToday: traffic.status === 'available' ? Number(row.visitors_today) : null,
+      accountsCreatedToday: Number(row.accounts_created_today),
+      confirmedToday: Number(row.confirmed_today),
+      pendingTotal: Number(row.pending_total)
+    })),
+    daily: dailyResult.results || [],
+    topPaths: pathsResult.results || [],
+    recentRegistrations: recentResult.results || [],
+    methodology: 'Visitors are daily IP + browser hash estimates, not verified people. Raw IP addresses are not stored. A registration is counted only after the account email is verified. Product Hunt is detected from the browser-reported referrer; Scenario is detected from the trusted BTC2G page path; Telegram and directory require allowlisted UTM sources; Reddit, LinkedIn and Product Hunt accept allowlisted UTM sources or HTTPS referrer hosts. These are browser-reported labels, not proof of an independent referral. Account creation and confirmed registrations are separate stages; daily confirmations can belong to accounts created on earlier days, so these counts are not a cohort funnel. No form-start or failed-attempt tracking is collected. A registration is attributed only when a signed same-day token matches the same browser/network estimate; the token uses the first known source of that daily estimate. Attribution is not recovered for old accounts, a different browser/network or an expired token. Arbitrary UTM values are not stored. Other registration/visitor ratios are not attributed conversion. Days before the earliest retained visit have no traffic data. Verified account emails are not marketing subscriptions.'
+  });
+}
+
+async function privateIdeasForUser(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'Sign in required.' }, 401);
+  const result = await env.DB.prepare(`
+    SELECT id, title, audience, problem, solution, status, moderation_note, created_at, updated_at
+    FROM private_ideas WHERE user_id = ? ORDER BY created_at DESC
+  `).bind(user.id).all();
+  return json({ ideas: result.results.map(ideaView), limit: user.role === 'admin' ? null : IDEA_LIMIT_PER_ACCOUNT });
+}
+
+async function enforceIdeaLimit(env, userId, now) {
+  const windowStart = Math.floor(now / 60) * 60;
+  const attempt = await env.DB.prepare(`
+    INSERT INTO private_idea_attempts (user_id, window_start, attempt_count)
+    VALUES (?, ?, 1)
+    ON CONFLICT(user_id, window_start)
+    DO UPDATE SET attempt_count = attempt_count + 1
+    RETURNING attempt_count
+  `).bind(userId, windowStart).first();
+  return Number(attempt?.attempt_count || 1) <= IDEA_ATTEMPT_LIMIT_PER_MINUTE;
+}
+
+async function submitPrivateIdea(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'Sign in required.' }, 401);
+  const isAdmin = user.role === 'admin';
+  if (!isAdmin && !user.email_verified_at) return json({ error: 'Verify your account email before submitting an idea.' }, 403);
+  const idempotencyKey = request.headers.get('Idempotency-Key') || '';
+  if (!/^[A-Za-z0-9_-]{16,100}$/.test(idempotencyKey)) {
+    return json({ error: 'A valid submission key is required.' }, 400);
+  }
+  const existing = await env.DB.prepare(`
+    SELECT id, title, audience, problem, solution, status, moderation_note, created_at, updated_at
+    FROM private_ideas WHERE user_id = ? AND idempotency_key = ?
+  `).bind(user.id, idempotencyKey).first();
+  if (existing) return json({ idea: ideaView(existing), duplicate: true });
+  const now = Math.floor(Date.now() / 1000);
+  if (!isAdmin && !await enforceIdeaLimit(env, user.id, now)) {
+    return json({ error: 'Too many submission attempts. Try again in one minute.' }, 429, { 'retry-after': '60' });
+  }
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  let title; let audience; let problem; let solution;
+  try {
+    title = ideaText(input?.title, 'Title', 5, 100);
+    audience = ideaText(input?.audience, 'Intended users', 3, 300);
+    problem = ideaText(input?.problem, 'Problem', 10, 800);
+    solution = ideaText(input?.solution, 'Proposed solution', 10, 1200);
+  } catch (error) { return json({ error: error.message }, 400); }
+  if (input?.reviewConsent !== true) {
+    return json({ error: 'Confirm that BTC2G may privately review this submission.' }, 400);
+  }
+  const count = await env.DB.prepare('SELECT COUNT(*) AS count FROM private_ideas WHERE user_id = ?')
+    .bind(user.id).first();
+  if (!isAdmin && Number(count?.count || 0) >= IDEA_LIMIT_PER_ACCOUNT) {
+    return json({ error: `Each account may submit up to ${IDEA_LIMIT_PER_ACCOUNT} ideas.` }, 409);
+  }
+  const idea = {
+    id: crypto.randomUUID(), title, audience, problem, solution,
+    status: 'submitted', moderation_note: null, created_at: now, updated_at: now
+  };
+  try {
+    await env.DB.prepare(`
+      INSERT INTO private_ideas
+        (id, user_id, title, audience, problem, solution, status, idempotency_key,
+         accepted_terms_version, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, 'submitted', ?, ?, ?, ?)
+    `).bind(idea.id, user.id, title, audience, problem, solution, idempotencyKey,
+      env.TERMS_VERSION || 'unknown', now, now).run();
+  } catch (error) {
+    const storageError = String(error).toLowerCase();
+    if (storageError.includes('unique') || storageError.includes('idea_limit_reached')) {
+      const duplicate = await env.DB.prepare(`
+        SELECT id, title, audience, problem, solution, status, moderation_note, created_at, updated_at
+        FROM private_ideas WHERE user_id = ? AND idempotency_key = ?
+      `).bind(user.id, idempotencyKey).first();
+      if (duplicate) return json({ idea: ideaView(duplicate), duplicate: true });
+    }
+    if (storageError.includes('idea_limit_reached')) {
+      return json({ error: `Each account may submit up to ${IDEA_LIMIT_PER_ACCOUNT} ideas.` }, 409);
+    }
+    throw error;
+  }
+  return json({ idea: ideaView(idea) }, 201);
+}
+
+async function adminIdeas(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  const result = await env.DB.prepare(`
+    SELECT private_ideas.id, private_ideas.title, private_ideas.audience,
+           private_ideas.problem, private_ideas.solution, private_ideas.status,
+           private_ideas.moderation_note, private_ideas.created_at, private_ideas.updated_at,
+           users.username
+    FROM private_ideas JOIN users ON users.id = private_ideas.user_id
+    ORDER BY CASE private_ideas.status
+      WHEN 'submitted' THEN 0 WHEN 'reviewing' THEN 1 ELSE 2 END,
+      private_ideas.created_at DESC
+  `).all();
+  return json({
+    ideas: result.results.map(idea => ({ ...ideaView(idea), username: idea.username })),
+    visibility: 'private'
+  });
+}
+
+async function reviewPrivateIdea(request, env) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== 'admin') return json({ error: 'Administrator access required.' }, 403);
+  let input;
+  try { input = await body(request); } catch (error) { return json({ error: error.message }, 400); }
+  if (typeof input?.ideaId !== 'string' || !/^[0-9a-f-]{36}$/i.test(input.ideaId)) {
+    return json({ error: 'Invalid idea identifier.' }, 400);
+  }
+  if (!['reviewing', 'accepted', 'declined'].includes(input?.status)) {
+    return json({ error: 'Invalid review status.' }, 400);
+  }
+  let note = null;
+  if (input.note != null && String(input.note).trim()) {
+    try { note = ideaText(String(input.note), 'Review note', 2, 500); }
+    catch (error) { return json({ error: error.message }, 400); }
+  }
+  if (input.status === 'declined' && !note) {
+    return json({ error: 'Add a short private note before declining an idea.' }, 400);
+  }
+  const now = Math.floor(Date.now() / 1000);
+  const result = await env.DB.prepare(`
+    UPDATE private_ideas SET status = ?, moderation_note = ?, updated_at = ?
+    WHERE id = ? RETURNING id
+  `).bind(input.status, note, now, input.ideaId).first();
+  return result ? json({ ok: true }) : json({ error: 'Idea not found.' }, 404);
+}
+
+async function api(request, env) {
+  const url = new URL(request.url);
+  if (request.method === 'GET' && url.pathname === '/api/stats') return stats(env);
+  if (request.method === 'GET' && url.pathname === '/api/admin/stats') return adminStats(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/admin/market-health') return adminMarketHealth(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/admin/ideas') return adminIdeas(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/ideas/mine') return privateIdeasForUser(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/passkeys') return listPasskeys(request, env);
+  if (request.method === 'GET' && url.pathname === '/api/me') {
+    const user = await currentUser(request, env);
+    return user ? json({ user: userView(user) }) : json({ user: null }, 401);
+  }
+  if (request.method === 'POST') {
+    if (url.pathname === '/api/visit') return recordVisit(request, env);
+    if (!sameOrigin(request, env)) return json({ error: 'Origin not allowed.' }, 403);
+    if (url.pathname === '/api/register') return register(request, env);
+    if (url.pathname === '/api/login') return login(request, env);
+    if (url.pathname === '/api/logout') return logout(request, env);
+    if (url.pathname === '/api/email-verification/request') return requestEmailVerification(request, env);
+    if (url.pathname === '/api/email-verification/confirm') return confirmEmailVerification(request, env);
+    if (url.pathname === '/api/passkeys/registration/options') return beginPasskeyRegistration(request, env);
+    if (url.pathname === '/api/passkeys/registration/verify') return finishPasskeyRegistration(request, env);
+    if (url.pathname === '/api/passkeys/authenticate') return finishPasskeyAuthentication(request, env);
+    if (url.pathname === '/api/ideas') return submitPrivateIdea(request, env);
+    if (url.pathname === '/api/admin/ideas/review') return reviewPrivateIdea(request, env);
+    if (url.pathname === '/api/bootstrap-admin') return bootstrapAdmin(request, env);
+  }
+  if (request.method === 'OPTIONS' && url.pathname === '/api/visit') {
+    const headers = corsHeaders(request.headers.get('Origin'), env);
+    return headers['access-control-allow-origin']
+      ? new Response(null, { status: 204, headers })
+      : json({ error: 'Origin not allowed.' }, 403);
+  }
+  return json({ error: 'Not found.' }, 404);
+}
+
+export default {
+  async fetch(request, env) {
+    try {
+      const url = new URL(request.url);
+      const response = url.pathname.startsWith('/api/')
+        ? await api(request, env)
+        : await env.ASSETS.fetch(request);
+      return secured(response);
+    } catch (error) {
+      console.error('Unhandled request error', error);
+      return secured(json({ error: 'Unexpected server error.' }, 500));
+    }
+  },
+
+  async scheduled(_event, env) {
+    const now = Math.floor(Date.now() / 1000);
+    const retentionDays = Math.max(30, Number(env.METRICS_RETENTION_DAYS || 400));
+    await env.DB.batch([
+      env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(now),
+      env.DB.prepare('DELETE FROM registration_attempts WHERE window_start < ?').bind(now - 86400),
+      env.DB.prepare('DELETE FROM email_verification_tokens WHERE expires_at <= ?').bind(now),
+      env.DB.prepare('DELETE FROM login_rate_limits WHERE last_failed_at < ?').bind(now - 86400),
+      env.DB.prepare('DELETE FROM webauthn_challenges WHERE expires_at <= ?').bind(now),
+      env.DB.prepare('DELETE FROM private_idea_attempts WHERE window_start < ?').bind(now - 86400),
+      env.DB.prepare("DELETE FROM daily_visitors WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays),
+      env.DB.prepare("DELETE FROM daily_pageviews WHERE day < date('now', '-' || ? || ' day')").bind(retentionDays)
+    ]);
+  }
+};
+

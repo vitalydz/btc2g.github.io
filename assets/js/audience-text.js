@@ -12,7 +12,10 @@ window.BTC2GAudienceText = {
     "invalid": "Enter zero or a positive decimal number, using a dot or comma.",
     "marketDate": "Market date (UTC)",
     "generated": "Chart generated (UTC)",
-    "subtitle": "Daily reference data · not live prices"
+    "subtitle": "Daily reference data · not live prices",
+    "saveTitle": "Compare how much Bitcoin you receive",
+    "saveNote": "Manual comparison: enter final MoonPay and Topper quotes for the same total payment.",
+    "saveAction": "Compare quotes"
   },
   "ru": {
     "intro": "Сравните Bitcoin и золото во времени: сколько тройских унций соответствует одному BTC? Посмотрите график и справочный калькулятор.",
@@ -27,7 +30,10 @@ window.BTC2GAudienceText = {
     "invalid": "Введите ноль или положительное десятичное число с точкой или запятой.",
     "marketDate": "Дата котировок (UTC)",
     "generated": "График создан (UTC)",
-    "subtitle": "Ежедневные справочные данные · не цены в реальном времени"
+    "subtitle": "Ежедневные справочные данные · не цены в реальном времени",
+    "saveTitle": "Сравните, сколько Bitcoin вы получите",
+    "saveNote": "Ручное сравнение: введите итоговые котировки MoonPay и Topper для одинаковой полной суммы оплаты.",
+    "saveAction": "Сравнить котировки"
   },
   "he": {
     "intro": "השוו בין ביטקוין לזהב לאורך זמן: כמה אונקיות טרוי מייצג BTC אחד? עיינו בתרשים ובמחשבון להשוואה.",
@@ -42,7 +48,10 @@ window.BTC2GAudienceText = {
     "invalid": "הזינו אפס או מספר עשרוני חיובי עם נקודה או פסיק.",
     "marketDate": "תאריך שוק (UTC)",
     "generated": "התרשים נוצר (UTC)",
-    "subtitle": "נתוני עזר יומיים · לא מחירים בזמן אמת"
+    "subtitle": "נתוני עזר יומיים · לא מחירים בזמן אמת",
+    "saveTitle": "השוו כמה Bitcoin תקבלו",
+    "saveNote": "השוואה ידנית: הזינו הצעות סופיות של MoonPay ו־Topper עבור אותו תשלום כולל.",
+    "saveAction": "השוואת הצעות"
   },
   "de": {
     "intro": "Vergleichen Sie Bitcoin und Gold im Zeitverlauf: Wie viele Feinunzen entspricht ein BTC? Nutzen Sie Diagramm und Referenzrechner.",
@@ -57,7 +66,10 @@ window.BTC2GAudienceText = {
     "invalid": "Geben Sie null oder eine positive Dezimalzahl mit Punkt oder Komma ein.",
     "marketDate": "Marktdatum (UTC)",
     "generated": "Diagramm erstellt (UTC)",
-    "subtitle": "Tägliche Referenzdaten · keine Live-Kurse"
+    "subtitle": "Tägliche Referenzdaten · keine Live-Kurse",
+    "saveTitle": "Vergleichen Sie, wie viel Bitcoin Sie erhalten",
+    "saveNote": "Manueller Vergleich: Geben Sie endgültige Angebote von MoonPay und Topper für denselben Gesamtbetrag ein.",
+    "saveAction": "Angebote vergleichen"
   },
   "fr": {
     "intro": "Comparez Bitcoin et or dans le temps : combien d’onces troy représente un BTC ? Explorez le graphique et le calculateur indicatif.",
@@ -72,7 +84,10 @@ window.BTC2GAudienceText = {
     "invalid": "Saisissez zéro ou un nombre décimal positif avec un point ou une virgule.",
     "marketDate": "Date de marché (UTC)",
     "generated": "Graphique généré (UTC)",
-    "subtitle": "Données indicatives quotidiennes · pas de prix en direct"
+    "subtitle": "Données indicatives quotidiennes · pas de prix en direct",
+    "saveTitle": "Comparez la quantité de Bitcoin reçue",
+    "saveNote": "Comparaison manuelle : saisissez les offres finales de MoonPay et Topper pour le même paiement total.",
+    "saveAction": "Comparer les offres"
   },
   "es": {
     "intro": "Compare Bitcoin y oro a lo largo del tiempo: ¿cuántas onzas troy representa un BTC? Explore el gráfico y la calculadora de referencia.",
@@ -87,7 +102,10 @@ window.BTC2GAudienceText = {
     "invalid": "Introduzca cero o un decimal positivo con punto o coma.",
     "marketDate": "Fecha de mercado (UTC)",
     "generated": "Gráfico generado (UTC)",
-    "subtitle": "Datos diarios de referencia · no son precios en vivo"
+    "subtitle": "Datos diarios de referencia · no son precios en vivo",
+    "saveTitle": "Compara cuánto Bitcoin recibirás",
+    "saveNote": "Comparación manual: introduce las cotizaciones finales de MoonPay y Topper para el mismo pago total.",
+    "saveAction": "Comparar cotizaciones"
   },
   "zh": {
     "intro": "比较比特币与黄金的长期变化：一个 BTC 相当于多少金衡盎司？查看图表和参考计算器。",
@@ -102,7 +120,10 @@ window.BTC2GAudienceText = {
     "invalid": "请输入零或正十进制数，可使用点或逗号。",
     "marketDate": "市场日期（UTC）",
     "generated": "图表生成日期（UTC）",
-    "subtitle": "每日参考数据 · 非实时价格"
+    "subtitle": "每日参考数据 · 非实时价格",
+    "saveTitle": "比较您将收到多少 Bitcoin",
+    "saveNote": "手动比较：输入相同总付款金额下 MoonPay 和 Topper 的最终报价。",
+    "saveAction": "比较报价"
   },
   "it": {
     "intro": "Confronta Bitcoin e oro nel tempo: quante once troy rappresenta un BTC? Esplora il grafico e il calcolatore indicativo.",
@@ -117,7 +138,10 @@ window.BTC2GAudienceText = {
     "invalid": "Inserisci zero o un decimale positivo con punto o virgola.",
     "marketDate": "Data di mercato (UTC)",
     "generated": "Grafico generato (UTC)",
-    "subtitle": "Dati giornalieri indicativi · non prezzi in tempo reale"
+    "subtitle": "Dati giornalieri indicativi · non prezzi in tempo reale",
+    "saveTitle": "Confronta quanti Bitcoin riceverai",
+    "saveNote": "Confronto manuale: inserisci i preventivi finali di MoonPay e Topper per lo stesso pagamento totale.",
+    "saveAction": "Confronta preventivi"
   },
   "pt": {
     "intro": "Compare Bitcoin e ouro ao longo do tempo: quantas onças troy representa um BTC? Explore o gráfico e a calculadora de referência.",
@@ -132,7 +156,10 @@ window.BTC2GAudienceText = {
     "invalid": "Introduza zero ou um decimal positivo com ponto ou vírgula.",
     "marketDate": "Data de mercado (UTC)",
     "generated": "Gráfico gerado (UTC)",
-    "subtitle": "Dados diários de referência · não são preços ao vivo"
+    "subtitle": "Dados diários de referência · não são preços ao vivo",
+    "saveTitle": "Compare quanto Bitcoin você receberá",
+    "saveNote": "Comparação manual: insira as cotações finais da MoonPay e da Topper para o mesmo pagamento total.",
+    "saveAction": "Comparar cotações"
   },
   "ar": {
     "intro": "قارن بيتكوين بالذهب عبر الزمن: كم أونصة ترويسية يمثل BTC واحد؟ استكشف الرسم والحاسبة المرجعية.",
@@ -147,7 +174,10 @@ window.BTC2GAudienceText = {
     "invalid": "أدخل صفراً أو عدداً عشرياً موجباً بنقطة أو فاصلة.",
     "marketDate": "تاريخ السوق (UTC)",
     "generated": "إنشاء الرسم (UTC)",
-    "subtitle": "بيانات مرجعية يومية · ليست أسعاراً مباشرة"
+    "subtitle": "بيانات مرجعية يومية · ليست أسعاراً مباشرة",
+    "saveTitle": "قارن كمية Bitcoin التي ستتلقاها",
+    "saveNote": "مقارنة يدوية: أدخل عروض MoonPay وTopper النهائية لنفس إجمالي مبلغ الدفع.",
+    "saveAction": "قارن العروض"
   },
   "hi": {
     "intro": "समय के साथ Bitcoin और सोने की तुलना करें: एक BTC कितने ट्रॉय औंस के बराबर है? चार्ट और संदर्भ कैलकुलेटर देखें।",
@@ -162,7 +192,10 @@ window.BTC2GAudienceText = {
     "invalid": "शून्य या धनात्मक दशमलव संख्या बिंदु या अल्पविराम से लिखें।",
     "marketDate": "बाजार तारीख (UTC)",
     "generated": "चार्ट निर्माण (UTC)",
-    "subtitle": "दैनिक संदर्भ डेटा · लाइव कीमतें नहीं"
+    "subtitle": "दैनिक संदर्भ डेटा · लाइव कीमतें नहीं",
+    "saveTitle": "तुलना करें कि आपको कितना Bitcoin मिलेगा",
+    "saveNote": "मैन्युअल तुलना: समान कुल भुगतान के लिए MoonPay और Topper के अंतिम कोट दर्ज करें।",
+    "saveAction": "कोट की तुलना करें"
   },
   "ja": {
     "intro": "ビットコインと金を長期で比較：1 BTCは何トロイオンスに相当するでしょうか。チャートと参考計算機をご覧ください。",
@@ -177,7 +210,10 @@ window.BTC2GAudienceText = {
     "invalid": "ゼロまたは正の小数を、点またはコンマで入力してください。",
     "marketDate": "市場日付（UTC）",
     "generated": "チャート生成日（UTC）",
-    "subtitle": "日次の参考データ · リアルタイム価格ではありません"
+    "subtitle": "日次の参考データ · リアルタイム価格ではありません",
+    "saveTitle": "受け取れるBitcoinの量を比較",
+    "saveNote": "手動比較：同じ合計支払額に対するMoonPayとTopperの最終見積もりを入力してください。",
+    "saveAction": "見積もりを比較"
   },
   "ko": {
     "intro": "시간에 따른 비트코인과 금을 비교하세요. 1 BTC는 몇 트로이온스일까요? 차트와 참고 계산기를 확인하세요.",
@@ -192,7 +228,10 @@ window.BTC2GAudienceText = {
     "invalid": "0 또는 양의 소수를 점이나 쉼표로 입력하세요.",
     "marketDate": "시장 날짜 (UTC)",
     "generated": "차트 생성일 (UTC)",
-    "subtitle": "일별 참고 데이터 · 실시간 가격 아님"
+    "subtitle": "일별 참고 데이터 · 실시간 가격 아님",
+    "saveTitle": "받을 Bitcoin 수량 비교",
+    "saveNote": "수동 비교: 동일한 총 결제 금액에 대한 MoonPay와 Topper의 최종 견적을 입력하세요.",
+    "saveAction": "견적 비교"
   },
   "tr": {
     "intro": "Bitcoin ile altını zaman içinde karşılaştırın: bir BTC kaç troy ons eder? Grafiği ve referans hesaplayıcıyı inceleyin.",
@@ -207,7 +246,10 @@ window.BTC2GAudienceText = {
     "invalid": "Nokta veya virgülle sıfır ya da pozitif ondalık sayı girin.",
     "marketDate": "Piyasa tarihi (UTC)",
     "generated": "Grafik oluşturma (UTC)",
-    "subtitle": "Günlük referans veriler · canlı fiyat değil"
+    "subtitle": "Günlük referans veriler · canlı fiyat değil",
+    "saveTitle": "Alacağınız Bitcoin miktarını karşılaştırın",
+    "saveNote": "Manuel karşılaştırma: Aynı toplam ödeme için MoonPay ve Topper son tekliflerini girin.",
+    "saveAction": "Teklifleri karşılaştır"
   },
   "pl": {
     "intro": "Porównaj Bitcoin i złoto w czasie: ile uncji trojańskich odpowiada jednemu BTC? Zobacz wykres i kalkulator orientacyjny.",
@@ -222,7 +264,10 @@ window.BTC2GAudienceText = {
     "invalid": "Podaj zero lub dodatnią liczbę dziesiętną z kropką albo przecinkiem.",
     "marketDate": "Data rynku (UTC)",
     "generated": "Wygenerowano wykres (UTC)",
-    "subtitle": "Dzienne dane orientacyjne · nie ceny na żywo"
+    "subtitle": "Dzienne dane orientacyjne · nie ceny na żywo",
+    "saveTitle": "Porównaj, ile Bitcoin otrzymasz",
+    "saveNote": "Porównanie ręczne: wpisz końcowe oferty MoonPay i Topper dla tej samej łącznej płatności.",
+    "saveAction": "Porównaj oferty"
   },
   "nl": {
     "intro": "Vergelijk Bitcoin en goud door de tijd: hoeveel troy ounce vertegenwoordigt één BTC? Bekijk de grafiek en referentiecalculator.",
@@ -237,7 +282,10 @@ window.BTC2GAudienceText = {
     "invalid": "Voer nul of een positief decimaal getal met punt of komma in.",
     "marketDate": "Marktdatum (UTC)",
     "generated": "Grafiek gemaakt (UTC)",
-    "subtitle": "Dagelijkse referentiegegevens · geen live prijzen"
+    "subtitle": "Dagelijkse referentiegegevens · geen live prijzen",
+    "saveTitle": "Vergelijk hoeveel Bitcoin u ontvangt",
+    "saveNote": "Handmatige vergelijking: voer definitieve offertes van MoonPay en Topper in voor dezelfde totale betaling.",
+    "saveAction": "Offertes vergelijken"
   },
   "uk": {
     "intro": "Порівняйте Bitcoin і золото в часі: скільки тройських унцій відповідає одному BTC? Перегляньте графік і довідковий калькулятор.",
@@ -252,7 +300,10 @@ window.BTC2GAudienceText = {
     "invalid": "Введіть нуль або додатне десяткове число з крапкою чи комою.",
     "marketDate": "Дата котирувань (UTC)",
     "generated": "Графік створено (UTC)",
-    "subtitle": "Щоденні довідкові дані · не ціни в реальному часі"
+    "subtitle": "Щоденні довідкові дані · не ціни в реальному часі",
+    "saveTitle": "Порівняйте, скільки Bitcoin ви отримаєте",
+    "saveNote": "Ручне порівняння: введіть підсумкові котирування MoonPay і Topper для однакової повної суми оплати.",
+    "saveAction": "Порівняти котирування"
   },
   "id": {
     "intro": "Bandingkan Bitcoin dan emas dari waktu ke waktu: berapa troy ounce setara satu BTC? Lihat grafik dan kalkulator referensi.",
@@ -267,7 +318,10 @@ window.BTC2GAudienceText = {
     "invalid": "Masukkan nol atau desimal positif dengan titik atau koma.",
     "marketDate": "Tanggal pasar (UTC)",
     "generated": "Grafik dibuat (UTC)",
-    "subtitle": "Data referensi harian · bukan harga langsung"
+    "subtitle": "Data referensi harian · bukan harga langsung",
+    "saveTitle": "Bandingkan jumlah Bitcoin yang diterima",
+    "saveNote": "Perbandingan manual: masukkan penawaran akhir MoonPay dan Topper untuk total pembayaran yang sama.",
+    "saveAction": "Bandingkan penawaran"
   },
   "vi": {
     "intro": "So sánh Bitcoin và vàng theo thời gian: một BTC tương đương bao nhiêu ounce troy? Xem biểu đồ và máy tính tham khảo.",
@@ -282,6 +336,9 @@ window.BTC2GAudienceText = {
     "invalid": "Nhập số không hoặc số thập phân dương bằng dấu chấm hoặc dấu phẩy.",
     "marketDate": "Ngày thị trường (UTC)",
     "generated": "Ngày tạo biểu đồ (UTC)",
-    "subtitle": "Dữ liệu tham khảo hằng ngày · không phải giá trực tiếp"
+    "subtitle": "Dữ liệu tham khảo hằng ngày · không phải giá trực tiếp",
+    "saveTitle": "So sánh lượng Bitcoin bạn nhận được",
+    "saveNote": "So sánh thủ công: nhập báo giá cuối cùng của MoonPay và Topper cho cùng tổng số tiền thanh toán.",
+    "saveAction": "So sánh báo giá"
   }
 };

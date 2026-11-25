@@ -1,0 +1,799 @@
+{
+  "checked_utc": "2026-11-01T10:33:46.461621+00:00",
+  "sitemap_count": 85,
+  "passed": 85,
+  "pages": [
+    {
+      "url": "https://btc2g.com/",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/",
+      "alternates": 20,
+      "heading": "Bitcoin vs Gold Ratio",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/buy.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/buy.html",
+      "alternates": 0,
+      "heading": "Buy Bitcoin",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/save.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/save.html",
+      "alternates": 20,
+      "heading": "Compare what reaches your wallet",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/scenario.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/scenario.html",
+      "alternates": 20,
+      "heading": "BTC / Gold Scenario Simulator",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/contest.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/contest.html",
+      "alternates": 0,
+      "heading": "Better tools start with your ideas.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/research.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/research.html",
+      "alternates": 0,
+      "heading": "TimeT research series",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/premium.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/premium.html",
+      "alternates": 20,
+      "heading": "More context behind the BTC vs Gold model.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/bitcoin-gold-ratio.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/bitcoin-gold-ratio.html",
+      "alternates": 0,
+      "heading": "Bitcoin Gold Ratio",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/bitcoin-vs-gold.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/bitcoin-vs-gold.html",
+      "alternates": 0,
+      "heading": "Bitcoin vs Gold",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/bitcoin-vs-gold-forecast-2026.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/bitcoin-vs-gold-forecast-2026.html",
+      "alternates": 0,
+      "heading": "Bitcoin vs Gold Forecast 2026",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/support.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/support.html",
+      "alternates": 0,
+      "heading": "BTC2G Support",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/terms.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/terms.html",
+      "alternates": 0,
+      "heading": "Terms of Service",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/privacy.html",
+      "status": 200,
+      "lang": "en",
+      "canonical": "https://btc2g.com/privacy.html",
+      "alternates": 0,
+      "heading": "Privacy Policy",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ru/",
+      "status": 200,
+      "lang": "ru",
+      "canonical": "https://btc2g.com/ru/",
+      "alternates": 20,
+      "heading": "Соотношение Биткоина и золота",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ru/save.html",
+      "status": 200,
+      "lang": "ru",
+      "canonical": "https://btc2g.com/ru/save.html",
+      "alternates": 20,
+      "heading": "Сравните, сколько придёт в кошелёк",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ru/scenario.html",
+      "status": 200,
+      "lang": "ru",
+      "canonical": "https://btc2g.com/ru/scenario.html",
+      "alternates": 20,
+      "heading": "Симулятор сценариев BTC / золото",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ru/premium.html",
+      "status": 200,
+      "lang": "ru",
+      "canonical": "https://btc2g.com/ru/premium.html",
+      "alternates": 20,
+      "heading": "Больше контекста для модели BTC и золота.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/he/",
+      "status": 200,
+      "lang": "he",
+      "canonical": "https://btc2g.com/he/",
+      "alternates": 20,
+      "heading": "יחס ביטקוין לזהב",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/he/save.html",
+      "status": 200,
+      "lang": "he",
+      "canonical": "https://btc2g.com/he/save.html",
+      "alternates": 20,
+      "heading": "השוו כמה יגיע לארנק שלכם",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/he/scenario.html",
+      "status": 200,
+      "lang": "he",
+      "canonical": "https://btc2g.com/he/scenario.html",
+      "alternates": 20,
+      "heading": "סימולטור תרחישי BTC / זהב",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/he/premium.html",
+      "status": 200,
+      "lang": "he",
+      "canonical": "https://btc2g.com/he/premium.html",
+      "alternates": 20,
+      "heading": "הקשר נוסף מאחורי מודל BTC vs Gold.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/de/",
+      "status": 200,
+      "lang": "de",
+      "canonical": "https://btc2g.com/de/",
+      "alternates": 20,
+      "heading": "Bitcoin-Gold-Verhältnis",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/de/save.html",
+      "status": 200,
+      "lang": "de",
+      "canonical": "https://btc2g.com/de/save.html",
+      "alternates": 20,
+      "heading": "Vergleichen Sie den BTC-Eingang",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/de/scenario.html",
+      "status": 200,
+      "lang": "de",
+      "canonical": "https://btc2g.com/de/scenario.html",
+      "alternates": 20,
+      "heading": "BTC-/Gold-Szenario-Simulator",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/de/premium.html",
+      "status": 200,
+      "lang": "de",
+      "canonical": "https://btc2g.com/de/premium.html",
+      "alternates": 20,
+      "heading": "Mehr Kontext hinter dem BTC-gegen-Gold-Modell.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/fr/",
+      "status": 200,
+      "lang": "fr",
+      "canonical": "https://btc2g.com/fr/",
+      "alternates": 20,
+      "heading": "Ratio Bitcoin / Or",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/fr/save.html",
+      "status": 200,
+      "lang": "fr",
+      "canonical": "https://btc2g.com/fr/save.html",
+      "alternates": 20,
+      "heading": "Comparez les BTC reçus",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/fr/scenario.html",
+      "status": 200,
+      "lang": "fr",
+      "canonical": "https://btc2g.com/fr/scenario.html",
+      "alternates": 20,
+      "heading": "Simulateur de scénarios BTC / or",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/fr/premium.html",
+      "status": 200,
+      "lang": "fr",
+      "canonical": "https://btc2g.com/fr/premium.html",
+      "alternates": 20,
+      "heading": "Plus de contexte derrière le modèle BTC vs Gold.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/es/",
+      "status": 200,
+      "lang": "es",
+      "canonical": "https://btc2g.com/es/",
+      "alternates": 20,
+      "heading": "Ratio Bitcoin / Oro",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/es/save.html",
+      "status": 200,
+      "lang": "es",
+      "canonical": "https://btc2g.com/es/save.html",
+      "alternates": 20,
+      "heading": "Compara los BTC que recibirás",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/es/scenario.html",
+      "status": 200,
+      "lang": "es",
+      "canonical": "https://btc2g.com/es/scenario.html",
+      "alternates": 20,
+      "heading": "Simulador de escenarios BTC / oro",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/es/premium.html",
+      "status": 200,
+      "lang": "es",
+      "canonical": "https://btc2g.com/es/premium.html",
+      "alternates": 20,
+      "heading": "Más contexto detrás del modelo BTC vs Gold.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/zh/",
+      "status": 200,
+      "lang": "zh",
+      "canonical": "https://btc2g.com/zh/",
+      "alternates": 20,
+      "heading": "比特币/黄金比率",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/zh/save.html",
+      "status": 200,
+      "lang": "zh",
+      "canonical": "https://btc2g.com/zh/save.html",
+      "alternates": 20,
+      "heading": "比较实际到账的 BTC",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/zh/scenario.html",
+      "status": 200,
+      "lang": "zh",
+      "canonical": "https://btc2g.com/zh/scenario.html",
+      "alternates": 20,
+      "heading": "BTC / 黄金情景模拟器",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/zh/premium.html",
+      "status": 200,
+      "lang": "zh",
+      "canonical": "https://btc2g.com/zh/premium.html",
+      "alternates": 20,
+      "heading": "比特币与黄金模型背后的更多背景。",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/it/",
+      "status": 200,
+      "lang": "it",
+      "canonical": "https://btc2g.com/it/",
+      "alternates": 20,
+      "heading": "Rapporto Bitcoin / Oro",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/it/save.html",
+      "status": 200,
+      "lang": "it",
+      "canonical": "https://btc2g.com/it/save.html",
+      "alternates": 20,
+      "heading": "Confronta i BTC ricevuti",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/it/scenario.html",
+      "status": 200,
+      "lang": "it",
+      "canonical": "https://btc2g.com/it/scenario.html",
+      "alternates": 20,
+      "heading": "Simulatore di scenari BTC / oro",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/it/premium.html",
+      "status": 200,
+      "lang": "it",
+      "canonical": "https://btc2g.com/it/premium.html",
+      "alternates": 20,
+      "heading": "Più contesto dietro il modello BTC vs Gold.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/pt/",
+      "status": 200,
+      "lang": "pt",
+      "canonical": "https://btc2g.com/pt/",
+      "alternates": 20,
+      "heading": "Relação Bitcoin / Ouro",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/pt/save.html",
+      "status": 200,
+      "lang": "pt",
+      "canonical": "https://btc2g.com/pt/save.html",
+      "alternates": 20,
+      "heading": "Compare os BTC recebidos",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/pt/scenario.html",
+      "status": 200,
+      "lang": "pt",
+      "canonical": "https://btc2g.com/pt/scenario.html",
+      "alternates": 20,
+      "heading": "Simulador de cenários BTC / ouro",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/pt/premium.html",
+      "status": 200,
+      "lang": "pt",
+      "canonical": "https://btc2g.com/pt/premium.html",
+      "alternates": 20,
+      "heading": "Mais contexto por trás do modelo BTC vs Gold.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ar/",
+      "status": 200,
+      "lang": "ar",
+      "canonical": "https://btc2g.com/ar/",
+      "alternates": 20,
+      "heading": "نسبة بيتكوين إلى الذهب",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ar/save.html",
+      "status": 200,
+      "lang": "ar",
+      "canonical": "https://btc2g.com/ar/save.html",
+      "alternates": 20,
+      "heading": "قارن كمية BTC التي ستصلك",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ar/scenario.html",
+      "status": 200,
+      "lang": "ar",
+      "canonical": "https://btc2g.com/ar/scenario.html",
+      "alternates": 20,
+      "heading": "محاكي سيناريو BTC / الذهب",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ar/premium.html",
+      "status": 200,
+      "lang": "ar",
+      "canonical": "https://btc2g.com/ar/premium.html",
+      "alternates": 20,
+      "heading": "مزيد من السياق وراء نموذج BTC مقابل الذهب.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/hi/",
+      "status": 200,
+      "lang": "hi",
+      "canonical": "https://btc2g.com/hi/",
+      "alternates": 20,
+      "heading": "बिटकॉइन/सोना अनुपात",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/hi/save.html",
+      "status": 200,
+      "lang": "hi",
+      "canonical": "https://btc2g.com/hi/save.html",
+      "alternates": 20,
+      "heading": "मिलने वाले BTC की तुलना करें",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/hi/scenario.html",
+      "status": 200,
+      "lang": "hi",
+      "canonical": "https://btc2g.com/hi/scenario.html",
+      "alternates": 20,
+      "heading": "BTC / गोल्ड परिदृश्य सिम्युलेटर",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/hi/premium.html",
+      "status": 200,
+      "lang": "hi",
+      "canonical": "https://btc2g.com/hi/premium.html",
+      "alternates": 20,
+      "heading": "बीटीसी बनाम गोल्ड मॉडल के पीछे अधिक संदर्भ।",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ja/",
+      "status": 200,
+      "lang": "ja",
+      "canonical": "https://btc2g.com/ja/",
+      "alternates": 20,
+      "heading": "ビットコイン／金 比率",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ja/save.html",
+      "status": 200,
+      "lang": "ja",
+      "canonical": "https://btc2g.com/ja/save.html",
+      "alternates": 20,
+      "heading": "受け取るBTCを比較",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ja/scenario.html",
+      "status": 200,
+      "lang": "ja",
+      "canonical": "https://btc2g.com/ja/scenario.html",
+      "alternates": 20,
+      "heading": "BTC / ゴールド シナリオシミュレーター",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ja/premium.html",
+      "status": 200,
+      "lang": "ja",
+      "canonical": "https://btc2g.com/ja/premium.html",
+      "alternates": 20,
+      "heading": "BTC 対ゴールド モデルの背後にある詳細なコンテキスト。",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ko/",
+      "status": 200,
+      "lang": "ko",
+      "canonical": "https://btc2g.com/ko/",
+      "alternates": 20,
+      "heading": "비트코인/금 비율",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ko/save.html",
+      "status": 200,
+      "lang": "ko",
+      "canonical": "https://btc2g.com/ko/save.html",
+      "alternates": 20,
+      "heading": "받을 BTC를 비교하세요",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ko/scenario.html",
+      "status": 200,
+      "lang": "ko",
+      "canonical": "https://btc2g.com/ko/scenario.html",
+      "alternates": 20,
+      "heading": "BTC / 금 시나리오 시뮬레이터",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/ko/premium.html",
+      "status": 200,
+      "lang": "ko",
+      "canonical": "https://btc2g.com/ko/premium.html",
+      "alternates": 20,
+      "heading": "BTC 대 Gold 모델에 대한 더 많은 맥락.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/tr/",
+      "status": 200,
+      "lang": "tr",
+      "canonical": "https://btc2g.com/tr/",
+      "alternates": 20,
+      "heading": "Bitcoin / Altın Oranı",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/tr/save.html",
+      "status": 200,
+      "lang": "tr",
+      "canonical": "https://btc2g.com/tr/save.html",
+      "alternates": 20,
+      "heading": "Alacağınız BTC miktarını karşılaştırın",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/tr/scenario.html",
+      "status": 200,
+      "lang": "tr",
+      "canonical": "https://btc2g.com/tr/scenario.html",
+      "alternates": 20,
+      "heading": "BTC / Altın Senaryo Simülatörü",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/tr/premium.html",
+      "status": 200,
+      "lang": "tr",
+      "canonical": "https://btc2g.com/tr/premium.html",
+      "alternates": 20,
+      "heading": "BTC ve Altın modelinin arkasında daha fazla bağlam var.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/pl/",
+      "status": 200,
+      "lang": "pl",
+      "canonical": "https://btc2g.com/pl/",
+      "alternates": 20,
+      "heading": "Stosunek Bitcoin / Złoto",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/pl/save.html",
+      "status": 200,
+      "lang": "pl",
+      "canonical": "https://btc2g.com/pl/save.html",
+      "alternates": 20,
+      "heading": "Porównaj otrzymane BTC",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/pl/scenario.html",
+      "status": 200,
+      "lang": "pl",
+      "canonical": "https://btc2g.com/pl/scenario.html",
+      "alternates": 20,
+      "heading": "Symulator scenariuszy BTC / złoto",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/pl/premium.html",
+      "status": 200,
+      "lang": "pl",
+      "canonical": "https://btc2g.com/pl/premium.html",
+      "alternates": 20,
+      "heading": "Więcej kontekstu za modelem BTC vs Gold.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/nl/",
+      "status": 200,
+      "lang": "nl",
+      "canonical": "https://btc2g.com/nl/",
+      "alternates": 20,
+      "heading": "Bitcoin-goudverhouding",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/nl/save.html",
+      "status": 200,
+      "lang": "nl",
+      "canonical": "https://btc2g.com/nl/save.html",
+      "alternates": 20,
+      "heading": "Vergelijk hoeveel BTC u ontvangt",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/nl/scenario.html",
+      "status": 200,
+      "lang": "nl",
+      "canonical": "https://btc2g.com/nl/scenario.html",
+      "alternates": 20,
+      "heading": "BTC / goud-scenariosimulator",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/nl/premium.html",
+      "status": 200,
+      "lang": "nl",
+      "canonical": "https://btc2g.com/nl/premium.html",
+      "alternates": 20,
+      "heading": "Meer context achter het BTC versus Gold-model.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/uk/",
+      "status": 200,
+      "lang": "uk",
+      "canonical": "https://btc2g.com/uk/",
+      "alternates": 20,
+      "heading": "Співвідношення Біткоїна й золота",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/uk/save.html",
+      "status": 200,
+      "lang": "uk",
+      "canonical": "https://btc2g.com/uk/save.html",
+      "alternates": 20,
+      "heading": "Порівняйте, скільки BTC отримаєте",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/uk/scenario.html",
+      "status": 200,
+      "lang": "uk",
+      "canonical": "https://btc2g.com/uk/scenario.html",
+      "alternates": 20,
+      "heading": "Симулятор сценаріїв BTC / золото",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/uk/premium.html",
+      "status": 200,
+      "lang": "uk",
+      "canonical": "https://btc2g.com/uk/premium.html",
+      "alternates": 20,
+      "heading": "Більше контексту моделі BTC проти Gold.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/id/",
+      "status": 200,
+      "lang": "id",
+      "canonical": "https://btc2g.com/id/",
+      "alternates": 20,
+      "heading": "Rasio Bitcoin / Emas",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/id/save.html",
+      "status": 200,
+      "lang": "id",
+      "canonical": "https://btc2g.com/id/save.html",
+      "alternates": 20,
+      "heading": "Bandingkan BTC yang diterima",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/id/scenario.html",
+      "status": 200,
+      "lang": "id",
+      "canonical": "https://btc2g.com/id/scenario.html",
+      "alternates": 20,
+      "heading": "Simulator Skenario BTC / Emas",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/id/premium.html",
+      "status": 200,
+      "lang": "id",
+      "canonical": "https://btc2g.com/id/premium.html",
+      "alternates": 20,
+      "heading": "Lebih banyak konteks di balik model BTC vs Emas.",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/vi/",
+      "status": 200,
+      "lang": "vi",
+      "canonical": "https://btc2g.com/vi/",
+      "alternates": 20,
+      "heading": "Tỷ lệ Bitcoin / Vàng",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/vi/save.html",
+      "status": 200,
+      "lang": "vi",
+      "canonical": "https://btc2g.com/vi/save.html",
+      "alternates": 20,
+      "heading": "So sánh lượng BTC nhận được",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/vi/scenario.html",
+      "status": 200,
+      "lang": "vi",
+      "canonical": "https://btc2g.com/vi/scenario.html",
+      "alternates": 20,
+      "heading": "Mô phỏng kịch bản BTC / vàng",
+      "ok": true
+    },
+    {
+      "url": "https://btc2g.com/vi/premium.html",
+      "status": 200,
+      "lang": "vi",
+      "canonical": "https://btc2g.com/vi/premium.html",
+      "alternates": 20,
+      "heading": "Thêm bối cảnh đằng sau mô hình BTC và Vàng.",
+      "ok": true
+    }
+  ],
+  "regional_user_agent_probes": [
+    {
+      "agent": "YandexBot",
+      "status": 200
+    },
+    {
+      "agent": "Baiduspider",
+      "status": 200
+    },
+    {
+      "agent": "Yeti",
+      "status": 200
+    },
+    {
+      "agent": "Sogou web spider",
+      "status": 200
+    },
+    {
+      "agent": "360Spider",
+      "status": 200
+    },
+    {
+      "agent": "coccocbot-web",
+      "status": 200
+    }
+  ],
+  "limitations": "Raw HTTP and User-Agent checks only; no browser visual review, ownership verification or indexing claim."
+}

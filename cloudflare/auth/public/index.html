@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>BTC2G Account</title>
+  <link rel="icon" type="image/png" href="https://btc2g.com/icons/icon-192.png">
+  <meta name="description" content="Create or access a BTC2G account and view transparent registration progress.">
+  <link rel="stylesheet" href="/account.css">
+</head>
+<body>
+  <main class="shell">
+    <div class="account-topbar">
+      <a class="brand" id="account-home-link" href="https://btc2g.com/" aria-label="Back to BTC2G">₿<span>BTC2G</span></a>
+      <select id="account-language" aria-label="Language">
+        <option value="en">English</option><option value="ru">Русский</option><option value="he">עברית</option>
+        <option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option>
+        <option value="zh">中文</option><option value="it">Italiano</option><option value="pt">Português</option>
+        <option value="ar">العربية</option><option value="hi">हिन्दी</option><option value="ja">日本語</option>
+        <option value="ko">한국어</option><option value="tr">Türkçe</option><option value="pl">Polski</option>
+        <option value="nl">Nederlands</option><option value="uk">Українська</option><option value="id">Bahasa Indonesia</option>
+        <option value="vi">Tiếng Việt</option>
+      </select>
+    </div>
+    <section class="hero">
+      <p class="eyebrow">EARLY ACCESS</p>
+      <h1 id="account-title">Create your free BTC2G account</h1>
+      <p id="account-intro">Create an account with a verified email for future research features. No payment details are collected.</p>
+      <p class="account-trust" id="account-trust">Email verification does not subscribe you to marketing.</p>
+      <p class="account-benefit" id="account-benefit">After email verification, you can submit product ideas privately to BTC2G.</p>
+    </section>
+
+    <section class="card" id="account-card">
+      <ol class="registration-steps" aria-label="Registration steps">
+        <li><strong id="step-create-title">Create account</strong><span id="step-create-detail">Choose a username and secure password.</span></li>
+        <li><strong id="step-inbox-title">Check your inbox</strong><span id="step-inbox-detail">Open the verification link within 30 minutes.</span></li>
+        <li><strong id="step-verified-title">Email verified</strong><span id="step-verified-detail">Your registration is complete.</span></li>
+      </ol>
+      <div class="tabs" id="account-tabs" role="tablist" aria-label="Account action">
+        <button class="tab active" id="register-tab" type="button" data-mode="register" role="tab" aria-selected="true" aria-controls="account-form" tabindex="0">Create free account</button>
+        <button class="tab" id="login-tab" type="button" data-mode="login" role="tab" aria-selected="false" aria-controls="account-form" tabindex="-1">Sign in</button>
+      </div>
+      <form id="account-form" role="tabpanel" aria-labelledby="register-tab">
+        <label><span id="username-label">Username</span>
+          <input id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" enterkeyhint="next" minlength="3" maxlength="32" pattern="[A-Za-z][A-Za-z0-9_]{2,31}" aria-describedby="username-hint username-privacy" required>
+          <small class="field-hint" id="username-hint">3–32 characters. Start with a Latin letter; use Latin letters, numbers, or underscores.</small>
+          <small class="field-hint" id="username-privacy">Your username is used only for sign-in and is not displayed publicly.</small>
+        </label>
+        <label id="registration-email-row"><span id="registration-email-label">Email address</span>
+          <input id="registration-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" enterkeyhint="next" maxlength="254" aria-describedby="registration-email-hint" required>
+          <small class="field-hint" id="registration-email-hint">Required. Registration is complete only after you verify this address.</small>
+        </label>
+        <label><span id="password-label">Password</span>
+          <span class="password-control">
+            <input id="password" name="password" type="password" autocomplete="new-password" passwordrules="minlength: 12; maxlength: 128; required: upper; required: lower; required: digit;" enterkeyhint="go" minlength="12" maxlength="128" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{12,128}" aria-describedby="password-hint" required>
+            <button id="toggle-password" type="button" aria-controls="password" aria-pressed="false">Show</button>
+          </span>
+          <small class="field-hint" id="password-hint">Use 12–128 characters with an uppercase letter, a lowercase letter, and a number.</small>
+        </label>
+        <label class="terms" id="terms-row">
+          <input id="accepted-terms" name="acceptedTerms" type="checkbox" required>
+          <span><span id="terms-prefix">I accept the</span> <a id="terms-link" href="https://btc2g.com/terms.html" target="_blank" rel="noopener">Terms</a> <span id="terms-and">and</span> <a id="privacy-link" href="https://btc2g.com/privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+        </label>
+        <button class="primary" id="submit-button" type="submit">Create free account</button>
+        <p class="message" id="message" role="status" aria-live="polite" tabindex="-1"></p>
+        <p class="form-support"><a id="registration-support" href="https://btc2g.com/support.html">Registration trouble? Contact support.</a></p>
+      </form>
+      <div id="signed-in" hidden>
+        <p>Signed in as <strong id="signed-in-name"></strong>.</p>
+        <a class="admin-link" id="admin-link" href="/admin/" hidden>Open admin dashboard</a>
+        <section class="email-panel" aria-labelledby="email-title">
+          <h2 id="email-title">Account email</h2>
+          <p id="email-status">No verified email is attached.</p>
+          <form id="email-form">
+            <label><span id="account-email-label">Email address</span>
+              <input id="account-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" enterkeyhint="send" maxlength="254" aria-describedby="account-email-hint" required>
+            </label>
+            <button class="primary" id="email-submit" type="submit">Send verification email</button>
+            <p class="message" id="email-message" role="status" aria-live="polite" tabindex="-1"></p>
+          </form>
+          <p class="field-hint" id="account-email-hint">Verification identifies your account email only. It does not subscribe you to marketing or activate Premium.</p>
+          <p class="newsletter-cta">Want model signal emails? <a href="https://btc2g.com/#subscribe">Join the separate confirmed newsletter and choose the Sunday digest.</a></p>
+          <p class="telegram-cta"><a href="https://t.me/BTC2GNews" target="_blank" rel="noopener">Telegram: @BTC2GNews</a></p>
+        </section>
+        <section class="idea-panel" id="idea-panel" aria-labelledby="idea-title">
+          <p class="eyebrow">PRIVATE FEEDBACK</p>
+          <h2 id="idea-title">Submit an idea for BTC2G</h2>
+          <p>Your submission is visible only to you and BTC2G administrators. It is not published, entered into a contest, or opened for voting.</p>
+          <p class="idea-access" id="idea-access" role="status"></p>
+          <form id="idea-form">
+            <label>Short title
+              <input id="idea-title-input" name="title" type="text" minlength="5" maxlength="100" required>
+            </label>
+            <label>Who would use it?
+              <input name="audience" type="text" minlength="3" maxlength="300" required>
+            </label>
+            <label>What problem does it solve?
+              <textarea name="problem" minlength="10" maxlength="800" rows="4" required></textarea>
+            </label>
+            <label>How should it work?
+              <textarea name="solution" minlength="10" maxlength="1200" rows="6" required></textarea>
+            </label>
+            <label class="terms">
+              <input name="reviewConsent" type="checkbox" required>
+              <span>I own or am authorized to share this text and permit BTC2G to review it privately under the Terms.</span>
+            </label>
+            <button class="primary" id="idea-submit" type="submit">Submit privately</button>
+            <p class="message" id="idea-message" role="status" aria-live="polite"></p>
+          </form>
+          <div class="idea-history">
+            <h3>Your submissions</h3>
+            <p class="field-hint">Users may submit up to three ideas; administrators have no submission limit. Only your own submissions appear here. Administrators can review all users’ ideas in the admin dashboard.</p>
+            <ul id="idea-list"></ul>
+          </div>
+        </section>
+        <p><a href="https://btc2g.com/save.html">Compare Bitcoin quotes</a> · <a href="https://btc2g.com/#calculator">Open BTC ↔ gold calculator</a> · <a href="https://t.me/BTC2GNews" target="_blank" rel="noopener">Telegram</a> · <a href="https://btc2g.com/support.html">Contact support</a></p>
+        <button class="secondary" id="logout-button" type="button">Sign out</button>
+      </div>
+    </section>
+
+    <section class="stats" aria-labelledby="stats-title">
+      <div><span id="today-count" data-count>—</span><small id="stats-title">new accounts today</small></div>
+      <div><span id="total-count" data-count>—</span><small id="total-label">total active accounts</small></div>
+      <div id="subscribers-card" hidden><span id="subscribers-count" data-count>—</span><small id="subscribers-label">confirmed email subscribers</small></div>
+      <div><span id="visitors-count" data-count>—</span><small id="visitors-label">estimated visitors today</small></div>
+      <div><span id="views-count" data-count>—</span><small id="views-label">recorded page views today</small></div>
+      <p id="stats-note">Loading live D1 totals…</p>
+    </section>
+    <p><button class="secondary" id="refresh-stats" type="button">Refresh statistics</button></p>
+
+    <p class="disclaimer" id="account-disclaimer">BTC2G provides informational research, not financial advice. Account totals include email-verified registrations, not verified investors or customers.</p>
+  </main>
+  <script type="module" src="/account.js"></script>
+</body>
+</html>
+

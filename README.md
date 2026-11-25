@@ -1,6 +1,31 @@
 # BTC2G
 
-BTC2G is a static GitHub Pages website with a Vercel Serverless Function for creating Topper bootstrap tokens.
+BTC2G is a free, multilingual research dashboard for comparing Bitcoin with gold using published daily reference data.
+
+- Live site: [btc2g.com](https://btc2g.com/?utm_source=directory)
+- Purchasing-power comparison: [open the chart](https://btc2g.com/?utm_source=directory&chart=purchasingPower#forecast)
+- What-if simulator: [scenario.html](https://btc2g.com/scenario.html?utm_source=directory)
+- Free account: [create an email-verified account](https://btc2g-accounts.btc2g.workers.dev/) to submit ideas privately
+- Methodology and limitations: [about.html](https://btc2g.com/about.html?utm_source=directory)
+
+The public interface supports 19 languages, including RTL layouts. It provides the historical BTC/gold ratio, a purchasing-power index, a reference calculator, arithmetic scenarios, and disclosed market dates. Purchasing-power lines are indexed to 100 on the first published date and compare changes in USD value; they are not adjusted for consumer-price inflation.
+
+BTC2G is educational software, not financial advice, a trading venue, or a promise of returns. Market data can be delayed or corrected. External providers have their own terms and availability; BTC2G does not custody assets or process payments.
+
+## Development
+
+```powershell
+npm install
+$testFiles = (Get-ChildItem tests -Filter '*.test.cjs').FullName
+node --test $testFiles
+npm run test:languages
+```
+
+The static site is published through GitHub Pages. Account and audience services are separate Cloudflare-backed applications; do not copy production credentials into local development or frontend files.
+
+## Historical implementation notes
+
+The sections below document earlier integration and deployment work. They are retained for engineering context and must not be read as confirmation that an experimental payment, email, or Premium flow is active in production.
 
 ## Topper serverless token endpoint
 
@@ -79,7 +104,7 @@ cd C:\Users\vitly\PycharmProjects\BTC2G\btc2g.github.io
 npm install
 ```
 
-This repository currently has no `test` or `build` scripts in `package.json`, so `npm test` and `npm run build` are not available unless scripts are added later.
+Run the public-site regression files with `node --test` as shown above; server-rendered language checks are available through `npm run test:languages`. The complete account-service suite additionally requires a Node release that provides `node:sqlite`.
 
 Run the offline regression checks from the repository root after installing the Python requirements:
 
@@ -457,3 +482,11 @@ Check these items:
 - Confirm Topper's expected bootstrap token payload with real sandbox credentials.
 - Update the CORS allowlist in `api/topper/token.ts` if the public frontend domain changes.
 - Keep `TOPPER_PRIVATE_JWK` only in Vercel environment variables and never commit it.
+
+## Mobile home-screen shortcut
+
+The public site provides an **Add to home screen** footer button in all 19 supported UI languages. It opens a native browser installation prompt when available, otherwise shows browser-menu instructions; iPhone/iPad instructions use Safari → Share → Add to Home Screen. Already installed standalone windows hide the button. No installation starts automatically, and no offline cache or service worker is added.
+
+`manifest.json` identifies BTC2G at the public origin with scope `/` and start URL `/?source=shortcut`. `home-screen/` contains the shared install UI, Apple 180px icon, Android 192/512px icons and a separately padded maskable icon, all derived from BTC2G's existing logo. Public HTML uses root-relative asset paths so language pages share the same app identity. `sw.js` is a root-scoped network-only service worker: it enables application-style installation on Android versions that still require a fetch-capable worker, but deliberately stores no responses, account data or market data.
+
+Validation: `node --test tests/site-install.test.cjs scripts/language-pages-test.mjs`. Check the actual launcher icon on a real Android/iOS device before claiming OS installation. The reusable cross-site procedure is saved in `SitePlatform/docs/home-screen-shortcuts.md` and its versioned VitdArt platform backup.

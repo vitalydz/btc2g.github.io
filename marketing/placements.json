@@ -1,0 +1,78 @@
+{
+  "site":"https://btc2g.com",
+  "checked":"2026-11-22",
+  "growth_target":{
+    "confirmed_production_accounts":100,
+    "counting_rule":"Only email-verified ordinary account rows reported by the production Cloudflare D1 statistics endpoint. Exclude administrators, tests, page views, clicks, unverified registrations and newsletter-only subscribers.",
+    "digest_rule":"Do not enable or production-test the mailing on real addresses before the confirmed production account total reaches 100. Request final owner confirmation immediately before that production check."
+  },
+  "latest_metrics":{
+    "day":"2026-11-22",
+    "time_zone":"Asia/Jerusalem",
+    "measured_at":"2026-11-22T17:50:05.987Z",
+    "source":"https://btc2g-accounts.btc2g.workers.dev/api/stats (Cloudflare D1)",
+    "confirmed_accounts_total":1,
+    "confirmed_accounts_today":0,
+    "remaining_to_100":99,
+    "estimated_visitors_today_not_counted_as_users":4,
+    "page_views_today_not_counted_as_users":5,
+    "confirmed_newsletter_subscribers_not_counted_as_accounts":1
+  },
+  "published":[{
+    "platform":"Reddit",
+    "community":"https://www.reddit.com/r/SideProject/",
+    "account":"u/vitdart",
+    "draft_id":"btc2g-reddit-en",
+    "language":"en",
+    "status":"published",
+    "published_url":"https://www.reddit.com/r/SideProject/comments/1xmix05/i_built_a_free_bitcoin_vs_gold_dashboard_with_a/",
+    "published_at":"2026-11-03",
+    "title":"I built a free Bitcoin vs gold dashboard with a what-if simulator",
+    "rules_checked":"2026-11-03: community description explicitly invites sharing projects and constructive feedback; no additional community rules displayed on rules page or composer. Search showed no existing BTC2G placement. Creator affiliation disclosed; one useful demo, no subscription or return promises.",
+    "evidence_path":"C:/Users/vitly/OneDrive/Documents/Playground/btc2g-reddit-sideproject-published.png",
+    "verification":"Reddit displayed Posted; permalink opened with full post by u/vitdart and no moderation/removal warning. This does not establish audience reach or conversions.",
+    "followup_2026_11_03":{"displayed_views":79,"displayed_score":2,"comment_counter":1,"comment_text":"Not displayed in the accessible comment region; no content or sentiment inferred.","interpretation":"Early post visibility, not site visits or attributed subscriptions. Owner test excluded."}
+  },{
+    "platform":"Telegram",
+    "community":"https://t.me/BTC2GNews",
+    "account":"@BTC2GNews",
+    "draft_id":"btc2g-telegram-tools-ru",
+    "language":"ru",
+    "status":"published",
+    "published_url":"https://t.me/BTC2GNews/8",
+    "published_at":"2026-11-03T19:11:33Z",
+    "title":"Что умеет BTC2G",
+    "rules_checked":"2026-11-03: owner identified @BTC2GNews as the destination and chose manual publication.",
+    "verification":"The public Telegram channel preview displayed post 8 with the prepared tools overview and both allowlisted utm_source=telegram links. This confirms publication, not traffic or registrations."
+  },{
+    "platform":"Product Hunt",
+    "community":"https://www.producthunt.com/",
+    "account":"@vitalyd",
+    "draft_id":"btc2g-producthunt-en",
+    "language":"en",
+    "status":"published",
+    "published_url":"https://www.producthunt.com/products/btc2g",
+    "published_at":"2026-11-03T00:01:00-08:00",
+    "title":"BTC2G: Bitcoin vs Gold Forecast",
+    "verification":"Authenticated Product Hunt showed launchState=live for post 1297456 and the public product page displayed BTC2G, the btc2g.com website link, maker Vitaly, one public maker comment, 1 point and 2 followers. The launch dashboard displayed position #554. Reverified on 2026-11-11 in a signed-out public session: the direct product URL remained live with the same point and follower counts, while Product Hunt product and launch searches returned no BTC2G result. These are Product Hunt display metrics, not verified site visits, registrations or conversions. No listing fields or public interactions were changed during verification."
+  },{
+    "platform":"LinkedIn",
+    "community":"https://www.linkedin.com/",
+    "account":"https://www.linkedin.com/in/vitaly-dz/",
+    "draft_id":"btc2g-linkedin-en",
+    "language":"en",
+    "status":"published",
+    "published_url":"https://www.linkedin.com/feed/update/urn:li:activity:7521631013110767617/",
+    "published_at":"2026-10-29T17:56:18.672Z",
+    "title":"My Personal Project: BTC2G — Bitcoin vs Gold",
+    "verification":"Verified on 2026-11-22 in the authenticated owner session: the permalink displayed a BTC2G post by Vitaly Dziubov linking to https://btc2g.com and showed 134 impressions. The publication timestamp is decoded from LinkedIn activity ID 7521631013110767617. Impressions are a LinkedIn display metric, not verified site visits, registrations or conversions."
+  }],
+  "scope":"Verified published placements: one Reddit product-feedback post, one Telegram tools overview, the live Product Hunt listing and one LinkedIn project post. Other platforms remain drafts.",
+  "candidates":[
+    {"platform":"Reddit r/sideprojects","status":"blocked","draft_id":"next-placement-2026-11-03.json","rules_checked":"2026-11-04","rules_url":"https://www.reddit.com/r/sideprojects/about/rules/","blocker":"Not submitted. Official rules were rechecked, but Reddit's Prove your humanity CAPTCHA blocked the composer before exact flair and authenticated duplicate history could be verified. Owner action and action-time confirmation are required before submission."},
+    {"platform":"Reddit","status":"published","draft_id":"btc2g-reddit-en","blocker":null},
+    {"platform":"Facebook","status":"draft_ready","draft_id":"btc2g-facebook-he","blocker":"Owner page/account and group-specific rules not verified."},
+    {"platform":"Product Hunt","status":"published","draft_id":"btc2g-producthunt-en","blocker":null,"verification":"Verified live on 2026-11-06 in the authenticated owner session and on the public product URL; see the published entry."},
+    {"platform":"LinkedIn","status":"published","draft_id":"btc2g-linkedin-en","blocker":null,"verification":"Verified live on 2026-11-22 in the authenticated owner session; see the published entry."}
+  ]
+}

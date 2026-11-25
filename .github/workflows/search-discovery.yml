@@ -1,0 +1,41 @@
+name: Notify search engines after publication
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.html'
+      - 'sitemap.xml'
+      - 'assets/**'
+      - 'indexnow-key.txt'
+      - 'scripts/submit_indexnow.py'
+      - '.github/workflows/search-discovery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: search-discovery
+  cancel-in-progress: false
+
+jobs:
+  indexnow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Notify participating search engines
+        env:
+          INITIAL_DISCOVERY: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [ "$INITIAL_DISCOVERY" = "true" ]; then
+            python scripts/submit_indexnow.py --all
+          else
+            python scripts/submit_indexnow.py --wait-for-publication
+          fi

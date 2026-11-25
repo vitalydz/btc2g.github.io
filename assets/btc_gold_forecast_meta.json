@@ -1,11 +1,14 @@
 {
-  "last_updated_utc": "2026-10-28T09:38:58.031864+00:00",
+  "last_updated_utc": "2026-11-25T12:51:21.200870+00:00",
   "status": "ok",
+  "market_date": "2026-11-24",
+  "price_basis": "Latest completed daily close shared by BTC and gold; no forward-filled quotes",
   "source": "yfinance",
   "tickers": {
     "Gold": "GC=F",
     "Bitcoin": "BTC-USD"
   },
   "chart": "assets/btc_gold_forecast.png",
-  "signal": "assets/btc_signal.json"
+  "signal": "assets/btc_signal.json",
+  "history": "assets/btc_gold_history.json"
 }
