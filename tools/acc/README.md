@@ -73,3 +73,10 @@ Windows 11 tests and compilation pass. Live Codex UI labels/delivery and Windows
 - Recover from non-object settings JSON and malformed agent-list containers.
 
 Local Windows 11 regression checks passed. Windows 10 (VITALY remote PC) and actual Desktop prompt delivery remain unverified.
+
+## Vita / Codex inbox (2026-11-25)
+
+ACC now polls a configured GitHub Issue every five seconds independently of Codex.
+Task messages queue and resume a dedicated CLI session; status and cancel require no model call.
+Use the **Vita / Codex** button. See [VITA_INBOX.md](VITA_INBOX.md) for the live test channel,
+message format, target configuration, stop command, and limitations.

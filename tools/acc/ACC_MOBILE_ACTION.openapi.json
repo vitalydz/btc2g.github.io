@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "ACC GitHub Publishing Bridge",
-    "version": "1.0.0"
+    "title": "ACC GitHub publishing and Codex inbox",
+    "version": "1.1.0"
   },
   "servers": [
     {
@@ -174,6 +174,55 @@
                     "properties": {},
                     "additionalProperties": true
                   }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "sendAccInboxMessage",
+        "summary": "Send a task, status request or cancellation to ACC",
+        "description": "Append one new owner-authorized message to the configured inbox issue (test: 12). Body starts with <!-- acc-inbox:v1 --> and one fenced JSON block: runner, action (task/status/cancel), target alias, and prompt for task only. Test runner win11, target acc-test. Do not resend on timeout: read comments first. Never include secrets. COMPLETED receipt, not comment creation, confirms completion.",
+        "x-openai-isConsequential": true,
+        "parameters": [
+          {
+            "name": "issue_number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "body"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message stored; read ACC receipts for execution status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
                 }
               }
             }

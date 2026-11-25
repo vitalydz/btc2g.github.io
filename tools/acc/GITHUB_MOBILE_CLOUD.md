@@ -128,3 +128,10 @@ python acc_github_bridge.py --repo vitalydz/btc2g.github.io --owner vitalydz --r
 - [GitHub: Issues API](https://docs.github.com/en/rest/issues/issues#create-an-issue)
 - [GitHub: Pages builds](https://docs.github.com/en/rest/pages/pages#request-a-github-pages-build)
 - [GitHub: workflow dispatch](https://docs.github.com/en/rest/actions/workflows#create-a-workflow-dispatch-event)
+
+## Vita / Codex inbox (2026-11-25)
+
+ACC now polls a configured GitHub Issue every five seconds independently of Codex.
+Task messages queue and resume a dedicated CLI session; status and cancel require no model call.
+Use the **Vita / Codex** button. See [VITA_INBOX.md](VITA_INBOX.md) for the live test channel,
+message format, target configuration, stop command, and limitations.

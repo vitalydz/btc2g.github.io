@@ -73,6 +73,7 @@ class ACCApp(DesktopTargetMixin):
         self.stop_event = threading.Event()
         self.worker = None
         self.github_panel = None
+        self.inbox_panel = None
         self.current_process = None
         self.latest_codex_output = ""
         self.last_handoff_text = ""
@@ -290,6 +291,7 @@ class ACCApp(DesktopTargetMixin):
             side="left", padx=(16, 0)
         )
         ttk.Button(controls, text="GitHub / Mobile", command=self.open_github_panel).pack(side="left", padx=6)
+        ttk.Button(controls, text="Vita / Codex", command=self.open_inbox_panel).pack(side="left", padx=6)
         self.status_var = tk.StringVar(value="Stopped")
         ttk.Label(controls, textvariable=self.status_var).pack(side="right")
         self.codex_status_var = tk.StringVar(value="Codex status: Idle")
@@ -569,6 +571,9 @@ class ACCApp(DesktopTargetMixin):
 
 
     def start(self):
+        if self.inbox_panel and self.inbox_panel.thread and self.inbox_panel.thread.is_alive():
+            messagebox.showerror("ACC", "Stop the Vita inbox before starting the local schedule.")
+            return
         if self.github_panel and self.github_panel.thread and self.github_panel.thread.is_alive():
             messagebox.showerror("ACC", "Stop the GitHub publishing bridge before starting the local Codex schedule.")
             return
@@ -1216,6 +1221,8 @@ class ACCApp(DesktopTargetMixin):
         self.save_settings()
         if self.github_panel and not self.github_panel.closed:
             self.github_panel.close()
+        if self.inbox_panel and not self.inbox_panel.closed:
+            self.inbox_panel.close()
         self.root.destroy()
 
     def open_github_panel(self):
@@ -1227,6 +1234,16 @@ class ACCApp(DesktopTargetMixin):
             messagebox.showinfo("ACC", "The previous bridge is stopping. Wait for its current request to finish.")
             return
         self.github_panel = GitHubPanel(self, CONFIG_FILE.with_suffix(".bridge.json"))
+
+    def open_inbox_panel(self):
+        from acc_inbox_panel import InboxPanel
+        if self.inbox_panel and not self.inbox_panel.closed:
+            self.inbox_panel.window.lift()
+            return
+        if self.inbox_panel and self.inbox_panel.thread and self.inbox_panel.thread.is_alive():
+            messagebox.showinfo("ACC", "The previous inbox is still stopping.")
+            return
+        self.inbox_panel = InboxPanel(self, CONFIG_FILE.with_suffix(".inbox.json"))
 
 
 def main():

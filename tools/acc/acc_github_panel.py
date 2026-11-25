@@ -71,6 +71,10 @@ class GitHubPanel:
         self.pump()
 
     def start(self):
+        inbox = getattr(self.app, "inbox_panel", None)
+        if inbox and inbox.thread and inbox.thread.is_alive():
+            messagebox.showerror("ACC", "Stop the Vita inbox before starting publishing.", parent=self.window)
+            return
         if self.thread and self.thread.is_alive():
             return
         if self.app.worker and self.app.worker.is_alive():

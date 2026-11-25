@@ -29,6 +29,12 @@ class PublicationFailed(BridgeError):
     pass
 
 
+class RateLimited(BridgeError):
+    def __init__(self, seconds):
+        self.seconds = max(5, min(3600, seconds))
+        super().__init__(f"GitHub rate limit; retry in {self.seconds} seconds.")
+
+
 def github_token():
     for name in ("ACC_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"):
         if os.environ.get(name):
@@ -38,6 +44,15 @@ def github_token():
                                 capture_output=True, text=True, timeout=10)
         if result.returncode == 0 and result.stdout.strip():
             return result.stdout.strip()
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    try:
+        result = subprocess.run(["git", "credential", "fill"],
+            input="protocol=https\nhost=github.com\n\n", capture_output=True, text=True, timeout=15,
+            env=dict(os.environ, GIT_TERMINAL_PROMPT="0", GCM_INTERACTIVE="never"))
+        fields = dict(line.split("=", 1) for line in result.stdout.splitlines() if "=" in line)
+        if result.returncode == 0 and fields.get("password"):
+            return fields["password"]
     except (OSError, subprocess.TimeoutExpired):
         pass
     raise BridgeError("Configure ACC_GITHUB_TOKEN, GH_TOKEN or gh auth login; never put a token in an issue.")
@@ -55,8 +70,9 @@ class GitHubClient:
         self.repo = repo
         self._token = token
         self.opener = build_opener(NoRedirect())
+        self.cache = {}
 
-    def request(self, method, path, data=None):
+    def request(self, method, path, data=None, cached=False):
         if not path.startswith("/") or path.startswith("//") or ".." in path:
             raise BridgeError("Invalid GitHub API path.")
         request = Request("https://api.github.com" + path, method=method,
@@ -66,11 +82,24 @@ class GitHubClient:
                                    "Content-Type": "application/json",
                                    "User-Agent": "ACC-GitHub-Bridge",
                                    "X-GitHub-Api-Version": "2022-11-28"})
+        if cached and path in self.cache:
+            request.add_header("If-None-Match", self.cache[path][0])
         try:
             with self.opener.open(request, timeout=20) as response:
                 raw = response.read()
-                return json.loads(raw) if raw else {}
+                value = json.loads(raw) if raw else {}
+                if cached and response.headers.get("ETag"):
+                    self.cache[path] = (response.headers["ETag"], value)
+                return value
         except HTTPError as exc:
+            if exc.code == 304 and cached and path in self.cache:
+                return self.cache[path][1]
+            if exc.code == 429 or (exc.code == 403 and (exc.headers.get("X-RateLimit-Remaining") == "0" or exc.headers.get("Retry-After"))):
+                try:
+                    delay = int(exc.headers.get("Retry-After") or max(5, int(exc.headers.get("X-RateLimit-Reset", "0")) - time.time()))
+                except ValueError:
+                    delay = 60
+                raise RateLimited(delay) from None
             # Never include response bodies or credential-bearing request objects in logs.
             raise BridgeError(f"GitHub HTTP {exc.code}; check permissions, branch rules and request parameters.") from None
         except (URLError, TimeoutError, OSError):
@@ -93,6 +122,15 @@ class GitHubClient:
 
     def comment(self, number, body):
         return self.api("POST", f"/issues/{int(number)}/comments", {"body": body})
+
+    def inbox_comments(self, number):
+        page = 1
+        while True:
+            items = self.request("GET", f"/repos/{self.repo}/issues/{int(number)}/comments?per_page=100&page={page}", cached=True)
+            yield from items
+            if len(items) < 100:
+                break
+            page += 1
 
 
 def parse_job(issue, owner, runner):
