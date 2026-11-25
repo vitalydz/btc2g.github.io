@@ -17,7 +17,7 @@ import threading
 import time
 import uuid
 
-from acc_github_bridge import BridgeError, GitHubClient, RateLimited, StateStore, github_token
+from acc_github_bridge import BridgeError, GitHubClient, PrivateGitHubClient, RateLimited, StateStore, github_token
 
 MARKER = "<!-- acc-inbox:v1 -->"
 TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "UNKNOWN", "REJECTED", "WAITING_USER", "ANSWERED"}
@@ -44,11 +44,12 @@ def parse_message(comment, owner, runner):
         return None
     action = job.get("action")
     allowed = {"task": {"runner", "action", "target", "prompt"},
+               "stats": {"runner", "action", "target"},
                "reply": {"runner", "action", "target", "prompt", "reply_to"},
                "status": {"runner", "action", "target"},
                "cancel": {"runner", "action", "target"}}
     if action not in allowed or set(job) - allowed[action]:
-        raise BridgeError("Only task, status and cancel are accepted; no shell/path/session overrides.")
+        raise BridgeError("Only task, reply, stats, status and cancel are accepted; no shell/path/session overrides.")
     if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", str(job.get("target", ""))):
         raise BridgeError("A configured target alias is required.")
     if action in {"task", "reply"} and (not isinstance(job.get("prompt"), str) or not 1 <= len(job["prompt"].strip()) <= 20000):
@@ -321,6 +322,9 @@ class Inbox:
             if job["target"] not in self.targets:
                 self.record(key, "REJECTED", "Unknown local target alias; configure it in ACC first.")
                 continue
+            if job["action"] == "stats" and not getattr(self.client, "requires_private", False):
+                self.record(key, "REJECTED", "Statistics are available only through the verified private receiver.")
+                continue
             # Never replay an execution after local journal loss.
             prefix = f"<!-- acc-receipt:{self.runner}:{key}:"
             remote = [c.get("body", "") for c in comments if c.get("user", {}).get("login", "").casefold() == self.owner.casefold()
@@ -348,7 +352,7 @@ class Inbox:
 
     def status(self, target):
         rows = [(key, r) for key, r in self.messages.items()
-                if r["job"]["target"] == target and r["job"]["action"] in {"task", "reply"}]
+                if r["job"]["target"] == target and r["job"]["action"] in {"task", "reply", "stats"}]
         running = [key for key, r in rows if r["state"] == "RUNNING"]
         waiting = [key for key, r in rows if r["state"] in {"QUEUED", "RECEIVED"}]
         recent = next(((key, r) for key, r in reversed(rows) if r["state"] in TERMINAL), None)
@@ -437,13 +441,19 @@ class Inbox:
             self.cancel = threading.Event()
             session = self.sessions.get(target_name) or target.get("session_id")
 
-            def work(key=key, target=dict(target), session=session, prompt=row["job"]["prompt"]):
+            def work(key=key, target=dict(target), session=session, prompt=row["job"].get("prompt", ""), action=row["job"]["action"]):
                 try:
-                    result = self.executor.execute(target, session, prompt, self.cancel,
-                        lambda kind, value: self.events.put((key, kind, value)))
+                    if action == "stats":
+                        self.client.verify_private()
+                        from acc_site_stats import statistics_report
+                        result = statistics_report(self.cancel)
+                    else:
+                        result = self.executor.execute(target, session, prompt, self.cancel,
+                            lambda kind, value: self.events.put((key, kind, value)))
                 except Exception:
-                    result = {"state": "UNKNOWN", "session_id": session,
-                              "result": "Codex launch/execution interrupted. Inspect local state before continuing this target."}
+                    result = ({"state": "FAILED", "result": "Read-only statistics unavailable; inspect local Cloudflare authentication and private channel status."}
+                              if action == "stats" else {"state": "UNKNOWN", "session_id": session,
+                              "result": "Codex launch/execution interrupted. Inspect local state before continuing this target."})
                 self.events.put((key, "done", result))
 
             self.thread = threading.Thread(target=work, daemon=True)
@@ -452,6 +462,8 @@ class Inbox:
 
     def tick(self):
         self.drain()
+        if getattr(self.client, "requires_private", False):
+            self.client.verify_private()
         issue = self.client.request("GET", f"/repos/{self.client.repo}/issues/{self.issue}", cached=True)
         if issue.get("state") != "open":
             self.closed = True
@@ -525,6 +537,7 @@ def main(argv=None):
     parser.add_argument("--stop", action="store_true", help="Request a graceful stop of this local CLI receiver")
     parser.add_argument("--interval", type=int, default=5)
     parser.add_argument("--allow-tasks", action="store_true")
+    parser.add_argument("--require-private", action="store_true")
     parser.add_argument("--once", action="store_true", help="Receive/status only; never launch a task")
     args = parser.parse_args(argv)
     if not 5 <= args.interval <= 3600 or not re.fullmatch(r"[A-Za-z0-9_-]{1,50}", args.runner):
@@ -537,7 +550,9 @@ def main(argv=None):
         return
     if not args.targets:
         parser.error("--targets is required unless --stop is used")
-    client = GitHubClient(args.repo, github_token())
+    client = (PrivateGitHubClient if args.require_private else GitHubClient)(args.repo, github_token())
+    if args.require_private:
+        client.verify_private()
     if client.request("GET", "/user")["login"].casefold() != args.owner.casefold():
         raise BridgeError("GitHub authentication must match the trusted author.")
     targets = load_targets(args.targets)

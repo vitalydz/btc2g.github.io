@@ -1,0 +1,179 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ACC private sites inbox",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.github.com"
+    }
+  ],
+  "paths": {
+    "/repos/vitalydz/acc-private/issues/{issue_number}": {
+      "get": {
+        "operationId": "privateGetAccJob",
+        "summary": "Read job before reporting or requesting approval",
+        "parameters": [
+          {
+            "name": "issue_number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Issue",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/repos/vitalydz/acc-private/issues/{issue_number}/comments": {
+      "get": {
+        "operationId": "privateGetAccJobStatus",
+        "summary": "Read runner receipts; DISPATCHED is not deployed",
+        "parameters": [
+          {
+            "name": "issue_number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status comments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {},
+                    "additionalProperties": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "privateSendAccInboxMessage",
+        "summary": "Send a task, status request or cancellation to ACC",
+        "description": "Private inbox only. Runner win11-private, target sites. To obtain aggregate registration counts send body starting <!-- acc-inbox:v1 --> and one fenced JSON object with runner/action=stats/target; no prompt or SQL. Other actions task/reply/status/cancel follow VITA_RELAY_INSTRUCTIONS.md. Never send credentials or individual records. Check repository private=true before reading or posting private results. A 404 means access is missing, not that the report is empty.",
+        "x-openai-isConsequential": true,
+        "parameters": [
+          {
+            "name": "issue_number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "body"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message stored; read ACC receipts for execution status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/repos/vitalydz/acc-private": {
+      "get": {
+        "operationId": "checkPrivateAccRepository",
+        "summary": "Verify private=true before private inbox use",
+        "responses": {
+          "200": {
+            "description": "Repository visibility",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "private": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "githubToken": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "githubToken": []
+    }
+  ]
+}

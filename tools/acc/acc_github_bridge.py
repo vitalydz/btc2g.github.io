@@ -221,6 +221,19 @@ class StateStore:
         self.lock.close()
 
 
+class PrivateGitHubClient(GitHubClient):
+    requires_private = True
+
+    def verify_private(self):
+        metadata = self.request("GET", f"/repos/{self.repo}")
+        if metadata.get("private") is not True:
+            raise BridgeError("Private receiver stopped: repository is not confirmed private.")
+
+    def comment(self, number, body):
+        self.verify_private()
+        return super().comment(number, body)
+
+
 class Publisher:
     def __init__(self, client, project, stop, workflows=()):
         self.client, self.project, self.stop = client, Path(project).resolve(), stop
