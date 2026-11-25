@@ -128,3 +128,10 @@ Win10/VITALY PC в этой проверке не участвовал.
 Постоянная инструкция посредника: [VITA_RELAY_INSTRUCTIONS.md](VITA_RELAY_INSTRUCTIONS.md).
 Codex может вернуть WAITING_USER. Очередь цели ждёт сообщения action=reply
 с prompt и reply_to (Message ID вопроса). Ответ продолжает ту же сессию.
+
+## Рабочая привязка MPA_04
+
+Текущая рабочая цель для Vita — `mpa`: C:\Users\vitly\PycharmProjects\MPA_04.
+Отдельная сессия CLI создаётся при первом задании и сохраняется в журнале ACC.
+Для рабочего диалога используйте target=mpa; acc-test остаётся тестовой целью.
+Источник актуальной инструкции: VITA_RELAY_INSTRUCTIONS.md.

@@ -17,11 +17,12 @@
 
 - GitHub Issue: https://github.com/vitalydz/btc2g.github.io/issues/2
 - Runner: `win11`.
-- Текущая цель: `acc-test`, отдельная тестовая сессия, read-only.
+- Текущая цель: `mpa`, рабочий проект MPA_04, отдельная постоянная сессия Codex CLI.
+- Локальный путь: `C:\Users\vitly\PycharmProjects\MPA_04`; sandbox: workspace-write.
 - Автор команд: `vitalydz`; используй имеющийся разрешённый доступ к GitHub.
 - Не меняй target между репликами. UUID и путь задаются локально в ACC.
 - Если выбран другой рабочий проект, сначала требуется его локальная привязка
-  в ACC. Не представляй тестовую цель как рабочий проект MPA или другой проект.
+  в ACC. Дополнительная цель acc-test остаётся только для изолированных тестов.
 
 ## Отправка
 
@@ -30,7 +31,7 @@
 ````text
 <!-- acc-inbox:v1 -->
 ```json
-{"runner":"win11","action":"task","target":"acc-test","prompt":"Точная реплика пользователя"}
+{"runner":"win11","action":"task","target":"mpa","prompt":"Точная реплика пользователя"}
 ```
 ````
 
@@ -51,7 +52,7 @@ RUNNING — выполнение; ни одно не означает завер
 ````text
 <!-- acc-inbox:v1 -->
 ```json
-{"runner":"win11","action":"reply","target":"acc-test","reply_to":"ID_ИЗ_MESSAGE","prompt":"Точный ответ пользователя"}
+{"runner":"win11","action":"reply","target":"mpa","reply_to":"ID_ИЗ_MESSAGE","prompt":"Точный ответ пользователя"}
 ```
 ````
 
@@ -67,7 +68,7 @@ ACC продолжает ту же сессию Codex. Пока вопрос н�
 ````text
 <!-- acc-inbox:v1 -->
 ```json
-{"runner":"win11","action":"status","target":"acc-test"}
+{"runner":"win11","action":"status","target":"mpa"}
 ```
 ````
 
